@@ -1,0 +1,81 @@
+project:
+  type: book
+  output-dir: _book
+
+book:
+  title: "Machine Learning for Energy Disaggregation"
+  subtitle: "A Structured Path from Signal to Appliance-Level Insight"
+  author: "Anthony Faustine"
+  date: today
+  site-url: "https://sambaiga.github.io/ml-energy-disaggregation/"
+  repo-url: "https://github.com/sambaiga/ml-energy-disaggregation"
+  repo-branch: main
+  repo-actions: [edit, issue, source]
+  search: true
+  page-navigation: true
+  bread-crumbs: false
+
+  sidebar:
+    collapse-level: 1
+
+  navbar:
+    right:
+      - icon: envelope-at
+        href: "mailto:sambaiga@gmail.com"
+        aria-label: "Email Anthony Faustine"
+      - icon: linkedin
+        href: "https://www.linkedin.com/in/sambaiga"
+        aria-label: "LinkedIn"
+      - icon: github
+        href: https://github.com/sambaiga/ml-energy-disaggregation
+        aria-label: "View source on GitHub"
+
+  page-footer:
+    left: |
+      <span class="faux-block">&copy; 2025&ndash;2026 <a href="https://sambaiga.github.io/">Anthony Faustine</a></span>
+      <span class="faux-block">Code licensed under <a href="https://www.apache.org/licenses/LICENSE-2.0">Apache 2.0</a></span>
+    center: |
+      <div class="footer-social">
+        <a href="mailto:sambaiga@gmail.com" title="Email"><i class="bi bi-envelope-at-fill"></i></a>
+        <a href="https://github.com/sambaiga" title="GitHub"><i class="bi bi-github"></i></a>
+        <a href="https://www.linkedin.com/in/sambaiga" title="LinkedIn"><i class="bi bi-linkedin"></i></a>
+      </div>
+    right: |
+      <span class="faux-block">Made with <a href="https://quarto.org">Quarto</a></span>
+      <span class="faux-block"><a href="https://github.com/sambaiga/ml-energy-disaggregation"><i class="bi bi-github"></i> View source</a></span>
+
+  chapters:
+    - index.qmd
+    - preface.qmd
+    - about.qmd
+
+  # Parts are added chapter by chapter as each is written.
+  #  - part: "Part 1: Foundations"
+  #    chapters:
+  #      - tutorials/01-foundations/01-intro.ipynb
+
+icons:
+  bootstrap: true
+
+format:
+  html:
+    theme: [cosmo, tutorials/_quarto/brand.scss]
+    highlight-style: github
+    code-fold: false
+    code-copy: true
+    code-link: false
+    toc: true
+    toc-depth: 3
+    toc-title: "In this chapter"
+    number-sections: false
+    fig-cap-location: bottom
+    anchor-sections: true
+    smooth-scroll: true
+
+freeze: auto
+jupyter: python3
+execute:
+  enabled: true
+  error: true
+  warning: false
+  cache: false

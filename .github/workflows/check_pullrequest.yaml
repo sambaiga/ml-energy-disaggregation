@@ -1,0 +1,108 @@
+name: ARK CID
+
+on:
+  push:
+    branches:
+      - main
+    tags-ignore:
+      - "v*"
+  pull_request:
+    branches:
+      - "*"
+
+jobs:
+  pre-commit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install uv
+        uses: astral-sh/setup-uv@v3
+        with:
+          version: "latest"
+      - name: Install dependencies for uv-lock hook
+        run: uv sync
+      - name: Cache pre-commit environments
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/pre-commit
+          key: pre-commit-${{ hashFiles('.pre-commit-config.yaml') }}
+          restore-keys: |
+            pre-commit-
+      - name: Run pre-commit hooks
+        uses: pre-commit/action@v3.0.1
+        env:
+          # no-commit-to-branch checks out the branch a *push* landed on, which
+          # for the push-to-main trigger below is always main by definition -
+          # it would fail on every single merge. It still runs (and protects)
+          # locally and on pull_request runs, where the checked-out branch is
+          # the feature branch, not main.
+          SKIP: no-commit-to-branch
+
+  test-and-lint:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install uv
+        uses: astral-sh/setup-uv@v3
+        with:
+          version: "latest"
+      - name: Cache uv dependencies
+
+        uses: actions/cache@v4
+        with:
+          path: .venv
+          key: ${{ runner.os }}-uv-${{ hashFiles('uv.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-uv-
+      - name: Install dependencies
+        run: uv sync --extra modelling  --extra dev --extra test
+      - name: Run Ruff Linting and Formatting Check
+        run: |
+          # Check fails if any linting issues are found or if formatting is required
+          uv run ruff check . --exit-non-zero-on-fix
+          uv run ruff format . --check
+      - name: Run Tests with Coverage
+        # cov-fail-under must stay 0 until real tests exist: with zero test
+        # data collected, pytest-cov hard-fails (exit 1, not the tolerated
+        # "no tests collected" exit 5) for ANY fail-under > 0, regardless of
+        # .coveragerc omissions. Raise this once the first tested module
+        # lands under ark/. .coveragerc already excludes ark/plot/* so that
+        # future targets measure the tested project surface, not the whole
+        # ark package.
+        run: |
+          set +e
+          uv run pytest --cov=ark --cov-report=xml --cov-fail-under=0
+          code=$?
+          set -e
+          if [ "$code" -ne 0 ] && [ "$code" -ne 5 ]; then exit "$code"; fi
+      - name: Upload coverage
+        uses: codecov/codecov-action@v4
+        with:
+          file: coverage.xml
+          token: ${{ secrets.CODECOV_TOKEN }}
+          name: ${{ github.job }}-${{ runner.os }}
+
+  quarto-check:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      - name: Install uv
+        uses: astral-sh/setup-uv@v3
+        with:
+          version: "latest"
+      - name: Install dependencies
+        run: uv sync --extra dev
+      - name: Set up Quarto
+        uses: quarto-dev/quarto-actions/setup@v2
+      - name: Render book (structure only, outputs from committed notebooks)
+        run: uv run quarto render --no-execute

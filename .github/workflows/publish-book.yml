@@ -1,0 +1,65 @@
+name: Publish Book
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - "tutorials/**"
+      - "ark/plot/**"
+      - "_quarto.yml"
+      - "index.qmd"
+      - "pyproject.toml"
+      - "uv.lock"
+      - ".github/workflows/publish-book.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v3
+        with:
+          version: "latest"
+
+      - name: Install dependencies
+        run: uv sync --extra dev
+
+      - name: Set up Quarto
+        uses: quarto-dev/quarto-actions/setup@v2
+
+      - name: Configure nbdime git drivers
+        run: uv run nbdime config-git --enable
+
+      - name: Register ark kernel
+        run: uv run python -m ipykernel install --user --name ark --display-name "ark"
+
+      - name: Restore Quarto freeze cache
+        uses: actions/cache@v4
+        with:
+          path: _freeze
+          key: quarto-freeze-${{ runner.os }}-${{ hashFiles('tutorials/**/*.ipynb', 'tutorials/**/*.qmd', '_quarto.yml') }}
+          restore-keys: |
+            quarto-freeze-${{ runner.os }}-
+
+      - name: Render book
+        run: uv run quarto render
+
+      - name: Publish to GitHub Pages
+        uses: quarto-dev/quarto-actions/publish@v2
+        with:
+          target: gh-pages
+          render: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

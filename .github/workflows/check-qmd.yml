@@ -1,0 +1,118 @@
+name: Check QMD Files
+
+on:
+  push:
+    paths:
+      - "tutorials/**/*.qmd"
+      - "tutorials/_quarto/**"
+      - "_quarto.yml"
+      - ".github/workflows/check-qmd.yml"
+  pull_request:
+    paths:
+      - "tutorials/**/*.qmd"
+      - "tutorials/_quarto/**"
+      - "_quarto.yml"
+      - ".github/workflows/check-qmd.yml"
+  workflow_dispatch:
+
+jobs:
+  lint-qmd:
+    name: Lint QMD files
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Check for em-dashes in QMD files
+        run: |
+          if grep -rPn "—" tutorials --include="*.qmd" 2>/dev/null; then
+            echo "Em-dashes found in QMD files. Use a colon or comma instead."
+            exit 1
+          fi
+          echo "No em-dashes found."
+
+      - name: Check for invalid code block syntax
+        run: |
+          if grep -rPn "\{[a-z]+ eval=false\}" tutorials --include="*.qmd" 2>/dev/null; then
+            echo "Found {lang eval=false} code block syntax. Use plain \`\`\`language fences for display-only blocks."
+            exit 1
+          fi
+          echo "Code block syntax is clean."
+
+      - name: Check for inline callout styles (should use CSS classes in QMD)
+        run: |
+          if grep -rPn 'style="background:#EAF3FA' tutorials --include="*.qmd" 2>/dev/null; then
+            echo "Found inline callout styles in QMD files. Use .ark-concept, .ark-activity etc. CSS classes instead."
+            exit 1
+          fi
+          echo "No inline callout styles found in QMD files."
+
+  validate-qmd:
+    name: Validate QMD structure
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Check YAML frontmatter present in all QMD files
+        run: |
+          rc=0
+          while IFS= read -r -d '' f; do
+            if ! head -1 "$f" | grep -q "^---"; then
+              echo "Missing YAML frontmatter in $f"
+              rc=1
+            fi
+          done < <(find tutorials -name "*.qmd" -print0)
+          exit $rc
+
+      - name: Check all cross-reference targets exist
+        run: |
+          python3 - <<'PYEOF'
+          import os, re, sys
+          rc = 0
+          for dirpath, _, filenames in os.walk('tutorials'):
+              for fname in sorted(filenames):
+                  if not fname.endswith('.qmd'):
+                      continue
+                  fpath = os.path.join(dirpath, fname)
+                  with open(fpath) as fh:
+                      content = fh.read()
+                  for href in re.findall(r'\[[^\]]+\]\(([^)]+)\)', content):
+                      path_part = href.split('#')[0]
+                      if not path_part or path_part.startswith(('http', 'mailto')):
+                          continue
+                      target = os.path.normpath(os.path.join(dirpath, path_part))
+                      if not os.path.exists(target):
+                          print(f"Broken link in {fpath}: {href}")
+                          rc = 1
+          sys.exit(rc)
+          PYEOF
+
+      - name: Check code blocks have language identifiers
+        run: |
+          python3 - <<'PYEOF'
+          import os, sys
+          rc = 0
+          for dirpath, _, filenames in os.walk('tutorials'):
+              for fname in sorted(filenames):
+                  if not fname.endswith('.qmd'):
+                      continue
+                  fpath = os.path.join(dirpath, fname)
+                  in_block = False
+                  unlabelled = []
+                  with open(fpath) as fh:
+                      for lineno, line in enumerate(fh, 1):
+                          stripped = line.rstrip()
+                          if stripped.startswith('```'):
+                              if in_block:
+                                  in_block = False   # closing fence
+                              elif stripped == '```':
+                                  unlabelled.append(lineno)
+                                  in_block = True    # opening fence, no language
+                              else:
+                                  in_block = True    # opening fence with language
+                  if unlabelled:
+                      print(f"{fpath}: unlabelled opening fence(s) at lines {unlabelled}")
+                      rc = 1
+          sys.exit(rc)
+          PYEOF

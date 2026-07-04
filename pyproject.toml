@@ -1,0 +1,136 @@
+[project]
+name = "ark"
+version = "0.1.0"
+description = "A structured, project-based path through machine learning for energy disaggregation (NILM)."
+readme = "README.md"
+license = { text = "Apache-2.0" }
+requires-python = ">=3.12"
+authors = [
+    { name = "sambaiga", email = "sambaiga@gmail.com" }]
+keywords = ["energy-disaggregation", "nilm", "machine-learning", "mlops", "tutorials", "python"]
+
+dependencies = [
+    "pydantic>=2.10.6",
+    "numpy>=2.0.0",
+    "pandas>=3.0.0",
+    "pyarrow>=17.0.0",
+    "tqdm>=4.66.4,<5.0.0",
+    "lets-plot>=4.11.0",
+    "matplotlib>=3.0.0",
+    "great-tables>=0.20.0",
+    "seaborn>=0.13.2",
+    "polars>=1.0.0",
+    "pandera>=0.21.0",
+    "pydantic-settings>=2.0.0",
+    "typer>=0.12.0",
+    "loguru>=0.7.0",
+    "structlog>=24.0.0",
+    "rich>=13.0.0",
+    "scikit-learn>=1.7.2",
+    "joblib>=1.3.0",
+    "pytest>=8.2.1",
+]
+
+[project.optional-dependencies]
+modelling = [
+    "xgboost>=3.1.1",
+    "optuna>=4.5.0",
+    "optuna-integration>=4.5.0",
+    "torch>=2.0.0",
+    "pytorch-lightning>=2.0.0",
+]
+
+mlops = [
+
+]
+
+test = [
+    "pytest-cov>=6.0.0",
+    "nbmake>=0.4.2",
+]
+
+dev = [
+    "commitizen>=4.3.0",
+    "pre-commit>=4.1.0",
+    "pycln>=2.5.0",
+    "ruff>=0.14.4",
+    "mypy>=1.13.0,",
+    "safety>=3.2.0",
+    "ipython>=9.1.0",
+    "ipykernel>=6.29.5",
+    "jupyter",
+    "pyyaml>=6.0.3",
+    "nbstripout>=0.8.1",
+    "nbdime>=4.0.0",
+    "optuna>=4.5.0",
+    "optuna-integration>=4.5.0",
+]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+
+packages = ["ark"]
+
+[tool.pytest.ini_options]
+norecursedirs = ["notebook", "data"]
+# cov-fail-under must stay 0 until real tests exist under ark/: with zero
+# test data collected, pytest-cov hard-fails (exit 1, not the tolerated
+# "no tests collected" exit 5) for ANY fail-under > 0, regardless of
+# .coveragerc omissions. Raise this once the first tested module lands.
+addopts = "--cov=ark --cov-report=term-missing --cov-report=xml --cov-config=.coveragerc --cov-fail-under=0"
+
+[tool.ruff]
+target-version = "py312"
+exclude = ["__pycache__", "env", ".env", "venv", ".venv"]
+line-length = 120
+
+[tool.ruff.lint]
+select = [
+    "B", "C4", "D", "E", "F", "I", "N", "PGH", "PTH", "Q", "S", "SIM", "TRY", "UP", "W", "YTT"
+]
+ignore = [
+    "D100", "D101", "D102", "D103", "D104", "D105", "D106", "D107",
+    "D200", "D401", "E402", "F401", "N812", "TRY003", "N803", "N806"
+]
+
+[tool.ruff.lint.per-file-ignores]
+"tests/**" = ["S101"]
+
+[tool.ruff.lint.isort]
+known-first-party = ["ark"]
+known-third-party = ["numpy", "pandas"]
+combine-as-imports = true
+force-sort-within-sections = true
+
+[tool.ruff.format]
+docstring-code-format = true
+
+[tool.ruff.lint.flake8-bugbear]
+extend-immutable-calls = ["chr"]
+
+[tool.ruff.lint.pydocstyle]
+convention = "google"
+
+[tool.mypy]
+python_version = "3.12"
+strict = false
+ignore_missing_imports = true
+exclude = ["tests", "examples"]
+
+
+[tool.pycln]
+all = true
+exclude = ["tests/"]
+
+[tool.codespell]
+skip = "*.ipynb,_freeze/*"
+ignore-words-list = "mape,fpr,rouge"
+
+[tool.commitizen]
+bump_message = "bump: v$current_version → v$new_version"
+tag_format = "v$version"
+update_changelog_on_bump = true
+version_provider = "pep621"

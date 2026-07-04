@@ -1,0 +1,34 @@
+---
+title: "About the Author"
+---
+
+```{=html}
+<div class="author-profile">
+  <img class="author-avatar" src="https://github.com/sambaiga.png" alt="Anthony Faustine">
+  <div class="author-meta">
+    <h2 class="author-name">Anthony Faustine</h2>
+    <p class="author-title">Principal ML Engineer &nbsp;&middot;&nbsp; Analog Devices, Ireland</p>
+    <div class="author-social-row">
+      <a href="https://sambaiga.github.io" title="Website"><i class="bi bi-globe2"></i> sambaiga.github.io</a>
+      <a href="https://github.com/sambaiga" title="GitHub"><i class="bi bi-github"></i> sambaiga</a>
+      <a href="https://www.linkedin.com/in/sambaiga" title="LinkedIn"><i class="bi bi-linkedin"></i> sambaiga</a>
+      <a href="https://orcid.org/0000-0002-7838-533X" title="ORCID"><i class="bi bi-award"></i> 0000-0002-7838-533X</a>
+      <a href="mailto:sambaiga@gmail.com" title="Email"><i class="bi bi-envelope-at"></i> sambaiga@gmail.com</a>
+    </div>
+  </div>
+</div>
+```
+
+I am a Principal Machine Learning Engineer with 10+ years designing, building, and operating production-grade ML systems across energy, industrial, and semiconductor domains. My work spans the full arc of a machine learning project: framing the problem, building the model, engineering the pipeline, and keeping it honest in production.
+
+At [Analog Devices](https://www.analog.com), I architect machine learning systems for supply chain demand planning and edge inference. Previously at [Eaton](https://www.eaton.com), I served as Lead Data Scientist and Principal Investigator at the Centre for Intelligent Power, securing €1.6M in competitive research funding and receiving the **Eaton STAR Leadership Award** for engineering innovation and cross-functional impact. My open-source work includes [Twiga](https://github.com/sambaiga/twiga), a production forecasting library with REST serving and MLOps integration, [MLPForecast](https://github.com/sambaiga/mlpforecast), an MLP-based net-load forecasting toolkit with uncertainty quantification, and [Deep-NILMtk](https://github.com/BHafsa/Deep-NILMtk), a community deep learning toolkit for non-intrusive load monitoring.
+
+**Projects** &nbsp;→&nbsp; [sambaiga.github.io/pages/projects](https://sambaiga.github.io/pages/projects/index.html)
+
+My research spans non-intrusive load monitoring, probabilistic forecasting, uncertainty quantification, physics-based intelligence, and AI for reliability engineering. I have authored 10+ peer-reviewed papers in IEEE Transactions on Smart Grid, IEEE Transactions on Power Systems, and IEEE Transactions on Industrial Informatics.
+
+**Publications** &nbsp;→&nbsp; [sambaiga.github.io/pages/publication](https://sambaiga.github.io/pages/publication/index.html) &nbsp;·&nbsp; [ORCID](https://orcid.org/0000-0002-7838-533X)
+
+I also write about machine learning, Bayesian thinking, and applied AI at:
+
+**Blog** &nbsp;→&nbsp; [sambaiga.github.io/pages/blog](https://sambaiga.github.io/pages/blog/index.html)

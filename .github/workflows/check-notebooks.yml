@@ -1,0 +1,118 @@
+name: Check Notebooks
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - "tutorials/**/*.ipynb"
+      - "tutorials/**/data/**"
+      - "ark/**"
+      - "pyproject.toml"
+      - "uv.lock"
+  pull_request:
+    paths:
+      - "tutorials/**/*.ipynb"
+      - "tutorials/**/data/**"
+      - "ark/**"
+      - "pyproject.toml"
+      - "uv.lock"
+  workflow_dispatch:
+
+jobs:
+  execute-notebooks:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Resolve changed notebooks
+        id: changed
+        run: |
+          # Notebooks skipped from CI execution (not ready or too slow).
+          # Add filenames here as needed, space-separated, e.g.:
+          # SKIP_LIST="tutorials/01-foundations/03-slow-chapter.ipynb"
+          SKIP_LIST=""
+
+          # Helper: find all notebooks, excluding archived ones
+          find_notebooks() {
+            find tutorials -name "*.ipynb" -not -path "*/_archive/*" | sort | tr '\n' ' '
+          }
+
+          # Determine base commit to diff against
+          if [ "${{ github.event_name }}" = "pull_request" ]; then
+            BASE="${{ github.event.pull_request.base.sha }}"
+          elif [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            # Manual trigger: run every notebook minus skipped ones
+            ALL=$(find_notebooks)
+            for nb in $SKIP_LIST; do ALL="${ALL//$nb /}"; done
+            echo "notebooks=$ALL" >> "$GITHUB_OUTPUT"
+            exit 0
+          else
+            BEFORE="${{ github.event.before }}"
+            if [ -z "$BEFORE" ] || [ "$BEFORE" = "0000000000000000000000000000000000000000" ] || ! git cat-file -e "$BEFORE" 2>/dev/null; then
+              BASE="$(git rev-parse HEAD~1 2>/dev/null || git rev-parse HEAD)"
+            else
+              BASE="$BEFORE"
+            fi
+          fi
+
+          # If shared library or package deps changed, run every notebook
+          # Note: workflow file changes alone do not require re-running all notebooks
+          DEPS=$(git diff --name-only "$BASE" "${{ github.sha }}" -- ark/ pyproject.toml uv.lock)
+          if [ -n "$DEPS" ]; then
+            echo "Dependency files changed -- running all notebooks"
+            ALL=$(find_notebooks)
+            for nb in $SKIP_LIST; do ALL="${ALL//$nb /}"; done
+            echo "notebooks=$ALL" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          # Otherwise: only notebooks that changed in this push/PR
+          CHANGED=$(git diff --name-only --diff-filter=d "$BASE" "${{ github.sha }}" -- '*.ipynb' | grep -v '/_archive/' | sort)
+          for nb in $SKIP_LIST; do CHANGED=$(echo "$CHANGED" | grep -vxF "$nb" || true); done
+          NOTEBOOKS=$(echo "$CHANGED" | tr '\n' ' ' | xargs)
+          echo "notebooks=$NOTEBOOKS" >> "$GITHUB_OUTPUT"
+
+      - name: Install uv
+        if: steps.changed.outputs.notebooks != ''
+        uses: astral-sh/setup-uv@v3
+        with:
+          version: "latest"
+
+      - name: Cache uv dependencies
+        if: steps.changed.outputs.notebooks != ''
+        uses: actions/cache@v4
+        with:
+          path: .venv
+          key: ${{ runner.os }}-uv-notebooks-${{ hashFiles('uv.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-uv-notebooks-
+
+      - name: Install dependencies
+        if: steps.changed.outputs.notebooks != ''
+        run: uv sync --extra dev --extra modelling --extra test
+
+      - name: Configure nbdime git drivers
+        if: steps.changed.outputs.notebooks != ''
+        run: uv run nbdime config-git --enable
+
+      - name: Register ark kernel
+        if: steps.changed.outputs.notebooks != ''
+        run: uv run python -m ipykernel install --user --name ark --display-name "ark"
+
+      - name: Execute changed notebooks
+        if: steps.changed.outputs.notebooks != ''
+        run: |
+          uv run --with nbmake pytest --nbmake \
+            --nbmake-timeout=300 \
+            --no-header \
+            -v \
+            --override-ini=addopts= \
+            ${{ steps.changed.outputs.notebooks }}
+        env:
+          PYTHONWARNINGS: ignore

@@ -1,0 +1,18 @@
+---
+title: "Preface"
+---
+
+::: {.preface-body}
+
+*Placeholder: replace this with the real motivation for the book, the way [ds-mlops-path's preface](https://sambaiga.github.io/ds-mlops-path/preface.html) opens on a concrete, specific incident rather than a general statement of intent.*
+
+Energy disaggregation, also known as non-intrusive load monitoring (NILM), asks a deceptively simple question: given only the aggregate power reading at a household's meter, can you tell which individual appliance is running, and how much energy it is using, without instrumenting every device separately? The answer touches signal processing, classical machine learning, deep learning, and the same production-engineering discipline any real ML system needs once it leaves a notebook.
+
+This book is a structured, project-based path through that problem, from raw smart-meter signal to appliance-level insight, written to be run and not just read.
+
+:::
+
+<div class="preface-attr">
+<strong>Anthony Faustine</strong><br>
+Principal ML Engineer &nbsp;·&nbsp; <a href="https://sambaiga.github.io">sambaiga.github.io</a>
+</div>

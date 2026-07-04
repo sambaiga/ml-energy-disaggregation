@@ -1,0 +1,135 @@
+# ----------------------------------------------------------------------
+# Python-generated files (Ignore all compiled/temporary Python artifacts)
+# ----------------------------------------------------------------------
+__pycache__/
+*.py[co]
+build/
+dist/
+wheels/
+*.egg-info
+.pypirc
+
+
+# ----------------------------------------------------------------------
+# Virtual environments (Standard ignore for local environments)
+# ----------------------------------------------------------------------
+.venv/
+venv/
+env/
+# uv
+# uv.lock  <-- RECOMMENDED: KEEP this file in version control for reproducibility.
+# PEP 582
+__pypackages__/
+
+
+# ----------------------------------------------------------------------
+# Build/Installer Files
+# ----------------------------------------------------------------------
+# PyInstaller
+*.manifest
+*.spec
+
+# Installer logs
+pip-log.txt
+pip-delete-this-directory.txt
+
+
+# ----------------------------------------------------------------------
+# Unit test / coverage reports (Ignore all test artifacts)
+# ----------------------------------------------------------------------
+htmlcov/
+.tox/
+.nox/
+.coverage
+.coverage.*
+.cache
+nosetests.xml
+coverage.xml
+junit.xml # Added common CI test report
+*.cover
+*.py,cover
+.hypothesis/
+.pytest_cache/
+.ruff_cache/
+pytestdebug.log
+cover/
+
+
+# ----------------------------------------------------------------------
+# Documentation & Notebooks
+# ----------------------------------------------------------------------
+# Translations
+*.mo
+*.pot
+
+# Sphinx documentation
+docs/_build/
+
+# Jupyter Notebook & IPython
+.ipynb_checkpoints
+profile_default/
+ipython_config.py
+
+
+# ----------------------------------------------------------------------
+# PyBuilder (Specific Tooling)
+# ----------------------------------------------------------------------
+.pybuilder/
+target/
+
+
+# ----------------------------------------------------------------------
+# IDE & OS Files
+# ----------------------------------------------------------------------
+# Jetbrains IDEs
+.idea/
+
+# VS Code
+.vscode/
+
+# Operating System Files
+*.DS_Store
+*.log
+
+
+# ----------------------------------------------------------------------
+# Serialised ML models (generated during notebook execution)
+# ----------------------------------------------------------------------
+*.joblib
+*.pkl
+*.pickle
+models/
+
+# ----------------------------------------------------------------------
+# Source materials (slides, papers, personal notes - not for distribution)
+# ----------------------------------------------------------------------
+sermon/
+
+# ----------------------------------------------------------------------
+# Data Files (Customize based on project needs)
+# ----------------------------------------------------------------------
+# IGNORE ALL data in this directory (assuming it's transient or external)
+data/
+
+# Exception: curated, versioned fixture data for tutorials, small enough to
+# commit and needed for notebooks to run immediately after a fresh clone.
+# Add specific tutorial data directories here as chapters are built, e.g.:
+# !tutorials/01-basics/data/
+
+# Alternative: Ignore specific generated directories
+# data/processed/
+# data/output/
+
+/.quarto/
+**/*.quarto_ipynb
+/_book/
+
+# _freeze/ is committed: CI uses quarto render --no-execute, reading from this cache
+
+# Rendered HTML artefacts emitted by quarto render on individual notebooks/QMD
+tutorials/**/*.html
+tutorials/**/*_files/
+
+# Local Claude Code memory and project instructions
+.claude/
+CLAUDE.md

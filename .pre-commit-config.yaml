@@ -1,0 +1,115 @@
+default_language_version:
+  python: python3.11
+
+
+exclude: '(\.venv/|__pycache__/|\.pytest_cache/|\.idea/|_freeze/)'
+
+ci:
+  autoupdate_schedule: monthly
+
+repos:
+  - repo: local
+    hooks:
+      - id: commitizen
+        name: commitizen
+        entry: cz check
+        args: [--commit-msg-file]
+        require_serial: true
+        language: system
+        stages: [commit-msg]
+
+  - repo: https://github.com/astral-sh/uv-pre-commit
+    rev: 0.9.7
+    hooks:
+        - id: uv-lock
+
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.6.0
+    hooks:
+      - id: check-yaml
+      - id: check-added-large-files
+        args: [--maxkb=1200]
+      - id: check-docstring-first
+      - id: check-shebang-scripts-are-executable
+      - id: check-merge-conflict
+      - id: check-json
+      - id: check-toml
+      - id: check-ast
+        exclude: .vscode
+      - id: check-case-conflict
+      - id: detect-private-key
+      - id: debug-statements
+      - id: end-of-file-fixer
+        exclude: ^LICENSE|\.(html|svg)$
+      - id: mixed-line-ending
+      - id: trailing-whitespace
+        args: [--markdown-linebreak-ext=md]
+        exclude: \.(html|svg)$
+      - id: check-xml
+      - id: destroyed-symlinks
+      - id: no-commit-to-branch
+
+  - repo: https://github.com/codespell-project/codespell
+    rev: v2.3.0
+    hooks:
+      - id: codespell
+
+  - repo: local
+    hooks:
+      - id: nbstripout-dev
+        name: nbstripout (dev)
+        entry: nbstripout --keep-output
+        language: python
+        types: [jupyter]
+        additional_dependencies: [nbstripout]
+        stages: [pre-commit]
+
+      - id: nbstripout-ci
+        name: nbstripout (ci)
+        entry: nbstripout --drop-empty-cells
+        language: python
+        types: [jupyter]
+        additional_dependencies: [nbstripout]
+        stages: [pre-push]
+
+      - id: check-qmd-no-emdash
+        name: "QMD no em-dashes"
+        language: system
+        entry: scripts/check_qmd_emdash.sh
+        files: '\.qmd$'
+        pass_filenames: true
+
+      - id: check-qmd-code-blocks
+        name: "QMD no eval=false code blocks"
+        language: system
+        entry: scripts/check_qmd_codeblocks.sh
+        files: '\.qmd$'
+        pass_filenames: true
+
+
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.5.0
+    hooks:
+      - id: ruff
+        args: [--fix, --exit-non-zero-on-fix]
+        types_or: [python, pyi, jupyter]
+      - id: ruff-format
+        types_or: [python, pyi, jupyter]
+
+  - repo: https://github.com/asottile/pyupgrade
+    rev: v3.17.0
+    hooks:
+      - id: pyupgrade
+        args: [--py311-plus]
+
+  - repo: https://github.com/hadialqattan/pycln
+    rev: v2.6.0
+    hooks:
+      - id: pycln
+        args: [--all, --config=pyproject.toml]
+
+  - repo: https://github.com/commitizen-tools/commitizen
+    rev: v4.9.1
+    hooks:
+      - id: commitizen-branch
+        stages: [pre-push]

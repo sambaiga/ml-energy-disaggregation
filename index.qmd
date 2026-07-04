@@ -1,0 +1,33 @@
+---
+title: "Welcome"
+title-block-banner: true
+page-layout: article
+---
+
+<div class="cover-hero">
+<div class="cover-hero-text">
+<p class="cover-eyebrow">A practical book for energy analytics and ML practitioners</p>
+<h1>Machine Learning for Energy Disaggregation</h1>
+<p>A structured, project-based path through non-intrusive load monitoring: from raw smart-meter signal to appliance-level insight, built to be run and not just read.</p>
+<p class="cover-author">By <a href="https://sambaiga.github.io/" style="color:#38BDF8;font-weight:600">Anthony Faustine</a>&nbsp;&nbsp;<a href="https://github.com/sambaiga" title="GitHub" style="color:#94A3B8"><i class="bi bi-github"></i></a>&nbsp;<a href="https://www.linkedin.com/in/sambaiga" title="LinkedIn" style="color:#94A3B8"><i class="bi bi-linkedin"></i></a>&nbsp;<a href="mailto:sambaiga@gmail.com" title="Email" style="color:#94A3B8"><i class="bi bi-envelope-at"></i></a></p>
+
+<a href="preface.qmd" class="btn-cover btn-secondary-cover"><i class="bi bi-book"></i> Read the preface</a>
+</div>
+</div>
+
+::: {.callout-note icon=false #callout-guide}
+## How this book works
+
+Every chapter is a Jupyter notebook or QMD file meant to be **run top to bottom**, not just read. Along the way you will see four recurring markers:
+
+| Marker | Purpose |
+|--------|---------|
+| <i class="bi bi-info-circle-fill" style="color:#0369A1"></i> **Key Concept** | The core idea, precisely defined |
+| <i class="bi bi-puzzle-fill" style="color:#009E73"></i> **Activity** | Hands-on challenge: fill in the `...` yourself before moving on |
+| <i class="bi bi-bug-fill" style="color:#DC2626"></i> **Common Mistake** | A bug pattern worth recognising on sight |
+| <i class="bi bi-lightbulb-fill" style="color:#7C3AED"></i> **Pro Tip** | A production-grade habit |
+:::
+
+<p class="section-label">Your learning path</p>
+
+<p style="color:#94A3B8;font-size:0.95rem;">Chapters are being written and will appear here as each is finished. <a href="https://github.com/sambaiga/ml-energy-disaggregation" style="color:#64748B">Follow progress on GitHub</a>.</p>
