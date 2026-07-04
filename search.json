@@ -1,0 +1,32 @@
+[
+  {
+    "objectID": "index.html",
+    "href": "index.html",
+    "title": "Machine Learning for Energy Disaggregation",
+    "section": "",
+    "text": "A practical book for energy analytics and ML practitioners\n\n\nMachine Learning for Energy Disaggregation\n\n\nA structured, project-based path through non-intrusive load monitoring: from raw smart-meter signal to appliance-level insight, built to be run and not just read.\n\n\nBy Anthony Faustine    \n\n Read the preface\n\n\n\n\n\n\n\n\nNoteHow this book works\n\n\n\nEvery chapter is a Jupyter notebook or QMD file meant to be run top to bottom, not just read. Along the way you will see four recurring markers:\n\n\n\n\n\n\n\nMarker\nPurpose\n\n\n\n\n Key Concept\nThe core idea, precisely defined\n\n\n Activity\nHands-on challenge: fill in the ... yourself before moving on\n\n\n Common Mistake\nA bug pattern worth recognising on sight\n\n\n Pro Tip\nA production-grade habit\n\n\n\n\n\n\nYour learning path\n\n\nChapters are being written and will appear here as each is finished. Follow progress on GitHub.",
+    "crumbs": [
+      "<span class='chapter-number'>1</span>  <span class='chapter-title'>Welcome</span>"
+    ]
+  },
+  {
+    "objectID": "preface.html",
+    "href": "preface.html",
+    "title": "Preface",
+    "section": "",
+    "text": "Placeholder: replace this with the real motivation for the book, the way ds-mlops-path’s preface opens on a concrete, specific incident rather than a general statement of intent.\nEnergy disaggregation, also known as non-intrusive load monitoring (NILM), asks a deceptively simple question: given only the aggregate power reading at a household’s meter, can you tell which individual appliance is running, and how much energy it is using, without instrumenting every device separately? The answer touches signal processing, classical machine learning, deep learning, and the same production-engineering discipline any real ML system needs once it leaves a notebook.\nThis book is a structured, project-based path through that problem, from raw smart-meter signal to appliance-level insight, written to be run and not just read.\n\n\nAnthony Faustine Principal ML Engineer  ·  sambaiga.github.io",
+    "crumbs": [
+      "<span class='chapter-number'>2</span>  <span class='chapter-title'>Preface</span>"
+    ]
+  },
+  {
+    "objectID": "about.html",
+    "href": "about.html",
+    "title": "About the Author",
+    "section": "",
+    "text": "Anthony Faustine\n    Principal ML Engineer  ·  Analog Devices, Ireland\n    \n       sambaiga.github.io\n       sambaiga\n       sambaiga\n       0000-0002-7838-533X\n       sambaiga@gmail.com\n    \n  \n\nI am a Principal Machine Learning Engineer with 10+ years designing, building, and operating production-grade ML systems across energy, industrial, and semiconductor domains. My work spans the full arc of a machine learning project: framing the problem, building the model, engineering the pipeline, and keeping it honest in production.\nAt Analog Devices, I architect machine learning systems for supply chain demand planning and edge inference. Previously at Eaton, I served as Lead Data Scientist and Principal Investigator at the Centre for Intelligent Power, securing €1.6M in competitive research funding and receiving the Eaton STAR Leadership Award for engineering innovation and cross-functional impact. My open-source work includes Twiga, a production forecasting library with REST serving and MLOps integration, MLPForecast, an MLP-based net-load forecasting toolkit with uncertainty quantification, and Deep-NILMtk, a community deep learning toolkit for non-intrusive load monitoring.\nProjects  →  sambaiga.github.io/pages/projects\nMy research spans non-intrusive load monitoring, probabilistic forecasting, uncertainty quantification, physics-based intelligence, and AI for reliability engineering. I have authored 10+ peer-reviewed papers in IEEE Transactions on Smart Grid, IEEE Transactions on Power Systems, and IEEE Transactions on Industrial Informatics.\nPublications  →  sambaiga.github.io/pages/publication  ·  ORCID\nI also write about machine learning, Bayesian thinking, and applied AI at:\nBlog  →  sambaiga.github.io/pages/blog",
+    "crumbs": [
+      "<span class='chapter-number'>3</span>  <span class='chapter-title'>About the Author</span>"
+    ]
+  }
+]
