@@ -55,7 +55,15 @@ jobs:
           else
             BEFORE="${{ github.event.before }}"
             if [ -z "$BEFORE" ] || [ "$BEFORE" = "0000000000000000000000000000000000000000" ] || ! git cat-file -e "$BEFORE" 2>/dev/null; then
-              BASE="$(git rev-parse HEAD~1 2>/dev/null || git rev-parse HEAD)"
+              # git rev-parse leaks an unresolved ref to stdout even on
+              # failure, so redirecting only stderr isn't enough to guard
+              # the fallback: test existence first, on a repo with no
+              # parent commit (the very first push) HEAD~1 doesn't exist.
+              if git rev-parse --verify -q HEAD~1 >/dev/null 2>&1; then
+                BASE="$(git rev-parse HEAD~1)"
+              else
+                BASE="$(git rev-parse HEAD)"
+              fi
             else
               BASE="$BEFORE"
             fi
