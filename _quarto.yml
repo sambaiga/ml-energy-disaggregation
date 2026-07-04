@@ -7,6 +7,7 @@ book:
   subtitle: "A Structured Path from Signal to Appliance-Level Insight"
   author: "Anthony Faustine"
   date: today
+  favicon: assets/favicon.svg
   site-url: "https://sambaiga.github.io/ml-energy-disaggregation/"
   repo-url: "https://github.com/sambaiga/ml-energy-disaggregation"
   repo-branch: main
@@ -59,7 +60,9 @@ icons:
 
 format:
   html:
-    theme: [cosmo, tutorials/_quarto/brand.scss]
+    theme:
+      light: [cosmo, tutorials/_quarto/brand.scss]
+      dark: [darkly, tutorials/_quarto/brand-dark.scss]
     highlight-style: github
     code-fold: false
     code-copy: true
