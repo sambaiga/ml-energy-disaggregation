@@ -5,15 +5,15 @@ on:
     branches:
       - main
     paths:
-      - "tutorials/**/*.ipynb"
-      - "tutorials/**/data/**"
+      - "book/**/*.ipynb"
+      - "book/**/data/**"
       - "ark/**"
       - "pyproject.toml"
       - "uv.lock"
   pull_request:
     paths:
-      - "tutorials/**/*.ipynb"
-      - "tutorials/**/data/**"
+      - "book/**/*.ipynb"
+      - "book/**/data/**"
       - "ark/**"
       - "pyproject.toml"
       - "uv.lock"
@@ -35,12 +35,12 @@ jobs:
         run: |
           # Notebooks skipped from CI execution (not ready or too slow).
           # Add filenames here as needed, space-separated, e.g.:
-          # SKIP_LIST="tutorials/01-foundations/03-slow-chapter.ipynb"
+          # SKIP_LIST="book/01-foundations/03-slow-chapter.ipynb"
           SKIP_LIST=""
 
           # Helper: find all notebooks, excluding archived ones
           find_notebooks() {
-            find tutorials -name "*.ipynb" -not -path "*/_archive/*" | sort | tr '\n' ' '
+            find book -name "*.ipynb" -not -path "*/_archive/*" | sort | tr '\n' ' '
           }
 
           # Determine base commit to diff against

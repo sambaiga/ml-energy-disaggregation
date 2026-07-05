@@ -1,14 +1,37 @@
 ---
 title: "Preface"
+bibliography: references.bib
 ---
 
 ::: {.preface-body}
 
-*Placeholder: replace this with the real motivation for the book, the way [ds-mlops-path's preface](https://sambaiga.github.io/ds-mlops-path/preface.html) opens on a concrete, specific incident rather than a general statement of intent.*
+A low-voltage feeder trips for the third time this July, on a street with no
+history of trouble. The network diagram says nothing is wrong. Nothing changed
+at the substation. What changed happened behind the meters: a few new EV
+chargers, a dozen rooftop solar installs, a heat wave. Nobody designed this
+feeder for the grid it's now carrying, and nobody at the utility saw it coming,
+because the data that would have shown it was sitting unread in fifteen-minute
+meter reads.
 
-Energy disaggregation, also known as non-intrusive load monitoring (NILM), asks a deceptively simple question: given only the aggregate power reading at a household's meter, can you tell which individual appliance is running, and how much energy it is using, without instrumenting every device separately? The answer touches signal processing, classical machine learning, deep learning, and the same production-engineering discipline any real ML system needs once it leaves a notebook.
+That story repeats itself, in different shapes, wherever a smart meter is
+already installed: the appliance nobody metered separately but the aggregate
+signal reveals anyway, tomorrow's demand a retailer needs before it happens,
+the theft pattern hiding in a bill that looks almost normal. A smart meter
+reports one number, at regular intervals. Almost everything interesting is
+sitting in what that number implies, and almost no single source treats the
+problem that way: {{< acr NILM >}} texts stop at the appliance, forecasting
+texts stop at the meter, and grid-planning work starts from substation data
+and rarely looks downstream, meter by meter [@volker2021watts].
 
-This book is a structured, project-based path through that problem, from raw smart-meter signal to appliance-level insight, written to be run and not just read.
+This book follows that signal all the way through. {{< acr NILM >}}
+disaggregation turns one aggregate reading into a per-appliance breakdown.
+Point and probabilistic forecasting of load and photovoltaic output tell a
+utility, or a household, what's coming before it happens. And once
+distributed energy resources start reshaping a low-voltage feeder from the
+edge in, that same signal underwrites anomaly detection, customer clustering,
+and the hosting-capacity questions a distribution operator actually has to
+answer. Every chapter pairs a narrative page with a companion notebook: run
+it top to bottom, don't just read it.
 
 :::
 
@@ -16,3 +39,8 @@ This book is a structured, project-based path through that problem, from raw sma
 <strong>Anthony Faustine</strong><br>
 Principal ML Engineer &nbsp;·&nbsp; <a href="https://sambaiga.github.io">sambaiga.github.io</a>
 </div>
+
+## References
+
+::: {#refs}
+:::

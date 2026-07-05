@@ -1,0 +1,281 @@
+---
+title: "Feature Engineering for Appliance Recognition"
+bibliography: ../../references.bib
+---
+
+A 60-watt bulb switches on next to a warehouse's compressor motor. On its
+own, a bulb's current is about the simplest signature in NILM: a smooth,
+resistive sine wave, barely worth building a classifier for. Wired to one
+leg of the same three-phase line as that motor, the bulb's voltage-current
+trajectory comes out looking almost unrecognizable, twisted by the current
+the motor's other two phases pull just to keep turning. Same bulb, same
+physics, but the feature a classifier sees depends entirely on what else is
+running on the line.
+
+Chapter 1 left one question open: how do you turn a raw switch-on event,
+whether it's a bulb's current spike or a motor's distorted three-phase draw,
+into a feature specific enough to tell one appliance from another? This
+chapter builds that feature once, then shows it survives both the clean
+residential case and the messy industrial one.
+
+## Getting one activation window
+
+Every feature in this chapter starts from the same raw material: a short
+window of current and voltage, centered on the moment an appliance changed
+state. Getting that window right matters as much as anything downstream of
+it. The recipe, unchanged across the WRG, AWRG, and phase-imbalance work,
+is to measure $N_s$ complete mains cycles immediately before the
+transition, $\{\mathbf{i}^{(b)}, \mathbf{v}^{(b)}\}$, and $N_s$ cycles
+immediately after, $\{\mathbf{i}^{(a)}, \mathbf{v}^{(a)}\}$
+[@faustine2020wrg]. For three-phase industrial data each phase gets its own
+before-and-after pair; for single-phase residential data there is only one
+[@faustine2021awrg].
+
+Both windows are aligned at the voltage's zero-crossing before anything else
+happens to them, and that alignment is not a formality. An AC waveform's
+instantaneous value depends on exactly where in the cycle it is sampled, so
+comparing a before-window and an after-window that start at different phase
+angles would pick up a difference caused by phase misalignment, not by the
+appliance. Zero-crossing alignment pins both windows to the same starting
+phase, so a point-by-point subtraction reflects only what actually changed.
+Because current also adds linearly, that subtraction is enough on its own to
+cancel out everything that did not change and leave only the appliance that
+just switched: $\mathbf{i} = \mathbf{i}^{(a)} - \mathbf{i}^{(b)}$ for a
+switch-on event, or the reverse for a switch-off [@faustine2020wrg;
+@faustine2021awrg]. $N_s$ itself is not universal: 20 cycles for the
+sub-metered single-appliance data the original WRG paper used, 2 cycles for
+aggregated PLAID (following the convention in
+[@debaets2018energybuildings]), and 10 to 25 cycles for the three-phase
+LILACD data, chosen empirically once the industrial signal turned out to
+need a longer window to settle [@faustine2020wrg; @faustine2021awrg;
+@faustine2023ftnilm].
+
+The resulting window is still $T_s = f_s / f$ samples long, tens of
+thousands of samples at PLAID's 30 kHz. Piecewise Aggregate Approximation
+(PAA) reduces it to a fixed, much smaller size $w$ by averaging each of $w$
+equal segments down to one value, which is what actually feeds the distance
+matrix below. @fig-activation-extraction walks through the extraction step;
+@fig-wrg-pipeline picks up immediately after, once that fixed-size window
+exists.
+
+::: {layout-ncol="2"}
+![One state transition splits the signal into a before-window and an after-window; subtracting them isolates the appliance that changed.](../../assets/nilm-activation-extraction.svg){#fig-activation-extraction}
+
+![The activation window, reduced by PAA, becomes a distance matrix, then a graph-like image, then a label.](../../assets/nilm-wrg-pipeline.svg){#fig-wrg-pipeline}
+:::
+
+::: {.ark-concept}
+<span class="ark-concept-title"><i class="bi bi-info-circle-fill"></i> Key Concept</span>
+
+Take that activation current, reduced to $w$ points
+$\mathbf{x} = \{x_1, \ldots, x_w\}$. The distance similarity matrix
+$D_{w \times w} = [d_{k,j}]$ records how far apart every pair of points in
+that window is:
+
+$$
+d_{k,j} = |x_k - x_j|
+$$
+
+$D$ says nothing about appliances by itself. It is a structural fingerprint
+of the waveform's own shape: a smooth periodic signal produces one pattern,
+a spiky transient produces another. The rest of this chapter is about what
+to do with $D$ once it exists [@faustine2020wrg].
+:::
+
+The notebook below builds $D$ for a single, real activation current from
+PLAID, already extracted the way @fig-activation-extraction describes. The
+same event can be read two ways at once: current against time, on the left,
+or current against voltage, on the right.
+
+{{< embed 02-feature-engineering-code.ipynb#3bc2d836 >}}
+{{< embed 02-feature-engineering-code.ipynb#3813ea23 >}}
+
+## The other route: the V-I trajectory
+
+Chapter 1 named the voltage-current (V-I) trajectory as a high-frequency
+signature: the closed loop traced by plotting instantaneous voltage against
+instantaneous current over one cycle. The right-hand panel above, the same
+activation current plotted against its own voltage instead of against time,
+is that loop.
+
+A resistive appliance traces something close to a straight line; a motor or
+a switch-mode power supply bends that line into a loop with a distinctive
+shape. That shape is a real, usable feature on its own, and it is the one
+most of the appliance-classification literature reached for first
+[@debaets2018smartcomp; @debaets2018energybuildings]. To make it a fixed-size
+input a classifier can consume, the loop is meshed onto a $w \times w$ grid
+and rasterized into a binary V-I image, the same way a raw current window
+gets reduced to $D$ above. That V-I image is the baseline this chapter
+measures WRG against for the rest of the way.
+
+## From a distance matrix to a recurrence graph
+
+The standard way to turn $D$ into an image, borrowed from nonlinear
+time-series analysis, is the recurrence plot: pick a threshold $\epsilon$ and
+mark two points as "recurring" whenever they are closer than that threshold
+[@marwan2007recurrence]. Formally, the recurrence graph $RG_{w \times w} =
+[r_{k,j}]$ is the binary matrix
+
+$$
+r_{k,j} = \begin{cases} 1 & \text{if } d_{k,j} \geq \epsilon \\ 0 & \text{otherwise} \end{cases}
+$$
+
+$RG$ can be read as an unweighted graph: $r_{k,j}$ is the adjacency matrix
+between points in time, and the resulting image gives a classifier something
+to learn from beyond the raw waveform [@faustine2020wrg]. But binarizing $D$
+at a single threshold throws away everything except a yes/no answer at every
+pixel. Two activations that are close but not identical, and two that are
+worlds apart, can end up looking the same once thresholded.
+
+## Weighted recurrence graphs
+
+The fix is to stop throwing that detail away. Instead of collapsing $D$ to 0
+or 1, the weighted recurrence graph (WRG) keeps a graded value, capped at a
+maximum $\delta$:
+
+$$
+r_{k,j} = \min\left(\left\lfloor \frac{d_{k,j}}{\epsilon} \right\rfloor, \delta\right)
+$$
+
+Reparametrizing $\lambda = 1/\epsilon$ for numerical stability, $r_{k,j} =
+\min(\lfloor d_{k,j} \cdot \lambda \rfloor, \delta)$. Setting $\delta = 1$
+recovers the binary $RG$ above; $\lambda$ and $\delta$ are hyperparameters,
+tuned once and then fixed [@faustine2020wrg]. The resulting $WRG_{w \times
+w}$ image, together with the V-I image introduced above, is what a small
+three-layer CNN classifies.
+
+{{< embed 02-feature-engineering-code.ipynb#b2a8a8db >}}
+
+The panels above make the earlier claim concrete: the weighted version keeps
+gradations the binary version collapses to a single color. On real datasets,
+that difference is not cosmetic. Moving from binary $RG$ to $WRG$ raises
+macro $F_1$ from 98.96% to 99.86% on the COOLL dataset and from 88.18% to
+94.35% on PLAID [@faustine2020wrg; @picon2016cooll; @gao2014plaid]. Against
+the V-I image baseline, evaluated with leave-one-house-out cross-validation
+so the comparison reflects generalization to a house the model never trained
+on, $WRG$ wins by 0.92, 8.5, and 4.5 percentage points of macro $F_1$ on
+COOLL, WHITED, and PLAID respectively
+[@faustine2020wrg; @debaets2018energybuildings; @kahl2016whited; @gao2015feasibility].
+
+{{< embed 02-feature-engineering-code.ipynb#b5120beb >}}
+
+## Making the hyperparameters learnable: AWRG
+
+$\lambda$ and $\delta$ still have to be chosen somehow, and hand-tuning two
+hyperparameters per dataset does not scale. The adaptive weighted recurrence
+graph (AWRG) treats them the same way a neural network treats its own
+weights: as parameters learned by gradient descent, initialized once and
+then updated during training rather than fixed in advance
+[@faustine2021awrg]. The block that does this is only two lines: floor the
+scaled distance, then clip it to the learned ceiling. On aggregated,
+multi-appliance PLAID and on the three-phase LILACD dataset, initializing
+both parameters near 10 gives the fastest, most stable convergence;
+initializing at zero stalls training outright, because the gradient has
+nothing to push against. AWRG lifts PLAID from 0.91 to 0.98 on the Matthews
+correlation coefficient (MCC, a single balanced accuracy score that tops out
+at 1.0), cutting misclassifications from 8.32% to 2.23%, and lifts LILACD
+from 0.85 to 0.98 MCC (13.82% down to 1.66%), both against the same V-I
+baseline [@faustine2021awrg; @kahl2019lilacd].
+
+## Extending to industrial, three-phase settings
+
+Which brings the chapter back to the bulb. Industrial sites mix large
+three-phase machinery with ordinary single-phase appliances, and real
+three-phase power is rarely perfectly balanced across all three lines
+[@henriet2018generative]. When a small appliance shares a line with a large,
+unbalanced load, its activation current comes out distorted, and WRG built
+directly on that raw current inherits the distortion.
+
+{{< embed 02-feature-engineering-code.ipynb#f0460681 >}}
+
+The tool for pulling the small signal back out is the Fortescue transform, a
+long-standing technique for decomposing an unbalanced three-phase system
+into three components: positive-sequence, negative-sequence, and
+zero-sequence. For a perfectly balanced three-phase system, the
+zero-sequence component is exactly zero. So whatever zero-sequence current
+does show up is, by construction, a direct measure of the imbalance itself,
+which is exactly where a single-phase appliance's own signature tends to
+concentrate once it is sharing a line with something much larger
+[@faustine2023ftnilm].
+
+{{< embed 02-feature-engineering-code.ipynb#77515a5e >}}
+
+Applying the Fortescue transform before building the recurrence graph, then
+classifying with the same architecture as before, raises the combined-phase
+$F_1$ score on LILACD from 94.21% without the transform to 96.43% with it.
+The V-I baseline fares far worse under imbalance: below 60% $F_1$ for
+resistive single-phase appliances like the coffee machine, kettle, and
+raclette, precisely the appliances most likely to sit on a line with a large
+motor [@faustine2023ftnilm; @kahl2019lilacd].
+
+## Training and evaluating the classifier
+
+Every number so far has been cited from the papers. This section trains a
+real classifier instead, on the full LILACD dataset: all 16 appliance types
+at once, three phases stacked as three input channels. The architecture is
+the same small three-layer CNN described earlier. The only thing that
+changes between runs is which image representation feeds it: V-I, WRG, or
+WRG with the Fortescue transform applied first. Following the same protocol
+as the AWRG paper, the model trains on a stratified 75% of the data and is
+evaluated on the untouched remaining 25% [@faustine2021awrg].
+
+{{< embed 02-feature-engineering-code.ipynb#3bc2d836 >}}
+{{< embed 02-feature-engineering-code.ipynb#027c858f >}}
+
+This notebook's own run is smaller and faster than the published
+experiments: 40 training iterations on a single split, not 600 iterations
+across a 4-fold cross-validation. Treat the exact numbers as a live sanity
+check, not a reproduction of the paper's headline scores. The ranking still
+comes out the same way: V-I trails badly (macro $F_1$
+around 48%), WRG is a large step up (around 88%), and adding the Fortescue
+transform improves it further still (around 93%), the same ordering
+reported at full scale above.
+
+{{< embed 02-feature-engineering-code.ipynb#82b5b481 >}}
+
+The confusion matrix shows where the WRG+FT model still struggles, and it is
+not random. In this run, Raclette gets mistaken for Coffee-machine more than
+any other pair, both are simple resistive heating elements with similar
+current shapes, and a smaller Hair-dryer/Raclette confusion survives too.
+That second pair is the same one the FT paper itself calls out: without the
+transform, RG confuses Hair-dryer and Raclette repeatedly; FT does not erase
+that confusion, it only shrinks it [@faustine2023ftnilm]. Fixing what is
+left would need a feature that distinguishes resistive loads by something
+other than current magnitude, not a bigger version of the same image.
+
+## Why bother
+
+None of this is only an accuracy exercise. An industrial site that can
+recognize its machines from one aggregate current measurement, phase
+imbalance and all, gets a single point of monitoring for equipment that
+would otherwise need a sub-meter per machine, and a foothold for
+predictive maintenance: catching a motor's changing signature before it
+fails, the same value proposition Chapter 1 introduced for a household
+fridge, now at industrial scale [@faustine2023ftnilm].
+
+## Where this part of the book goes
+
+This chapter treated every event as caused by exactly one appliance
+changing state. Real aggregate signals rarely cooperate:
+
+- **Chapter 3, multi-appliance recognition**, extends this same graph-based
+  representation to the more realistic case where several appliances change
+  state at once, all captured in the same activation window.
+- **Chapter 4, deep learning at low frequency**, moves off event-based,
+  high-frequency features entirely, onto the energy-estimation side of NILM
+  introduced in Chapter 1.
+
+::: {.ark-mistake}
+<span class="ark-mistake-title"><i class="bi bi-bug-fill"></i> Common Mistake</span>
+
+Assuming a larger embedding size $w$ always helps. Past a certain
+resolution, a bigger $WRG$ image does not improve classification, it only
+slows training down. Too small a $w$, on the other hand, genuinely loses
+information. The right size is found empirically, once, not maximized by
+default.
+:::
+
+## References
+
+::: {#refs}
+:::

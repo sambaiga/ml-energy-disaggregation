@@ -5,7 +5,7 @@ on:
     branches:
       - main
     paths:
-      - "tutorials/**"
+      - "book/**"
       - "ark/plot/**"
       - "_quarto.yml"
       - "index.qmd"
@@ -49,7 +49,7 @@ jobs:
         uses: actions/cache@v4
         with:
           path: _freeze
-          key: quarto-freeze-${{ runner.os }}-${{ hashFiles('tutorials/**/*.ipynb', 'tutorials/**/*.qmd', '_quarto.yml') }}
+          key: quarto-freeze-${{ runner.os }}-${{ hashFiles('book/**/*.ipynb', 'book/**/*.qmd', '_quarto.yml') }}
           restore-keys: |
             quarto-freeze-${{ runner.os }}-
 

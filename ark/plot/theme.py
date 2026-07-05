@@ -14,7 +14,7 @@ from lets_plot import element_blank, element_line, element_rect, element_text, t
 from ark.plot.tokens import BODY_FONT_STACK, BRAND_PALETTE
 
 # Backwards-compatible aliases - existing call sites (ark.plot.basic_plots,
-# tutorials/03-data-analysis) import these names directly.
+# book/03-data-analysis) import these names directly.
 pro_colors = BRAND_PALETTE
 
 

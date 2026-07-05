@@ -47,8 +47,8 @@ Every chapter is a Jupyter notebook or QMD file meant to be run top to bottom, n
 ## Project structure
 
 ```
-tutorials/            # chapters, one notebook or .qmd per chapter, grouped into parts
-tutorials/_quarto/    # brand.scss, the site's visual theme
+book/                 # chapters, one notebook or .qmd per chapter, grouped into parts
+book/_quarto/         # brand.scss, the site's visual theme
 ark/plot/             # shared branding module: theme, tokens, and Great Tables styling
                        # used by every chart and table in the book
 tests/                # tests for any code promoted out of a notebook into ark/

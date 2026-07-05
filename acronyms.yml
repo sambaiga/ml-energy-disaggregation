@@ -1,0 +1,16 @@
+---
+acronyms:
+  keys:
+    - shortname: NILM
+      longname: Non-Intrusive Load Monitoring
+    - shortname: LV
+      longname: Low Voltage
+    - shortname: MV
+      longname: Medium Voltage
+    - shortname: DER
+      longname: Distributed Energy Resources
+    - shortname: PV
+      longname: Photovoltaic
+    - shortname: CRPS
+      longname: Continuously Ranked Probability Score
+...
