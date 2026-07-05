@@ -1,4 +1,4 @@
-"""Hand-drawn concept diagrams for the tutorials, using matplotlib directly.
+"""Hand-drawn concept diagrams for the book, using matplotlib directly.
 
 Unlike everything else in :mod:`ark.plot`, these are not data visualisations:
 each function draws a fixed, illustrative diagram for one specific concept

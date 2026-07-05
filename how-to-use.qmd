@@ -1,0 +1,14 @@
+---
+title: "How to Use This Book"
+---
+
+This book is meant to be worked through, not skimmed. Each chapter pairs a
+narrative page like this one with a companion notebook: **run it top to
+bottom**, don't just read it. Along the way you'll see four recurring markers.
+
+| Marker | Purpose |
+|--------|---------|
+| <i class="bi bi-info-circle-fill" style="color:#0369A1"></i> **Key Concept** | The core idea, precisely defined |
+| <i class="bi bi-puzzle-fill" style="color:#009E73"></i> **Activity** | Hands-on challenge: fill in the `...` yourself before moving on |
+| <i class="bi bi-bug-fill" style="color:#DC2626"></i> **Common Mistake** | A bug pattern worth recognising on sight |
+| <i class="bi bi-lightbulb-fill" style="color:#7C3AED"></i> **Pro Tip** | A production-grade habit |

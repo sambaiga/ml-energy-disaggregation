@@ -3,8 +3,9 @@ project:
   output-dir: _book
 
 book:
-  title: "Machine Learning for Energy Disaggregation"
-  subtitle: "A Structured Path from Signal to Appliance-Level Insight"
+  title: "Machine Learning for Smart Meter Data"
+  subtitle: "A Structured Path from Meter Signal to Business Insight"
+  description: "A structured, project-based path through smart meter data: disaggregation, forecasting, anomaly detection, and grid-edge value, from raw signal to business insight."
   author: "Anthony Faustine"
   date: today
   favicon: assets/favicon.svg
@@ -48,21 +49,46 @@ book:
   chapters:
     - index.qmd
     - preface.qmd
+    - how-to-use.qmd
+    - part: "Part 2: Disaggregation"
+      chapters:
+        - book/02-disaggregation/01-what-is-nilm.qmd
+        - book/02-disaggregation/02-feature-engineering.qmd
     - about.qmd
+    - acronyms.qmd
 
   # Parts are added chapter by chapter as each is written.
   #  - part: "Part 1: Foundations"
   #    chapters:
-  #      - tutorials/01-foundations/01-intro.ipynb
+  #      - book/01-foundations/01-intro.ipynb
+
+
+csl: book/_quarto/ieee.csl
+
+filters:
+  - acronyms
+
+acronyms:
+  fromfile: acronyms.yml
+  insert_loa: false
 
 icons:
   bootstrap: true
 
 format:
   html:
+    # References render at the end of each chapter, not consolidated, so a
+    # citation's link target can't be reliably scoped to "this chapter" by
+    # Quarto/pandoc across a multi-chapter book (see quarto-dev/quarto-cli
+    # discussion #11873 - no per-chapter bibliography scoping exists yet).
+    # Disable citation hyperlinking rather than ship links that silently
+    # jump to the wrong chapter; the full reference is a scroll away either way.
+    link-citations: false
+    open-graph: true
+    twitter-card: true
     theme:
-      light: [cosmo, tutorials/_quarto/brand.scss]
-      dark: [darkly, tutorials/_quarto/brand-dark.scss]
+      light: [cosmo, book/_quarto/brand.scss]
+      dark: [darkly, book/_quarto/brand-dark.scss]
     highlight-style: github
     code-fold: false
     code-copy: true

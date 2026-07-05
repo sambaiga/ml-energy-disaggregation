@@ -5,15 +5,15 @@ on:
     branches:
       - main
     paths:
-      - "tutorials/**/*.ipynb"
-      - "tutorials/**/data/**"
+      - "book/**/*.ipynb"
+      - "book/**/data/**"
       - "ark/**"
       - "pyproject.toml"
       - "uv.lock"
   pull_request:
     paths:
-      - "tutorials/**/*.ipynb"
-      - "tutorials/**/data/**"
+      - "book/**/*.ipynb"
+      - "book/**/data/**"
       - "ark/**"
       - "pyproject.toml"
       - "uv.lock"
@@ -33,14 +33,19 @@ jobs:
       - name: Resolve changed notebooks
         id: changed
         run: |
-          # Notebooks skipped from CI execution (not ready or too slow).
-          # Add filenames here as needed, space-separated, e.g.:
-          # SKIP_LIST="tutorials/01-foundations/03-slow-chapter.ipynb"
-          SKIP_LIST=""
+          # Notebooks skipped from CI execution (not ready, too slow, or
+          # dependent on gitignored local data).
+          # book/02-disaggregation/02-feature-engineering-code.ipynb loads
+          # real PLAID/LILACD data from resources/nilm-code/AWRGNILM, the
+          # author's own research code, gitignored and not available in CI.
+          # Its outputs are committed and {{< embed >}} reads them directly
+          # without re-executing the notebook, so the rendered book is
+          # unaffected; only this from-scratch CI re-execution can't run it.
+          SKIP_LIST="book/02-disaggregation/02-feature-engineering-code.ipynb"
 
           # Helper: find all notebooks, excluding archived ones
           find_notebooks() {
-            find tutorials -name "*.ipynb" -not -path "*/_archive/*" | sort | tr '\n' ' '
+            find book -name "*.ipynb" -not -path "*/_archive/*" | sort | tr '\n' ' '
           }
 
           # Determine base commit to diff against

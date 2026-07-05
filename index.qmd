@@ -1,33 +1,121 @@
 ---
 title: "Welcome"
-title-block-banner: true
+title-block-banner: false
 page-layout: article
+description: "A structured, project-based path through smart meter data: disaggregation, forecasting, anomaly detection, and grid-edge value, from raw signal to business insight."
 ---
 
-<div class="cover-hero">
+<div class="cover-hero column-page">
+<div class="cover-hero-row">
 <div class="cover-hero-text">
 <p class="cover-eyebrow">A practical book for energy analytics and ML practitioners</p>
-<h1>Machine Learning for Energy Disaggregation</h1>
-<p>A structured, project-based path through non-intrusive load monitoring: from raw smart-meter signal to appliance-level insight, built to be run and not just read.</p>
+<h1>Machine Learning for Smart Meter Data</h1>
+<p>From raw meter signal to business decision: disaggregation, forecasting, and grid-edge value, built to be run, not just read.</p>
 <p class="cover-author">By <a href="https://sambaiga.github.io/" style="color:#38BDF8;font-weight:600">Anthony Faustine</a>&nbsp;&nbsp;<a href="https://github.com/sambaiga" title="GitHub" style="color:#94A3B8"><i class="bi bi-github"></i></a>&nbsp;<a href="https://www.linkedin.com/in/sambaiga" title="LinkedIn" style="color:#94A3B8"><i class="bi bi-linkedin"></i></a>&nbsp;<a href="mailto:sambaiga@gmail.com" title="Email" style="color:#94A3B8"><i class="bi bi-envelope-at"></i></a></p>
 
-<a href="preface.qmd" class="btn-cover btn-secondary-cover"><i class="bi bi-book"></i> Read the preface</a>
+<div class="cover-cta-row">
+<a href="preface.qmd" class="btn-cover btn-primary-cover"><i class="bi bi-book"></i> Read the preface</a>
+<a href="https://github.com/sambaiga/ml-energy-disaggregation" class="btn-cover btn-secondary-cover"><i class="bi bi-github"></i> View on GitHub</a>
 </div>
 </div>
 
-::: {.callout-note icon=false #callout-guide}
-## How this book works
+<div class="cover-hero-visual" role="img" aria-label="A meter signal flows through data analytics and ML into business value">
+<div class="signal-node signal-node-meter">
+<span class="signal-icon"><i class="bi bi-speedometer2"></i></span>
+<span class="signal-node-label">Meter Signal</span>
+</div>
+<span class="signal-connector"></span>
+<div class="signal-node signal-node-model">
+<span class="signal-icon"><i class="bi bi-cpu-fill"></i></span>
+<span class="signal-node-label">Data &amp; ML</span>
+</div>
+<span class="signal-connector"></span>
+<div class="signal-node signal-node-value">
+<span class="signal-icon"><i class="bi bi-bullseye"></i></span>
+<span class="signal-node-label">Business Value</span>
+</div>
+</div>
+</div>
 
-Every chapter is a Jupyter notebook or QMD file meant to be **run top to bottom**, not just read. Along the way you will see four recurring markers:
+<div class="pipeline-flow">
+<div class="pipeline-step">
+<span class="pipeline-dot pipeline-dot-1"><i class="bi bi-activity"></i></span>
+<span class="pipeline-label">Meter Signal</span>
+</div>
+<span class="pipeline-arrow">&#8594;</span>
+<a class="pipeline-step" href="book/02-disaggregation/01-what-is-nilm.qmd">
+<span class="pipeline-dot pipeline-dot-2"><i class="bi bi-plug-fill"></i></span>
+<span class="pipeline-label">Disaggregation</span>
+</a>
+<span class="pipeline-arrow">&#8594;</span>
+<div class="pipeline-step">
+<span class="pipeline-dot pipeline-dot-3"><i class="bi bi-graph-up-arrow"></i></span>
+<span class="pipeline-label">Forecasting</span>
+</div>
+<span class="pipeline-arrow">&#8594;</span>
+<div class="pipeline-step">
+<span class="pipeline-dot pipeline-dot-4"><i class="bi bi-diagram-3-fill"></i></span>
+<span class="pipeline-label">Grid-Edge Value</span>
+</div>
+</div>
+</div>
 
-| Marker | Purpose |
-|--------|---------|
-| <i class="bi bi-info-circle-fill" style="color:#0369A1"></i> **Key Concept** | The core idea, precisely defined |
-| <i class="bi bi-puzzle-fill" style="color:#009E73"></i> **Activity** | Hands-on challenge: fill in the `...` yourself before moving on |
-| <i class="bi bi-bug-fill" style="color:#DC2626"></i> **Common Mistake** | A bug pattern worth recognising on sight |
-| <i class="bi bi-lightbulb-fill" style="color:#7C3AED"></i> **Pro Tip** | A production-grade habit |
-:::
+<div class="column-page">
 
 <p class="section-label">Your learning path</p>
 
-<p style="color:#94A3B8;font-size:0.95rem;">Chapters are being written and will appear here as each is finished. <a href="https://github.com/sambaiga/ml-energy-disaggregation" style="color:#64748B">Follow progress on GitHub</a>.</p>
+<div class="roadmap-grid">
+
+<div class="act-card">
+<div class="act-stripe act-1"></div>
+<div class="act-inner">
+<i class="bi bi-activity act-icon act-icon-1"></i>
+<span class="act-eyebrow">Part 1 · Foundations</span>
+<p class="act-desc">Smart meter data fundamentals, signal processing, and the data pipelines every later chapter builds on.</p>
+<ul class="act-chapters">
+<li><span class="ch-row"><span class="ch-num">01</span><span class="ch-name">Reading a meter signal</span><span class="ch-soon">Soon</span></span></li>
+</ul>
+</div>
+</div>
+
+<div class="act-card">
+<div class="act-stripe act-2"></div>
+<div class="act-inner">
+<i class="bi bi-plug-fill act-icon act-icon-2"></i>
+<span class="act-eyebrow">Part 2 · Disaggregation</span>
+<p class="act-desc">Non-intrusive load monitoring: from the aggregate signal to appliance-level insight.</p>
+<ul class="act-chapters">
+<li><a href="book/02-disaggregation/01-what-is-nilm.qmd"><span class="ch-num">01</span><span class="ch-name">What Is Non-Intrusive Load Monitoring</span><i class="bi bi-check-circle-fill ch-check"></i></a></li>
+</ul>
+</div>
+</div>
+
+<div class="act-card">
+<div class="act-stripe act-3"></div>
+<div class="act-inner">
+<i class="bi bi-graph-up-arrow act-icon act-icon-3"></i>
+<span class="act-eyebrow">Part 3 · Forecasting</span>
+<p class="act-desc">Probabilistic load and PV forecasting, built on Twiga: point forecasts and calibrated uncertainty.</p>
+<ul class="act-chapters">
+<li><span class="ch-row"><span class="ch-num">03</span><span class="ch-name">Forecasting with uncertainty</span><span class="ch-soon">Soon</span></span></li>
+</ul>
+</div>
+</div>
+
+<div class="act-card">
+<div class="act-stripe act-4"></div>
+<div class="act-inner">
+<i class="bi bi-diagram-3-fill act-icon act-icon-4"></i>
+<span class="act-eyebrow">Part 4 · Grid-Edge Value</span>
+<p class="act-desc">Clustering, anomaly and theft detection, and LV hosting-capacity questions as DER growth reshapes the grid.</p>
+<ul class="act-chapters">
+<li><span class="ch-row"><span class="ch-num">04</span><span class="ch-name">Value at the grid edge</span><span class="ch-soon">Soon</span></span></li>
+</ul>
+</div>
+</div>
+
+</div>
+
+<p style="color:#94A3B8;font-size:0.85rem;">Chapters are being written part by part. <a href="https://github.com/sambaiga/ml-energy-disaggregation" style="color:#64748B">Follow progress on GitHub</a>.</p>
+
+</div>

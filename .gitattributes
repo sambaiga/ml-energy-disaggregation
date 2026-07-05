@@ -2,3 +2,13 @@
 *.ipynb	diff=jupyternotebook
 
 *.ipynb	merge=jupyternotebook
+
+# Some machines have a global `*.ipynb filter=nbstripout` registered (from an
+# unrelated project's `nbstripout --install --global`), which strips outputs
+# and regenerates cell ids on every commit with no flags. This project keeps
+# notebook outputs and stable cell ids on purpose (the paired .qmd chapters
+# reference specific cell ids via `{{< embed >}}`) through its own
+# pre-commit hook (`nbstripout --keep-output --keep-id`) instead. Explicitly
+# unset any inherited filter so a stray global config can't silently corrupt
+# committed notebooks.
+*.ipynb	-filter

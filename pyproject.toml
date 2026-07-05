@@ -27,6 +27,7 @@ dependencies = [
     "structlog>=24.0.0",
     "rich>=13.0.0",
     "scikit-learn>=1.7.2",
+    "scipy>=1.18.0",
     "joblib>=1.3.0",
     "pytest>=8.2.1",
 ]
@@ -38,6 +39,7 @@ modelling = [
     "optuna-integration>=4.5.0",
     "torch>=2.0.0",
     "pytorch-lightning>=2.0.0",
+    "twiga[nn]>=1.0.0",
 ]
 
 mlops = [
@@ -126,8 +128,8 @@ all = true
 exclude = ["tests/"]
 
 [tool.codespell]
-skip = "*.ipynb,_freeze/*"
-ignore-words-list = "mape,fpr,rouge"
+skip = "*.ipynb,_freeze/*,_extensions/*"
+ignore-words-list = "mape,fpr,rouge,hart"
 
 [tool.commitizen]
 bump_message = "bump: v$current_version → v$new_version"

@@ -3,14 +3,16 @@ name: Check QMD Files
 on:
   push:
     paths:
-      - "tutorials/**/*.qmd"
-      - "tutorials/_quarto/**"
+      - "*.qmd"
+      - "book/**/*.qmd"
+      - "book/_quarto/**"
       - "_quarto.yml"
       - ".github/workflows/check-qmd.yml"
   pull_request:
     paths:
-      - "tutorials/**/*.qmd"
-      - "tutorials/_quarto/**"
+      - "*.qmd"
+      - "book/**/*.qmd"
+      - "book/_quarto/**"
       - "_quarto.yml"
       - ".github/workflows/check-qmd.yml"
   workflow_dispatch:
@@ -25,15 +27,15 @@ jobs:
 
       - name: Check for em-dashes in QMD files
         run: |
-          if grep -rPn "—" tutorials --include="*.qmd" 2>/dev/null; then
-            echo "Em-dashes found in QMD files. Use a colon or comma instead."
+          if grep -rPn "—" book --include="*.qmd" 2>/dev/null || grep -lPn "—" *.qmd 2>/dev/null; then
+            echo "Em-dashes found in QMD files. Use a colon, comma, or period instead."
             exit 1
           fi
           echo "No em-dashes found."
 
       - name: Check for invalid code block syntax
         run: |
-          if grep -rPn "\{[a-z]+ eval=false\}" tutorials --include="*.qmd" 2>/dev/null; then
+          if grep -rPn "\{[a-z]+ eval=false\}" book --include="*.qmd" 2>/dev/null || grep -lPn "\{[a-z]+ eval=false\}" *.qmd 2>/dev/null; then
             echo "Found {lang eval=false} code block syntax. Use plain \`\`\`language fences for display-only blocks."
             exit 1
           fi
@@ -41,7 +43,7 @@ jobs:
 
       - name: Check for inline callout styles (should use CSS classes in QMD)
         run: |
-          if grep -rPn 'style="background:#EAF3FA' tutorials --include="*.qmd" 2>/dev/null; then
+          if grep -rPn 'style="background:#EAF3FA' book --include="*.qmd" 2>/dev/null || grep -lPn 'style="background:#EAF3FA' *.qmd 2>/dev/null; then
             echo "Found inline callout styles in QMD files. Use .ark-concept, .ark-activity etc. CSS classes instead."
             exit 1
           fi
@@ -62,7 +64,7 @@ jobs:
               echo "Missing YAML frontmatter in $f"
               rc=1
             fi
-          done < <(find tutorials -name "*.qmd" -print0)
+          done < <(find book -maxdepth 10 -name "*.qmd" -print0; find . -maxdepth 1 -name "*.qmd" -print0)
           exit $rc
 
       - name: Check all cross-reference targets exist
@@ -70,21 +72,33 @@ jobs:
           python3 - <<'PYEOF'
           import os, re, sys
           rc = 0
-          for dirpath, _, filenames in os.walk('tutorials'):
-              for fname in sorted(filenames):
-                  if not fname.endswith('.qmd'):
+          roots = ['book', '.']
+          seen = set()
+          for root in roots:
+              maxdepth_ok = root != '.'
+              for dirpath, dirnames, filenames in os.walk(root):
+                  if not maxdepth_ok and dirpath != '.':
+                      dirnames[:] = []
                       continue
-                  fpath = os.path.join(dirpath, fname)
-                  with open(fpath) as fh:
-                      content = fh.read()
-                  for href in re.findall(r'\[[^\]]+\]\(([^)]+)\)', content):
-                      path_part = href.split('#')[0]
-                      if not path_part or path_part.startswith(('http', 'mailto')):
+                  if root == '.':
+                      dirnames[:] = [d for d in dirnames if d not in ('book', 'resources', '.venv', '_book', '_extensions', '.git')]
+                  for fname in sorted(filenames):
+                      if not fname.endswith('.qmd'):
                           continue
-                      target = os.path.normpath(os.path.join(dirpath, path_part))
-                      if not os.path.exists(target):
-                          print(f"Broken link in {fpath}: {href}")
-                          rc = 1
+                      fpath = os.path.normpath(os.path.join(dirpath, fname))
+                      if fpath in seen:
+                          continue
+                      seen.add(fpath)
+                      with open(fpath) as fh:
+                          content = fh.read()
+                      for href in re.findall(r'\[[^\]]+\]\(([^)]+)\)', content):
+                          path_part = href.split('#')[0]
+                          if not path_part or path_part.startswith(('http', 'mailto')):
+                              continue
+                          target = os.path.normpath(os.path.join(dirpath, path_part))
+                          if not os.path.exists(target):
+                              print(f"Broken link in {fpath}: {href}")
+                              rc = 1
           sys.exit(rc)
           PYEOF
 
@@ -93,26 +107,37 @@ jobs:
           python3 - <<'PYEOF'
           import os, sys
           rc = 0
-          for dirpath, _, filenames in os.walk('tutorials'):
-              for fname in sorted(filenames):
-                  if not fname.endswith('.qmd'):
-                      continue
-                  fpath = os.path.join(dirpath, fname)
-                  in_block = False
-                  unlabelled = []
-                  with open(fpath) as fh:
-                      for lineno, line in enumerate(fh, 1):
-                          stripped = line.rstrip()
-                          if stripped.startswith('```'):
-                              if in_block:
-                                  in_block = False   # closing fence
-                              elif stripped == '```':
-                                  unlabelled.append(lineno)
-                                  in_block = True    # opening fence, no language
-                              else:
-                                  in_block = True    # opening fence with language
-                  if unlabelled:
-                      print(f"{fpath}: unlabelled opening fence(s) at lines {unlabelled}")
-                      rc = 1
+          roots = ['book', '.']
+          seen = set()
+          for root in roots:
+              for dirpath, dirnames, filenames in os.walk(root):
+                  if root == '.':
+                      if dirpath != '.':
+                          dirnames[:] = []
+                          continue
+                      dirnames[:] = [d for d in dirnames if d not in ('book', 'resources', '.venv', '_book', '_extensions', '.git')]
+                  for fname in sorted(filenames):
+                      if not fname.endswith('.qmd'):
+                          continue
+                      fpath = os.path.normpath(os.path.join(dirpath, fname))
+                      if fpath in seen:
+                          continue
+                      seen.add(fpath)
+                      in_block = False
+                      unlabelled = []
+                      with open(fpath) as fh:
+                          for lineno, line in enumerate(fh, 1):
+                              stripped = line.rstrip()
+                              if stripped.startswith('```'):
+                                  if in_block:
+                                      in_block = False   # closing fence
+                                  elif stripped == '```':
+                                      unlabelled.append(lineno)
+                                      in_block = True    # opening fence, no language
+                                  else:
+                                      in_block = True    # opening fence with language
+                      if unlabelled:
+                          print(f"{fpath}: unlabelled opening fence(s) at lines {unlabelled}")
+                          rc = 1
           sys.exit(rc)
           PYEOF

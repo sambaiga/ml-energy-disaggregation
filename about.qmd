@@ -19,13 +19,42 @@ title: "About the Author"
 </div>
 ```
 
-I am a Principal Machine Learning Engineer with 10+ years designing, building, and operating production-grade ML systems across energy, industrial, and semiconductor domains. My work spans the full arc of a machine learning project: framing the problem, building the model, engineering the pipeline, and keeping it honest in production.
+Every part of this book started as something I had to solve for real, not as a
+topic I picked to write about.
 
-At [Analog Devices](https://www.analog.com), I architect machine learning systems for supply chain demand planning and edge inference. Previously at [Eaton](https://www.eaton.com), I served as Lead Data Scientist and Principal Investigator at the Centre for Intelligent Power, securing €1.6M in competitive research funding and receiving the **Eaton STAR Leadership Award** for engineering innovation and cross-functional impact. My open-source work includes [Twiga](https://github.com/sambaiga/twiga), a production forecasting library with REST serving and MLOps integration, [MLPForecast](https://github.com/sambaiga/mlpforecast), an MLP-based net-load forecasting toolkit with uncertainty quantification, and [Deep-NILMtk](https://github.com/BHafsa/Deep-NILMtk), a community deep learning toolkit for non-intrusive load monitoring.
+The earliest was disaggregation: teaching a model to look at one aggregate
+power reading and say which appliance was drawing it, the same problem Part 2
+of this book covers. That question led to the one utilities actually pay for:
+not just what's running now, but what demand and solar output will look like
+tomorrow, with an honest estimate of how wrong that forecast might be. My PhD
+took that question to the low-voltage substation, forecasting net load in the
+presence of solar and EV charging when a headline accuracy number wasn't good
+enough to act on. At [Eaton](https://www.eaton.com)'s Centre for Intelligent
+Power, I ran that same question as Lead Data Scientist and Principal
+Investigator, securing €1.6M in competitive research funding and picking up
+the Eaton STAR Leadership Award along the way.
+
+Today, as Principal ML Engineer at [Analog Devices](https://www.analog.com),
+the question is the same one this book keeps returning to: not whether a model
+works in a notebook, but whether it survives contact with production, supply
+chain demand planning and edge inference in my case. That is the bar every
+chapter here holds itself to.
+
+The open-source side of that decade is public:
+[Twiga](https://github.com/sambaiga/twiga) (point and probabilistic
+forecasting, one interface, every model), [MLPForecast](https://github.com/sambaiga/mlpforecast)
+(uncertainty-aware net-load forecasting), and
+[Deep-NILMtk](https://github.com/BHafsa/Deep-NILMtk) (a community toolkit for
+non-intrusive load monitoring, the same disaggregation problem this book opens
+with).
 
 **Projects** &nbsp;→&nbsp; [sambaiga.github.io/pages/projects](https://sambaiga.github.io/pages/projects/index.html)
 
-My research spans non-intrusive load monitoring, probabilistic forecasting, uncertainty quantification, physics-based intelligence, and AI for reliability engineering. I have authored 10+ peer-reviewed papers in IEEE Transactions on Smart Grid, IEEE Transactions on Power Systems, and IEEE Transactions on Industrial Informatics.
+The published record runs the same thread: non-intrusive load monitoring,
+probabilistic forecasting, uncertainty quantification, physics-based
+intelligence, and AI for reliability engineering, across 10+ peer-reviewed
+papers in IEEE Transactions on Smart Grid, IEEE Transactions on Power Systems,
+and IEEE Transactions on Industrial Informatics.
 
 **Publications** &nbsp;→&nbsp; [sambaiga.github.io/pages/publication](https://sambaiga.github.io/pages/publication/index.html) &nbsp;·&nbsp; [ORCID](https://orcid.org/0000-0002-7838-533X)
 

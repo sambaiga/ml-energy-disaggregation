@@ -1,19 +1,23 @@
 /*-- scss:defaults --*/
 
-// Brand tokens, mirrors ark/plot/tokens.py and sambaiga.github.io _defaults.scss.
-// Keep these three in sync by hand.
+// Dark-mode counterpart to brand.scss. Same structure and typography,
+// colors chosen for a dark background instead of derived at compile time:
+// Quarto compiles this as a wholly separate bundle layered on darkly, so
+// keeping it a full sibling file (not a conditional inside brand.scss)
+// avoids relying on bootswatch variable state that isn't reliably
+// available yet when a custom theme's own defaults block runs.
 
-$primary:              #1E293B;
-$link-color:           #0369A1;
-$body-color:           #1A202C;
-$body-bg:              #FFFFFF;
-$code-bg:              #F8FAFC;
-$code-color:           #0F172A;
+$primary:              #38BDF8;
+$link-color:           #38BDF8;
+$body-color:           #E2E8F0;
+$body-bg:              #0F172A;
+$code-bg:              #1E293B;
+$code-color:           #E2E8F0;
 
 $font-family-sans-serif: "Libre Franklin", "Segoe UI", system-ui, sans-serif !default;
 $headings-font-family:   "Jost", "Segoe UI", system-ui, sans-serif !default;
 $headings-font-weight:   600;
-$headings-color:         #1E293B;
+$headings-color:         #F1F5F9;
 $font-size-base:         1.0625rem;
 $line-height-base:       1.8;
 
@@ -40,19 +44,19 @@ h1, h2, h3, h4 {
 
 .content h2,
 .chapter h2 {
-  border-bottom: 1px solid #EEF2F7;
+  border-bottom: 1px solid #334155;
   padding-bottom: 0.3em;
   margin-top: 2.5rem;
 }
 
 blockquote {
-  border-left: 4px solid #0369A1;
-  background: #F0F7FF;
+  border-left: 4px solid #38BDF8;
+  background: #16243D;
   padding: 0.9rem 1.25rem;
   margin: 1.5rem 0;
   border-radius: 0 8px 8px 0;
   font-style: italic;
-  color: #334155;
+  color: #CBD5E1;
 
   p { margin-bottom: 0; text-align: left; }
 }
@@ -61,17 +65,17 @@ blockquote {
 
 pre.sourceCode {
   border: none;
-  border-left: 3px solid #0369A1;
+  border-left: 3px solid #38BDF8;
   border-radius: 0 8px 8px 0;
-  background: #F8FAFC;
+  background: #1E293B;
   padding: 1rem 1.3rem;
   font-size: 0.875rem;
 }
 
 code:not(.sourceCode) {
-  background: #EFF6FF;
-  color: #1E3A5F;
-  border: 1px solid #DBEAFE;
+  background: #1E3A5F;
+  color: #BFDBFE;
+  border: 1px solid #2C4A6E;
   padding: 0.15em 0.45em;
   border-radius: 4px;
   font-size: 0.875em;
@@ -83,7 +87,7 @@ code:not(.sourceCode) {
   font-family: $headings-font-family;
   font-size: 0.9rem;
   font-weight: 700;
-  color: #1E293B;
+  color: #F1F5F9;
 }
 
 .sidebar-menu-container {
@@ -95,11 +99,11 @@ code:not(.sourceCode) {
   font-size: 0.75rem;
   text-transform: uppercase;
   letter-spacing: 0.06em;
-  color: #475569;
+  color: #94A3B8;
 }
 
 .sidebar-item.active > .sidebar-item-container .sidebar-item-text {
-  color: #0369A1;
+  color: #38BDF8;
   font-weight: 600;
 }
 
@@ -108,14 +112,14 @@ code:not(.sourceCode) {
 .quarto-title-block {
   padding-bottom: 1rem;
   margin-bottom: 2rem;
-  border-bottom: 2px solid #F1F5F9;
+  border-bottom: 2px solid #334155;
 
   .title { font-size: 1.875rem; line-height: 1.2; }
 }
 
 .quarto-title-breadcrumbs {
   font-size: 0.8125rem;
-  color: #64748B;
+  color: #94A3B8;
 }
 
 // ── Callout (Quarto-native) ──────────────────────────────────────────────────
@@ -127,57 +131,58 @@ div.callout {
 // ── ARK callout divs (QMD chapters only; notebooks use inline styles) ────────
 
 .ark-concept {
-  background: #EAF3FA;
-  border-left: 5px solid #0369A1;
+  background: #16243D;
+  border-left: 5px solid #38BDF8;
   padding: 14px 18px;
   border-radius: 0 8px 8px 0;
   margin: 18px 0;
 }
-.ark-concept-title { color: #0369A1; font-weight: bold; }
+.ark-concept-title { color: #38BDF8; font-weight: bold; }
 
 .ark-activity {
-  background: #EBF5F0;
-  border-left: 5px solid #009E73;
+  background: #10291F;
+  border-left: 5px solid #34D399;
   padding: 14px 18px;
   border-radius: 0 8px 8px 0;
   margin: 18px 0;
 }
-.ark-activity-title { color: #065F46; font-weight: bold; }
+.ark-activity-title { color: #34D399; font-weight: bold; }
 .ark-activity pre {
-  background: #FFF8E1;
+  background: #3A2E0A;
   padding: 10px;
   border-radius: 4px;
   font-size: 0.9em;
 }
 
 .ark-tip {
-  background: #F5F3FF;
-  border-left: 5px solid #7C3AED;
+  background: #241B3D;
+  border-left: 5px solid #A78BFA;
   padding: 14px 18px;
   border-radius: 0 8px 8px 0;
   margin: 18px 0;
 }
-.ark-tip-title { color: #5B21B6; font-weight: bold; }
+.ark-tip-title { color: #A78BFA; font-weight: bold; }
 
 .ark-mistake {
-  background: #FEF2F2;
-  border-left: 5px solid #DC2626;
+  background: #3A1414;
+  border-left: 5px solid #F87171;
   padding: 14px 18px;
   border-radius: 0 8px 8px 0;
   margin: 18px 0;
 }
-.ark-mistake-title { color: #991B1B; font-weight: bold; }
+.ark-mistake-title { color: #F87171; font-weight: bold; }
 
 .ark-example {
-  background: #EAF7F0;
-  border-left: 5px solid #059669;
+  background: #0F2A1E;
+  border-left: 5px solid #34D399;
   padding: 14px 18px;
   border-radius: 0 8px 8px 0;
   margin: 18px 0;
 }
-.ark-example-title { color: #059669; font-weight: bold; }
+.ark-example-title { color: #34D399; font-weight: bold; }
 
 // ── Footer ───────────────────────────────────────────────────────────────────
+// Already dark by design (matches the cover hero), unchanged from brand.scss.
 
 .nav-footer {
   background-color: #0F172A;
@@ -251,44 +256,44 @@ div.callout {
   display: none;
 }
 
+// ── Cover page: suppress the automatic title block ──────────────────────────
+// index.qmd's .cover-hero already carries title/subtitle/author; without this
+// Quarto's book-level title header renders the same info again just above it.
+body:has(.cover-hero) #title-block-header {
+  display: none;
+}
+
 // ── Cover hero ───────────────────────────────────────────────────────────────
+// Already dark by design, unchanged from brand.scss.
 
 .cover-hero {
-  background:
-    repeating-linear-gradient(
-      -45deg,
-      transparent,
-      transparent 28px,
-      rgba(3, 105, 161, 0.045) 28px,
-      rgba(3, 105, 161, 0.045) 29px
-    ),
-    repeating-linear-gradient(
-      45deg,
-      transparent,
-      transparent 56px,
-      rgba(3, 105, 161, 0.025) 56px,
-      rgba(3, 105, 161, 0.025) 57px
-    ),
-    linear-gradient(160deg, #1E293B 0%, #0F172A 55%, #0C1628 100%);
+  // Anchored on the same dark background the rest of the brand's dark theme
+  // already uses ($dark-body-bg #0F172A on sambaiga.github.io), not an
+  // invented texture.
+  background: linear-gradient(135deg, #1E293B 0%, #0F172A 60%, #0B1220 100%);
+  border: 1px solid rgba(148, 163, 184, 0.08);
+  box-shadow: 0 24px 60px -24px rgba(2, 6, 23, 0.65);
   border-radius: 14px;
-  padding: 44px 48px;
+  padding: 40px 48px 32px;
   margin-bottom: 36px;
   color: #FFFFFF;
   position: relative;
   overflow: hidden;
   display: flex;
-  align-items: center;
-  gap: 36px;
+  flex-direction: column;
+  gap: 26px;
 
+  // Two soft glows in the site's own named brand accents (ai-accent violet,
+  // energy-accent emerald), not generic blue: this book is both of those.
   &::before {
     content: '';
     position: absolute;
-    top: -80px;
-    right: -80px;
-    width: 340px;
-    height: 340px;
+    top: -90px;
+    right: -60px;
+    width: 320px;
+    height: 320px;
     border-radius: 50%;
-    background: radial-gradient(circle, rgba(3,105,161,0.12) 0%, transparent 65%);
+    background: radial-gradient(circle, rgba(139,92,246,0.10) 0%, transparent 65%);
     pointer-events: none;
   }
 
@@ -300,7 +305,7 @@ div.callout {
     width: 220px;
     height: 220px;
     border-radius: 50%;
-    background: radial-gradient(circle, rgba(56,189,248,0.06) 0%, transparent 65%);
+    background: radial-gradient(circle, rgba(16,185,129,0.08) 0%, transparent 65%);
     pointer-events: none;
   }
 
@@ -319,37 +324,147 @@ div.callout {
     text-align: left;
     hyphens: none;
     margin-bottom: 0;
-    max-width: 560px;
+    max-width: 620px;
     line-height: 1.65;
   }
 
   @media (max-width: 576px) {
     padding: 28px 24px;
-    flex-direction: column;
     h1 { font-size: 1.65rem; }
   }
 }
 
+.cover-hero-row {
+  display: flex;
+  align-items: center;
+  gap: 32px;
+  flex-wrap: wrap;
+}
+
 .cover-hero-text {
-  flex: 1;
+  flex: 1 1 320px;
   min-width: 0;
 }
 
+// The signal-to-analytics-to-value diagram: real Bootstrap icons (matching
+// the pipeline strip below), not hand-drawn shapes. Three plain nodes end to
+// end: the raw signal, what processes it, and the payoff, not a repeat of
+// the technique-by-technique breakdown the roadmap grid already covers.
 .cover-hero-visual {
-  flex-shrink: 0;
-  width: 42%;
-  max-width: 400px;
+  flex: 1 1 300px;
+  max-width: 360px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
 
-  svg {
-    width: 100%;
-    height: auto;
-    display: block;
-    opacity: 0.92;
-  }
-
-  @media (max-width: 768px) {
+  @media (max-width: 640px) {
     display: none;
   }
+}
+
+.signal-node {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 9px;
+  flex-shrink: 0;
+}
+
+.signal-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  font-size: 1.5rem;
+  color: #0F172A;
+
+  .signal-node-meter & { background: #38BDF8; }
+  .signal-node-model & { background: #A78BFA; }
+  .signal-node-value & { background: #FBBF24; }
+}
+
+.signal-node-label {
+  font-family: $headings-font-family;
+  font-size: 0.7rem;
+  font-weight: 700;
+  color: #CBD5E1;
+  text-align: center;
+  white-space: nowrap;
+}
+
+.signal-connector {
+  width: 22px;
+  height: 1.5px;
+  background: rgba(148, 163, 184, 0.35);
+  flex-shrink: 0;
+}
+
+.cover-cta-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 6px;
+}
+
+// ── Cover pipeline strip: the book's 4 parts, shown not described ───────────
+
+.pipeline-flow {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 10px 6px;
+  padding-top: 22px;
+  border-top: 1px solid rgba(255,255,255,0.08);
+  position: relative;
+  z-index: 1;
+}
+
+.pipeline-step {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 10px;
+}
+
+.pipeline-dot {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  font-size: 1rem;
+  color: #0F172A;
+  flex-shrink: 0;
+
+  &.pipeline-dot-1 { background: #38BDF8; }
+  &.pipeline-dot-2 { background: #A78BFA; }
+  &.pipeline-dot-3 { background: #34D399; }
+  &.pipeline-dot-4 { background: #FBBF24; }
+}
+
+.pipeline-label {
+  font-family: $headings-font-family;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+  color: #E2E8F0;
+  white-space: nowrap;
+}
+
+.pipeline-arrow {
+  flex-shrink: 0;
+  color: #475569;
+  font-size: 1.1rem;
+  margin: 0 4px;
+}
+
+@media (max-width: 700px) {
+  .pipeline-arrow { display: none; }
 }
 
 .cover-eyebrow {
@@ -450,28 +565,31 @@ div.callout {
     content: '';
     flex: 1;
     height: 1px;
-    background: #EEF2F7;
+    background: #334155;
   }
 }
 
 // ── 4-act learning-path roadmap ───────────────────────────────────────────────
 
 .roadmap-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
   gap: 1.125rem !important;
+  margin: 1.5rem 0 2rem;
 }
 
 .act-card {
-  border: 1px solid #E9ECEF;
+  border: 1px solid #334155;
   border-radius: 12px;
   overflow: hidden;
-  background: #FFFFFF;
+  background: #1E293B;
   height: 100%;
   display: flex;
   flex-direction: column;
   transition: box-shadow 0.2s ease, transform 0.2s ease;
 
   &:hover {
-    box-shadow: 0 6px 24px rgba(30,41,59,0.09);
+    box-shadow: 0 6px 24px rgba(0,0,0,0.4);
     transform: translateY(-2px);
   }
 }
@@ -480,10 +598,10 @@ div.callout {
   height: 5px;
   flex-shrink: 0;
 
-  &.act-1 { background: #0369A1; }
-  &.act-2 { background: #7C3AED; }
-  &.act-3 { background: #059669; }
-  &.act-4 { background: #D97706; }
+  &.act-1 { background: #38BDF8; }
+  &.act-2 { background: #A78BFA; }
+  &.act-3 { background: #34D399; }
+  &.act-4 { background: #FBBF24; }
 }
 
 .act-inner {
@@ -499,10 +617,10 @@ div.callout {
   margin-bottom: 10px;
   line-height: 1;
 
-  &.act-icon-1 { color: #0369A1; }
-  &.act-icon-2 { color: #7C3AED; }
-  &.act-icon-3 { color: #059669; }
-  &.act-icon-4 { color: #D97706; }
+  &.act-icon-1 { color: #38BDF8; }
+  &.act-icon-2 { color: #A78BFA; }
+  &.act-icon-3 { color: #34D399; }
+  &.act-icon-4 { color: #FBBF24; }
 }
 
 .act-eyebrow {
@@ -511,14 +629,14 @@ div.callout {
   font-weight: 700;
   letter-spacing: -0.01em;
   text-transform: none;
-  color: #1E293B;
+  color: #F1F5F9;
   display: block;
   margin-bottom: 6px;
 }
 
 .act-desc {
   font-size: 0.795rem;
-  color: #64748B;
+  color: #94A3B8;
   line-height: 1.5;
   text-align: left;
   hyphens: none;
@@ -529,7 +647,7 @@ div.callout {
   list-style: none;
   padding: 0;
   margin: 14px 0 0;
-  border-top: 1px solid #F1F5F9;
+  border-top: 1px solid #334155;
   padding-top: 12px;
 }
 
@@ -542,8 +660,8 @@ div.callout {
     gap: 8px;
     font-size: 0.8rem;
     text-decoration: none;
-    color: #1E293B;
-    &:hover { color: #0369A1; text-decoration: none; }
+    color: #E2E8F0;
+    &:hover { color: #38BDF8; text-decoration: none; }
   }
 
   .ch-row {
@@ -551,7 +669,7 @@ div.callout {
     align-items: center;
     gap: 8px;
     font-size: 0.8rem;
-    color: #9CA3AF;
+    color: #94A3B8;
   }
 }
 
@@ -577,15 +695,16 @@ div.callout {
   font-weight: 600;
   letter-spacing: 0.06em;
   text-transform: uppercase;
-  color: #9CA3AF;
-  background: #F9FAFB;
-  border: 1px solid #E9ECEF;
+  color: #94A3B8;
+  background: #1E293B;
+  border: 1px solid #334155;
   padding: 1px 6px;
   border-radius: 99px;
   flex-shrink: 0;
 }
 
 // ── About the Author page ────────────────────────────────────────────────────
+// Already dark by design, unchanged from brand.scss.
 
 .author-profile {
   display: flex;
@@ -611,7 +730,7 @@ div.callout {
   height: 88px;
   border-radius: 50%;
   object-fit: cover;
-  border: 3px solid #0369A1;
+  border: 3px solid #38BDF8;
   display: block;
   border: 3px solid rgba(56,189,248,0.3);
 }
@@ -670,13 +789,13 @@ div.callout {
 }
 
 .project-item {
-  border: 1px solid #E9ECEF;
+  border: 1px solid #334155;
   border-radius: 10px;
   padding: 16px 18px;
-  background: #FFFFFF;
+  background: #1E293B;
   transition: box-shadow 0.2s ease;
 
-  &:hover { box-shadow: 0 4px 16px rgba(30,41,59,0.08); }
+  &:hover { box-shadow: 0 4px 16px rgba(0,0,0,0.4); }
 }
 
 .project-header {
@@ -690,7 +809,7 @@ div.callout {
   font-family: $headings-font-family;
   font-size: 0.95rem;
   font-weight: 700;
-  color: #1E293B;
+  color: #F1F5F9;
 }
 
 .project-year {
@@ -702,7 +821,7 @@ div.callout {
 
 .project-desc {
   font-size: 0.8rem;
-  color: #475569;
+  color: #CBD5E1;
   line-height: 1.55;
   margin-bottom: 10px;
   text-align: left;
@@ -717,7 +836,7 @@ div.callout {
   a {
     font-size: 0.75rem;
     font-weight: 600;
-    color: #0369A1;
+    color: #38BDF8;
     text-decoration: none;
     display: inline-flex;
     align-items: center;
@@ -738,7 +857,7 @@ div.callout {
 
 .pub-item {
   padding: 14px 0;
-  border-bottom: 1px solid #F1F5F9;
+  border-bottom: 1px solid #334155;
 
   &:last-child { border-bottom: none; }
 }
@@ -750,12 +869,12 @@ div.callout {
   text-align: left;
   hyphens: none;
 
-  a { color: #1E293B; text-decoration: none; &:hover { color: #0369A1; text-decoration: underline; } }
+  a { color: #E2E8F0; text-decoration: none; &:hover { color: #38BDF8; text-decoration: underline; } }
 }
 
 .pub-meta {
   font-size: 0.775rem;
-  color: #64748B;
+  color: #94A3B8;
   margin-bottom: 0;
   text-align: left;
   hyphens: none;
@@ -768,9 +887,9 @@ div.callout {
   font-size: 1.15rem;
   font-weight: 400;
   font-style: italic;
-  color: #0369A1;
-  border-left: 4px solid #0369A1;
-  background: #F0F7FF;
+  color: #38BDF8;
+  border-left: 4px solid #38BDF8;
+  background: #16243D;
   padding: 1.1rem 1.5rem;
   border-radius: 0 10px 10px 0;
   margin: 0 0 2.5rem;
@@ -785,27 +904,27 @@ div.callout {
   font-weight: 800;
   line-height: 0.75;
   margin: 0.06em 0.1em 0 0;
-  color: #0369A1;
+  color: #38BDF8;
 }
 
 .preface-attr {
   margin-top: 2.5rem;
   padding-top: 1.25rem;
-  border-top: 1px solid #EEF2F7;
+  border-top: 1px solid #334155;
   font-size: 0.875rem;
-  color: #64748B;
+  color: #94A3B8;
 
-  strong { color: #1E293B; }
+  strong { color: #F1F5F9; }
 }
 
 // ── GT-aligned table theme ────────────────────────────────────────────────────
-// Mirrors gt_style.py: PRIMARY (#0369A1) header, #EAF3FA even-row fill,
-// 2px top accent border, Jost column labels, Libre Franklin body text.
+// Dark counterpart to gt_style.py's default look: same header/border shape,
+// colors adjusted for a dark page background.
 
 table {
   width: 100%;
-  border-top: 2px solid #0369A1;
-  border-bottom: 1px solid #0369A1;
+  border-top: 2px solid #38BDF8;
+  border-bottom: 1px solid #38BDF8;
   border-collapse: collapse;
   font-size: 0.8125rem;
   margin: 1.25rem 0;
@@ -823,12 +942,18 @@ table {
 
   tbody tr td {
     padding: 7px 12px;
-    color: #1E293B;
-    border-bottom: 1px solid #E2E8F0;
+    color: #E2E8F0;
+    border-bottom: 1px solid #334155;
     vertical-align: top;
   }
 
   tbody tr:nth-of-type(even) td {
-    background-color: #EAF3FA;
+    background-color: #16243D;
   }
+}
+
+// See brand.scss: Quarto hides a chapter's own #refs div under `part:`
+// chapter grouping. Force it visible.
+#refs.csl-bib-body {
+  display: block !important;
 }
