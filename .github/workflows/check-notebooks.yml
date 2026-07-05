@@ -33,10 +33,15 @@ jobs:
       - name: Resolve changed notebooks
         id: changed
         run: |
-          # Notebooks skipped from CI execution (not ready or too slow).
-          # Add filenames here as needed, space-separated, e.g.:
-          # SKIP_LIST="book/01-foundations/03-slow-chapter.ipynb"
-          SKIP_LIST=""
+          # Notebooks skipped from CI execution (not ready, too slow, or
+          # dependent on gitignored local data).
+          # book/02-disaggregation/02-feature-engineering-code.ipynb loads
+          # real PLAID/LILACD data from resources/nilm-code/AWRGNILM, the
+          # author's own research code, gitignored and not available in CI.
+          # Its outputs are committed and {{< embed >}} reads them directly
+          # without re-executing the notebook, so the rendered book is
+          # unaffected; only this from-scratch CI re-execution can't run it.
+          SKIP_LIST="book/02-disaggregation/02-feature-engineering-code.ipynb"
 
           # Helper: find all notebooks, excluding archived ones
           find_notebooks() {
