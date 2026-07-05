@@ -1,6 +1,7 @@
-<svg viewBox="0 0 560 300" fill="none" xmlns="http://www.w3.org/2000/svg">
-  <rect x="1" y="1" width="558" height="298" rx="12" fill="#F8FAFC" stroke="#E2E8F0" stroke-width="1.5"/>
+<svg viewBox="0 0 520 278.57" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect x="1" y="1" width="518" height="276.57" rx="12" fill="#F8FAFC" stroke="#E2E8F0" stroke-width="1.5"/>
 
+  <g transform="scale(0.928571)">
   <!-- Row A: single-appliance -->
   <text x="280" y="28" text-anchor="middle" font-family="'Jost', system-ui, sans-serif" font-size="12" font-weight="700" fill="#334155">SINGLE-APPLIANCE</text>
   <text x="280" y="41" text-anchor="middle" font-family="'Libre Franklin', system-ui, sans-serif" font-size="9" font-style="italic" fill="#64748B">a separate model, and a separate pass, per appliance</text>
@@ -71,4 +72,5 @@
 
   <text x="470" y="240" text-anchor="middle" font-family="'Libre Franklin', system-ui, sans-serif" font-size="8.5" font-style="italic" fill="#7C3AED">one</text>
   <text x="470" y="251" text-anchor="middle" font-family="'Libre Franklin', system-ui, sans-serif" font-size="8.5" font-style="italic" fill="#7C3AED">pass</text>
+  </g>
 </svg>

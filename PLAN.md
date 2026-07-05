@@ -128,6 +128,46 @@ into the prose via Quarto's `{{< embed >}}` shortcode and never duplicates code.
   committed to git (`nbstripout --keep-output` is already configured for this).
 - `freeze: auto` (already set project-wide) avoids re-executing unrelated
   chapters on unrelated renders.
+- A machine can have a global `*.ipynb filter=nbstripout` registered (from an
+  unrelated project's `nbstripout --install --global`, e.g. in
+  `~/.config/git/attributes`) that silently strips outputs and regenerates
+  cell ids on every `git add`, with none of this project's flags. This repo's
+  own `.gitattributes` explicitly unsets that filter (`*.ipynb -filter`) so
+  only this project's own pre-commit/pre-push hooks
+  (`nbstripout --keep-output --keep-id`) touch notebooks. If a commit ever
+  shows notebook cell ids collapsed to sequential integers ("0", "1", "2",
+  ...), this is why: check `git check-attr -a <path>.ipynb` for a stray
+  `filter: nbstripout` first.
+
+### Figure sizing convention
+
+Keep figure dimensions consistent within each role rather than picking
+`ggsize`/`viewBox` numbers per figure. What matters for on-page consistency
+is the *aspect ratio*, since Quarto renders at a consistent container width
+and scales height to match:
+
+| Role | Size (px) | Used for |
+| --- | --- | --- |
+| Full-width single chart | `ggsize(650, 320)` | One line/bar chart on its own (Chapter 1's aggregate-signal plot) |
+| Two-panel faceted comparison | `ggsize(560, 320)` | `facet_wrap` comparisons like RG-vs-WRG, V-I-vs-WRG |
+| Paired square panels | `ggsize(330, 330)` each, combined via `gggrid([...], ncol=2)` | Two *different* plot objects shown side by side from one notebook cell (waveform + V-I trajectory) |
+| Standalone SVG diagram, single concept | `viewBox="0 0 520 240"` | One-row hand-authored diagrams (frequency split, transient/steady-state, WRG pipeline, activation extraction) |
+| Standalone SVG diagram, two-row/denser | width `520`, height whatever the content needs (e.g. `278.57` for the single-vs-multi-appliance diagram) | Diagrams with multiple stacked sections |
+
+Layout mechanics, two different mechanisms depending on figure type:
+
+- **Hand-authored SVGs** (`![caption](path.svg){#fig-x}`): Quarto reads
+  sizing from the figure's own attributes (e.g. `width="70%"`), not the
+  SVG's `viewBox`. For side by side, wrap two figures in
+  `::: {layout-ncol="2"} ... :::`. For top and bottom, just don't wrap them;
+  plain sequential figures stack vertically by default.
+- **Lets-plot figures via `{{< embed >}}`**: Quarto's `layout-ncol` div does
+  *not* reliably arrange these, since embed just injects whatever HTML the
+  notebook already produced. Set sizing at generation time with `ggsize()`,
+  and for two different plot objects that need to sit side by side, combine
+  them with lets-plot's own `gggrid([plot_a, plot_b], ncol=2)` inside the
+  notebook into one image, rather than trying to lay out two separate
+  embeds in the qmd.
 
 ## Dependencies
 
@@ -251,3 +291,16 @@ worth working around.
   live rather than only citing the papers' numbers. Confirms the same
   ranking as the published results at a smaller scale (40 iterations, one
   75/25 split, not 600 iterations across 4-fold CV).
+- Applied the visualization best-practices checklist (see the auto-memory
+  entry `reference-dataviz-best-practices`) to Chapter 2's plots: value
+  labels on the confusion matrix (was unreadable with no legend and no
+  labels), muted the two losing bars in the F1 comparison chart so the
+  accent color highlights only the winning method, and rewrote several
+  chart titles to state the finding instead of just describing the axes.
+  Also standardized figure sizing across both chapters per the "Figure
+  sizing convention" above, resizing Chapter 1's three SVGs and its
+  notebook chart to match Chapter 2's established dimensions.
+- Every function in both chapters' notebooks now has a proper docstring,
+  and each notebook has short markdown section headers so it reads
+  coherently on its own (e.g. via the "Download Notebook" link), without
+  duplicating the chapter's full narrative.

@@ -1,6 +1,7 @@
-<svg viewBox="0 0 540 260" fill="none" xmlns="http://www.w3.org/2000/svg">
-  <rect x="1" y="1" width="538" height="258" rx="12" fill="#F8FAFC" stroke="#E2E8F0" stroke-width="1.5"/>
+<svg viewBox="0 0 520 240" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect x="1" y="1" width="518" height="238" rx="12" fill="#F8FAFC" stroke="#E2E8F0" stroke-width="1.5"/>
 
+  <g transform="translate(10.77,0) scale(0.923077)">
   <!-- Zone shading -->
   <rect x="40" y="60" width="182" height="180" fill="#7C3AED" fill-opacity="0.06"/>
   <rect x="222" y="60" width="278" height="180" fill="#0369A1" fill-opacity="0.05"/>
@@ -24,4 +25,5 @@
   <!-- Steady-state label -->
   <text x="361" y="80" text-anchor="middle" font-family="'Jost', system-ui, sans-serif" font-size="12" font-weight="700" fill="#0C4A6E">STEADY STATE</text>
   <text x="361" y="95" text-anchor="middle" font-family="'Libre Franklin', system-ui, sans-serif" font-size="9" fill="#0369A1">active power, reactive power, current</text>
+  </g>
 </svg>
