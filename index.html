@@ -7,9 +7,10 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 <meta name="author" content="Anthony Faustine">
-<meta name="dcterms.date" content="2026-07-04">
+<meta name="dcterms.date" content="2026-07-05">
+<meta name="description" content="A structured, project-based path through smart meter data: disaggregation, forecasting, anomaly detection, and grid-edge value, from raw signal to business insight.">
 
-<title>Machine Learning for Energy Disaggregation</title>
+<title>Machine Learning for Smart Meter Data</title>
 <style>
 /* Default styles provided by pandoc.
 ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
@@ -48,9 +49,9 @@ ul.task-list li input[type="checkbox"] {
 <link href="site_libs/quarto-html/quarto-syntax-highlighting-de63f62b328812d8e578a4d74e282472.css" rel="stylesheet" class="quarto-color-scheme-extra" id="quarto-text-highlighting-styles">
 <script src="site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="site_libs/bootstrap/bootstrap-beae7f006aa19e5949bb4641e0a5dd6e.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
-<link href="site_libs/bootstrap/bootstrap-dark-762c4684d003dd83798248c3895918e5.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="dark">
-<link href="site_libs/bootstrap/bootstrap-beae7f006aa19e5949bb4641e0a5dd6e.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme-extra" id="quarto-bootstrap" data-mode="light">
+<link href="site_libs/bootstrap/bootstrap-36bd8577216834d23b435baa2ce28cca.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
+<link href="site_libs/bootstrap/bootstrap-dark-0aba252a5ad676c385980f30b0449bb6.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="dark">
+<link href="site_libs/bootstrap/bootstrap-36bd8577216834d23b435baa2ce28cca.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme-extra" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -81,6 +82,12 @@ ul.task-list li input[type="checkbox"] {
 <style>html{ scroll-behavior: smooth; }</style>
 
 
+<meta property="og:title" content="Machine Learning for Smart Meter Data">
+<meta property="og:description" content="A structured, project-based path through smart meter data: disaggregation, forecasting, anomaly detection, and grid-edge value, from raw signal to business insight.">
+<meta property="og:site_name" content="Machine Learning for Smart Meter Data">
+<meta name="twitter:title" content="Machine Learning for Smart Meter Data">
+<meta name="twitter:description" content="A structured, project-based path through smart meter data: disaggregation, forecasting, anomaly detection, and grid-edge value, from raw signal to business insight.">
+<meta name="twitter:card" content="summary">
 </head>
 
 <body class="nav-sidebar floating nav-fixed quarto-light"><script id="quarto-html-before-body" type="application/javascript">
@@ -248,12 +255,12 @@ ul.task-list li input[type="checkbox"] {
   </script>
 
 <div id="quarto-search-results"></div>
-  <header id="quarto-header" class="headroom fixed-top quarto-banner">
+  <header id="quarto-header" class="headroom fixed-top">
     <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
       <div class="navbar-container container-fluid">
       <div class="navbar-brand-container mx-auto">
     <a class="navbar-brand" href="./index.html">
-    <span class="navbar-title">Machine Learning for Energy Disaggregation</span>
+    <span class="navbar-title">Machine Learning for Smart Meter Data</span>
     </a>
   </div>
             <div id="quarto-search" class="" title="Search"></div>
@@ -291,42 +298,13 @@ ul.task-list li input[type="checkbox"] {
         <i class="bi bi-layout-text-sidebar-reverse"></i>
       </button>
         <a class="flex-grow-1 no-decor" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
-          <h1 class="quarto-secondary-nav-title">Machine Learning for Energy Disaggregation</h1>
+          <h1 class="quarto-secondary-nav-title">Machine Learning for Smart Meter Data</h1>
         </a>     
     </div>
   </nav>
 </header>
 <!-- content -->
-<header id="title-block-header" class="quarto-title-block default page-columns page-full">
-  <div class="quarto-title-banner page-columns page-full">
-    <div class="quarto-title column-body">
-      <h1 class="title d-none d-lg-block">Machine Learning for Energy Disaggregation</h1>
-            <p class="subtitle lead">A Structured Path from Signal to Appliance-Level Insight</p>
-                      </div>
-  </div>
-    
-  
-  <div class="quarto-title-meta">
-
-      <div>
-      <div class="quarto-title-meta-heading">Author</div>
-      <div class="quarto-title-meta-contents">
-               <p>Anthony Faustine </p>
-            </div>
-    </div>
-      
-      <div>
-      <div class="quarto-title-meta-heading">Published</div>
-      <div class="quarto-title-meta-contents">
-        <p class="date">July 4, 2026</p>
-      </div>
-    </div>
-    
-      
-    </div>
-    
-  
-  </header><div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
 <!-- sidebar -->
   <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation floating overflow-auto">
     <div class="sidebar-menu-container"> 
@@ -343,7 +321,38 @@ ul.task-list li input[type="checkbox"] {
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
+  <a href="./how-to-use.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">How to Use This Book</span></a>
+  </div>
+</li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="false">
+ <span class="menu-text">Part 2: Disaggregation</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="false" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./book/02-disaggregation/01-what-is-nilm.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">What Is Non-Intrusive Load Monitoring</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./book/02-disaggregation/02-feature-engineering.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">Feature Engineering for Appliance Recognition</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
   <a href="./about.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">About the Author</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./acronyms.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">List of Acronyms</span></a>
   </div>
 </li>
     </ul>
@@ -355,79 +364,167 @@ ul.task-list li input[type="checkbox"] {
         
     </div>
 <!-- main -->
-<main class="content quarto-banner-title-block" id="quarto-document-content">
+<main class="content page-columns page-full" id="quarto-document-content">
 
 
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title d-none d-lg-block">Machine Learning for Smart Meter Data</h1>
+<p class="subtitle lead">A Structured Path from Meter Signal to Business Insight</p>
+</div>
+
+<div>
+  <div class="description">
+    A structured, project-based path through smart meter data: disaggregation, forecasting, anomaly detection, and grid-edge value, from raw signal to business insight.
+  </div>
+</div>
 
 
+<div class="quarto-title-meta">
+
+    <div>
+    <div class="quarto-title-meta-heading">Author</div>
+    <div class="quarto-title-meta-contents">
+             <p>Anthony Faustine </p>
+          </div>
+  </div>
+    
+    <div>
+    <div class="quarto-title-meta-heading">Published</div>
+    <div class="quarto-title-meta-contents">
+      <p class="date">July 5, 2026</p>
+    </div>
+  </div>
+  
+    
+  </div>
+  
 
 
-<div class="cover-hero">
+</header>
+
+
+<div class="cover-hero column-page">
+<div class="cover-hero-row">
 <div class="cover-hero-text">
 <p class="cover-eyebrow">
 A practical book for energy analytics and ML practitioners
 </p>
 <h1>
-Machine Learning for Energy Disaggregation
+Machine Learning for Smart Meter Data
 </h1>
 <p>
-A structured, project-based path through non-intrusive load monitoring: from raw smart-meter signal to appliance-level insight, built to be run and not just read.
+From raw meter signal to business decision: disaggregation, forecasting, and grid-edge value, built to be run, not just read.
 </p>
 <p class="cover-author">
 By <a href="https://sambaiga.github.io/" style="color:#38BDF8;font-weight:600">Anthony Faustine</a>&nbsp;&nbsp;<a href="https://github.com/sambaiga" title="GitHub" style="color:#94A3B8"><i class="bi bi-github"></i></a>&nbsp;<a href="https://www.linkedin.com/in/sambaiga" title="LinkedIn" style="color:#94A3B8"><i class="bi bi-linkedin"></i></a>&nbsp;<a href="mailto:sambaiga@gmail.com" title="Email" style="color:#94A3B8"><i class="bi bi-envelope-at"></i></a>
 </p>
-<p><a href="./preface.html" class="btn-cover btn-secondary-cover"><i class="bi bi-book"></i> Read the preface</a></p>
+<div class="cover-cta-row">
+<p><a href="./preface.html" class="btn-cover btn-primary-cover"><i class="bi bi-book"></i> Read the preface</a> <a href="https://github.com/sambaiga/ml-energy-disaggregation" class="btn-cover btn-secondary-cover"><i class="bi bi-github"></i> View on GitHub</a></p>
 </div>
 </div>
-<div id="callout-guide" class="callout callout-style-default callout-note no-icon callout-titled">
-<div class="callout-header d-flex align-content-center">
-<div class="callout-icon-container">
-<i class="callout-icon no-icon"></i>
+<div class="cover-hero-visual" role="img" aria-label="A meter signal flows through data analytics and ML into business value">
+<div class="signal-node signal-node-meter">
+<p><span class="signal-icon"><i class="bi bi-speedometer2"></i></span> <span class="signal-node-label">Meter Signal</span></p>
 </div>
-<div class="callout-title-container flex-fill">
-<span class="screen-reader-only">Note</span>How this book works
+<span class="signal-connector"></span>
+<div class="signal-node signal-node-model">
+<p><span class="signal-icon"><i class="bi bi-cpu-fill"></i></span> <span class="signal-node-label">Data &amp; ML</span></p>
 </div>
-</div>
-<div class="callout-body-container callout-body">
-<p>Every chapter is a Jupyter notebook or QMD file meant to be <strong>run top to bottom</strong>, not just read. Along the way you will see four recurring markers:</p>
-<table class="caption-top table">
-<colgroup>
-<col style="width: 47%">
-<col style="width: 52%">
-</colgroup>
-<thead>
-<tr class="header">
-<th>Marker</th>
-<th>Purpose</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td><i class="bi bi-info-circle-fill" style="color:#0369A1"></i> <strong>Key Concept</strong></td>
-<td>The core idea, precisely defined</td>
-</tr>
-<tr class="even">
-<td><i class="bi bi-puzzle-fill" style="color:#009E73"></i> <strong>Activity</strong></td>
-<td>Hands-on challenge: fill in the <code>...</code> yourself before moving on</td>
-</tr>
-<tr class="odd">
-<td><i class="bi bi-bug-fill" style="color:#DC2626"></i> <strong>Common Mistake</strong></td>
-<td>A bug pattern worth recognising on sight</td>
-</tr>
-<tr class="even">
-<td><i class="bi bi-lightbulb-fill" style="color:#7C3AED"></i> <strong>Pro Tip</strong></td>
-<td>A production-grade habit</td>
-</tr>
-</tbody>
-</table>
+<span class="signal-connector"></span>
+<div class="signal-node signal-node-value">
+<p><span class="signal-icon"><i class="bi bi-bullseye"></i></span> <span class="signal-node-label">Business Value</span></p>
 </div>
 </div>
+</div>
+<div class="pipeline-flow">
+<div class="pipeline-step">
+<p><span class="pipeline-dot pipeline-dot-1"><i class="bi bi-activity"></i></span> <span class="pipeline-label">Meter Signal</span></p>
+</div>
+<span class="pipeline-arrow">→</span> <a class="pipeline-step" href="./book/02-disaggregation/01-what-is-nilm.html"> <span class="pipeline-dot pipeline-dot-2"><i class="bi bi-plug-fill"></i></span> <span class="pipeline-label">Disaggregation</span> </a> <span class="pipeline-arrow">→</span>
+<div class="pipeline-step">
+<p><span class="pipeline-dot pipeline-dot-3"><i class="bi bi-graph-up-arrow"></i></span> <span class="pipeline-label">Forecasting</span></p>
+</div>
+<span class="pipeline-arrow">→</span>
+<div class="pipeline-step">
+<p><span class="pipeline-dot pipeline-dot-4"><i class="bi bi-diagram-3-fill"></i></span> <span class="pipeline-label">Grid-Edge Value</span></p>
+</div>
+</div>
+</div>
+<div class="column-page">
 <p class="section-label">
 Your learning path
 </p>
-<p style="color:#94A3B8;font-size:0.95rem;">
-Chapters are being written and will appear here as each is finished. <a href="https://github.com/sambaiga/ml-energy-disaggregation" style="color:#64748B">Follow progress on GitHub</a>.
+<div class="roadmap-grid">
+<div class="act-card">
+<div class="act-stripe act-1">
+
+</div>
+<div class="act-inner">
+<i class="bi bi-activity act-icon act-icon-1"></i> <span class="act-eyebrow">Part 1 · Foundations</span>
+<p class="act-desc">
+Smart meter data fundamentals, signal processing, and the data pipelines every later chapter builds on.
 </p>
+<ul class="act-chapters">
+<li>
+<span class="ch-row"><span class="ch-num">01</span><span class="ch-name">Reading a meter signal</span><span class="ch-soon">Soon</span></span>
+</li>
+</ul>
+</div>
+</div>
+<div class="act-card">
+<div class="act-stripe act-2">
+
+</div>
+<div class="act-inner">
+<i class="bi bi-plug-fill act-icon act-icon-2"></i> <span class="act-eyebrow">Part 2 · Disaggregation</span>
+<p class="act-desc">
+Non-intrusive load monitoring: from the aggregate signal to appliance-level insight.
+</p>
+<ul class="act-chapters">
+<li>
+<a href="./book/02-disaggregation/01-what-is-nilm.html"><span class="ch-num">01</span><span class="ch-name">What Is Non-Intrusive Load Monitoring</span><i class="bi bi-check-circle-fill ch-check"></i></a>
+</li>
+</ul>
+</div>
+</div>
+<div class="act-card">
+<div class="act-stripe act-3">
+
+</div>
+<div class="act-inner">
+<i class="bi bi-graph-up-arrow act-icon act-icon-3"></i> <span class="act-eyebrow">Part 3 · Forecasting</span>
+<p class="act-desc">
+Probabilistic load and PV forecasting, built on Twiga: point forecasts and calibrated uncertainty.
+</p>
+<ul class="act-chapters">
+<li>
+<span class="ch-row"><span class="ch-num">03</span><span class="ch-name">Forecasting with uncertainty</span><span class="ch-soon">Soon</span></span>
+</li>
+</ul>
+</div>
+</div>
+<div class="act-card">
+<div class="act-stripe act-4">
+
+</div>
+<div class="act-inner">
+<i class="bi bi-diagram-3-fill act-icon act-icon-4"></i> <span class="act-eyebrow">Part 4 · Grid-Edge Value</span>
+<p class="act-desc">
+Clustering, anomaly and theft detection, and LV hosting-capacity questions as DER growth reshapes the grid.
+</p>
+<ul class="act-chapters">
+<li>
+<span class="ch-row"><span class="ch-num">04</span><span class="ch-name">Value at the grid edge</span><span class="ch-soon">Soon</span></span>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<p style="color:#94A3B8;font-size:0.85rem;">
+Chapters are being written part by part. <a href="https://github.com/sambaiga/ml-energy-disaggregation" style="color:#64748B">Follow progress on GitHub</a>.
+</p>
+</div>
 
 
 
