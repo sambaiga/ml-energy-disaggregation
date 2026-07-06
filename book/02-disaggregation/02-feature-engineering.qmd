@@ -1,5 +1,5 @@
 ---
-title: "Feature Engineering for Appliance Recognition"
+title: "Appliance Recognition"
 bibliography: ../../references.bib
 ---
 
@@ -177,6 +177,89 @@ at 1.0), cutting misclassifications from 8.32% to 2.23%, and lifts LILACD
 from 0.85 to 0.98 MCC (13.82% down to 1.66%), both against the same V-I
 baseline [@faustine2021awrg; @kahl2019lilacd].
 
+## Reproducing the residential result
+
+Every number in that last paragraph is cited from the AWRG paper's own
+experiments. Before trusting them, it is worth training a fresh classifier
+on data neither those experiments nor this book has touched yet: PLAID
+2020, a newer release of the same residential dataset with 2,092 real
+aggregated activation events across 12 household appliances
+[@medico2020plaid]. Same recipe as the WRG-vs-V-I comparison above, applied
+to a full dataset instead of one activation, evaluated on a held-out 25%.
+
+Before training that classifier, the same separability check from the
+LILACD section is worth running here too: a deliberately mixed set of six
+residential appliances, three of V-I's worst performers (blender, coffee
+maker, fridge) and three of its best (hair iron, CFL, water kettle).
+
+{{< embed 02-feature-engineering-code.ipynb#d6e6907d >}}
+
+Same pattern as LILACD: V-I's six clusters overlap heavily, WRG's mostly
+pull apart. That is what the trained classifier confirms next.
+
+{{< embed 02-feature-engineering-code.ipynb#f7b8b897 >}}
+
+The residential story holds on fresh data: V-I tops out at 60.4% macro
+$F_1$; WRG reaches 81.2%, a 21-point jump from swapping one feature
+representation for another with nothing else changed. Which appliances
+carry that gap?
+
+{{< embed 02-feature-engineering-code.ipynb#e82013f9 >}}
+
+V-I's worst scores land on appliances whose current barely varies from one
+sample to the next: a blender (26%), a coffee maker (30%), a fridge (34%).
+WRG recovers most of them outright, the coffee maker jumps to 98%, but not
+all of them. The fridge barely moves, 34% to 38%, a reminder that WRG fixes
+the specific confusion caused by a flat current shape, not every source of
+appliance ambiguity. The confusion matrix shows exactly where that specific
+failure lands.
+
+{{< embed 02-feature-engineering-code.ipynb#72202d4e >}}
+
+The single biggest confusion is a fridge called an air conditioner (15
+of this test split's mistakes), followed by an air conditioner called an
+incandescent bulb (12) and a fridge called a fridge defroster (8). The
+first and third make sense, a fridge, an air conditioner, and a fridge
+defroster are all compressor-driven appliances with a similarly gradual
+current draw, not the sharp, resistive signature WRG is best at telling
+apart. The second is a genuine open question this run doesn't resolve.
+
+{{< embed 02-feature-engineering-code.ipynb#fbeb9df2 >}}
+
+The panels above are the literal WRG image behind that top confusion: a
+real held-out fridge activation the model called an air conditioner, next
+to a real, correctly classified air conditioner. Two compressor motors,
+photographed by the same feature, look almost the same.
+
+## How much do the hyperparameters actually matter?
+
+$\lambda$ and $\delta$ still have to be chosen somehow, and the AWRG
+paper's own grid search found performance swinging widely across both, with
+zero initialization stalling training outright. Running that same sweep on
+PLAID 2020 turns that claim into a picture.
+
+{{< embed 02-feature-engineering-code.ipynb#219e8b13 >}}
+
+Both curves peak in the middle and fall off at either extreme. $\lambda$
+climbs from 50.3% macro $F_1$ at $\lambda=1$ to 81.6% at $\lambda=10$, then
+slides back to 76.8% by $\lambda=50$: too small and the distance matrix
+barely gets thresholded at all, too large and every cell saturates to the
+ceiling. $\delta=1$, the binary recurrence graph, tops out at 52.4%;
+letting $\delta$ grow to 20 recovers WRG's full 81.6%, then overshooting to
+$\delta=50$ gives back some of that gain. Neither curve has an obvious
+"just set it high" or "just set it low" answer, which is exactly the
+situation AWRG's learned parameters exist to avoid.
+
+The embedding size $w$ has a different shape entirely.
+
+{{< embed 02-feature-engineering-code.ipynb#514fa86c >}}
+
+Tripling $w$ from 30 to 80 buys 6.9 points of macro $F_1$ (77.5% to 84.4%)
+while nearly quadrupling training time (14 seconds to 51). Past a point,
+spending more $w$ buys far less accuracy than it costs in training time,
+precisely the tradeoff the Common Mistake box near the end of this chapter
+warns about.
+
 ## Extending to industrial, three-phase settings
 
 Which brings the chapter back to the bulb. Industrial sites mix large
@@ -186,8 +269,6 @@ three-phase power is rarely perfectly balanced across all three lines
 unbalanced load, its activation current comes out distorted, and WRG built
 directly on that raw current inherits the distortion.
 
-{{< embed 02-feature-engineering-code.ipynb#f0460681 >}}
-
 The tool for pulling the small signal back out is the Fortescue transform, a
 long-standing technique for decomposing an unbalanced three-phase system
 into three components: positive-sequence, negative-sequence, and
@@ -196,7 +277,11 @@ zero-sequence component is exactly zero. So whatever zero-sequence current
 does show up is, by construction, a direct measure of the imbalance itself,
 which is exactly where a single-phase appliance's own signature tends to
 concentrate once it is sharing a line with something much larger
-[@faustine2023ftnilm].
+[@faustine2023ftnilm]. The panels below put both sides of that fix side by
+side: a real LILACD bulb's raw three-phase current, one phase carrying the
+load and the other two carrying almost nothing, next to the same event after
+the transform, where the zero-sequence component alone carries the bulb's
+signature.
 
 {{< embed 02-feature-engineering-code.ipynb#77515a5e >}}
 
@@ -219,6 +304,23 @@ WRG with the Fortescue transform applied first. Following the same protocol
 as the AWRG paper, the model trains on a stratified 75% of the data and is
 evaluated on the untouched remaining 25% [@faustine2021awrg].
 
+Before training that classifier, it is worth checking whether the features
+feeding it even separate appliances in the first place, with no model in
+the loop yet. The plot below runs t-SNE on the raw V-I and WRG feature
+vectors for six LILACD appliances chosen to mix single-phase and
+three-phase loads: a bulb, two resistive heaters this section later shows
+the classifier confusing, a single-phase motor, and two three-phase
+industrial machines.
+
+{{< embed 02-feature-engineering-code.ipynb#c635c7ad >}}
+
+Under V-I, the six appliances' clusters overlap heavily; under WRG, most
+of them pull apart, the two three-phase machines especially, since a large
+motor's activation current has almost nothing in common with a bulb's or a
+heater's once WRG turns it into a graph instead of a loop. That is what the
+numbers below confirm with an actual trained classifier instead of an
+unsupervised projection.
+
 {{< embed 02-feature-engineering-code.ipynb#3bc2d836 >}}
 {{< embed 02-feature-engineering-code.ipynb#027c858f >}}
 
@@ -226,10 +328,24 @@ This notebook's own run is smaller and faster than the published
 experiments: 40 training iterations on a single split, not 600 iterations
 across a 4-fold cross-validation. Treat the exact numbers as a live sanity
 check, not a reproduction of the paper's headline scores. The ranking still
-comes out the same way: V-I trails badly (macro $F_1$
-around 48%), WRG is a large step up (around 88%), and adding the Fortescue
-transform improves it further still (around 93%), the same ordering
-reported at full scale above.
+comes out the same way: V-I trails badly (macro $F_1$ 48.2%), WRG is a
+large step up (88.2%), and adding the Fortescue transform improves it
+further still (92.6%), the same ordering reported at full scale above.
+Which appliances specifically?
+
+{{< embed 02-feature-engineering-code.ipynb#869c89de >}}
+
+V-I's worst scores are near-total failures on single-phase resistive loads:
+0% on both Kettle and Hair-dryer, 14% on Coffee-machine, 18% on Raclette,
+all four are simple heating elements whose current shape carries almost no
+distinguishing detail as a V-I loop. WRG recovers Kettle and Coffee-machine
+completely (both reach 100%) and lifts Raclette to 73%, but Hair-dryer stays
+stuck at 0% until the Fortescue transform is added, at which point it jumps
+to 77%. WRG+FT is not a uniform upgrade over WRG alone, though: Coffee-machine
+actually drops from 100% to 84%, and Raclette from 73% to 68%. The net effect
+across all 16 appliances is still a gain (88.2% to 92.6% macro $F_1$), but it
+is not every appliance winning; it is Hair-dryer's large gain outweighing two
+smaller losses elsewhere.
 
 {{< embed 02-feature-engineering-code.ipynb#82b5b481 >}}
 
@@ -243,15 +359,46 @@ that confusion, it only shrinks it [@faustine2023ftnilm]. Fixing what is
 left would need a feature that distinguishes resistive loads by something
 other than current magnitude, not a bigger version of the same image.
 
+{{< embed 02-feature-engineering-code.ipynb#a477dcc8 >}}
+
+That top confusion is not an abstraction. The panels above are the literal
+WRG+FT image behind one real held-out mistake: an actual Raclette activation
+the model called a Coffee-machine, next to an actual, correctly classified
+Coffee-machine. Placed side by side, the reason for the mix-up stops being a
+sentence about "similar resistive heating elements" and becomes a fact about
+two pictures that look almost the same.
+
 ## Why bother
 
-None of this is only an accuracy exercise. An industrial site that can
-recognize its machines from one aggregate current measurement, phase
-imbalance and all, gets a single point of monitoring for equipment that
-would otherwise need a sub-meter per machine, and a foothold for
-predictive maintenance: catching a motor's changing signature before it
-fails, the same value proposition Chapter 1 introduced for a household
-fridge, now at industrial scale [@faustine2023ftnilm].
+None of this is only a classification exercise. Recognizing that an
+activation came from "Motor #3" is a means, not the point. What actually
+pays for the sensor is what that signature reveals about the shape of the
+current a machine draws, cycle after cycle, and whether that shape is
+drifting.
+
+A bearing wearing down, a rotor bar cracking, a winding starting to
+degrade: all of these distort a motor's own current draw first, well
+before the vibration, heat, or noise a technician would notice on a walk
+through. That is the same physical fact this whole chapter has been built
+on: current carries an appliance's identity in its shape, not just its
+magnitude. Nothing about that fact stops being true once an appliance is
+correctly classified. The WRG image built to answer "which machine is
+this" is the same object that can answer "does this machine still look
+like itself." Comparing a motor's own recurrence graph against its healthy
+baseline, month over month, is the identical distance-similarity
+computation this chapter opened with, run against the machine's own past
+instead of against other appliance classes.
+
+That reframing is what makes this worth building beyond a labeling
+exercise. An industrial site that already runs this feature pipeline for
+appliance recognition gets equipment health monitoring for free: no
+vibration sensor, no thermal camera, no extra hardware per machine, just
+the same aggregate current measurement, phase imbalance and all, read a
+second way. Catching a large motor's changing signature while it is still
+running, instead of after it stops, is the same value proposition Chapter
+1 introduced for a household fridge, now scaled to equipment where an
+unplanned outage is measured in downtime and lost production, not spoiled
+food [@faustine2023ftnilm].
 
 ## Where this part of the book goes
 
@@ -269,10 +416,11 @@ changing state. Real aggregate signals rarely cooperate:
 <span class="ark-mistake-title"><i class="bi bi-bug-fill"></i> Common Mistake</span>
 
 Assuming a larger embedding size $w$ always helps. Past a certain
-resolution, a bigger $WRG$ image does not improve classification, it only
-slows training down. Too small a $w$, on the other hand, genuinely loses
-information. The right size is found empirically, once, not maximized by
-default.
+resolution, a bigger $WRG$ image stops paying for itself: this chapter's own
+sweep found tripling $w$ from 30 to 80 worth only 6.9 points of macro $F_1$
+for nearly quadruple the training time. Too small a $w$, on the other hand,
+genuinely loses information. The right size is found empirically, once, not
+maximized by default.
 :::
 
 ## References
