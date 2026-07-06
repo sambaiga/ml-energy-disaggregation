@@ -71,7 +71,7 @@ appliance active in the background, not just whichever one changed state
 
 {{< embed 03-multi-appliance-recognition-code.ipynb#7f28b4d7 >}}
 
-V-I image reaches 65.3% macro $F_1$; raw activation current reaches 62.7%.
+V-I image reaches 65.7% macro $F_1$; raw activation current reaches 62.7%.
 That is not the order the published result found, current a few points
 ahead of V-I there too [@faustine2020mlcfcd], but the published gap between
 them is itself small (0.826 to 0.849), and this run's own gap is just as
@@ -141,15 +141,36 @@ one for on, and applies a softmax over just those two before a
 cross-entropy loss, verified directly against the author's own training
 code, not just the paper's prose.
 
+![Two ways to turn a logit into a yes-or-no. Sigmoid needs an external cutoff, fixed after training and hard to improve on. The two-logit softmax folds that decision into the network itself: whichever logit is larger wins.](../../assets/nilm-softmax-vs-sigmoid.svg){#fig-softmax-vs-sigmoid}
+
 Worth being precise about what that buys, because the honest answer is
-narrower than it first sounds. A softmax over two logits $(a, b)$ reduces
-exactly to $\mathrm{sigmoid}(a - b)$, so this is a reparametrized sigmoid,
-not a fundamentally different mechanism. What is genuinely different is
-where the decision boundary lives: with two competing logits, "on" wins
-whenever its logit is larger, a rule trained end to end as part of the
-network, rather than an external 0.5 cutoff applied to a probability after
-the fact. Small difference, but a real one, and it is the one this chapter
-can defend without overselling it.
+narrower than it first sounds. Write appliance $m$'s two logits as $(a_m,
+b_m)$, off and on. The softmax probability of "on" is
+
+$$
+\hat{p}_m = \frac{\exp(b_m)}{\exp(a_m) + \exp(b_m)}
+          = \frac{1}{1 + \exp(a_m - b_m)}
+          = \mathrm{sigmoid}(b_m - a_m),
+$$
+
+dividing numerator and denominator by $\exp(b_m)$. So this is a
+reparametrized sigmoid, not a fundamentally different mechanism. What is
+genuinely different is where the decision boundary lives: with two
+competing logits, "on" wins whenever $b_m > a_m$, a rule trained end to
+end as part of the network, rather than an external 0.5 cutoff applied to
+a probability after the fact. Small difference, but a real one, and it is
+the one this chapter can defend without overselling it.
+
+One more honest note. The original paper describes this loss as one that
+"implicitly captures the relations between labels" [@faustine2020mlcfcd].
+Structurally, that is not quite what is happening: each appliance's
+two-logit softmax above is computed independently of every other
+appliance's, with no term in the loss that couples them directly.
+Whatever relation the model learns between, say, a kettle and a fan being
+on together comes entirely from the shared CNN encoder underneath, the
+same 128 features feeding every appliance's own logit pair, not from the
+softmax or the loss itself. Worth knowing before reading more into the
+mechanism than it delivers.
 
 ## Which appliances specifically?
 
@@ -159,11 +180,14 @@ matrix, on the same held-out split.
 
 {{< embed 03-multi-appliance-recognition-code.ipynb#3026a340 >}}
 
-Most appliances improve substantially: AC, CFL, and Fan all sit under 60% on
-V-I and clear 70% on the decomposed distance matrix, Vacuum is already
-near-perfect on V-I (98.7%) and reaches exactly 100% on the decomposed
-distance matrix, and only SolderingIron and Waterkettle close most of the
-gap without quite crossing the 70% line. The published
+Most appliances improve substantially: AC, CFL, Fan, ILB, and LaptopCharger
+all sit under 70% on V-I, some far under it (CFL at 64%, Fan at 52%), and
+all five clear 70% on the decomposed distance matrix, CFL by nearly 30
+points. Appliances already strong on V-I stay strong: HairIron,
+FridgeDefroster, Fridge, and Vacuum (100% on both). SolderingIron and
+Waterkettle improve substantially without quite crossing the 70% line, and
+CoffeeMaker barely moves at all, the one exception the next section
+explains directly. The published
 result reports the same broad pattern, over 90% example-based $F_1$ for
 every appliance except AC, ILB, and LaptopCharger, once the decomposed
 distance feature is used [@faustine2020mlcfcd]. This run's own weak point
@@ -172,9 +196,30 @@ after decomposition, its worst score by a wide margin. Coffee makers are
 simple resistive heating elements, the same category of appliance Chapter
 2 found genuinely hard to tell apart in LILACD (Raclette and Coffee-machine
 confused each other more than any other pair there). The same physical
-reason plausibly applies here: a resistive heating element's current shape
-carries little that distinguishes it from another resistive heating
-element, decomposition or not.
+reason plausibly applies here, and unlike in Chapter 2, it is checkable
+directly rather than left as a plausible story.
+
+## Why the coffee maker specifically?
+
+Restricting to the 648 single-appliance activations (so each point is one
+appliance's own current, not several summed together), the Fryze split
+gives a direct per-sample measurement: how much of an appliance's own
+current is non-active, as a share of its total RMS current. A purely
+resistive load carries almost no non-active current by definition; a
+motor or a switching power supply carries much more.
+
+{{< embed 03-multi-appliance-recognition-code.ipynb#4ce06fa9 >}}
+
+The three lowest scorers on the decomposed distance matrix, SolderingIron,
+Waterkettle, and CoffeeMaker, are exactly the three appliances with the
+lowest median non-active share here (8.0%, 8.8%, and 9.0%), clustered on
+top of each other near zero. AC and ILB, also plain resistive loads, sit
+close behind at 10.8% and 14.1%. Motors and electronics separate cleanly
+from all of them: Fridge and HairIron sit in the 30-40% range, and CFL and
+LaptopCharger, both switching electronics, average above 85%. CoffeeMaker's
+weak score is not a modelling failure; it is measuring an appliance whose
+own current genuinely looks like its resistive neighbours, decomposition
+or not.
 
 ## What kind of mistake is it?
 
