@@ -85,7 +85,9 @@ description: "A structured, project-based path through smart meter data: disaggr
 <span class="act-eyebrow">Part 2 · Disaggregation</span>
 <p class="act-desc">Non-intrusive load monitoring: from the aggregate signal to appliance-level insight.</p>
 <ul class="act-chapters">
-<li><a href="book/02-disaggregation/01-what-is-nilm.qmd"><span class="ch-num">01</span><span class="ch-name">What Is Non-Intrusive Load Monitoring</span><i class="bi bi-check-circle-fill ch-check"></i></a></li>
+<li><a href="book/02-disaggregation/01-what-is-nilm.qmd"><span class="ch-num">01</span><span class="ch-name">Non-Intrusive Load Monitoring</span><i class="bi bi-check-circle-fill ch-check"></i></a></li>
+<li><a href="book/02-disaggregation/02-feature-engineering.qmd"><span class="ch-num">02</span><span class="ch-name">Appliance Recognition</span><i class="bi bi-check-circle-fill ch-check"></i></a></li>
+<li><a href="book/02-disaggregation/03-multi-appliance-recognition.qmd"><span class="ch-num">03</span><span class="ch-name">Multi-Appliance Recognition</span><i class="bi bi-check-circle-fill ch-check"></i></a></li>
 </ul>
 </div>
 </div>

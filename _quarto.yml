@@ -54,6 +54,7 @@ book:
       chapters:
         - book/02-disaggregation/01-what-is-nilm.qmd
         - book/02-disaggregation/02-feature-engineering.qmd
+        - book/02-disaggregation/03-multi-appliance-recognition.qmd
     - about.qmd
     - acronyms.qmd
 

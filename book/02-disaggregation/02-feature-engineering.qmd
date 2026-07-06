@@ -1,5 +1,5 @@
 ---
-title: "Appliance Recognition"
+title: "Chapter 2: Appliance Recognition"
 bibliography: ../../references.bib
 ---
 
