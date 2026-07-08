@@ -38,10 +38,17 @@ jobs:
           # book/02-disaggregation/02-feature-engineering-code.ipynb loads
           # real PLAID/LILACD data from resources/nilm-code/AWRGNILM, the
           # author's own research code, gitignored and not available in CI.
-          # Its outputs are committed and {{< embed >}} reads them directly
-          # without re-executing the notebook, so the rendered book is
-          # unaffected; only this from-scratch CI re-execution can't run it.
-          SKIP_LIST="book/02-disaggregation/02-feature-engineering-code.ipynb"
+          # book/02-disaggregation/03-multi-appliance-recognition-code.ipynb
+          # loads real multi-label PLAID data from resources/nilm-code/MLCFCD,
+          # same reason.
+          # book/02-disaggregation/04-multi-task-low-frequency-code.ipynb
+          # loads real UK-DALE data from resources/nilm-code/UNETNiLM, same
+          # reason.
+          # All three notebooks' outputs are committed and {{< embed >}}
+          # reads them directly without re-executing the notebook, so the
+          # rendered book is unaffected; only this from-scratch CI
+          # re-execution can't run them.
+          SKIP_LIST="book/02-disaggregation/02-feature-engineering-code.ipynb book/02-disaggregation/03-multi-appliance-recognition-code.ipynb book/02-disaggregation/04-multi-task-low-frequency-code.ipynb"
 
           # Helper: find all notebooks, excluding archived ones
           find_notebooks() {
