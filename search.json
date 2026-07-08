@@ -4,7 +4,7 @@
     "href": "index.html",
     "title": "Machine Learning for Smart Meter Data",
     "section": "",
-    "text": "A practical book for energy analytics and ML practitioners\n\n\nMachine Learning for Smart Meter Data\n\n\nFrom raw meter signal to business decision: disaggregation, forecasting, and grid-edge value, built to be run, not just read.\n\n\nBy Anthony Faustine    \n\n\n Read the preface  View on GitHub\n\n\n\n\n Meter Signal\n\n\n\n Data & ML\n\n\n\n Business Value\n\n\n\n\n\n Meter Signal\n\n→   Disaggregation  →\n\n Forecasting\n\n→\n\n Grid-Edge Value\n\n\n\n\n\nYour learning path\n\n\n\n\n\n\n\n Part 1 · Foundations\n\nSmart meter data fundamentals, signal processing, and the data pipelines every later chapter builds on.\n\n\n\n01Reading a meter signalSoon\n\n\n\n\n\n\n\n\n\n Part 2 · Disaggregation\n\nNon-intrusive load monitoring: from the aggregate signal to appliance-level insight.\n\n\n\n01Non-Intrusive Load Monitoring\n\n\n02Appliance Recognition\n\n\n03Multi-Appliance Recognition\n\n\n\n\n\n\n\n\n\n Part 3 · Forecasting\n\nProbabilistic load and PV forecasting, built on Twiga: point forecasts and calibrated uncertainty.\n\n\n\n03Forecasting with uncertaintySoon\n\n\n\n\n\n\n\n\n\n Part 4 · Grid-Edge Value\n\nClustering, anomaly and theft detection, and LV hosting-capacity questions as DER growth reshapes the grid.\n\n\n\n04Value at the grid edgeSoon\n\n\n\n\n\n\nChapters are being written part by part. Follow progress on GitHub.",
+    "text": "A practical book for energy analytics and ML practitioners\n\n\nMachine Learning for Smart Meter Data\n\n\nFrom raw meter signal to business decision: disaggregation, forecasting, and grid-edge value, built to be run, not just read.\n\n\nBy Anthony Faustine    \n\n\n Read the preface  View on GitHub\n\n\n\n\n Meter Signal\n\n\n\n Data & ML\n\n\n\n Business Value\n\n\n\n\n\n Meter Signal\n\n→   Disaggregation  →\n\n Forecasting\n\n→\n\n Grid-Edge Value\n\n\n\n\n\nYour learning path\n\n\n\n\n\n\n\n Part 1 · Foundations\n\nSmart meter data fundamentals, signal processing, and the data pipelines every later chapter builds on.\n\n\n\n01Reading a meter signalSoon\n\n\n\n\n\n\n\n\n\n Part 2 · Disaggregation\n\nNon-intrusive load monitoring: from the aggregate signal to appliance-level insight.\n\n\n\n01Non-Intrusive Load Monitoring\n\n\n02Appliance Recognition\n\n\n03Multi-Appliance Recognition\n\n\n04Multi-Task Deep Learning\n\n\n\n\n\n\n\n\n\n Part 3 · Forecasting\n\nProbabilistic load and PV forecasting, built on Twiga: point forecasts and calibrated uncertainty.\n\n\n\n03Forecasting with uncertaintySoon\n\n\n\n\n\n\n\n\n\n Part 4 · Grid-Edge Value\n\nClustering, anomaly and theft detection, and LV hosting-capacity questions as DER growth reshapes the grid.\n\n\n\n04Value at the grid edgeSoon\n\n\n\n\n\n\nChapters are being written part by part. Follow progress on GitHub.",
     "crumbs": [
       "<span class='chapter-number'>1</span>  <span class='chapter-title'>Welcome</span>"
     ]
@@ -393,13 +393,134 @@
     ]
   },
   {
+    "objectID": "book/02-disaggregation/04-multi-task-low-frequency.html",
+    "href": "book/02-disaggregation/04-multi-task-low-frequency.html",
+    "title": "Chapter 4: Multi-Task Deep Learning at Low Frequency",
+    "section": "",
+    "text": "From one state to a state and a power\nA kettle switches on. Not as a crisp current transient at 30kHz, the kind Chapters 2 and 3 built their whole pipeline around, but as a slow rise in a number a real smart meter reports once every few seconds. There is no before-window and after-window to subtract, no single clean event to isolate: a fridge is already cycling, a dishwasher is running, and the kettle’s own contribution is just one more wrinkle in a continuously wandering aggregate curve. This is the low-frequency world Chapter 1 named and Chapter 3 handed off to: energy estimation, not load identification, at the rate every real smart meter actually reports.\nThe question changes with it. Not “which appliance is this event,” not even “which appliances are active in this window” (Chapter 3): now, how much power is each one drawing, continuously, moment to moment, alongside whether it is on at all.\nAn aggregate reading is still the same sum Chapters 3 and 4’s own source papers both start from,\n\\[\nx_t = \\sum_{m=1}^{M} y_m(t) \\cdot s_m(t) + \\epsilon_t,\n\\]\nbut now each appliance \\(m\\) carries two targets instead of one: a binary state \\(s_m(t) \\in \\{0, 1\\}\\) and a continuous power \\(y_m(t)\\), one derived directly from the other by a fixed threshold. That coupling is the actual argument for a multi-task model: one shared representation feeding two heads, rather than a classifier and a regressor trained as if they had nothing to do with each other [1].\nFive real UK-DALE house-1 appliances make this concrete: kettle, fridge, dishwasher, washing machine, microwave, the same subset and the same house the source paper itself uses.",
+    "crumbs": [
+      "Part 2: Disaggregation",
+      "<span class='chapter-number'>7</span>  <span class='chapter-title'>Chapter 4: Multi-Task Deep Learning at Low Frequency</span>"
+    ]
+  },
+  {
+    "objectID": "book/02-disaggregation/04-multi-task-low-frequency.html#turning-a-power-curve-into-a-state",
+    "href": "book/02-disaggregation/04-multi-task-low-frequency.html#turning-a-power-curve-into-a-state",
+    "title": "Chapter 4: Multi-Task Deep Learning at Low Frequency",
+    "section": "Turning a power curve into a state",
+    "text": "Turning a power curve into a state\nAbove a fixed on-power threshold (2000W for the kettle, the real constant this data was built from), a continuous curve becomes a binary label. That threshold is not something the model has to discover; it is how the ground truth itself was built.",
+    "crumbs": [
+      "Part 2: Disaggregation",
+      "<span class='chapter-number'>7</span>  <span class='chapter-title'>Chapter 4: Multi-Task Deep Learning at Low Frequency</span>"
+    ]
+  },
+  {
+    "objectID": "book/02-disaggregation/04-multi-task-low-frequency.html#from-an-activation-window-to-a-sliding-window",
+    "href": "book/02-disaggregation/04-multi-task-low-frequency.html#from-an-activation-window-to-a-sliding-window",
+    "title": "Chapter 4: Multi-Task Deep Learning at Low Frequency",
+    "section": "From an activation window to a sliding window",
+    "text": "From an activation window to a sliding window\nChapters 2 and 3 isolated one detected event: a before-window and an after-window around a single state change. There is no event to detect at low frequency, so a fixed window of 100 consecutive aggregate readings slides across the whole signal instead, and the target is the state and power at the window’s last point, a seq2point framing, matching the Dataset class in the author’s own UNETNiLM repository. That repository builds windows one at a time in Python; at this chapter’s scale, hundreds of thousands of candidate windows rather than Chapters 2-3’s few thousand activations, that loop is a real bottleneck, so this notebook gathers every window with one vectorized NumPy operation instead.",
+    "crumbs": [
+      "Part 2: Disaggregation",
+      "<span class='chapter-number'>7</span>  <span class='chapter-title'>Chapter 4: Multi-Task Deep Learning at Low Frequency</span>"
+    ]
+  },
+  {
+    "objectID": "book/02-disaggregation/04-multi-task-low-frequency.html#two-backbones-one-set-of-heads",
+    "href": "book/02-disaggregation/04-multi-task-low-frequency.html#two-backbones-one-set-of-heads",
+    "title": "Chapter 4: Multi-Task Deep Learning at Low Frequency",
+    "section": "Two backbones, one set of heads",
+    "text": "Two backbones, one set of heads\n\n Key Concept\nMulti-target quantile regression is not five separate regressions bolted together. A single shared network predicts a handful of quantiles per appliance at once (here, the paper’s own choice: 2.5%, 10%, 50%, 90%, 97.5%), trained with the pinball loss, which penalizes over- and under-prediction asymmetrically depending on which quantile is being fit. The payoff: a real uncertainty band around every prediction, not just a point estimate, at essentially no extra modeling cost over a plain regression head [1].\n\nBoth backbones compared here end in the identical pair of heads: a per-appliance 2-way softmax for state, the same mechanism Chapter 3 used for multi-label appliance state, and a per-appliance multi-quantile linear head for power. CNN1DModel is a plain stacked-Conv1D encoder. UNETNiLM is a true U-Net: the same downsampling stack, followed by an upsampling stack with skip-connection concatenation back to the matching downsampling stage. Ported directly from the author’s own UNETNiLM repository, with two small fixes applied along the way: the checked-out unet.py imports Conv1D/Deconv1D from a .block module that does not exist (they live in layers.py), and its U-Net class referred to an undefined num_classes that needed to be a constructor argument. Both are one-line fixes, not a redesign; everything else is the original architecture, verified directly against the code, not just the paper’s prose.",
+    "crumbs": [
+      "Part 2: Disaggregation",
+      "<span class='chapter-number'>7</span>  <span class='chapter-title'>Chapter 4: Multi-Task Deep Learning at Low Frequency</span>"
+    ]
+  },
+  {
+    "objectID": "book/02-disaggregation/04-multi-task-low-frequency.html#live-results-does-the-u-net-actually-help-here",
+    "href": "book/02-disaggregation/04-multi-task-low-frequency.html#live-results-does-the-u-net-actually-help-here",
+    "title": "Chapter 4: Multi-Task Deep Learning at Low Frequency",
+    "section": "Live results: does the U-Net actually help here?",
+    "text": "Live results: does the U-Net actually help here?\nBoth models trained on a real subsample of the UK-DALE training split (100,000 windows, far short of the full 1.5 million-plus readings available, but enough to train on real data throughout) and evaluated on a held-out 20,000-window test subsample. MAE below is in the same per-appliance normalized units both models were trained on, not raw watts; NDE is a ratio and unaffected either way.\n\n\n\nCNN1DModel: F1-macro=0.659  F1-eb=0.331\nUNETNiLM: F1-macro=0.657  F1-eb=0.309\n\n\n\n\n\n\n\n\n\nmodel\nappliance\nmae\nnde\n\n\n\n\n0\nCNN1DModel\nkettle\n0.048186\n0.352167\n\n\n1\nCNN1DModel\nfridge\n0.482402\n0.668945\n\n\n2\nCNN1DModel\ndishwasher\n0.068059\n0.378716\n\n\n3\nCNN1DModel\nwashingmachine\n0.061486\n0.210548\n\n\n4\nCNN1DModel\nmicrowave\n0.053414\n0.985990\n\n\n5\nUNETNiLM\nkettle\n0.049199\n0.444324\n\n\n6\nUNETNiLM\nfridge\n0.501920\n0.677169\n\n\n7\nUNETNiLM\ndishwasher\n0.072005\n0.449237\n\n\n8\nUNETNiLM\nwashingmachine\n0.070739\n0.323176\n\n\n9\nUNETNiLM\nmicrowave\n0.049969\n0.987932\n\n\n\n\n\n\n\n\n\n\n\n   \n   \n\n\n\n\n\n\n   \n   \n\n\n\nInconclusive, at this training budget, and that is itself the honest result. In this run, CNN1DModel has the lower (better) MAE on four of five appliances, kettle, fridge, dishwasher, and washing machine, UNETNiLM only winning on microwave, and the lower NDE on all five. State detection is close to a tie: macro F1 65.9% for CNN1DModel against 65.7% for UNETNiLM, example-based F1 33.1% against 30.9%. Re-executing this exact code, same seed, same data, produced four different rankings across four runs while this chapter was being written: macro F1 ranged 64.5-68.7% for CNN1DModel and 65.7-68.9% for UNETNiLM, overlapping ranges with no consistent winner, sometimes UNETNiLM ahead by three points, sometimes CNN1DModel ahead, purely from ordinary CPU floating-point non-determinism in convolution and batch-norm reduction order. The published result finds a clear, repeatable U-Net advantage, average MAE reduced 26.35% and F1-macro 0.941 against 0.930 for the plain CNN baseline, on a training budget far larger than this chapter’s 100,000 random windows across 6 epochs afford [1]. At book scale, that gap is too small relative to run-to-run noise to call reliably in either direction; the architecture question needs either more training or a less noisy evaluation to answer here, not a bigger claim than the data supports.",
+    "crumbs": [
+      "Part 2: Disaggregation",
+      "<span class='chapter-number'>7</span>  <span class='chapter-title'>Chapter 4: Multi-Task Deep Learning at Low Frequency</span>"
+    ]
+  },
+  {
+    "objectID": "book/02-disaggregation/04-multi-task-low-frequency.html#a-close-look-at-uncertainty",
+    "href": "book/02-disaggregation/04-multi-task-low-frequency.html#a-close-look-at-uncertainty",
+    "title": "Chapter 4: Multi-Task Deep Learning at Low Frequency",
+    "section": "A close look at uncertainty",
+    "text": "A close look at uncertainty\nOne real kettle activation from the held-out test split, predicted by UNETNiLM as a full set of quantiles, not just a single number. The 80% and 95% bands come directly from the same multi-quantile head trained above, nothing extra fit on top.",
+    "crumbs": [
+      "Part 2: Disaggregation",
+      "<span class='chapter-number'>7</span>  <span class='chapter-title'>Chapter 4: Multi-Task Deep Learning at Low Frequency</span>"
+    ]
+  },
+  {
+    "objectID": "book/02-disaggregation/04-multi-task-low-frequency.html#checking-the-combined-loss-itself",
+    "href": "book/02-disaggregation/04-multi-task-low-frequency.html#checking-the-combined-loss-itself",
+    "title": "Chapter 4: Multi-Task Deep Learning at Low Frequency",
+    "section": "Checking the combined loss itself",
+    "text": "Checking the combined loss itself\nThe two task losses are summed unweighted, matching the paper’s own choice, worth checking directly rather than assuming neither term quietly dominates the other.\n\n\n\n   \n   \n\n\n\nBoth terms decrease smoothly across every epoch for both backbones, and if anything the state (cross-entropy) loss stays two to three times larger than the power (pinball) loss throughout training, not the other way around. Nothing here suggests one task is starving the other, at least at this scale.",
+    "crumbs": [
+      "Part 2: Disaggregation",
+      "<span class='chapter-number'>7</span>  <span class='chapter-title'>Chapter 4: Multi-Task Deep Learning at Low Frequency</span>"
+    ]
+  },
+  {
+    "objectID": "book/02-disaggregation/04-multi-task-low-frequency.html#what-reproducible-benchmarking-means-here",
+    "href": "book/02-disaggregation/04-multi-task-low-frequency.html#what-reproducible-benchmarking-means-here",
+    "title": "Chapter 4: Multi-Task Deep Learning at Low Frequency",
+    "section": "What “reproducible benchmarking” means here",
+    "text": "What “reproducible benchmarking” means here\nDeepNLMTK.pdf is not where this chapter’s model code came from. Deep-NILMtk’s own UNETNILM* variants turned out to be single-task regression or mixture-density models, no joint state head at all, and its multi-task attention variant has a constructor signature mismatch that would fail on instantiation. What the toolkit paper is used for here is its actual contribution: a standardized template for comparing NILM models fairly, same split, same metrics, same held-out test set, model differences isolated from data or evaluation differences [2]. That discipline is exactly what the CNN1DModel vs UNETNiLM comparison above followed: identical heads, identical data, identical training budget, only the backbone differs.",
+    "crumbs": [
+      "Part 2: Disaggregation",
+      "<span class='chapter-number'>7</span>  <span class='chapter-title'>Chapter 4: Multi-Task Deep Learning at Low Frequency</span>"
+    ]
+  },
+  {
+    "objectID": "book/02-disaggregation/04-multi-task-low-frequency.html#why-bother",
+    "href": "book/02-disaggregation/04-multi-task-low-frequency.html#why-bother",
+    "title": "Chapter 4: Multi-Task Deep Learning at Low Frequency",
+    "section": "Why bother",
+    "text": "Why bother\nThree concrete things this buys beyond “another architecture.” First, deployability taken one step further than Chapter 3: no event detector at all is needed now, this works directly off the low read-rate every real smart meter already reports, not a high-frequency stream most utilities will never collect. Second, multi-task efficiency: one shared model instead of five separate single-appliance models to train, version, and keep working, a real engineering cost that compounds at fleet scale. Third, actionable uncertainty: a quantile band, not a point estimate, is what a downstream system, a demand-response signal, an anomaly flag, an appliance-health check, needs to decide how much to trust a specific prediction at a specific moment, not just on average across a test set.",
+    "crumbs": [
+      "Part 2: Disaggregation",
+      "<span class='chapter-number'>7</span>  <span class='chapter-title'>Chapter 4: Multi-Task Deep Learning at Low Frequency</span>"
+    ]
+  },
+  {
+    "objectID": "book/02-disaggregation/04-multi-task-low-frequency.html#where-this-part-of-the-book-goes",
+    "href": "book/02-disaggregation/04-multi-task-low-frequency.html#where-this-part-of-the-book-goes",
+    "title": "Chapter 4: Multi-Task Deep Learning at Low Frequency",
+    "section": "Where this part of the book goes",
+    "text": "Where this part of the book goes\nThis closes Part 2. The quantile regression this chapter leaned on is not a one-off trick: Part 3’s forecasting chapters, built on Twiga, reuse the same idea for a different target, whole-house load instead of per-appliance power, with the same payoff of a real uncertainty band instead of a single number.\n\n Common Mistake\nReporting one training run’s number as if it settles an architecture comparison, instead of checking whether the gap between architectures is larger than the run-to-run noise. It usually is not, at this scale: two close architectures and a light training budget together mean ordinary CPU floating-point non-determinism in convolution and batch-norm reduction order can move the result more than the architecture choice does. A single confident-looking decimal is not evidence of anything until it survives being re-run.",
+    "crumbs": [
+      "Part 2: Disaggregation",
+      "<span class='chapter-number'>7</span>  <span class='chapter-title'>Chapter 4: Multi-Task Deep Learning at Low Frequency</span>"
+    ]
+  },
+  {
+    "objectID": "book/02-disaggregation/04-multi-task-low-frequency.html#references",
+    "href": "book/02-disaggregation/04-multi-task-low-frequency.html#references",
+    "title": "Chapter 4: Multi-Task Deep Learning at Low Frequency",
+    "section": "References",
+    "text": "References\n\n\n[1] A. Faustine, L. Pereira, H. Bousbiat, and S. Kulkarni, “UNet-NILM: A deep neural network for multi-tasks appliances state detection and power estimation in NILM,” in Proceedings of the 5th international workshop on non-intrusive load monitoring, 2020, pp. 84–88. doi: 10.1145/3427771.3427859.\n\n\n[2] H. Bousbiat, A. Faustine, C. Klemenjak, L. Pereira, and W. Elmenreich, “Unlocking the full potential of neural NILM: On automation, hyperparameters & modular pipelines,” IEEE Transactions on Industrial Informatics, vol. 18, no. 10, 2022, doi: 10.1109/TII.2022.3206322.",
+    "crumbs": [
+      "Part 2: Disaggregation",
+      "<span class='chapter-number'>7</span>  <span class='chapter-title'>Chapter 4: Multi-Task Deep Learning at Low Frequency</span>"
+    ]
+  },
+  {
     "objectID": "about.html",
     "href": "about.html",
     "title": "About the Author",
     "section": "",
     "text": "Anthony Faustine\n    Principal ML Engineer  ·  Analog Devices, Ireland\n    \n       sambaiga.github.io\n       sambaiga\n       sambaiga\n       0000-0002-7838-533X\n       sambaiga@gmail.com\n    \n  \n\nEvery part of this book started as something I had to solve for real, not as a topic I picked to write about.\nThe earliest was disaggregation: teaching a model to look at one aggregate power reading and say which appliance was drawing it, the same problem Part 2 of this book covers. That question led to the one utilities actually pay for: not just what’s running now, but what demand and solar output will look like tomorrow, with an honest estimate of how wrong that forecast might be. My PhD took that question to the low-voltage substation, forecasting net load in the presence of solar and EV charging when a headline accuracy number wasn’t good enough to act on. At Eaton’s Centre for Intelligent Power, I ran that same question as Lead Data Scientist and Principal Investigator, securing €1.6M in competitive research funding and picking up the Eaton STAR Leadership Award along the way.\nToday, as Principal ML Engineer at Analog Devices, the question is the same one this book keeps returning to: not whether a model works in a notebook, but whether it survives contact with production, supply chain demand planning and edge inference in my case. That is the bar every chapter here holds itself to.\nThe open-source side of that decade is public: Twiga (point and probabilistic forecasting, one interface, every model), MLPForecast (uncertainty-aware net-load forecasting), and Deep-NILMtk (a community toolkit for non-intrusive load monitoring, the same disaggregation problem this book opens with).\nProjects  →  sambaiga.github.io/pages/projects\nThe published record runs the same thread: non-intrusive load monitoring, probabilistic forecasting, uncertainty quantification, physics-based intelligence, and AI for reliability engineering, across 10+ peer-reviewed papers in IEEE Transactions on Smart Grid, IEEE Transactions on Power Systems, and IEEE Transactions on Industrial Informatics.\nPublications  →  sambaiga.github.io/pages/publication  ·  ORCID\nI also write about machine learning, Bayesian thinking, and applied AI at:\nBlog  →  sambaiga.github.io/pages/blog",
     "crumbs": [
-      "<span class='chapter-number'>7</span>  <span class='chapter-title'>About the Author</span>"
+      "<span class='chapter-number'>8</span>  <span class='chapter-title'>About the Author</span>"
     ]
   },
   {
@@ -409,7 +530,7 @@
     "section": "",
     "text": "List Of Acronyms\n\nCRPS\n\nContinuously Ranked Probability Score\n\nDER\n\nDistributed Energy Resources\n\nLV\n\nLow Voltage\n\nMV\n\nMedium Voltage\n\nNILM\n\nNon-Intrusive Load Monitoring\n\nPV\n\nPhotovoltaic",
     "crumbs": [
-      "<span class='chapter-number'>8</span>  <span class='chapter-title'>List of Acronyms</span>"
+      "<span class='chapter-number'>9</span>  <span class='chapter-title'>List of Acronyms</span>"
     ]
   }
 ]
