@@ -90,7 +90,7 @@ low-frequency deep learning:
 | --- | --- | --- | --- | --- |
 | 1 | What Is Non-Intrusive Load Monitoring | Both | Survey's problem formulation + 4-step pipeline | **Done**: `book/02-disaggregation/01-what-is-nilm.qmd` |
 | 2 | Feature Engineering for Appliance Recognition (WRG, AWRG, phase imbalance) | High-frequency | `chapter-nilm.tex` WRG/AWRG/FT sections + `wrg.pdf`/`AWRG.pdf`/`FTNILM.pdf`; code and real PLAID/LILACD data from `resources/nilm-code/AWRGNILM` | **Done**: `book/02-disaggregation/02-feature-engineering.qmd` |
-| 3 | Multi-Appliance Recognition from High-Frequency Signals | High-frequency | `paper_v3.tex` (Fryze decomposition + multi-label softmax CNN, PLAID) | Not started |
+| 3 | Multi-Appliance Recognition from High-Frequency Signals | High-frequency | `Final_version.tex` (Fryze decomposition + multi-label softmax CNN, PLAID); code and real multi-label PLAID data from `resources/nilm-code/MLCFCD` | **Done**: `book/02-disaggregation/03-multi-appliance-recognition.qmd` |
 | 4 | Deep Learning and Reproducible Benchmarking at Low Frequency | Low-frequency | `DeepNLMTK.pdf` (direct code reuse, same pattern as Twiga in Part 3; UK-DALE) | Not started |
 
 ### Part 3: Forecasting (green)

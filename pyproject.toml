@@ -40,6 +40,7 @@ modelling = [
     "torch>=2.0.0",
     "pytorch-lightning>=2.0.0",
     "twiga[nn]>=1.0.0",
+    "iterative-stratification>=0.1.9",
 ]
 
 mlops = [

@@ -1,5 +1,5 @@
 ---
-title: "Non-Intrusive Load Monitoring"
+title: "Chapter 1: Non-Intrusive Load Monitoring"
 bibliography: ../../references.bib
 ---
 

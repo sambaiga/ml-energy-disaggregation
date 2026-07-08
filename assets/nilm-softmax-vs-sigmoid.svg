@@ -1,0 +1,53 @@
+<svg viewBox="0 0 520 236" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect x="1" y="1" width="518" height="234" rx="12" fill="#F8FAFC" stroke="#E2E8F0" stroke-width="1.5"/>
+
+  <!-- Row A: sigmoid + external threshold -->
+  <text x="260" y="26" text-anchor="middle" font-family="'Jost', system-ui, sans-serif" font-size="12" font-weight="700" fill="#334155">SIGMOID + THRESHOLD</text>
+  <text x="260" y="39" text-anchor="middle" font-family="'Libre Franklin', system-ui, sans-serif" font-size="9" font-style="italic" fill="#64748B">the usual approach: one logit, a cutoff bolted on after training</text>
+
+  <rect x="20" y="53" width="68" height="40" rx="6" fill="#94A3B8" fill-opacity="0.15" stroke="#64748B" stroke-width="1.5"/>
+  <text x="54" y="77" text-anchor="middle" font-family="'Libre Franklin', system-ui, sans-serif" font-size="9.5" font-weight="600" fill="#334155">logit</text>
+
+  <path d="M 88 73 L 116 73" stroke="#94A3B8" stroke-width="1.5"/>
+  <circle cx="140" cy="73" r="21" fill="#38BDF8" fill-opacity="0.15" stroke="#0369A1" stroke-width="1.5"/>
+  <text x="140" y="78" text-anchor="middle" font-family="'Libre Franklin', system-ui, sans-serif" font-size="13" fill="#0C4A6E">&#963;</text>
+
+  <path d="M 161 73 L 186 73" stroke="#94A3B8" stroke-width="1.5"/>
+  <rect x="186" y="60" width="98" height="26" rx="13" fill="#FFFFFF" stroke="#94A3B8" stroke-width="1.5"/>
+  <text x="235" y="77" text-anchor="middle" font-family="'Libre Franklin', system-ui, sans-serif" font-size="9" fill="#334155">P(on) = 0.62</text>
+
+  <line x1="316" y1="50" x2="316" y2="96" stroke="#94A3B8" stroke-width="1.5" stroke-dasharray="3 3"/>
+  <text x="316" y="106" text-anchor="middle" font-family="'Libre Franklin', system-ui, sans-serif" font-size="8" font-style="italic" fill="#64748B">0.5 cutoff, fixed</text>
+
+  <path d="M 284 73 L 344 73" stroke="#94A3B8" stroke-width="1.5"/>
+  <rect x="344" y="60" width="130" height="26" rx="13" fill="#FFFFFF" stroke="#64748B" stroke-width="1.5"/>
+  <text x="409" y="77" text-anchor="middle" font-family="'Libre Franklin', system-ui, sans-serif" font-size="9" fill="#334155">Decision: ON</text>
+
+  <!-- Divider -->
+  <line x1="20" y1="121" x2="500" y2="121" stroke="#CBD5E1" stroke-width="1" stroke-dasharray="4 3"/>
+
+  <!-- Row B: per-appliance two-logit softmax -->
+  <text x="260" y="146" text-anchor="middle" font-family="'Jost', system-ui, sans-serif" font-size="12" font-weight="700" fill="#5B21B6">TWO-LOGIT SOFTMAX</text>
+  <text x="260" y="159" text-anchor="middle" font-family="'Libre Franklin', system-ui, sans-serif" font-size="9" font-style="italic" fill="#7C3AED">this chapter's approach: the cutoff is learned, not bolted on</text>
+
+  <rect x="20" y="167" width="68" height="18" rx="5" fill="#7C3AED" fill-opacity="0.12" stroke="#5B21B6" stroke-width="1.5"/>
+  <text x="54" y="180" text-anchor="middle" font-family="'Libre Franklin', system-ui, sans-serif" font-size="8.5" font-weight="600" fill="#5B21B6">off logit</text>
+
+  <rect x="20" y="189" width="68" height="18" rx="5" fill="#7C3AED" fill-opacity="0.12" stroke="#5B21B6" stroke-width="1.5"/>
+  <text x="54" y="202" text-anchor="middle" font-family="'Libre Franklin', system-ui, sans-serif" font-size="8.5" font-weight="600" fill="#5B21B6">on logit</text>
+
+  <path d="M 88 176 C 104 176 104 187 120 187" stroke="#7C3AED" stroke-width="1.5" fill="none"/>
+  <path d="M 88 198 C 104 198 104 187 120 187" stroke="#7C3AED" stroke-width="1.5" fill="none"/>
+
+  <rect x="120" y="167" width="90" height="40" rx="8" fill="#7C3AED" fill-opacity="0.1" stroke="#7C3AED" stroke-width="1.5"/>
+  <text x="165" y="181" text-anchor="middle" font-family="'Libre Franklin', system-ui, sans-serif" font-size="9" font-weight="600" fill="#5B21B6">softmax</text>
+  <text x="165" y="193" text-anchor="middle" font-family="'Libre Franklin', system-ui, sans-serif" font-size="8" fill="#7C3AED">(2-way)</text>
+
+  <path d="M 210 187 L 236 187" stroke="#7C3AED" stroke-width="1.5"/>
+  <rect x="236" y="174" width="140" height="26" rx="13" fill="#FFFFFF" stroke="#7C3AED" stroke-width="1.5"/>
+  <text x="306" y="191" text-anchor="middle" font-family="'Libre Franklin', system-ui, sans-serif" font-size="8.5" fill="#334155">P(off)=0.35, P(on)=0.65</text>
+
+  <path d="M 376 187 L 402 187" stroke="#7C3AED" stroke-width="1.5"/>
+  <rect x="402" y="174" width="98" height="26" rx="13" fill="#FFFFFF" stroke="#5B21B6" stroke-width="1.5"/>
+  <text x="451" y="191" text-anchor="middle" font-family="'Libre Franklin', system-ui, sans-serif" font-size="9" fill="#334155">Decision: ON</text>
+</svg>
