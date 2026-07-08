@@ -2,30 +2,34 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
     <loc>https://sambaiga.github.io/ml-energy-disaggregation/index.html</loc>
-    <lastmod>2026-07-06T17:33:27.351Z</lastmod>
+    <lastmod>2026-07-08T21:19:22.470Z</lastmod>
   </url>
   <url>
     <loc>https://sambaiga.github.io/ml-energy-disaggregation/preface.html</loc>
-    <lastmod>2026-07-06T17:33:27.351Z</lastmod>
+    <lastmod>2026-07-08T21:19:22.470Z</lastmod>
   </url>
   <url>
     <loc>https://sambaiga.github.io/ml-energy-disaggregation/how-to-use.html</loc>
-    <lastmod>2026-07-06T17:33:27.351Z</lastmod>
+    <lastmod>2026-07-08T21:19:22.470Z</lastmod>
   </url>
   <url>
     <loc>https://sambaiga.github.io/ml-energy-disaggregation/book/02-disaggregation/01-what-is-nilm.html</loc>
-    <lastmod>2026-07-06T17:33:27.347Z</lastmod>
+    <lastmod>2026-07-08T21:19:22.467Z</lastmod>
   </url>
   <url>
     <loc>https://sambaiga.github.io/ml-energy-disaggregation/book/02-disaggregation/02-feature-engineering.html</loc>
-    <lastmod>2026-07-06T17:33:27.350Z</lastmod>
+    <lastmod>2026-07-08T21:19:22.469Z</lastmod>
+  </url>
+  <url>
+    <loc>https://sambaiga.github.io/ml-energy-disaggregation/book/02-disaggregation/03-multi-appliance-recognition.html</loc>
+    <lastmod>2026-07-08T21:19:22.469Z</lastmod>
   </url>
   <url>
     <loc>https://sambaiga.github.io/ml-energy-disaggregation/about.html</loc>
-    <lastmod>2026-07-06T17:33:27.345Z</lastmod>
+    <lastmod>2026-07-08T21:19:22.465Z</lastmod>
   </url>
   <url>
     <loc>https://sambaiga.github.io/ml-energy-disaggregation/acronyms.html</loc>
-    <lastmod>2026-07-06T17:33:27.345Z</lastmod>
+    <lastmod>2026-07-08T21:19:22.465Z</lastmod>
   </url>
 </urlset>

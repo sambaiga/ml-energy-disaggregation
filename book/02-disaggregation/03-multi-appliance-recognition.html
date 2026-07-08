@@ -1,0 +1,2848 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.9.38">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="description" content="A structured, project-based path through smart meter data: disaggregation, forecasting, anomaly detection, and grid-edge value, from raw signal to business insight.">
+
+<title>Chapter 3: Multi-Appliance Recognition – Machine Learning for Smart Meter Data</title>
+<style>
+/* Default styles provided by pandoc.
+** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+*/
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for citations */
+div.csl-bib-body { }
+div.csl-entry {
+  clear: both;
+  margin-bottom: 0em;
+}
+.hanging-indent div.csl-entry {
+  margin-left:2em;
+  text-indent:-2em;
+}
+div.csl-left-margin {
+  min-width:2em;
+  float:left;
+}
+div.csl-right-inline {
+  margin-left:2em;
+  padding-left:1em;
+}
+div.csl-indent {
+  margin-left: 2em;
+}</style>
+
+
+<script src="https://cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.min.js" integrity="sha384-ZvpUoO/+PpLXR1lu4jmpXWu80pZlYUAfxl5NsBMWOEPSjUn/6Z/hRTt8+pR6L4N2" crossorigin="anonymous"></script><script src="../../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../../">
+<link href="../../about.html" rel="next">
+<link href="../../book/02-disaggregation/02-feature-engineering.html" rel="prev">
+<link href="../../assets/favicon.svg" rel="icon" type="image/svg+xml">
+<script src="../../site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="../../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="../../site_libs/quarto-html/popper.min.js"></script>
+<script src="../../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-de63f62b328812d8e578a4d74e282472.css" rel="stylesheet" class="quarto-color-scheme" id="quarto-text-highlighting-styles">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-dark-6b6957c917596b414ec0b78690761e87.css" rel="stylesheet" class="quarto-color-scheme quarto-color-alternate" id="quarto-text-highlighting-styles">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-de63f62b328812d8e578a4d74e282472.css" rel="stylesheet" class="quarto-color-scheme-extra" id="quarto-text-highlighting-styles">
+<script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../../site_libs/bootstrap/bootstrap-36bd8577216834d23b435baa2ce28cca.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
+<link href="../../site_libs/bootstrap/bootstrap-dark-0aba252a5ad676c385980f30b0449bb6.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="dark">
+<link href="../../site_libs/bootstrap/bootstrap-36bd8577216834d23b435baa2ce28cca.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme-extra" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+<style>html{ scroll-behavior: smooth; }</style>
+<script src="https://cdn.jsdelivr.net/npm/requirejs@2.3.6/require.min.js" integrity="sha384-c9c+LnTbwQ3aujuU7ULEPVvgLs+Fn6fJUvIGTsuu1ZcCf11fiEubah0ttpca4ntM sha384-6V1/AdqZRWk1KAlWbKBlGhN7VG4iE/yAZcO6NZPMF8od0vukrvr0tg4qY6NSrItx" crossorigin="anonymous"></script>
+
+<script type="application/javascript">define('jquery', [],function() {return window.jQuery;})</script>
+
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script defer="" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN" && texText && texText.data) {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+<meta property="og:title" content="Chapter 3: Multi-Appliance Recognition – Machine Learning for Smart Meter Data">
+<meta property="og:description" content="A structured, project-based path through smart meter data: disaggregation, forecasting, anomaly detection, and grid-edge value, from raw signal to business insight.">
+<meta property="og:image" content="https://sambaiga.github.io/ml-energy-disaggregation/assets/nilm-softmax-vs-sigmoid.svg">
+<meta property="og:site_name" content="Machine Learning for Smart Meter Data">
+<meta name="twitter:title" content="Chapter 3: Multi-Appliance Recognition – Machine Learning for Smart Meter Data">
+<meta name="twitter:description" content="A structured, project-based path through smart meter data: disaggregation, forecasting, anomaly detection, and grid-edge value, from raw signal to business insight.">
+<meta name="twitter:image" content="https://sambaiga.github.io/ml-energy-disaggregation/assets/nilm-softmax-vs-sigmoid.svg">
+<meta name="twitter:card" content="summary_large_image">
+</head>
+
+<body class="nav-sidebar floating nav-fixed quarto-light"><script id="quarto-html-before-body" type="application/javascript">
+    const toggleBodyColorMode = (bsSheetEl) => {
+      const mode = bsSheetEl.getAttribute("data-mode");
+      const bodyEl = window.document.querySelector("body");
+      if (mode === "dark") {
+        bodyEl.classList.add("quarto-dark");
+        bodyEl.classList.remove("quarto-light");
+      } else {
+        bodyEl.classList.add("quarto-light");
+        bodyEl.classList.remove("quarto-dark");
+      }
+    }
+    const toggleBodyColorPrimary = () => {
+      const bsSheetEl = window.document.querySelector("link#quarto-bootstrap:not([rel=disabled-stylesheet])");
+      if (bsSheetEl) {
+        toggleBodyColorMode(bsSheetEl);
+      }
+    }
+    const setColorSchemeToggle = (alternate) => {
+      const toggles = window.document.querySelectorAll('.quarto-color-scheme-toggle');
+      for (let i=0; i < toggles.length; i++) {
+        const toggle = toggles[i];
+        if (toggle) {
+          if (alternate) {
+            toggle.classList.add("alternate");
+          } else {
+            toggle.classList.remove("alternate");
+          }
+        }
+      }
+    };
+    const toggleColorMode = (alternate) => {
+      // Switch the stylesheets
+      const primaryStylesheets = window.document.querySelectorAll('link.quarto-color-scheme:not(.quarto-color-alternate)');
+      const alternateStylesheets = window.document.querySelectorAll('link.quarto-color-scheme.quarto-color-alternate');
+      manageTransitions('#quarto-margin-sidebar .nav-link', false);
+      if (alternate) {
+        // note: dark is layered on light, we don't disable primary!
+        enableStylesheet(alternateStylesheets);
+        for (const sheetNode of alternateStylesheets) {
+          if (sheetNode.id === "quarto-bootstrap") {
+            toggleBodyColorMode(sheetNode);
+          }
+        }
+      } else {
+        disableStylesheet(alternateStylesheets);
+        enableStylesheet(primaryStylesheets)
+        toggleBodyColorPrimary();
+      }
+      manageTransitions('#quarto-margin-sidebar .nav-link', true);
+      // Switch the toggles
+      setColorSchemeToggle(alternate)
+      // Hack to workaround the fact that safari doesn't
+      // properly recolor the scrollbar when toggling (#1455)
+      if (navigator.userAgent.indexOf('Safari') > 0 && navigator.userAgent.indexOf('Chrome') == -1) {
+        manageTransitions("body", false);
+        window.scrollTo(0, 1);
+        setTimeout(() => {
+          window.scrollTo(0, 0);
+          manageTransitions("body", true);
+        }, 40);
+      }
+    }
+    const disableStylesheet = (stylesheets) => {
+      for (let i=0; i < stylesheets.length; i++) {
+        const stylesheet = stylesheets[i];
+        stylesheet.rel = 'disabled-stylesheet';
+      }
+    }
+    const enableStylesheet = (stylesheets) => {
+      for (let i=0; i < stylesheets.length; i++) {
+        const stylesheet = stylesheets[i];
+        if(stylesheet.rel !== 'stylesheet') { // for Chrome, which will still FOUC without this check
+          stylesheet.rel = 'stylesheet';
+        }
+      }
+    }
+    const manageTransitions = (selector, allowTransitions) => {
+      const els = window.document.querySelectorAll(selector);
+      for (let i=0; i < els.length; i++) {
+        const el = els[i];
+        if (allowTransitions) {
+          el.classList.remove('notransition');
+        } else {
+          el.classList.add('notransition');
+        }
+      }
+    }
+    const isFileUrl = () => {
+      return window.location.protocol === 'file:';
+    }
+    const hasAlternateSentinel = () => {
+      let styleSentinel = getColorSchemeSentinel();
+      if (styleSentinel !== null) {
+        return styleSentinel === "alternate";
+      } else {
+        return false;
+      }
+    }
+    const setStyleSentinel = (alternate) => {
+      const value = alternate ? "alternate" : "default";
+      if (!isFileUrl()) {
+        window.localStorage.setItem("quarto-color-scheme", value);
+      } else {
+        localAlternateSentinel = value;
+      }
+    }
+    const getColorSchemeSentinel = () => {
+      if (!isFileUrl()) {
+        const storageValue = window.localStorage.getItem("quarto-color-scheme");
+        return storageValue != null ? storageValue : localAlternateSentinel;
+      } else {
+        return localAlternateSentinel;
+      }
+    }
+    const toggleGiscusIfUsed = (isAlternate, darkModeDefault) => {
+      const baseTheme = document.querySelector('#giscus-base-theme')?.value ?? 'light';
+      const alternateTheme = document.querySelector('#giscus-alt-theme')?.value ?? 'dark';
+      let newTheme = '';
+      if(authorPrefersDark) {
+        newTheme = isAlternate ? baseTheme : alternateTheme;
+      } else {
+        newTheme = isAlternate ? alternateTheme : baseTheme;
+      }
+      const changeGiscusTheme = () => {
+        // From: https://github.com/giscus/giscus/issues/336
+        const sendMessage = (message) => {
+          const iframe = document.querySelector('iframe.giscus-frame');
+          if (!iframe) return;
+          iframe.contentWindow.postMessage({ giscus: message }, 'https://giscus.app');
+        }
+        sendMessage({
+          setConfig: {
+            theme: newTheme
+          }
+        });
+      }
+      const isGiscussLoaded = window.document.querySelector('iframe.giscus-frame') !== null;
+      if (isGiscussLoaded) {
+        changeGiscusTheme();
+      }
+    };
+    const authorPrefersDark = false;
+    const darkModeDefault = authorPrefersDark;
+      document.querySelector('link#quarto-text-highlighting-styles.quarto-color-scheme-extra').rel = 'disabled-stylesheet';
+      document.querySelector('link#quarto-bootstrap.quarto-color-scheme-extra').rel = 'disabled-stylesheet';
+    let localAlternateSentinel = darkModeDefault ? 'alternate' : 'default';
+    // Dark / light mode switch
+    window.quartoToggleColorScheme = () => {
+      // Read the current dark / light value
+      let toAlternate = !hasAlternateSentinel();
+      toggleColorMode(toAlternate);
+      setStyleSentinel(toAlternate);
+      toggleGiscusIfUsed(toAlternate, darkModeDefault);
+      window.dispatchEvent(new Event('resize'));
+    };
+    // Switch to dark mode if need be
+    if (hasAlternateSentinel()) {
+      toggleColorMode(true);
+    } else {
+      toggleColorMode(false);
+    }
+  </script>
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+    <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container mx-auto">
+    <a class="navbar-brand" href="../../index.html">
+    <span class="navbar-title">Machine Learning for Smart Meter Data</span>
+    </a>
+  </div>
+            <div id="quarto-search" class="" title="Search"></div>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" role="menu" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav navbar-nav-scroll ms-auto">
+  <li class="nav-item compact">
+    <a class="nav-link" href="mailto:sambaiga@gmail.com"> <i class="bi bi-envelope-at" role="img" aria-label="Email Anthony Faustine">
+</i> 
+<span class="menu-text"></span></a>
+  </li>  
+  <li class="nav-item compact">
+    <a class="nav-link" href="https://www.linkedin.com/in/sambaiga"> <i class="bi bi-linkedin" role="img" aria-label="LinkedIn">
+</i> 
+<span class="menu-text"></span></a>
+  </li>  
+  <li class="nav-item compact">
+    <a class="nav-link" href="https://github.com/sambaiga/ml-energy-disaggregation"> <i class="bi bi-github" role="img" aria-label="View source on GitHub">
+</i> 
+<span class="menu-text"></span></a>
+  </li>  
+</ul>
+          </div> <!-- /navcollapse -->
+            <div class="quarto-navbar-tools">
+    <a href="https://github.com/sambaiga/ml-energy-disaggregation" title="Source Code" class="quarto-navigation-tool px-1" aria-label="Source Code"><i class="bi bi-github"></i></a>
+  <a href="" class="quarto-color-scheme-toggle quarto-navigation-tool  px-1" onclick="window.quartoToggleColorScheme(); return false;" title="Toggle dark mode"><i class="bi"></i></a>
+</div>
+      </div> <!-- /container-fluid -->
+    </nav>
+  <nav class="quarto-secondary-nav">
+    <div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
+      </button>
+        <a class="flex-grow-1 no-decor" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+          <h1 class="quarto-secondary-nav-title"><span class="chapter-title">Chapter 3: Multi-Appliance Recognition</span></h1>
+        </a>     
+    </div>
+  </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation floating overflow-auto">
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../index.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">Welcome</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../preface.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">Preface</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../how-to-use.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">How to Use This Book</span></a>
+  </div>
+</li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true">
+ <span class="menu-text">Part 2: Disaggregation</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../book/02-disaggregation/01-what-is-nilm.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">Chapter 1: Non-Intrusive Load Monitoring</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../book/02-disaggregation/02-feature-engineering.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">Chapter 2: Appliance Recognition</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../book/02-disaggregation/03-multi-appliance-recognition.html" class="sidebar-item-text sidebar-link active"><span class="chapter-title">Chapter 3: Multi-Appliance Recognition</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../about.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">About the Author</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../acronyms.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">List of Acronyms</span></a>
+  </div>
+</li>
+    </ul>
+    </div>
+</nav>
+<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">In this chapter</h2>
+   
+  <ul>
+  <li><a href="#from-one-label-to-a-set-of-labels" id="toc-from-one-label-to-a-set-of-labels" class="nav-link active" data-scroll-target="#from-one-label-to-a-set-of-labels">From one label to a set of labels</a></li>
+  <li><a href="#does-the-same-feature-carry-over-as-is" id="toc-does-the-same-feature-carry-over-as-is" class="nav-link" data-scroll-target="#does-the-same-feature-carry-over-as-is">Does the same feature carry over as-is?</a></li>
+  <li><a href="#fryze-power-decomposition" id="toc-fryze-power-decomposition" class="nav-link" data-scroll-target="#fryze-power-decomposition">Fryze power decomposition</a></li>
+  <li><a href="#from-decomposed-current-to-a-distance-matrix" id="toc-from-decomposed-current-to-a-distance-matrix" class="nav-link" data-scroll-target="#from-decomposed-current-to-a-distance-matrix">From decomposed current to a distance matrix</a></li>
+  <li><a href="#the-multi-label-head-and-what-its-softmax-trick-actually-buys" id="toc-the-multi-label-head-and-what-its-softmax-trick-actually-buys" class="nav-link" data-scroll-target="#the-multi-label-head-and-what-its-softmax-trick-actually-buys">The multi-label head, and what its softmax trick actually buys</a></li>
+  <li><a href="#which-appliances-specifically" id="toc-which-appliances-specifically" class="nav-link" data-scroll-target="#which-appliances-specifically">Which appliances specifically?</a></li>
+  <li><a href="#why-the-coffee-maker-specifically" id="toc-why-the-coffee-maker-specifically" class="nav-link" data-scroll-target="#why-the-coffee-maker-specifically">Why the coffee maker specifically?</a></li>
+  <li><a href="#what-kind-of-mistake-is-it" id="toc-what-kind-of-mistake-is-it" class="nav-link" data-scroll-target="#what-kind-of-mistake-is-it">What kind of mistake is it?</a></li>
+  <li><a href="#why-bother" id="toc-why-bother" class="nav-link" data-scroll-target="#why-bother">Why bother</a></li>
+  <li><a href="#where-this-part-of-the-book-goes" id="toc-where-this-part-of-the-book-goes" class="nav-link" data-scroll-target="#where-this-part-of-the-book-goes">Where this part of the book goes</a></li>
+  <li><a href="#references" id="toc-references" class="nav-link" data-scroll-target="#references">References</a></li>
+  </ul>
+<div class="toc-actions"><ul><li><a href="https://github.com/sambaiga/ml-energy-disaggregation/edit/main/book/02-disaggregation/03-multi-appliance-recognition.qmd" class="toc-action"><i class="bi bi-github"></i>Edit this page</a></li><li><a href="https://github.com/sambaiga/ml-energy-disaggregation/issues/new" class="toc-action"><i class="bi empty"></i>Report an issue</a></li><li><a href="https://github.com/sambaiga/ml-energy-disaggregation/blob/main/book/02-disaggregation/03-multi-appliance-recognition.qmd" class="toc-action"><i class="bi empty"></i>View source</a></li></ul></div></nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title d-none d-lg-block"><span class="chapter-title">Chapter 3: Multi-Appliance Recognition</span></h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<p>A coffee maker clicks on. Before its heating element has even settled into a steady draw, the kettle across the counter finishes boiling and clicks off, and the fan in the next room is still running from twenty minutes ago. One current window, three appliances, two of them mid-cycle already. Chapter 2’s whole pipeline, the before-window, the after-window, the subtraction that isolates exactly one appliance’s signature, quietly assumed this never happens: that whatever changes in a window is caused by exactly one appliance switching state. Real homes do not clear that assumption. They rarely change one thing at a time.</p>
+<p>This chapter keeps the tools Chapter 2 built, activation windows, PAA, distance-similarity matrices, a small CNN, but asks a different question of them. Not “which one appliance is this,” but “which appliances, plural, are active right now.” That is a genuinely different problem, not a harder version of the same one, and it needs a different label, a different metric, and one new piece of signal processing to answer well.</p>
+<section id="from-one-label-to-a-set-of-labels" class="level2">
+<h2 class="anchored" data-anchor-id="from-one-label-to-a-set-of-labels">From one label to a set of labels</h2>
+<p>Chapter 2’s classifier picked exactly one class per activation. That stops making sense the moment more than one appliance can be active in the same window: the aggregate current a classifier sees is the sum of whatever is running, not a clean sample of one appliance. The right target is a state vector, one entry per appliance, each either on or off, not a single class index. Given aggregate measurements <span class="math inline">\(x_t\)</span> built from <span class="math inline">\(M\)</span> appliances, each with its own power draw <span class="math inline">\(y_t^{(m)}\)</span> and state <span class="math inline">\(s_t^{(m)} \in \{0,1\}\)</span>,</p>
+<p><span class="math display">\[
+x_t = \sum_{m=1}^{M} y_t^{(m)} \cdot s_t^{(m)} + \epsilon_t
+\]</span></p>
+<p>the job is to recover the whole state vector <span class="math inline">\(\mathbf{s}_t\)</span>, not one label, from one aggregate feature vector <span class="citation" data-cites="faustine2020mlcfcd">[1]</span>.</p>
+<div class="ark-concept">
+<p><span class="ark-concept-title"><i class="bi bi-info-circle-fill"></i> Key Concept</span></p>
+<p>Macro <span class="math inline">\(F_1\)</span>, the metric Chapter 2 used throughout, still works here: it scores each appliance separately and averages, so an appliance that is almost always off does not get to hide behind one that is almost always on. But multi-label prediction has a second, equally real question macro <span class="math inline">\(F_1\)</span> cannot answer on its own: for this one activation, did the model get the <em>whole set</em> right, not just each appliance’s own average? Example-based <span class="math inline">\(F_1\)</span> (<span class="math inline">\(F_1\)</span>-eb) answers that instead, scoring each sample’s predicted set against its true set and averaging over samples. A model can score well on one and poorly on the other: high macro <span class="math inline">\(F_1\)</span> with a few appliances it never gets right in combination, or high <span class="math inline">\(F_1\)</span>-eb with one rare appliance it silently ignores. Both numbers matter; neither replaces the other.</p>
+</div>
+</section>
+<section id="does-the-same-feature-carry-over-as-is" class="level2">
+<h2 class="anchored" data-anchor-id="does-the-same-feature-carry-over-as-is">Does the same feature carry over as-is?</h2>
+<p>The obvious first move is to reuse Chapter 2’s own two representations, the binary V-I image and the raw activation current, and just see what happens once “the current” might be more than one appliance’s signature added together. The plot below is a real PLAID event with two appliances already active in the same window.</p>
+<div class="quarto-embed-nb-cell" data-notebook="/home/runner/work/ml-energy-disaggregation/ml-energy-disaggregation/book/02-disaggregation/03-multi-appliance-recognition-code.ipynb" data-notebook-title="Multi-Appliance Recognition from High-Frequency Signals" data-notebook-cellid="adaae1bd">
+<div id="adaae1bd" class="cell">
+<div class="cell-output cell-output-display">
+
+        <div id="A5tpyq"></div>
+        <script type="text/javascript" data-lets-plot-script="library">
+            if(!window.letsPlotCallQueue) {
+                window.letsPlotCallQueue = [];
+            };
+            window.letsPlotCall = function(f) {
+                window.letsPlotCallQueue.push(f);
+            };
+            (function() {
+                var script = document.createElement("script");
+                script.type = "text/javascript";
+                script.src = "https://cdn.jsdelivr.net/gh/JetBrains/lets-plot@v4.11.0/js-package/distr/lets-plot.min.js";
+                script.onload = function() {
+                    window.letsPlotCall = function(f) {f();};
+                    window.letsPlotCallQueue.forEach(function(f) {f();});
+                    window.letsPlotCallQueue = [];
+                    
+                };
+                script.onerror = function(event) {
+                    window.letsPlotCall = function(f) {};    // noop
+                    window.letsPlotCallQueue = [];
+                    var div = document.createElement("div");
+                    div.style.color = 'darkred';
+                    div.textContent = 'Error loading Lets-Plot JS';
+                    document.getElementById("A5tpyq").appendChild(div);
+                };
+                var e = document.getElementById("A5tpyq");
+                e.appendChild(script);
+            })()
+        </script>
+        
+</div>
+</div>
+</div>
+<div class="quarto-embed-nb-cell" data-notebook="/home/runner/work/ml-energy-disaggregation/ml-energy-disaggregation/book/02-disaggregation/03-multi-appliance-recognition-code.ipynb" data-notebook-title="Multi-Appliance Recognition from High-Frequency Signals" data-notebook-cellid="de62bc1a">
+<div id="de62bc1a" class="cell">
+<div class="cell-output cell-output-display">
+   <div id="ltDnPt"></div>
+   <script type="text/javascript" data-lets-plot-script="plot">
+   
+   (function() {
+   // ----------
+   
+   const forceImmediateRender = false;
+   const responsive = false;
+   
+   let sizing = {
+       width_mode: "MIN",
+       height_mode: "SCALED",
+       width: null, 
+       height: null 
+   };
+   
+   const preferredWidth = document.body.dataset.letsPlotPreferredWidth;
+   if (preferredWidth !== undefined) {
+       sizing = {
+           width_mode: 'FIXED',
+           height_mode: 'SCALED',
+           width: parseFloat(preferredWidth)
+       };
+   }
+   
+   const containerDiv = document.getElementById("ltDnPt");
+   let fig = null;
+   
+   function renderPlot() {
+       if (fig === null) {
+           const plotSpec = {
+"data":{
+"sample":[0.0,1.0,2.0,3.0,4.0,5.0,6.0,7.0,8.0,9.0,10.0,11.0,12.0,13.0,14.0,15.0,16.0,17.0,18.0,19.0,20.0,21.0,22.0,23.0,24.0,25.0,26.0,27.0,28.0,29.0,30.0,31.0,32.0,33.0,34.0,35.0,36.0,37.0,38.0,39.0,40.0,41.0,42.0,43.0,44.0,45.0,46.0,47.0,48.0,49.0,50.0,51.0,52.0,53.0,54.0,55.0,56.0,57.0,58.0,59.0,60.0,61.0,62.0,63.0,64.0,65.0,66.0,67.0,68.0,69.0,70.0,71.0,72.0,73.0,74.0,75.0,76.0,77.0,78.0,79.0,80.0,81.0,82.0,83.0,84.0,85.0,86.0,87.0,88.0,89.0,90.0,91.0,92.0,93.0,94.0,95.0,96.0,97.0,98.0,99.0,100.0,101.0,102.0,103.0,104.0,105.0,106.0,107.0,108.0,109.0,110.0,111.0,112.0,113.0,114.0,115.0,116.0,117.0,118.0,119.0,120.0,121.0,122.0,123.0,124.0,125.0,126.0,127.0,128.0,129.0,130.0,131.0,132.0,133.0,134.0,135.0,136.0,137.0,138.0,139.0,140.0,141.0,142.0,143.0,144.0,145.0,146.0,147.0,148.0,149.0,150.0,151.0,152.0,153.0,154.0,155.0,156.0,157.0,158.0,159.0,160.0,161.0,162.0,163.0,164.0,165.0,166.0,167.0,168.0,169.0,170.0,171.0,172.0,173.0,174.0,175.0,176.0,177.0,178.0,179.0,180.0,181.0,182.0,183.0,184.0,185.0,186.0,187.0,188.0,189.0,190.0,191.0,192.0,193.0,194.0,195.0,196.0,197.0,198.0,199.0,200.0,201.0,202.0,203.0,204.0,205.0,206.0,207.0,208.0,209.0,210.0,211.0,212.0,213.0,214.0,215.0,216.0,217.0,218.0,219.0,220.0,221.0,222.0,223.0,224.0,225.0,226.0,227.0,228.0,229.0,230.0,231.0,232.0,233.0,234.0,235.0,236.0,237.0,238.0,239.0,240.0,241.0,242.0,243.0,244.0,245.0,246.0,247.0,248.0,249.0,250.0,251.0,252.0,253.0,254.0,255.0,256.0,257.0,258.0,259.0,260.0,261.0,262.0,263.0,264.0,265.0,266.0,267.0,268.0,269.0,270.0,271.0,272.0,273.0,274.0,275.0,276.0,277.0,278.0,279.0,280.0,281.0,282.0,283.0,284.0,285.0,286.0,287.0,288.0,289.0,290.0,291.0,292.0,293.0,294.0,295.0,296.0,297.0,298.0,299.0,300.0,301.0,302.0,303.0,304.0,305.0,306.0,307.0,308.0,309.0,310.0,311.0,312.0,313.0,314.0,315.0,316.0,317.0,318.0,319.0,320.0,321.0,322.0,323.0,324.0,325.0,326.0,327.0,328.0,329.0,330.0,331.0,332.0,333.0,334.0,335.0,336.0,337.0,338.0,339.0,340.0,341.0,342.0,343.0,344.0,345.0,346.0,347.0,348.0,349.0,350.0,351.0,352.0,353.0,354.0,355.0,356.0,357.0,358.0,359.0,360.0,361.0,362.0,363.0,364.0,365.0,366.0,367.0,368.0,369.0,370.0,371.0,372.0,373.0,374.0,375.0,376.0,377.0,378.0,379.0,380.0,381.0,382.0,383.0,384.0,385.0,386.0,387.0,388.0,389.0,390.0,391.0,392.0,393.0,394.0,395.0,396.0,397.0,398.0,399.0,400.0,401.0,402.0,403.0,404.0,405.0,406.0,407.0,408.0,409.0,410.0,411.0,412.0,413.0,414.0,415.0,416.0,417.0,418.0,419.0,420.0,421.0,422.0,423.0,424.0,425.0,426.0,427.0,428.0,429.0,430.0,431.0,432.0,433.0,434.0,435.0,436.0,437.0,438.0,439.0,440.0,441.0,442.0,443.0,444.0,445.0,446.0,447.0,448.0,449.0,450.0,451.0,452.0,453.0,454.0,455.0,456.0,457.0,458.0,459.0,460.0,461.0,462.0,463.0,464.0,465.0,466.0,467.0,468.0,469.0,470.0,471.0,472.0,473.0,474.0,475.0,476.0,477.0,478.0,479.0,480.0,481.0,482.0,483.0,484.0,485.0,486.0,487.0,488.0,489.0,490.0,491.0,492.0,493.0,494.0,495.0,496.0,497.0,498.0,499.0,500.0],
+"current":[-0.29886298,-0.28615113,-0.26454099,-0.24928678,-0.23276137,-0.21750716,-0.19971057,-0.18191398,-0.16538858,-0.14886318,-0.13106659,-0.11327001,-0.09547342,-0.07767684,-0.05988025,-0.04208366,-0.02682945,-0.00776167,0.00749254,0.02528913,0.04181453,0.06215349,0.07613652,0.09266192,0.10918732,0.12952628,0.14478049,0.1613059,0.17910248,0.19817025,0.21342447,0.23249224,0.24647527,0.2693566,0.28333963,0.29986503,0.3189328,0.33672939,0.35325479,0.36978019,0.38503441,0.39901744,0.4193564,0.43079706,0.44859365,0.46384786,0.4778309,0.49181393,0.50579696,0.51977999,0.53249184,0.55028843,0.56427146,0.57571212,0.59223752,0.60876292,0.6189324,0.63418662,0.64689847,0.66342387,0.67613571,0.69138993,0.70410178,0.71554244,0.72825429,0.73969495,0.75494917,0.7689322,0.78291523,0.79562708,0.81215248,0.82359314,0.83503381,0.84520329,0.8604575,0.87189816,0.88206764,0.89477949,0.91003371,0.92020318,0.93164385,0.94562688,0.95706754,0.97105057,0.97867768,0.98884716,1.00028782,1.01427086,1.02571152,1.035881,1.04605047,1.05621995,1.06766061,1.08037246,1.09308431,1.10325379,1.1108809,1.12232156,1.13249104,1.14266051,1.15282999,1.16554184,1.17444013,1.18333843,1.19477909,1.20494857,1.21384686,1.22274515,1.23164345,1.24181292,1.25071122,1.26088069,1.26469425,1.27613491,1.28630439,1.29266031,1.30155861,1.31172808,1.31808401,1.32571112,1.33206704,1.34477889,1.352406,1.35749073,1.36638903,1.37274495,1.38291443,1.38799917,1.39435509,1.40325339,1.40833812,1.41596523,1.41977879,1.42867708,1.435033,1.44266011,1.44647367,1.45282959,1.45282959,1.45664314,1.46299907,1.46681262,1.47062618,1.47316855,1.4769821,1.47952447,1.48333802,1.48588039,1.48588039,1.48842276,1.48588039,1.48460921,1.48842276,1.48588039,1.48079565,1.4769821,1.47571092,1.47316855,1.46681262,1.4604567,1.45410078,1.45282959,1.44647367,1.435033,1.43376182,1.42486353,1.41723642,1.40706694,1.4019822,1.39181272,1.38418561,1.37274495,1.36766021,1.35749073,1.34732126,1.33715178,1.3269823,1.31808401,1.30410098,1.29520268,1.28249084,1.27105017,1.25960951,1.24944003,1.23672818,1.22528752,1.21130449,1.2024062,1.18842316,1.17444013,1.16299947,1.15028762,1.14011814,1.12613511,1.11469445,1.10325379,1.09181312,1.07783009,1.06511824,1.04986403,1.04096573,1.02825389,1.01681322,1.00283019,0.99011835,0.97613531,0.96215228,0.95071162,0.94054214,0.92401674,0.91638963,0.89986423,0.88842357,0.8769829,0.86554224,0.85283039,0.83757618,0.82867788,0.81215248,0.79689827,0.7854576,0.77528812,0.75876272,0.74350851,0.73079666,0.71808481,0.70155941,0.68757638,0.67232216,0.65706794,0.64054254,0.62655951,0.61130529,0.59477989,0.57698331,0.55918672,0.54520369,0.52994947,0.51215288,0.49562748,0.47528853,0.46130549,0.44350891,0.42952588,0.40918692,0.39266152,0.3774073,0.3608819,0.34562768,0.32528873,0.31003451,0.29223792,0.27317015,0.25791594,0.24266172,0.2274075,0.20833973,0.19181433,0.17401774,0.15494997,0.13842457,0.12317035,0.1028314,0.08503481,0.06850941,0.05198401,0.03672979,0.0189332,-1.3457E-4,-0.01538878,-0.03318537,-0.05098196,-0.06623617,-0.08403276,-0.09801579,-0.11708356,-0.13360896,-0.15267673,-0.16920214,-0.18699872,-0.20479531,-0.22132071,-0.24038848,-0.25691388,-0.27343929,-0.28996469,-0.30903246,-0.32301549,-0.34208326,-0.35987985,-0.37640525,-0.39293065,-0.4056425,-0.42343908,-0.43615093,-0.45394752,-0.46920173,-0.4806424,-0.49843898,-0.51242202,-0.52640505,-0.53784571,-0.5556423,-0.56962533,-0.58487955,-0.59504902,-0.60903206,-0.62428627,-0.63826931,-0.65225234,-0.66750655,-0.67894722,-0.69420143,-0.70437091,-0.7221675,-0.73360816,-0.74886238,-0.75903186,-0.77301489,-0.78572673,-0.79970977,-0.81242161,-0.82259109,-0.83657412,-0.85182834,-0.86199782,-0.87598085,-0.88615033,-0.90013336,-0.91030284,-0.92047232,-0.93699772,-0.9471672,-0.95860786,-0.96877734,-0.98403155,-0.99165866,-1.00437051,-1.01708236,-1.02852302,-1.03742131,-1.04631961,-1.05903145,-1.0717433,-1.08191278,-1.09335344,-1.10225173,-1.11242121,-1.12513306,-1.13403135,-1.14420083,-1.15437031,-1.16199742,-1.17343808,-1.18106519,-1.19123467,-1.2052177,-1.21157362,-1.21920073,-1.23191258,-1.23572613,-1.24589561,-1.25606509,-1.26623457,-1.27386167,-1.2802176,-1.29038708,-1.29801418,-1.30691248,-1.3132684,-1.32089551,-1.33106499,-1.33742091,-1.34504802,-1.35267513,-1.36157342,-1.36920053,-1.37809882,-1.38699712,-1.39335304,-1.39716659,-1.40225133,-1.41114963,-1.41750555,-1.42386147,-1.42894621,-1.43275977,-1.43911569,-1.44420043,-1.45055635,-1.45309872,-1.45691228,-1.46453939,-1.46835294,-1.46962412,-1.47216649,-1.47725123,-1.47852242,-1.47725123,-1.47725123,-1.48106479,-1.48233597,-1.47852242,-1.47725123,-1.47470886,-1.47089531,-1.46581057,-1.4632682,-1.45691228,-1.45436991,-1.44928517,-1.44292924,-1.43784451,-1.42894621,-1.4213191,-1.41496318,-1.4047937,-1.39970896,-1.39462422,-1.38572593,-1.37555645,-1.36411579,-1.3552175,-1.34886157,-1.3386921,-1.33106499,-1.31708196,-1.30564129,-1.29928537,-1.28911589,-1.27513286,-1.26114983,-1.24970916,-1.23953969,-1.22809902,-1.21411599,-1.2052177,-1.19250585,-1.18106519,-1.16708216,-1.15564149,-1.14801439,-1.13530254,-1.12386188,-1.10860766,-1.09462463,-1.08318396,-1.07301449,-1.06157382,-1.04886198,-1.03360776,-1.0221671,-1.00945525,-0.99547222,-0.98530274,-0.97131971,-0.95733667,-0.94970957,-0.93318416,-0.9217435,-0.91030284,-0.89886218,-0.88360796,-0.87089611,-0.86072663,-0.84420123,-0.83403176,-0.82004872,-0.80733688,-0.79462503,-0.780642,-0.76665896,-0.75648949,-0.73996408,-0.72598105,-0.71072684,-0.6967438,-0.67894722,-0.66750655,-0.65225234,-0.63572694,-0.61920153,-0.60394732,-0.58996429,-0.57471007,-0.55691348,-0.54038808,-0.52386268,-0.50733728,-0.49335424,-0.47301529,-0.45648989,-0.43996449,-0.42598145,-0.4056425,-0.39293065,-0.37259169,-0.35733748,-0.33954089,-0.32301549,-0.30776127]
+},
+"mapping":{
+"x":"sample",
+"y":"current"
+},
+"data_meta":{
+"series_annotations":[{
+"type":"int",
+"column":"sample"
+},{
+"type":"float",
+"column":"current"
+}]
+},
+"ggtitle":{
+"text":"Two appliances, one window",
+"subtitle":"Real PLAID event: Fan, AC both active"
+},
+"guides":{
+"x":{
+"title":"Sample"
+},
+"y":{
+"title":"Current (A)"
+}
+},
+"theme":{
+"text":{
+"color":"#2d2d2d",
+"family":"'Libre Franklin', 'Segoe UI', Roboto, Helvetica, Arial, sans-serif",
+"size":12.0,
+"blank":false
+},
+"axis_title_x":{
+"face":"bold",
+"size":14.0,
+"margin":[10.0,0.0,0.0,0.0],
+"blank":false
+},
+"axis_title_y":{
+"face":"bold",
+"size":14.0,
+"margin":[0.0,10.0,0.0,0.0],
+"blank":false
+},
+"axis_text_x":{
+"color":"#666666",
+"angle":0.0,
+"hjust":0.5,
+"margin":[8.0,0.0,0.0,0.0],
+"blank":false
+},
+"axis_text_y":{
+"color":"#666666",
+"margin":[0.0,0.0,0.0,8.0],
+"blank":false
+},
+"axis_ticks":{
+"color":"#bbbbbb",
+"size":0.75,
+"blank":false
+},
+"axis_line":{
+"color":"#bbbbbb",
+"size":1.0,
+"blank":false
+},
+"legend_background":{
+"blank":true
+},
+"legend_text":{
+"size":12.0,
+"blank":false
+},
+"legend_title":{
+"face":"bold",
+"size":14.0,
+"blank":false
+},
+"legend_position":"top",
+"legend_spacing":10.0,
+"legend_key":{
+"blank":true
+},
+"panel_background":{
+"blank":true
+},
+"panel_border":{
+"blank":true
+},
+"panel_grid_minor":{
+"blank":true
+},
+"panel_grid_major_x":{
+"blank":true
+},
+"panel_grid_major_y":{
+"blank":true
+},
+"plot_background":{
+"blank":true
+},
+"plot_title":{
+"color":"#333333",
+"face":"bold",
+"size":19.0,
+"hjust":0.0,
+"margin":[0.0,0.0,6.0,0.0],
+"blank":false
+},
+"plot_subtitle":{
+"color":"#6b6b6b",
+"size":16.0,
+"hjust":0.0,
+"margin":[0.0,0.0,18.0,0.0],
+"blank":false
+},
+"plot_caption":{
+"color":"#999999",
+"face":"italic",
+"size":9.0,
+"hjust":1.0,
+"margin":[12.0,0.0,0.0,0.0],
+"blank":false
+},
+"plot_margin":[16.0,16.0,10.0,10.0],
+"strip_background":{
+"blank":true
+},
+"strip_text":{
+"family":"'Libre Franklin', 'Segoe UI', Roboto, Helvetica, Arial, sans-serif",
+"face":"bold",
+"size":12.0,
+"hjust":0.0,
+"blank":false
+}
+},
+"ggsize":{
+"width":650.0,
+"height":320.0
+},
+"kind":"plot",
+"scales":[],
+"layers":[{
+"geom":"line",
+"mapping":{
+},
+"data_meta":{
+},
+"color":"#0369A1",
+"size":0.9,
+"data":{
+}
+}],
+"metainfo_list":[],
+"spec_id":"1"
+};
+           window.letsPlotCall(function() { fig = LetsPlot.buildPlotFromProcessedSpecs(plotSpec, containerDiv, sizing); });
+       } else {
+           fig.updateView({});
+       }
+   }
+   
+   const renderImmediately = 
+       forceImmediateRender || (
+           sizing.width_mode === 'FIXED' && 
+           (sizing.height_mode === 'FIXED' || sizing.height_mode === 'SCALED')
+       );
+   
+   if (renderImmediately) {
+       renderPlot();
+   }
+   
+   if (!renderImmediately || responsive) {
+       // Set up observer for initial sizing or continuous monitoring
+       var observer = new ResizeObserver(function(entries) {
+           for (let entry of entries) {
+               if (entry.contentBoxSize && 
+                   entry.contentBoxSize[0].inlineSize > 0) {
+                   if (!responsive && observer) {
+                       observer.disconnect();
+                       observer = null;
+                   }
+                   renderPlot();
+                   if (!responsive) {
+                       break;
+                   }
+               }
+           }
+       });
+       
+       observer.observe(containerDiv);
+   }
+   
+   // ----------
+   })();
+   
+   </script>
+</div>
+</div>
+</div>
+<p>Training the same small CNN on both representations, on a real, multi-label subset of PLAID (1154 aggregated activations, each labeled with every appliance active in the background, not just whichever one changed state <span class="citation" data-cites="faustine2020mlcfcd">[1]</span>), gives a real answer rather than an assumed one.</p>
+<div class="quarto-embed-nb-cell" data-notebook="/home/runner/work/ml-energy-disaggregation/ml-energy-disaggregation/book/02-disaggregation/03-multi-appliance-recognition-code.ipynb" data-notebook-title="Multi-Appliance Recognition from High-Frequency Signals" data-notebook-cellid="7f28b4d7">
+<div id="7f28b4d7" class="cell">
+<div class="cell-output cell-output-display">
+   <div id="Os3cdL"></div>
+   <script type="text/javascript" data-lets-plot-script="plot">
+   
+   (function() {
+   // ----------
+   
+   const forceImmediateRender = false;
+   const responsive = false;
+   
+   let sizing = {
+       width_mode: "MIN",
+       height_mode: "SCALED",
+       width: null, 
+       height: null 
+   };
+   
+   const preferredWidth = document.body.dataset.letsPlotPreferredWidth;
+   if (preferredWidth !== undefined) {
+       sizing = {
+           width_mode: 'FIXED',
+           height_mode: 'SCALED',
+           width: parseFloat(preferredWidth)
+       };
+   }
+   
+   const containerDiv = document.getElementById("Os3cdL");
+   let fig = null;
+   
+   function renderPlot() {
+       if (fig === null) {
+           const plotSpec = {
+"data":{
+"representation":["V-I image","Activation current"],
+"f1_macro":[65.7,62.7]
+},
+"mapping":{
+"x":"representation",
+"y":"f1_macro",
+"fill":"representation"
+},
+"data_meta":{
+"series_annotations":[{
+"type":"str",
+"column":"representation"
+},{
+"type":"float",
+"column":"f1_macro"
+}]
+},
+"ggtitle":{
+"text":"A close call, not a clean win",
+"subtitle":"Macro F1, PLAID multi-label, held-out 25%"
+},
+"guides":{
+"x":{
+"title":""
+},
+"y":{
+"title":"Macro F1 (%)"
+}
+},
+"theme":{
+"text":{
+"color":"#2d2d2d",
+"family":"'Libre Franklin', 'Segoe UI', Roboto, Helvetica, Arial, sans-serif",
+"size":12.0,
+"blank":false
+},
+"axis_title_x":{
+"face":"bold",
+"size":14.0,
+"margin":[10.0,0.0,0.0,0.0],
+"blank":false
+},
+"axis_title_y":{
+"face":"bold",
+"size":14.0,
+"margin":[0.0,10.0,0.0,0.0],
+"blank":false
+},
+"axis_text_x":{
+"color":"#666666",
+"angle":0.0,
+"hjust":0.5,
+"margin":[8.0,0.0,0.0,0.0],
+"blank":false
+},
+"axis_text_y":{
+"color":"#666666",
+"margin":[0.0,0.0,0.0,8.0],
+"blank":false
+},
+"axis_ticks":{
+"color":"#bbbbbb",
+"size":0.75,
+"blank":false
+},
+"axis_line":{
+"color":"#bbbbbb",
+"size":1.0,
+"blank":false
+},
+"legend_background":{
+"blank":true
+},
+"legend_text":{
+"size":12.0,
+"blank":false
+},
+"legend_title":{
+"face":"bold",
+"size":14.0,
+"blank":false
+},
+"legend_position":"none",
+"legend_spacing":10.0,
+"legend_key":{
+"blank":true
+},
+"panel_background":{
+"blank":true
+},
+"panel_border":{
+"blank":true
+},
+"panel_grid_minor":{
+"blank":true
+},
+"panel_grid_major_x":{
+"blank":true
+},
+"panel_grid_major_y":{
+"blank":true
+},
+"plot_background":{
+"blank":true
+},
+"plot_title":{
+"color":"#333333",
+"face":"bold",
+"size":19.0,
+"hjust":0.0,
+"margin":[0.0,0.0,6.0,0.0],
+"blank":false
+},
+"plot_subtitle":{
+"color":"#6b6b6b",
+"size":16.0,
+"hjust":0.0,
+"margin":[0.0,0.0,18.0,0.0],
+"blank":false
+},
+"plot_caption":{
+"color":"#999999",
+"face":"italic",
+"size":9.0,
+"hjust":1.0,
+"margin":[12.0,0.0,0.0,0.0],
+"blank":false
+},
+"plot_margin":[16.0,16.0,10.0,10.0],
+"strip_background":{
+"blank":true
+},
+"strip_text":{
+"family":"'Libre Franklin', 'Segoe UI', Roboto, Helvetica, Arial, sans-serif",
+"face":"bold",
+"size":12.0,
+"hjust":0.0,
+"blank":false
+}
+},
+"ggsize":{
+"width":500.0,
+"height":340.0
+},
+"kind":"plot",
+"scales":[{
+"aesthetic":"fill",
+"values":["#BAE6FD","#0369A1"]
+}],
+"layers":[{
+"geom":"bar",
+"stat":"identity",
+"mapping":{
+},
+"data_meta":{
+},
+"width":0.5,
+"data":{
+}
+},{
+"geom":"text",
+"mapping":{
+"label":"f1_macro"
+},
+"data_meta":{
+},
+"nudge_y":1.5,
+"format":"{.1f}",
+"va":"bottom",
+"size":8.0,
+"data":{
+}
+}],
+"metainfo_list":[],
+"spec_id":"2"
+};
+           window.letsPlotCall(function() { fig = LetsPlot.buildPlotFromProcessedSpecs(plotSpec, containerDiv, sizing); });
+       } else {
+           fig.updateView({});
+       }
+   }
+   
+   const renderImmediately = 
+       forceImmediateRender || (
+           sizing.width_mode === 'FIXED' && 
+           (sizing.height_mode === 'FIXED' || sizing.height_mode === 'SCALED')
+       );
+   
+   if (renderImmediately) {
+       renderPlot();
+   }
+   
+   if (!renderImmediately || responsive) {
+       // Set up observer for initial sizing or continuous monitoring
+       var observer = new ResizeObserver(function(entries) {
+           for (let entry of entries) {
+               if (entry.contentBoxSize && 
+                   entry.contentBoxSize[0].inlineSize > 0) {
+                   if (!responsive && observer) {
+                       observer.disconnect();
+                       observer = null;
+                   }
+                   renderPlot();
+                   if (!responsive) {
+                       break;
+                   }
+               }
+           }
+       });
+       
+       observer.observe(containerDiv);
+   }
+   
+   // ----------
+   })();
+   
+   </script>
+</div>
+</div>
+</div>
+<p>V-I image reaches 65.7% macro <span class="math inline">\(F_1\)</span>; raw activation current reaches 62.7%. That is not the order the published result found, current a few points ahead of V-I there too <span class="citation" data-cites="faustine2020mlcfcd">[1]</span>, but the published gap between them is itself small (0.826 to 0.849), and this run’s own gap is just as small in the other direction. Read it as what it is: two representations that are genuinely close, not one cleanly beating the other. Neither is good enough to call this problem solved.</p>
+</section>
+<section id="fryze-power-decomposition" class="level2">
+<h2 class="anchored" data-anchor-id="fryze-power-decomposition">Fryze power decomposition</h2>
+<p>The fix is not a bigger network. It is a real piece of signal processing Chapter 2 never needed: splitting the current itself into two physically different parts before any image gets built. The Fryze power theory decomposes an activation current <span class="math inline">\(i(t)\)</span> into an active component, purely resistive, in phase with the voltage, and a non-active component, whatever is left over <span class="citation" data-cites="faustine2020mlcfcd">[1]</span>:</p>
+<p><span class="math display">\[
+i(t) = i_a(t) + i_f(t)
+\]</span></p>
+<p>The active component carries the same active power as the real signal, at the same voltage:</p>
+<p><span class="math display">\[
+i_a(t) = \frac{p_a}{v_\text{rms}^2} \, v(t), \qquad
+p_a = \frac{1}{T_s}\sum_{t=1}^{T_s} i(t) \, v(t)
+\]</span></p>
+<p>and the non-active component is simply what remains, <span class="math inline">\(i_f(t) = i(t) -
+i_a(t)\)</span>. Two appliances sharing a window rarely agree on both of these at once, even when their raw sum looks similar. The plot below applies this split to the same two-appliance event shown above.</p>
+<div class="quarto-embed-nb-cell" data-notebook="/home/runner/work/ml-energy-disaggregation/ml-energy-disaggregation/book/02-disaggregation/03-multi-appliance-recognition-code.ipynb" data-notebook-title="Multi-Appliance Recognition from High-Frequency Signals" data-notebook-cellid="b104d87e">
+<div id="b104d87e" class="cell">
+<div class="cell-output cell-output-display">
+   <div id="XNyxbE"></div>
+   <script type="text/javascript" data-lets-plot-script="plot">
+   
+   (function() {
+   // ----------
+   
+   const forceImmediateRender = false;
+   const responsive = false;
+   
+   let sizing = {
+       width_mode: "MIN",
+       height_mode: "SCALED",
+       width: null, 
+       height: null 
+   };
+   
+   const preferredWidth = document.body.dataset.letsPlotPreferredWidth;
+   if (preferredWidth !== undefined) {
+       sizing = {
+           width_mode: 'FIXED',
+           height_mode: 'SCALED',
+           width: parseFloat(preferredWidth)
+       };
+   }
+   
+   const containerDiv = document.getElementById("XNyxbE");
+   let fig = null;
+   
+   function renderPlot() {
+       if (fig === null) {
+           const plotSpec = {
+"data":{
+"sample":[0.0,1.0,2.0,3.0,4.0,5.0,6.0,7.0,8.0,9.0,10.0,11.0,12.0,13.0,14.0,15.0,16.0,17.0,18.0,19.0,20.0,21.0,22.0,23.0,24.0,25.0,26.0,27.0,28.0,29.0,30.0,31.0,32.0,33.0,34.0,35.0,36.0,37.0,38.0,39.0,40.0,41.0,42.0,43.0,44.0,45.0,46.0,47.0,48.0,49.0,50.0,51.0,52.0,53.0,54.0,55.0,56.0,57.0,58.0,59.0,60.0,61.0,62.0,63.0,64.0,65.0,66.0,67.0,68.0,69.0,70.0,71.0,72.0,73.0,74.0,75.0,76.0,77.0,78.0,79.0,80.0,81.0,82.0,83.0,84.0,85.0,86.0,87.0,88.0,89.0,90.0,91.0,92.0,93.0,94.0,95.0,96.0,97.0,98.0,99.0,100.0,101.0,102.0,103.0,104.0,105.0,106.0,107.0,108.0,109.0,110.0,111.0,112.0,113.0,114.0,115.0,116.0,117.0,118.0,119.0,120.0,121.0,122.0,123.0,124.0,125.0,126.0,127.0,128.0,129.0,130.0,131.0,132.0,133.0,134.0,135.0,136.0,137.0,138.0,139.0,140.0,141.0,142.0,143.0,144.0,145.0,146.0,147.0,148.0,149.0,150.0,151.0,152.0,153.0,154.0,155.0,156.0,157.0,158.0,159.0,160.0,161.0,162.0,163.0,164.0,165.0,166.0,167.0,168.0,169.0,170.0,171.0,172.0,173.0,174.0,175.0,176.0,177.0,178.0,179.0,180.0,181.0,182.0,183.0,184.0,185.0,186.0,187.0,188.0,189.0,190.0,191.0,192.0,193.0,194.0,195.0,196.0,197.0,198.0,199.0,200.0,201.0,202.0,203.0,204.0,205.0,206.0,207.0,208.0,209.0,210.0,211.0,212.0,213.0,214.0,215.0,216.0,217.0,218.0,219.0,220.0,221.0,222.0,223.0,224.0,225.0,226.0,227.0,228.0,229.0,230.0,231.0,232.0,233.0,234.0,235.0,236.0,237.0,238.0,239.0,240.0,241.0,242.0,243.0,244.0,245.0,246.0,247.0,248.0,249.0,250.0,251.0,252.0,253.0,254.0,255.0,256.0,257.0,258.0,259.0,260.0,261.0,262.0,263.0,264.0,265.0,266.0,267.0,268.0,269.0,270.0,271.0,272.0,273.0,274.0,275.0,276.0,277.0,278.0,279.0,280.0,281.0,282.0,283.0,284.0,285.0,286.0,287.0,288.0,289.0,290.0,291.0,292.0,293.0,294.0,295.0,296.0,297.0,298.0,299.0,300.0,301.0,302.0,303.0,304.0,305.0,306.0,307.0,308.0,309.0,310.0,311.0,312.0,313.0,314.0,315.0,316.0,317.0,318.0,319.0,320.0,321.0,322.0,323.0,324.0,325.0,326.0,327.0,328.0,329.0,330.0,331.0,332.0,333.0,334.0,335.0,336.0,337.0,338.0,339.0,340.0,341.0,342.0,343.0,344.0,345.0,346.0,347.0,348.0,349.0,350.0,351.0,352.0,353.0,354.0,355.0,356.0,357.0,358.0,359.0,360.0,361.0,362.0,363.0,364.0,365.0,366.0,367.0,368.0,369.0,370.0,371.0,372.0,373.0,374.0,375.0,376.0,377.0,378.0,379.0,380.0,381.0,382.0,383.0,384.0,385.0,386.0,387.0,388.0,389.0,390.0,391.0,392.0,393.0,394.0,395.0,396.0,397.0,398.0,399.0,400.0,401.0,402.0,403.0,404.0,405.0,406.0,407.0,408.0,409.0,410.0,411.0,412.0,413.0,414.0,415.0,416.0,417.0,418.0,419.0,420.0,421.0,422.0,423.0,424.0,425.0,426.0,427.0,428.0,429.0,430.0,431.0,432.0,433.0,434.0,435.0,436.0,437.0,438.0,439.0,440.0,441.0,442.0,443.0,444.0,445.0,446.0,447.0,448.0,449.0,450.0,451.0,452.0,453.0,454.0,455.0,456.0,457.0,458.0,459.0,460.0,461.0,462.0,463.0,464.0,465.0,466.0,467.0,468.0,469.0,470.0,471.0,472.0,473.0,474.0,475.0,476.0,477.0,478.0,479.0,480.0,481.0,482.0,483.0,484.0,485.0,486.0,487.0,488.0,489.0,490.0,491.0,492.0,493.0,494.0,495.0,496.0,497.0,498.0,499.0,500.0,0.0,1.0,2.0,3.0,4.0,5.0,6.0,7.0,8.0,9.0,10.0,11.0,12.0,13.0,14.0,15.0,16.0,17.0,18.0,19.0,20.0,21.0,22.0,23.0,24.0,25.0,26.0,27.0,28.0,29.0,30.0,31.0,32.0,33.0,34.0,35.0,36.0,37.0,38.0,39.0,40.0,41.0,42.0,43.0,44.0,45.0,46.0,47.0,48.0,49.0,50.0,51.0,52.0,53.0,54.0,55.0,56.0,57.0,58.0,59.0,60.0,61.0,62.0,63.0,64.0,65.0,66.0,67.0,68.0,69.0,70.0,71.0,72.0,73.0,74.0,75.0,76.0,77.0,78.0,79.0,80.0,81.0,82.0,83.0,84.0,85.0,86.0,87.0,88.0,89.0,90.0,91.0,92.0,93.0,94.0,95.0,96.0,97.0,98.0,99.0,100.0,101.0,102.0,103.0,104.0,105.0,106.0,107.0,108.0,109.0,110.0,111.0,112.0,113.0,114.0,115.0,116.0,117.0,118.0,119.0,120.0,121.0,122.0,123.0,124.0,125.0,126.0,127.0,128.0,129.0,130.0,131.0,132.0,133.0,134.0,135.0,136.0,137.0,138.0,139.0,140.0,141.0,142.0,143.0,144.0,145.0,146.0,147.0,148.0,149.0,150.0,151.0,152.0,153.0,154.0,155.0,156.0,157.0,158.0,159.0,160.0,161.0,162.0,163.0,164.0,165.0,166.0,167.0,168.0,169.0,170.0,171.0,172.0,173.0,174.0,175.0,176.0,177.0,178.0,179.0,180.0,181.0,182.0,183.0,184.0,185.0,186.0,187.0,188.0,189.0,190.0,191.0,192.0,193.0,194.0,195.0,196.0,197.0,198.0,199.0,200.0,201.0,202.0,203.0,204.0,205.0,206.0,207.0,208.0,209.0,210.0,211.0,212.0,213.0,214.0,215.0,216.0,217.0,218.0,219.0,220.0,221.0,222.0,223.0,224.0,225.0,226.0,227.0,228.0,229.0,230.0,231.0,232.0,233.0,234.0,235.0,236.0,237.0,238.0,239.0,240.0,241.0,242.0,243.0,244.0,245.0,246.0,247.0,248.0,249.0,250.0,251.0,252.0,253.0,254.0,255.0,256.0,257.0,258.0,259.0,260.0,261.0,262.0,263.0,264.0,265.0,266.0,267.0,268.0,269.0,270.0,271.0,272.0,273.0,274.0,275.0,276.0,277.0,278.0,279.0,280.0,281.0,282.0,283.0,284.0,285.0,286.0,287.0,288.0,289.0,290.0,291.0,292.0,293.0,294.0,295.0,296.0,297.0,298.0,299.0,300.0,301.0,302.0,303.0,304.0,305.0,306.0,307.0,308.0,309.0,310.0,311.0,312.0,313.0,314.0,315.0,316.0,317.0,318.0,319.0,320.0,321.0,322.0,323.0,324.0,325.0,326.0,327.0,328.0,329.0,330.0,331.0,332.0,333.0,334.0,335.0,336.0,337.0,338.0,339.0,340.0,341.0,342.0,343.0,344.0,345.0,346.0,347.0,348.0,349.0,350.0,351.0,352.0,353.0,354.0,355.0,356.0,357.0,358.0,359.0,360.0,361.0,362.0,363.0,364.0,365.0,366.0,367.0,368.0,369.0,370.0,371.0,372.0,373.0,374.0,375.0,376.0,377.0,378.0,379.0,380.0,381.0,382.0,383.0,384.0,385.0,386.0,387.0,388.0,389.0,390.0,391.0,392.0,393.0,394.0,395.0,396.0,397.0,398.0,399.0,400.0,401.0,402.0,403.0,404.0,405.0,406.0,407.0,408.0,409.0,410.0,411.0,412.0,413.0,414.0,415.0,416.0,417.0,418.0,419.0,420.0,421.0,422.0,423.0,424.0,425.0,426.0,427.0,428.0,429.0,430.0,431.0,432.0,433.0,434.0,435.0,436.0,437.0,438.0,439.0,440.0,441.0,442.0,443.0,444.0,445.0,446.0,447.0,448.0,449.0,450.0,451.0,452.0,453.0,454.0,455.0,456.0,457.0,458.0,459.0,460.0,461.0,462.0,463.0,464.0,465.0,466.0,467.0,468.0,469.0,470.0,471.0,472.0,473.0,474.0,475.0,476.0,477.0,478.0,479.0,480.0,481.0,482.0,483.0,484.0,485.0,486.0,487.0,488.0,489.0,490.0,491.0,492.0,493.0,494.0,495.0,496.0,497.0,498.0,499.0,500.0,0.0,1.0,2.0,3.0,4.0,5.0,6.0,7.0,8.0,9.0,10.0,11.0,12.0,13.0,14.0,15.0,16.0,17.0,18.0,19.0,20.0,21.0,22.0,23.0,24.0,25.0,26.0,27.0,28.0,29.0,30.0,31.0,32.0,33.0,34.0,35.0,36.0,37.0,38.0,39.0,40.0,41.0,42.0,43.0,44.0,45.0,46.0,47.0,48.0,49.0,50.0,51.0,52.0,53.0,54.0,55.0,56.0,57.0,58.0,59.0,60.0,61.0,62.0,63.0,64.0,65.0,66.0,67.0,68.0,69.0,70.0,71.0,72.0,73.0,74.0,75.0,76.0,77.0,78.0,79.0,80.0,81.0,82.0,83.0,84.0,85.0,86.0,87.0,88.0,89.0,90.0,91.0,92.0,93.0,94.0,95.0,96.0,97.0,98.0,99.0,100.0,101.0,102.0,103.0,104.0,105.0,106.0,107.0,108.0,109.0,110.0,111.0,112.0,113.0,114.0,115.0,116.0,117.0,118.0,119.0,120.0,121.0,122.0,123.0,124.0,125.0,126.0,127.0,128.0,129.0,130.0,131.0,132.0,133.0,134.0,135.0,136.0,137.0,138.0,139.0,140.0,141.0,142.0,143.0,144.0,145.0,146.0,147.0,148.0,149.0,150.0,151.0,152.0,153.0,154.0,155.0,156.0,157.0,158.0,159.0,160.0,161.0,162.0,163.0,164.0,165.0,166.0,167.0,168.0,169.0,170.0,171.0,172.0,173.0,174.0,175.0,176.0,177.0,178.0,179.0,180.0,181.0,182.0,183.0,184.0,185.0,186.0,187.0,188.0,189.0,190.0,191.0,192.0,193.0,194.0,195.0,196.0,197.0,198.0,199.0,200.0,201.0,202.0,203.0,204.0,205.0,206.0,207.0,208.0,209.0,210.0,211.0,212.0,213.0,214.0,215.0,216.0,217.0,218.0,219.0,220.0,221.0,222.0,223.0,224.0,225.0,226.0,227.0,228.0,229.0,230.0,231.0,232.0,233.0,234.0,235.0,236.0,237.0,238.0,239.0,240.0,241.0,242.0,243.0,244.0,245.0,246.0,247.0,248.0,249.0,250.0,251.0,252.0,253.0,254.0,255.0,256.0,257.0,258.0,259.0,260.0,261.0,262.0,263.0,264.0,265.0,266.0,267.0,268.0,269.0,270.0,271.0,272.0,273.0,274.0,275.0,276.0,277.0,278.0,279.0,280.0,281.0,282.0,283.0,284.0,285.0,286.0,287.0,288.0,289.0,290.0,291.0,292.0,293.0,294.0,295.0,296.0,297.0,298.0,299.0,300.0,301.0,302.0,303.0,304.0,305.0,306.0,307.0,308.0,309.0,310.0,311.0,312.0,313.0,314.0,315.0,316.0,317.0,318.0,319.0,320.0,321.0,322.0,323.0,324.0,325.0,326.0,327.0,328.0,329.0,330.0,331.0,332.0,333.0,334.0,335.0,336.0,337.0,338.0,339.0,340.0,341.0,342.0,343.0,344.0,345.0,346.0,347.0,348.0,349.0,350.0,351.0,352.0,353.0,354.0,355.0,356.0,357.0,358.0,359.0,360.0,361.0,362.0,363.0,364.0,365.0,366.0,367.0,368.0,369.0,370.0,371.0,372.0,373.0,374.0,375.0,376.0,377.0,378.0,379.0,380.0,381.0,382.0,383.0,384.0,385.0,386.0,387.0,388.0,389.0,390.0,391.0,392.0,393.0,394.0,395.0,396.0,397.0,398.0,399.0,400.0,401.0,402.0,403.0,404.0,405.0,406.0,407.0,408.0,409.0,410.0,411.0,412.0,413.0,414.0,415.0,416.0,417.0,418.0,419.0,420.0,421.0,422.0,423.0,424.0,425.0,426.0,427.0,428.0,429.0,430.0,431.0,432.0,433.0,434.0,435.0,436.0,437.0,438.0,439.0,440.0,441.0,442.0,443.0,444.0,445.0,446.0,447.0,448.0,449.0,450.0,451.0,452.0,453.0,454.0,455.0,456.0,457.0,458.0,459.0,460.0,461.0,462.0,463.0,464.0,465.0,466.0,467.0,468.0,469.0,470.0,471.0,472.0,473.0,474.0,475.0,476.0,477.0,478.0,479.0,480.0,481.0,482.0,483.0,484.0,485.0,486.0,487.0,488.0,489.0,490.0,491.0,492.0,493.0,494.0,495.0,496.0,497.0,498.0,499.0,500.0],
+"current":[-0.29886298,-0.28615113,-0.26454099,-0.24928678,-0.23276137,-0.21750716,-0.19971057,-0.18191398,-0.16538858,-0.14886318,-0.13106659,-0.11327001,-0.09547342,-0.07767684,-0.05988025,-0.04208366,-0.02682945,-0.00776167,0.00749254,0.02528913,0.04181453,0.06215349,0.07613652,0.09266192,0.10918732,0.12952628,0.14478049,0.1613059,0.17910248,0.19817025,0.21342447,0.23249224,0.24647527,0.2693566,0.28333963,0.29986503,0.3189328,0.33672939,0.35325479,0.36978019,0.38503441,0.39901744,0.4193564,0.43079706,0.44859365,0.46384786,0.4778309,0.49181393,0.50579696,0.51977999,0.53249184,0.55028843,0.56427146,0.57571212,0.59223752,0.60876292,0.6189324,0.63418662,0.64689847,0.66342387,0.67613571,0.69138993,0.70410178,0.71554244,0.72825429,0.73969495,0.75494917,0.7689322,0.78291523,0.79562708,0.81215248,0.82359314,0.83503381,0.84520329,0.8604575,0.87189816,0.88206764,0.89477949,0.91003371,0.92020318,0.93164385,0.94562688,0.95706754,0.97105057,0.97867768,0.98884716,1.00028782,1.01427086,1.02571152,1.035881,1.04605047,1.05621995,1.06766061,1.08037246,1.09308431,1.10325379,1.1108809,1.12232156,1.13249104,1.14266051,1.15282999,1.16554184,1.17444013,1.18333843,1.19477909,1.20494857,1.21384686,1.22274515,1.23164345,1.24181292,1.25071122,1.26088069,1.26469425,1.27613491,1.28630439,1.29266031,1.30155861,1.31172808,1.31808401,1.32571112,1.33206704,1.34477889,1.352406,1.35749073,1.36638903,1.37274495,1.38291443,1.38799917,1.39435509,1.40325339,1.40833812,1.41596523,1.41977879,1.42867708,1.435033,1.44266011,1.44647367,1.45282959,1.45282959,1.45664314,1.46299907,1.46681262,1.47062618,1.47316855,1.4769821,1.47952447,1.48333802,1.48588039,1.48588039,1.48842276,1.48588039,1.48460921,1.48842276,1.48588039,1.48079565,1.4769821,1.47571092,1.47316855,1.46681262,1.4604567,1.45410078,1.45282959,1.44647367,1.435033,1.43376182,1.42486353,1.41723642,1.40706694,1.4019822,1.39181272,1.38418561,1.37274495,1.36766021,1.35749073,1.34732126,1.33715178,1.3269823,1.31808401,1.30410098,1.29520268,1.28249084,1.27105017,1.25960951,1.24944003,1.23672818,1.22528752,1.21130449,1.2024062,1.18842316,1.17444013,1.16299947,1.15028762,1.14011814,1.12613511,1.11469445,1.10325379,1.09181312,1.07783009,1.06511824,1.04986403,1.04096573,1.02825389,1.01681322,1.00283019,0.99011835,0.97613531,0.96215228,0.95071162,0.94054214,0.92401674,0.91638963,0.89986423,0.88842357,0.8769829,0.86554224,0.85283039,0.83757618,0.82867788,0.81215248,0.79689827,0.7854576,0.77528812,0.75876272,0.74350851,0.73079666,0.71808481,0.70155941,0.68757638,0.67232216,0.65706794,0.64054254,0.62655951,0.61130529,0.59477989,0.57698331,0.55918672,0.54520369,0.52994947,0.51215288,0.49562748,0.47528853,0.46130549,0.44350891,0.42952588,0.40918692,0.39266152,0.3774073,0.3608819,0.34562768,0.32528873,0.31003451,0.29223792,0.27317015,0.25791594,0.24266172,0.2274075,0.20833973,0.19181433,0.17401774,0.15494997,0.13842457,0.12317035,0.1028314,0.08503481,0.06850941,0.05198401,0.03672979,0.0189332,-1.3457E-4,-0.01538878,-0.03318537,-0.05098196,-0.06623617,-0.08403276,-0.09801579,-0.11708356,-0.13360896,-0.15267673,-0.16920214,-0.18699872,-0.20479531,-0.22132071,-0.24038848,-0.25691388,-0.27343929,-0.28996469,-0.30903246,-0.32301549,-0.34208326,-0.35987985,-0.37640525,-0.39293065,-0.4056425,-0.42343908,-0.43615093,-0.45394752,-0.46920173,-0.4806424,-0.49843898,-0.51242202,-0.52640505,-0.53784571,-0.5556423,-0.56962533,-0.58487955,-0.59504902,-0.60903206,-0.62428627,-0.63826931,-0.65225234,-0.66750655,-0.67894722,-0.69420143,-0.70437091,-0.7221675,-0.73360816,-0.74886238,-0.75903186,-0.77301489,-0.78572673,-0.79970977,-0.81242161,-0.82259109,-0.83657412,-0.85182834,-0.86199782,-0.87598085,-0.88615033,-0.90013336,-0.91030284,-0.92047232,-0.93699772,-0.9471672,-0.95860786,-0.96877734,-0.98403155,-0.99165866,-1.00437051,-1.01708236,-1.02852302,-1.03742131,-1.04631961,-1.05903145,-1.0717433,-1.08191278,-1.09335344,-1.10225173,-1.11242121,-1.12513306,-1.13403135,-1.14420083,-1.15437031,-1.16199742,-1.17343808,-1.18106519,-1.19123467,-1.2052177,-1.21157362,-1.21920073,-1.23191258,-1.23572613,-1.24589561,-1.25606509,-1.26623457,-1.27386167,-1.2802176,-1.29038708,-1.29801418,-1.30691248,-1.3132684,-1.32089551,-1.33106499,-1.33742091,-1.34504802,-1.35267513,-1.36157342,-1.36920053,-1.37809882,-1.38699712,-1.39335304,-1.39716659,-1.40225133,-1.41114963,-1.41750555,-1.42386147,-1.42894621,-1.43275977,-1.43911569,-1.44420043,-1.45055635,-1.45309872,-1.45691228,-1.46453939,-1.46835294,-1.46962412,-1.47216649,-1.47725123,-1.47852242,-1.47725123,-1.47725123,-1.48106479,-1.48233597,-1.47852242,-1.47725123,-1.47470886,-1.47089531,-1.46581057,-1.4632682,-1.45691228,-1.45436991,-1.44928517,-1.44292924,-1.43784451,-1.42894621,-1.4213191,-1.41496318,-1.4047937,-1.39970896,-1.39462422,-1.38572593,-1.37555645,-1.36411579,-1.3552175,-1.34886157,-1.3386921,-1.33106499,-1.31708196,-1.30564129,-1.29928537,-1.28911589,-1.27513286,-1.26114983,-1.24970916,-1.23953969,-1.22809902,-1.21411599,-1.2052177,-1.19250585,-1.18106519,-1.16708216,-1.15564149,-1.14801439,-1.13530254,-1.12386188,-1.10860766,-1.09462463,-1.08318396,-1.07301449,-1.06157382,-1.04886198,-1.03360776,-1.0221671,-1.00945525,-0.99547222,-0.98530274,-0.97131971,-0.95733667,-0.94970957,-0.93318416,-0.9217435,-0.91030284,-0.89886218,-0.88360796,-0.87089611,-0.86072663,-0.84420123,-0.83403176,-0.82004872,-0.80733688,-0.79462503,-0.780642,-0.76665896,-0.75648949,-0.73996408,-0.72598105,-0.71072684,-0.6967438,-0.67894722,-0.66750655,-0.65225234,-0.63572694,-0.61920153,-0.60394732,-0.58996429,-0.57471007,-0.55691348,-0.54038808,-0.52386268,-0.50733728,-0.49335424,-0.47301529,-0.45648989,-0.43996449,-0.42598145,-0.4056425,-0.39293065,-0.37259169,-0.35733748,-0.33954089,-0.32301549,-0.30776127,-0.014498561477274682,0.0021518124501710926,0.021876101564222237,0.0400634330849707,0.06030004139678941,0.08181744770302703,0.10256637521261329,0.1230591431233158,0.14252727263848314,0.1612269233569992,0.18043889327328275,0.19811390559626366,0.21425196032594188,0.2329516110444579,0.24908966577413608,0.26317844371274407,0.27957265804130604,0.2951983935732167,0.30979949070959223,0.3238882686482002,0.340538642575646,0.35693285690420795,0.3751201884249564,0.39330751994570484,0.4138002878564073,0.4337807365693423,0.45376118528227727,0.4722046764019095,0.4926974443126119,0.5124217334266631,0.5308652245462954,0.5482840772703925,0.5646782915989544,0.5800478675319813,0.5946489646683569,0.6084815830080811,0.6220580417489214,0.6348660216931105,0.6463932036428807,0.6576642259937671,0.6691914079435373,0.6814870686899587,0.6935265698374964,0.7047975921883828,0.7140193377481988,0.7204233277202934,0.7324628288678312,0.747832404800858,0.7644827787283037,0.7785715566669118,0.7908672174133333,0.8023943993631034,0.8139215813128734,0.8257049228615274,0.8374882644101814,0.8505524039532543,0.8646411818918621,0.8787299598304701,0.8930748973679619,0.906907515707686,0.916385420866386,0.9250948472284345,0.9340604331893669,0.9450752959413695,0.9599325526766288,0.9742774902141206,0.9873416297571933,0.9978441733114283,1.0075782380690121,1.0178246220243634,1.028583325177482,1.0398543475283684,1.0518938486759062,1.064957988218979,1.0769974893665166,1.0869877137229842,1.0969779380794515,1.1061996836392676,1.1146529504024325,1.1233623767644811,1.1305348455332271,1.1400127506919269,1.1482098578562079,1.157431603416024,1.1656287105803051,1.1745942965412373,1.183047563304402,1.1909885108697993,1.2002102564296153,1.2112251191816181,1.2212153435380855,1.2283878123068315,1.2353041214766933,1.241964271047672,1.2504175378108366,1.258358485376234,1.266555592540515,1.2750088593036797,1.2819251684735418,1.2878168392478686,1.2937085100221957,1.30011249999429,1.3065164899663844,1.310615043548525,1.3152259163284332,1.3216299063005277,1.3288023750692735,1.3336694074480655,1.3375118014313223,1.3408418762168113,1.3441719510023005,1.3462212277933707,1.3475020257877899,1.3503197813755112,1.3546744945565354,1.3572360905453733,1.36107848452863,1.3654331977096543,1.3687632724951435,1.3710687088850972,1.3733741452750514,1.3769603796594245,1.3787534968516109,1.3808027736426811,1.3825958908348677,1.3841328484281703,1.384645167625938,1.3851574868237055,1.3861821252192406,1.3864382848181243,1.3874629232136595,1.3879752424114271,1.3897683596036137,1.3902806788013808,1.390536838400265,1.3900245192024974,1.3902806788013808,1.3900245192024974,1.3897683596036137,1.3889998808069624,1.3889998808069624,1.3884875616091945,1.3872067636147756,1.3851574868237055,1.3810589332415648,1.3777288584560758,1.3743987836705867,1.366970155302957,1.358773048138676,1.3510882601721623,1.3418665146123463,1.3316201306569952,1.3208614275038764,1.3111273627462927,1.300368659593174,1.2890976372422878,1.2803882108802391,1.2724472633148416,1.2637378369527932,1.253491452997442,1.2437573882398583,1.2358164406744612,1.2260823759168773,1.2137867151704558,1.2061019272039426,1.198417139237429,1.1909885108697993,1.1827914037055185,1.174850456140121,1.166909508574724,1.1579439226137918,1.1476975386584405,1.1379634739008568,1.1277170899455053,1.116702227193503,1.1054312048426165,1.0933917036950787,1.082376840943076,1.071874297388841,1.0595786366424196,1.0483076142915333,1.038061230336182,1.0262778887875281,1.0139822280411066,1.0032235248879877,0.9916963429382176,0.9799130013895637,0.9683858194397936,0.9576271162866747,0.9471245727324397,0.9355973907826696,0.9240702088328995,0.9130553460808969,0.902296642927778,0.8902571417802404,0.8784738002315864,0.8666904586829325,0.8559317555298136,0.8446607331789272,0.832108912833622,0.8213502096805032,0.8093107085329655,0.7982958457809629,0.7860001850345414,0.7744730030847713,0.7626896615361173,0.7503940007896958,0.7388668188399257,0.7260588388957366,0.7140193377481988,0.7014675174028936,0.6896841758542397,0.6817432282888425,0.675339238316748,0.6638120563669778,0.6479301612361833,0.6305113085120861,0.6151417325790592,0.5992598374482649,0.581584825125284,0.5649344511978384,0.5480279176715087,0.5306090649474117,0.5124217334266631,0.4932097635103795,0.4747662723907473,0.45504198327669615,0.4363423325581801,0.418923479834083,0.4012484675111021,0.3845980935836563,0.36820387925509435,0.35155350532764856,0.33311001420801634,0.3144103634895003,0.29417375517768163,0.27265634887144397,0.25037046376855504,0.22962153625896875,0.20938492794715002,0.18914831963533135,0.1694240305212802,0.15200517779718306,0.13433016547420215,0.11767979154675638,0.10179789641596196,0.08668448008181887,0.07208338294544335,0.057738445407951595,0.04211270987604095,0.026999293541897864,0.010348919614452088,-0.007838411906296373,-0.026281903025928612,-0.04523771334332841,-0.06624280045179848,-0.08647940876361718,-0.10748449587208725,-0.12720878498613838,-0.14667691450130577,-0.16716968241200825,-0.18458853513610535,-0.19995811106913222,-0.21840160218876448,-0.23300269932513998,-0.2478599560603993,-0.26348569159230995,-0.27962374632198816,-0.29524948185389877,-0.3111313769846933,-0.3262447933188363,-0.3436636460429335,-0.36133865836591433,-0.37901367068889524,-0.39745716180852747,-0.41718145092257863,-0.43741805923439736,-0.45765466754621603,-0.4773789566602672,-0.49607860737878323,-0.515034417696183,-0.5334779088158152,-0.5508967615399124,-0.5667786566707068,-0.5811235942081986,-0.5959808509434579,-0.6093011500854145,-0.6226214492273712,-0.6344047907760251,-0.6456758131269114,-0.6577153142744492,-0.6697548154219868,-0.6815381569706408,-0.6930653389204109,-0.7025432440791107,-0.7084349148534378,-0.7189374584076728,-0.7348193535384673,-0.7501889294714941,-0.7647900266078695,-0.7770856873542911,-0.7904059864962478,-0.8019331684460179,-0.8124357120002529,-0.8249875323455583,-0.8377955122897474,-0.8506034922339364,-0.8641799509747766,-0.8782687289133847,-0.8926136664508765,-0.9038846888017626,-0.9115694767682762,-0.922328179921395,-0.9330868830745137,-0.9466633418153543,-0.961008279352846,-0.9750970572914538,-0.9866242392412241,-0.9961021443999241,-1.00532388995974,-1.017107231508394,-1.0286344134581642,-1.0409300742045857,-1.0539942137476586,-1.0660337148951962,-1.0757677796527798,-1.084989525212596,-1.094467430371296,-1.1026645375355768,-1.110861644699858,-1.1198272306607904,-1.128280497423955,-1.1362214449893524,-1.1454431905491684,-1.1538964573123331,-1.1613250856799628,-1.1702906716408952,-1.1784877788051762,-1.1877095243649922,-1.198468227518111,-1.20922693067123,-1.218448676231046,-1.2243403470053729,-1.2320251349718865,-1.2399660825372838,-1.2481631897015644,-1.2550794988714267,-1.2625081272390564,-1.27019291520557,-1.2765969051776644,-1.2824885759519913,-1.2883802467263183,-1.2947842366984128,-1.300419747873856,-1.3042621418571128,-1.309641493433672,-1.315533164207999,-1.3209125157845585,-1.325267228965583,-1.3288534633499556,-1.3321835381354448,-1.3350012937231666,-1.3362820917175853,-1.3390998473053068,-1.3429422412885634,-1.3462723160740528,-1.349602390859542,-1.3524201464472636,-1.3567748596282878,-1.3590802960182418,-1.3618980516059633,-1.3647158071936851,-1.3680458819791743,-1.3698389991713606,-1.3711197971657796,-1.372912914357966,-1.374193712352385,-1.37521835074792,-1.37521835074792,-1.375474510346804,-1.377523787137874,-1.3782922659345254,-1.378804585132293,-1.3793169043300606,-1.380085383126712,-1.379829223527828,-1.3790607447311767,-1.379829223527828,-1.3793169043300606,-1.3793169043300606,-1.3785484255334095,-1.3782922659345254,-1.3772676275389903,-1.3747060315501525,-1.3700951587702446,-1.367021243583639,-1.3631788496003825,-1.3572871788260554,-1.348577752464007,-1.3390998473053068,-1.3301342613443745,-1.3206563561856748,-1.309641493433672,-1.2986266306816696,-1.2891487255229699,-1.2799269799631534,-1.2696805960078021,-1.2609711696457537,-1.2527740624814727,-1.244064636119424,-1.2345867309607244,-1.225621144999792,-1.2169117186377434,-1.2061530154846247,-1.1979559083203437,-1.1895026415571788,-1.1830986515850843,-1.1746453848219194,-1.165679798860987,-1.1579950108944737,-1.1487732653346576,-1.1380145621815387,-1.128280497423955,-1.1180341134686038,-1.1083000487110202,-1.0960043879645986,-1.083964886817061,-1.0724377048672906,-1.0614228421152883,-1.048871021769983,-1.037087680221329,-1.026585136667094,-1.015826433513975,-1.00532388995974,-0.9937967080099699,-0.9822695260601998,-0.9712546633081972,-0.958702842962892,-0.946919501414238,-0.936416957860003,-0.924633616311349,-0.914131072757114,-0.9028600504062276,-0.892101347253109,-0.8813426440999901,-0.8690469833535686,-0.8577759610026822,-0.8462487790529121,-0.8342092779053744,-0.8231944151533717,-0.8111549140058341,-0.7991154128582963,-0.787588230908526,-0.7755487297609884,-0.764533867008986,-0.7527505254603319,-0.7409671839116779,-0.7284153635663728,-0.7161197028199513,-0.7027994036779946,-0.6905037429315731,-0.6779519225862679,-0.6692424962242193,-0.6636069850487761,-0.6536167606923086,-0.6379910251603981,-0.6205721724363008,-0.6049464369043902,-0.588808382174712,-0.5711333698517311,-0.5544829959242853,-0.5393695795901423,-0.5222068864649289,-0.5037633953452967,-0.48480758502789684,-0.4663640939082646,-0.4479206027886324,-0.4281963136745812,-0.4094966629560652,-0.3915654910342005,-0.3744027979089871,-0.35826474317930895,-0.3403335712574443,-0.32163392053892825,-0.30319042941929597,-0.28449077870078,-0.2627172127956586,-0.24043132769276965,-0.21968240018318336,-0.19995811106913222,-0.1786968643617784,-0.15897257524772723,-0.14129756292474635,-0.12490334859618435,-0.10876529386650613,-0.0931395583345955,-0.07905078039598754,-0.06419352366072822,-0.049848586123236484,-0.03499132938797717,-0.018597115059415182,-0.2843644185227253,-0.2883029424501711,-0.28641709156422224,-0.2893502130849707,-0.29306141139678943,-0.29932460770302705,-0.3022769452126133,-0.3049731231233158,-0.30791585263848315,-0.3100901033569992,-0.31150548327328276,-0.31138391559626366,-0.3097253803259419,-0.3106284510444579,-0.3089699157741361,-0.3052621037127441,-0.306402108041306,-0.3029600635732167,-0.30230695070959224,-0.2985991386482002,-0.29872411257564596,-0.294779366904208,-0.29898366842495644,-0.30064559994570483,-0.30461296785640735,-0.3042544565693423,-0.30898069528227723,-0.3108987764019095,-0.3135949643126119,-0.3142514834266631,-0.3174407545462954,-0.3157918372703925,-0.3182030215989544,-0.31069126753198134,-0.3113093346683569,-0.3086165530080811,-0.3031252417489214,-0.29813663169311044,-0.2931384136428807,-0.28788403599376705,-0.28415699794353727,-0.2824696286899587,-0.27417016983749637,-0.2740005321883828,-0.2654256877481988,-0.2565754677202934,-0.2546319288678312,-0.256018474800858,-0.25868581872830376,-0.25879156666691183,-0.2583753774133333,-0.25210596936310337,-0.24965012131287345,-0.24999280286152736,-0.24525074441018146,-0.24178948395325428,-0.24570878189186207,-0.24454333983047005,-0.24617642736796186,-0.243483645707686,-0.24024971086638602,-0.23370491722843445,-0.22995865318936692,-0.22953285594136952,-0.23167826267662883,-0.23458254021412062,-0.23239245975719336,-0.22891197331142832,-0.22466300806901218,-0.22219754202436337,-0.21643084517748212,-0.21626120752836842,-0.2168600386759062,-0.21975469821897897,-0.21653998936651664,-0.21508955372298422,-0.2149102980794515,-0.21142019363926756,-0.2046192404024325,-0.20315919676448113,-0.1988909955332271,-0.19438587069192692,-0.19114231785620783,-0.18638103341602397,-0.18695103058030516,-0.1857471365412373,-0.18275974330440192,-0.17671765086979918,-0.17449873642961533,-0.17534411918161807,-0.17516487353808552,-0.17216786230683145,-0.16764351147669343,-0.16159181104767195,-0.15733322781083658,-0.15510469537623406,-0.15567469254051503,-0.15268729930367964,-0.14943412847354187,-0.1451563292478686,-0.14087852002219559,-0.13457065999428997,-0.13207635996638434,-0.12727661354852504,-0.12044682632843329,-0.11668133630052768,-0.11495551506927337,-0.11092425744806556,-0.10586835143132234,-0.09902895621681118,-0.09346073100230057,-0.0853405377933707,-0.08280777578778986,-0.07418487137551133,-0.06837010455653547,-0.06457578054537327,-0.059519874528629835,-0.05370511770965436,-0.05067926249514354,-0.04535758888509722,-0.041307105275051326,-0.03218148965942458,-0.026347496851610863,-0.023312043642681024,-0.016206860834867776,-0.01138789842817034,-0.0017307376259378948,0.0028416831762945183,0.00817296478075935,0.016815105181875678,0.020875196786340533,0.027989987588572962,0.0300104303963864,0.03839640119861909,0.04449616159973502,0.052635590797502685,0.0561929911986192,0.06280507079750253,0.06306123039638623,0.0676432591930376,0.0739991891930376,0.0783250583908055,0.08341941638522443,0.08801106317629448,0.09592316675843526,0.10179561154392425,0.10893923632941327,0.11891023469704298,0.127107341861324,0.13733449982783763,0.14401387538765364,0.15298907934300465,0.1675613324961236,0.17475302725370723,0.18042699040682586,0.1878844627577123,0.1953227091197609,0.20072128668515843,0.20307478304720683,0.20696524700255803,0.21034339176014183,0.21701314932553872,0.22039129408312275,0.22124628482954423,0.22765989279605736,0.22644639076257111,0.22624790913020076,0.2242755362944815,0.227131743859879,0.2249032114252758,0.2262416873862083,0.22504741134155948,0.2296967360991431,0.22977364005449474,0.23061903280649698,0.23172057515738342,0.2335905963049214,0.2357071690569239,0.23222668261115897,0.23562404335758047,0.2341832257084666,0.23298893966381806,0.23333162121247186,0.23545780195889332,0.23350465511201235,0.23359117706178234,0.23139148861043635,0.23402038056020635,0.23079604371332518,0.22731555726756036,0.22740207921733036,0.2262174111671006,0.2270627939191031,0.2238384670722221,0.2244373082197596,0.2247799897684135,0.2251226613170676,0.22189833447018636,0.2204575068210729,0.21775511716637796,0.21961552031949672,0.2189431814670345,0.21851737421903705,0.21683000496545868,0.21564534691522874,0.2134456484638827,0.2117582792103042,0.21184480116007431,0.2144833011042634,0.2099974022518012,0.21492211259710636,0.21018005414576035,0.20668034171115757,0.20164366168325198,0.2017301836330222,0.20490022876381675,0.20706487148791386,0.21353614742094074,0.212892642551735,0.21531344487471604,0.22052314880216162,0.2272602023284913,0.22815365505258833,0.23108677657333687,0.2375868964896205,0.2433185376092527,0.24651742672330385,0.2512340474418199,0.253398680165917,0.2558194724888979,0.2559444464163437,0.25835563074490564,0.25975178467235144,0.26166987579198364,0.2625729465104997,0.2650129648223184,0.27254734112855605,0.279579006231445,0.2825313437410313,0.28624255205285,0.28614021036466863,0.2918814594787198,0.2915037322028169,0.29519571452579785,0.2915071284532436,0.29086362358403806,0.29072281991818116,0.2887985170545566,0.2878892345920484,0.2831760201239591,0.28303521645810215,0.28188900038554787,0.28100856190629636,0.2841978430259286,0.2878994333433284,0.2936503004517985,0.2948191387636172,0.2992988258720872,0.3012265249861384,0.30162688450130576,0.3055942524120082,0.30775888513610533,0.3027895110691322,0.3034364121887645,0.30151210932514,0.2998439660603993,0.30021548159230993,0.29855694632198815,0.29511491185389876,0.2957425969846933,0.29305942331883633,0.2926816860429335,0.29510248836591435,0.29498091068889526,0.2994413718085275,0.30009789092257866,0.30380909923439736,0.30497793754621605,0.3081768166602672,0.3090798873787832,0.31023910769618296,0.3121571988158153,0.3105082815399124,0.30986477667070683,0.3076843042081986,0.30601616094345785,0.3002686900854145,0.29960595922737115,0.2923215307760251,0.28579596312691136,0.28131006427444916,0.2768241654219868,0.2758956569706408,0.26962625892041087,0.26639231407911074,0.2544873948534378,0.24973572840767277,0.25417695353846725,0.2517499494714941,0.2523680066078695,0.250680637354291,0.2525602764962478,0.24629086844601789,0.24281038200025284,0.2401079823455583,0.24274649228974732,0.2415714322339364,0.2398936809747766,0.23999941891338472,0.2403613264508765,0.23637813880176262,0.2326222567682762,0.22812674992139503,0.22871597307451375,0.2244958418153543,0.2274001193528461,0.22623467729145375,0.2275923792412241,0.22308725439992405,0.21959715995974005,0.217397461508394,0.21621280345816418,0.21833898420458575,0.21742009374765858,0.2142053748951962,0.21376995965277978,0.20900867521259603,0.20831710037129603,0.2025311775355768,0.2005588046998581,0.19935491066079036,0.19128277742395505,0.18905424498935242,0.18683533054916845,0.1851191173123331,0.17729353567996287,0.17863201164089515,0.1741172688051762,0.17062716436499215,0.16994520751811115,0.17180562067122995,0.17212906623104596,0.16530889700537288,0.16028183497188642,0.1580533025372839,0.15480974970156436,0.15282776887142657,0.15008691723905643,0.14505985520556997,0.14256555517766434,0.13828774595199134,0.13400993672631833,0.13278681669841275,0.126981667873856,0.12319695185711277,0.11840682343367193,0.11031546420799909,0.10933889578455847,0.10606649896558284,0.09694088334995565,0.09645740813544479,0.08910568372316652,0.08021700171758517,0.0728652773053069,0.06908057128856337,0.06605471607405278,0.059215310859542125,0.05440596644726359,0.04986237962828777,0.04581189601824187,0.041002541605963394,0.03365081719368512,0.030624971979174243,0.02479097917136075,0.018444667165779638,0.011339494357965885,0.004993182352384995,-0.0028804692520798536,-0.01177876925207988,-0.01787852965319603,-0.019642802862126052,-0.023959064065474545,-0.03234504486770695,-0.0381886456699394,-0.043776086873288156,-0.04911698647217211,-0.05369902526882342,-0.05928646647217195,-0.06488352566993938,-0.07123944566993945,-0.07455029446659056,-0.0786200140654747,-0.08727176246100976,-0.09364690844984747,-0.09952896122975541,-0.10514524641636092,-0.11407238039961753,-0.12123524117394457,-0.128673477535993,-0.13815138269469318,-0.1509305286556255,-0.16167961381432527,-0.16888092656632803,-0.1786245993183304,-0.18556013447703013,-0.19096833003684655,-0.19612997399219778,-0.20229703035424618,-0.20413821751852734,-0.21030527388057596,-0.21469843903927566,-0.21730809500020798,-0.22093279136225652,-0.22279319451537538,-0.22336319167965635,-0.2254605384428212,-0.2216950484149156,-0.2250635751780805,-0.22894442113901303,-0.22773091910552634,-0.2267831846653423,-0.22610122781846131,-0.22693700257604488,-0.23082745653139614,-0.23039205128897988,-0.23506060203540136,-0.23311707318293906,-0.23320358513270945,-0.23786252788471174,-0.2402448682300169,-0.23804517977867112,-0.23456469333290597,-0.23388272648602504,-0.23421580004025988,-0.23430231199003004,-0.23184646393980024,-0.23396303669180274,-0.2338030070371081,-0.234145688585762,-0.23066520213999708,-0.23100787368865106,-0.2338833172428859,-0.23244248959377245,-0.231760532746891,-0.22726501590001003,-0.22557764664643143,-0.22540799899731778,-0.22676571094708797,-0.22736454209462564,-0.22566756484662842,-0.22245284599416593,-0.22305168714170376,-0.221867019091474,-0.2199234902390116,-0.220768872991014,-0.218569184539668,-0.21636948608832207,-0.22129420643362718,-0.21706445718004874,-0.2189440963220054,-0.21979909706842682,-0.22091025741373205,-0.2143654637757807,-0.20728912495122387,-0.20710986930769149,-0.20621020483960195,-0.2134595875636992,-0.21510228309560975,-0.21852849782528805,-0.22349166014826882,-0.22615900407571465,-0.2272893804098577,-0.23428260353507113,-0.23620068465470334,-0.24117346497210318,-0.24436274609173536,-0.24882319721136764,-0.25075090632541874,-0.25800988704393485,-0.26068684896579947,-0.26132414209101285,-0.26093678682069105,-0.26361374874255566,-0.2683303694610717,-0.271519640580704,-0.27242270129921997,-0.2776708672043415,-0.2834313523072304,-0.28765487981681664,-0.29339612893086775,-0.2943184256382216,-0.2975173147522728,-0.29866692707525366,-0.30107810140381563,-0.2968772061334939,-0.2997910916654045,-0.29354090960401247,-0.29314395633927176,-0.2896923038767635,-0.28802416061202285,-0.2891641549405848],
+"component":["Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Source current","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active","Non-active"]
+},
+"mapping":{
+"x":"sample",
+"y":"current",
+"color":"component"
+},
+"data_meta":{
+"series_annotations":[{
+"type":"int",
+"column":"sample"
+},{
+"type":"float",
+"column":"current"
+},{
+"type":"str",
+"factor_levels":["Source current","Active","Non-active"],
+"column":"component"
+}]
+},
+"facet":{
+"name":"wrap",
+"facets":"component",
+"ncol":3.0,
+"scales":"free_y",
+"order":1.0,
+"dir":"h"
+},
+"ggtitle":{
+"text":"One current, two physical components",
+"subtitle":"Fryze decomposition, same two-appliance event"
+},
+"guides":{
+"x":{
+"title":"Sample"
+},
+"y":{
+"title":"Current (A)"
+}
+},
+"theme":{
+"text":{
+"color":"#2d2d2d",
+"family":"'Libre Franklin', 'Segoe UI', Roboto, Helvetica, Arial, sans-serif",
+"size":12.0,
+"blank":false
+},
+"axis_title_x":{
+"face":"bold",
+"size":14.0,
+"margin":[10.0,0.0,0.0,0.0],
+"blank":false
+},
+"axis_title_y":{
+"face":"bold",
+"size":14.0,
+"margin":[0.0,10.0,0.0,0.0],
+"blank":false
+},
+"axis_text_x":{
+"color":"#666666",
+"angle":0.0,
+"hjust":0.5,
+"margin":[8.0,0.0,0.0,0.0],
+"blank":false
+},
+"axis_text_y":{
+"color":"#666666",
+"margin":[0.0,0.0,0.0,8.0],
+"blank":false
+},
+"axis_ticks":{
+"color":"#bbbbbb",
+"size":0.75,
+"blank":false
+},
+"axis_line":{
+"color":"#bbbbbb",
+"size":1.0,
+"blank":false
+},
+"legend_background":{
+"blank":true
+},
+"legend_text":{
+"size":12.0,
+"blank":false
+},
+"legend_title":{
+"face":"bold",
+"size":14.0,
+"blank":false
+},
+"legend_position":"none",
+"legend_spacing":10.0,
+"legend_key":{
+"blank":true
+},
+"panel_background":{
+"blank":true
+},
+"panel_border":{
+"blank":true
+},
+"panel_grid_minor":{
+"blank":true
+},
+"panel_grid_major_x":{
+"blank":true
+},
+"panel_grid_major_y":{
+"blank":true
+},
+"plot_background":{
+"blank":true
+},
+"plot_title":{
+"color":"#333333",
+"face":"bold",
+"size":19.0,
+"hjust":0.0,
+"margin":[0.0,0.0,6.0,0.0],
+"blank":false
+},
+"plot_subtitle":{
+"color":"#6b6b6b",
+"size":16.0,
+"hjust":0.0,
+"margin":[0.0,0.0,18.0,0.0],
+"blank":false
+},
+"plot_caption":{
+"color":"#999999",
+"face":"italic",
+"size":9.0,
+"hjust":1.0,
+"margin":[12.0,0.0,0.0,0.0],
+"blank":false
+},
+"plot_margin":[16.0,16.0,10.0,10.0],
+"strip_background":{
+"blank":true
+},
+"strip_text":{
+"family":"'Libre Franklin', 'Segoe UI', Roboto, Helvetica, Arial, sans-serif",
+"face":"bold",
+"size":12.0,
+"hjust":0.0,
+"blank":false
+}
+},
+"ggsize":{
+"width":650.0,
+"height":320.0
+},
+"kind":"plot",
+"scales":[{
+"aesthetic":"color",
+"values":["#0369A1","#EA580C","#059669","#DC2626","#8B5CF6","#FF777C","#10B981","#CA8A04","#1E293B","#6B7280"]
+}],
+"layers":[{
+"geom":"line",
+"mapping":{
+},
+"data_meta":{
+"series_annotations":[{
+"column":"component",
+"factor_levels":["Source current","Active","Non-active"]
+}]
+},
+"size":0.8,
+"data":{
+}
+}],
+"metainfo_list":[],
+"spec_id":"3"
+};
+           window.letsPlotCall(function() { fig = LetsPlot.buildPlotFromProcessedSpecs(plotSpec, containerDiv, sizing); });
+       } else {
+           fig.updateView({});
+       }
+   }
+   
+   const renderImmediately = 
+       forceImmediateRender || (
+           sizing.width_mode === 'FIXED' && 
+           (sizing.height_mode === 'FIXED' || sizing.height_mode === 'SCALED')
+       );
+   
+   if (renderImmediately) {
+       renderPlot();
+   }
+   
+   if (!renderImmediately || responsive) {
+       // Set up observer for initial sizing or continuous monitoring
+       var observer = new ResizeObserver(function(entries) {
+           for (let entry of entries) {
+               if (entry.contentBoxSize && 
+                   entry.contentBoxSize[0].inlineSize > 0) {
+                   if (!responsive && observer) {
+                       observer.disconnect();
+                       observer = null;
+                   }
+                   renderPlot();
+                   if (!responsive) {
+                       break;
+                   }
+               }
+           }
+       });
+       
+       observer.observe(containerDiv);
+   }
+   
+   // ----------
+   })();
+   
+   </script>
+</div>
+</div>
+</div>
+</section>
+<section id="from-decomposed-current-to-a-distance-matrix" class="level2">
+<h2 class="anchored" data-anchor-id="from-decomposed-current-to-a-distance-matrix">From decomposed current to a distance matrix</h2>
+<p>Chapter 2’s <code>distance_matrix()</code> step reappears unchanged. It is applied separately to the active and non-active components, each PAA-reduced to the same fixed size <span class="math inline">\(w\)</span>, and stacked as two channels the same way Chapter 2 stacked three phases for LILACD. Four representations are compared in total: the V-I image and raw current from above, the decomposed current itself fed directly to a small 1D CNN, and the decomposed current’s own distance-similarity matrix fed to a 2D CNN.</p>
+<div class="quarto-embed-nb-cell" data-notebook="/home/runner/work/ml-energy-disaggregation/ml-energy-disaggregation/book/02-disaggregation/03-multi-appliance-recognition-code.ipynb" data-notebook-title="Multi-Appliance Recognition from High-Frequency Signals" data-notebook-cellid="9b041a3f">
+<div id="9b041a3f" class="cell">
+<div class="cell-output cell-output-display">
+   <div id="yml0Kb"></div>
+   <script type="text/javascript" data-lets-plot-script="plot">
+   
+   (function() {
+   // ----------
+   
+   const forceImmediateRender = false;
+   const responsive = false;
+   
+   let sizing = {
+       width_mode: "MIN",
+       height_mode: "SCALED",
+       width: null, 
+       height: null 
+   };
+   
+   const preferredWidth = document.body.dataset.letsPlotPreferredWidth;
+   if (preferredWidth !== undefined) {
+       sizing = {
+           width_mode: 'FIXED',
+           height_mode: 'SCALED',
+           width: parseFloat(preferredWidth)
+       };
+   }
+   
+   const containerDiv = document.getElementById("yml0Kb");
+   let fig = null;
+   
+   function renderPlot() {
+       if (fig === null) {
+           const plotSpec = {
+"data":{
+"representation":["V-I image","Activation current","Decomposed current","Decomposed distance"],
+"f1_macro":[65.7,62.7,79.7,77.9]
+},
+"mapping":{
+"x":"representation",
+"y":"f1_macro",
+"fill":"representation"
+},
+"data_meta":{
+"series_annotations":[{
+"type":"str",
+"factor_levels":["V-I image","Activation current","Decomposed current","Decomposed distance"],
+"column":"representation"
+},{
+"type":"float",
+"column":"f1_macro"
+}]
+},
+"ggtitle":{
+"text":"Decomposing the current is what actually helps",
+"subtitle":"Macro F1, PLAID multi-label, held-out 25%"
+},
+"guides":{
+"x":{
+"title":""
+},
+"y":{
+"title":"Macro F1 (%)"
+}
+},
+"theme":{
+"text":{
+"color":"#2d2d2d",
+"family":"'Libre Franklin', 'Segoe UI', Roboto, Helvetica, Arial, sans-serif",
+"size":12.0,
+"blank":false
+},
+"axis_title_x":{
+"face":"bold",
+"size":14.0,
+"margin":[10.0,0.0,0.0,0.0],
+"blank":false
+},
+"axis_title_y":{
+"face":"bold",
+"size":14.0,
+"margin":[0.0,10.0,0.0,0.0],
+"blank":false
+},
+"axis_text_x":{
+"color":"#666666",
+"angle":15.0,
+"hjust":0.5,
+"margin":[8.0,0.0,0.0,0.0],
+"blank":false
+},
+"axis_text_y":{
+"color":"#666666",
+"margin":[0.0,0.0,0.0,8.0],
+"blank":false
+},
+"axis_ticks":{
+"color":"#bbbbbb",
+"size":0.75,
+"blank":false
+},
+"axis_line":{
+"color":"#bbbbbb",
+"size":1.0,
+"blank":false
+},
+"legend_background":{
+"blank":true
+},
+"legend_text":{
+"size":12.0,
+"blank":false
+},
+"legend_title":{
+"face":"bold",
+"size":14.0,
+"blank":false
+},
+"legend_position":"none",
+"legend_spacing":10.0,
+"legend_key":{
+"blank":true
+},
+"panel_background":{
+"blank":true
+},
+"panel_border":{
+"blank":true
+},
+"panel_grid_minor":{
+"blank":true
+},
+"panel_grid_major_x":{
+"blank":true
+},
+"panel_grid_major_y":{
+"blank":true
+},
+"plot_background":{
+"blank":true
+},
+"plot_title":{
+"color":"#333333",
+"face":"bold",
+"size":19.0,
+"hjust":0.0,
+"margin":[0.0,0.0,6.0,0.0],
+"blank":false
+},
+"plot_subtitle":{
+"color":"#6b6b6b",
+"size":16.0,
+"hjust":0.0,
+"margin":[0.0,0.0,18.0,0.0],
+"blank":false
+},
+"plot_caption":{
+"color":"#999999",
+"face":"italic",
+"size":9.0,
+"hjust":1.0,
+"margin":[12.0,0.0,0.0,0.0],
+"blank":false
+},
+"plot_margin":[16.0,16.0,10.0,10.0],
+"strip_background":{
+"blank":true
+},
+"strip_text":{
+"family":"'Libre Franklin', 'Segoe UI', Roboto, Helvetica, Arial, sans-serif",
+"face":"bold",
+"size":12.0,
+"hjust":0.0,
+"blank":false
+}
+},
+"ggsize":{
+"width":650.0,
+"height":380.0
+},
+"kind":"plot",
+"scales":[{
+"aesthetic":"fill",
+"values":["#E0F2FE","#7DD3FC","#0EA5E9","#0369A1"]
+}],
+"layers":[{
+"geom":"bar",
+"stat":"identity",
+"mapping":{
+},
+"data_meta":{
+"series_annotations":[{
+"column":"representation",
+"factor_levels":["V-I image","Activation current","Decomposed current","Decomposed distance"]
+}]
+},
+"width":0.6,
+"data":{
+}
+},{
+"geom":"text",
+"mapping":{
+"label":"f1_macro"
+},
+"data_meta":{
+"series_annotations":[{
+"column":"representation",
+"factor_levels":["V-I image","Activation current","Decomposed current","Decomposed distance"]
+}]
+},
+"nudge_y":1.5,
+"format":"{.1f}",
+"va":"bottom",
+"size":8.0,
+"data":{
+}
+}],
+"metainfo_list":[],
+"spec_id":"4"
+};
+           window.letsPlotCall(function() { fig = LetsPlot.buildPlotFromProcessedSpecs(plotSpec, containerDiv, sizing); });
+       } else {
+           fig.updateView({});
+       }
+   }
+   
+   const renderImmediately = 
+       forceImmediateRender || (
+           sizing.width_mode === 'FIXED' && 
+           (sizing.height_mode === 'FIXED' || sizing.height_mode === 'SCALED')
+       );
+   
+   if (renderImmediately) {
+       renderPlot();
+   }
+   
+   if (!renderImmediately || responsive) {
+       // Set up observer for initial sizing or continuous monitoring
+       var observer = new ResizeObserver(function(entries) {
+           for (let entry of entries) {
+               if (entry.contentBoxSize && 
+                   entry.contentBoxSize[0].inlineSize > 0) {
+                   if (!responsive && observer) {
+                       observer.disconnect();
+                       observer = null;
+                   }
+                   renderPlot();
+                   if (!responsive) {
+                       break;
+                   }
+               }
+           }
+       });
+       
+       observer.observe(containerDiv);
+   }
+   
+   // ----------
+   })();
+   
+   </script>
+</div>
+</div>
+</div>
+<p>Decomposing the current is what actually moves the number: 79.7% macro <span class="math inline">\(F_1\)</span> for the decomposed current itself, 77.9% for its distance matrix, both roughly 15 points above either representation that skipped the decomposition. The published result finds the same shape (0.931 and 0.940 macro <span class="math inline">\(F_1\)</span> against 0.826 to 0.849 without decomposition) and calls the two decomposed features “comparable,” which is exactly what this run finds too: decomposed current and decomposed distance land within two points of each other, in either order <span class="citation" data-cites="faustine2020mlcfcd">[1]</span>. The signal processing step is doing the real work here, not the choice of image on top of it.</p>
+</section>
+<section id="the-multi-label-head-and-what-its-softmax-trick-actually-buys" class="level2">
+<h2 class="anchored" data-anchor-id="the-multi-label-head-and-what-its-softmax-trick-actually-buys">The multi-label head, and what its softmax trick actually buys</h2>
+<p>The usual way to bolt multi-label output onto a CNN is a sigmoid per appliance and a threshold, typically 0.5, that turns a probability into a yes-or-no. That threshold is picked after training, not learned as part of it, and building a better one is its own open problem <span class="citation" data-cites="faustine2020mlcfcd">[1]</span>. The classifier trained above does something more specific instead: it produces <em>two</em> logits per appliance, one for off and one for on, and applies a softmax over just those two before a cross-entropy loss, verified directly against the author’s own training code, not just the paper’s prose.</p>
+<div id="fig-softmax-vs-sigmoid" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-softmax-vs-sigmoid-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="../../assets/nilm-softmax-vs-sigmoid.svg" class="img-fluid figure-img">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-softmax-vs-sigmoid-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;6.1: Two ways to turn a logit into a yes-or-no. Sigmoid needs an external cutoff, fixed after training and hard to improve on. The two-logit softmax folds that decision into the network itself: whichever logit is larger wins.
+</figcaption>
+</figure>
+</div>
+<p>Worth being precise about what that buys, because the honest answer is narrower than it first sounds. Write appliance <span class="math inline">\(m\)</span>’s two logits as <span class="math inline">\((a_m,
+b_m)\)</span>, off and on. The softmax probability of “on” is</p>
+<p><span class="math display">\[
+\hat{p}_m = \frac{\exp(b_m)}{\exp(a_m) + \exp(b_m)}
+          = \frac{1}{1 + \exp(a_m - b_m)}
+          = \mathrm{sigmoid}(b_m - a_m),
+\]</span></p>
+<p>dividing numerator and denominator by <span class="math inline">\(\exp(b_m)\)</span>. So this is a reparametrized sigmoid, not a fundamentally different mechanism. What is genuinely different is where the decision boundary lives: with two competing logits, “on” wins whenever <span class="math inline">\(b_m &gt; a_m\)</span>, a rule trained end to end as part of the network, rather than an external 0.5 cutoff applied to a probability after the fact. Small difference, but a real one, and it is the one this chapter can defend without overselling it.</p>
+<p>One more honest note. The original paper describes this loss as one that “implicitly captures the relations between labels” <span class="citation" data-cites="faustine2020mlcfcd">[1]</span>. Structurally, that is not quite what is happening: each appliance’s two-logit softmax above is computed independently of every other appliance’s, with no term in the loss that couples them directly. Whatever relation the model learns between, say, a kettle and a fan being on together comes entirely from the shared CNN encoder underneath, the same 128 features feeding every appliance’s own logit pair, not from the softmax or the loss itself. Worth knowing before reading more into the mechanism than it delivers.</p>
+</section>
+<section id="which-appliances-specifically" class="level2">
+<h2 class="anchored" data-anchor-id="which-appliances-specifically">Which appliances specifically?</h2>
+<p>Macro <span class="math inline">\(F_1\)</span> hides which appliances the winning feature still struggles with. Per-appliance <span class="math inline">\(F_1\)</span>, V-I image against the decomposed distance matrix, on the same held-out split.</p>
+<div class="quarto-embed-nb-cell" data-notebook="/home/runner/work/ml-energy-disaggregation/ml-energy-disaggregation/book/02-disaggregation/03-multi-appliance-recognition-code.ipynb" data-notebook-title="Multi-Appliance Recognition from High-Frequency Signals" data-notebook-cellid="3026a340">
+<div id="3026a340" class="cell">
+<div class="cell-output cell-output-display">
+   <div id="TvAd3v"></div>
+   <script type="text/javascript" data-lets-plot-script="plot">
+   
+   (function() {
+   // ----------
+   
+   const forceImmediateRender = false;
+   const responsive = false;
+   
+   let sizing = {
+       width_mode: "MIN",
+       height_mode: "SCALED",
+       width: null, 
+       height: null 
+   };
+   
+   const preferredWidth = document.body.dataset.letsPlotPreferredWidth;
+   if (preferredWidth !== undefined) {
+       sizing = {
+           width_mode: 'FIXED',
+           height_mode: 'SCALED',
+           width: parseFloat(preferredWidth)
+       };
+   }
+   
+   const containerDiv = document.getElementById("TvAd3v");
+   let fig = null;
+   
+   function renderPlot() {
+       if (fig === null) {
+           const plotSpec = {
+"data":{
+"appliance":["AC","CFL","CoffeeMaker","Fan","Fridge","FridgeDefroster","HairIron","ILB","LaptopCharger","SolderingIron","Vacuum","Waterkettle","AC","CFL","CoffeeMaker","Fan","Fridge","FridgeDefroster","HairIron","ILB","LaptopCharger","SolderingIron","Vacuum","Waterkettle"],
+"f1":[56.52173913043478,64.0,0.0,51.85185185185185,85.71428571428571,89.79591836734694,96.0,64.7887323943662,69.6969696969697,56.666666666666664,100.0,53.48837209302325,71.42857142857143,91.80327868852459,19.51219512195122,87.87878787878788,88.88888888888889,98.0392156862745,94.44444444444444,71.7948717948718,76.47058823529412,65.625,100.0,69.44444444444444],
+"representation":["V-I image","V-I image","V-I image","V-I image","V-I image","V-I image","V-I image","V-I image","V-I image","V-I image","V-I image","V-I image","Decomposed distance","Decomposed distance","Decomposed distance","Decomposed distance","Decomposed distance","Decomposed distance","Decomposed distance","Decomposed distance","Decomposed distance","Decomposed distance","Decomposed distance","Decomposed distance"]
+},
+"mapping":{
+"x":"appliance",
+"y":"f1",
+"fill":"representation"
+},
+"data_meta":{
+"series_annotations":[{
+"type":"str",
+"factor_levels":["CoffeeMaker","Fan","Waterkettle","AC","SolderingIron","CFL","ILB","LaptopCharger","Fridge","FridgeDefroster","HairIron","Vacuum"],
+"column":"appliance"
+},{
+"type":"float",
+"column":"f1"
+},{
+"type":"str",
+"column":"representation"
+}]
+},
+"coord":{
+"name":"flip",
+"flip":true
+},
+"ggtitle":{
+"text":"Per-appliance F1: V-I vs decomposed distance",
+"subtitle":"PLAID multi-label, sorted by V-I score"
+},
+"guides":{
+"x":{
+"title":""
+},
+"y":{
+"title":"F1 (%)"
+}
+},
+"theme":{
+"text":{
+"color":"#2d2d2d",
+"family":"'Libre Franklin', 'Segoe UI', Roboto, Helvetica, Arial, sans-serif",
+"size":12.0,
+"blank":false
+},
+"axis_title_x":{
+"face":"bold",
+"size":14.0,
+"margin":[10.0,0.0,0.0,0.0],
+"blank":false
+},
+"axis_title_y":{
+"face":"bold",
+"size":14.0,
+"margin":[0.0,10.0,0.0,0.0],
+"blank":false
+},
+"axis_text_x":{
+"color":"#666666",
+"angle":0.0,
+"hjust":0.5,
+"margin":[8.0,0.0,0.0,0.0],
+"blank":false
+},
+"axis_text_y":{
+"color":"#666666",
+"margin":[0.0,0.0,0.0,8.0],
+"blank":false
+},
+"axis_ticks":{
+"color":"#bbbbbb",
+"size":0.75,
+"blank":false
+},
+"axis_line":{
+"color":"#bbbbbb",
+"size":1.0,
+"blank":false
+},
+"legend_background":{
+"blank":true
+},
+"legend_text":{
+"size":12.0,
+"blank":false
+},
+"legend_title":{
+"face":"bold",
+"size":14.0,
+"blank":false
+},
+"legend_position":"bottom",
+"legend_spacing":10.0,
+"legend_key":{
+"blank":true
+},
+"panel_background":{
+"blank":true
+},
+"panel_border":{
+"blank":true
+},
+"panel_grid_minor":{
+"blank":true
+},
+"panel_grid_major_x":{
+"blank":true
+},
+"panel_grid_major_y":{
+"blank":true
+},
+"plot_background":{
+"blank":true
+},
+"plot_title":{
+"color":"#333333",
+"face":"bold",
+"size":19.0,
+"hjust":0.0,
+"margin":[0.0,0.0,6.0,0.0],
+"blank":false
+},
+"plot_subtitle":{
+"color":"#6b6b6b",
+"size":16.0,
+"hjust":0.0,
+"margin":[0.0,0.0,18.0,0.0],
+"blank":false
+},
+"plot_caption":{
+"color":"#999999",
+"face":"italic",
+"size":9.0,
+"hjust":1.0,
+"margin":[12.0,0.0,0.0,0.0],
+"blank":false
+},
+"plot_margin":[16.0,16.0,10.0,10.0],
+"strip_background":{
+"blank":true
+},
+"strip_text":{
+"family":"'Libre Franklin', 'Segoe UI', Roboto, Helvetica, Arial, sans-serif",
+"face":"bold",
+"size":12.0,
+"hjust":0.0,
+"blank":false
+}
+},
+"ggsize":{
+"width":650.0,
+"height":420.0
+},
+"kind":"plot",
+"scales":[{
+"aesthetic":"fill",
+"values":["#BAE6FD","#0369A1"]
+}],
+"layers":[{
+"geom":"bar",
+"stat":"identity",
+"mapping":{
+},
+"position":"dodge",
+"data_meta":{
+"series_annotations":[{
+"column":"appliance",
+"factor_levels":["CoffeeMaker","Fan","Waterkettle","AC","SolderingIron","CFL","ILB","LaptopCharger","Fridge","FridgeDefroster","HairIron","Vacuum"]
+}]
+},
+"data":{
+}
+}],
+"metainfo_list":[],
+"spec_id":"5"
+};
+           window.letsPlotCall(function() { fig = LetsPlot.buildPlotFromProcessedSpecs(plotSpec, containerDiv, sizing); });
+       } else {
+           fig.updateView({});
+       }
+   }
+   
+   const renderImmediately = 
+       forceImmediateRender || (
+           sizing.width_mode === 'FIXED' && 
+           (sizing.height_mode === 'FIXED' || sizing.height_mode === 'SCALED')
+       );
+   
+   if (renderImmediately) {
+       renderPlot();
+   }
+   
+   if (!renderImmediately || responsive) {
+       // Set up observer for initial sizing or continuous monitoring
+       var observer = new ResizeObserver(function(entries) {
+           for (let entry of entries) {
+               if (entry.contentBoxSize && 
+                   entry.contentBoxSize[0].inlineSize > 0) {
+                   if (!responsive && observer) {
+                       observer.disconnect();
+                       observer = null;
+                   }
+                   renderPlot();
+                   if (!responsive) {
+                       break;
+                   }
+               }
+           }
+       });
+       
+       observer.observe(containerDiv);
+   }
+   
+   // ----------
+   })();
+   
+   </script>
+</div>
+</div>
+</div>
+<p>Most appliances improve substantially: AC, CFL, Fan, ILB, and LaptopCharger all sit under 70% on V-I, some far under it (CFL at 64%, Fan at 52%), and all five clear 70% on the decomposed distance matrix, CFL by nearly 30 points. Appliances already strong on V-I stay strong: HairIron, FridgeDefroster, Fridge, and Vacuum (100% on both). SolderingIron and Waterkettle improve substantially without quite crossing the 70% line, and CoffeeMaker barely moves at all, the one exception the next section explains directly. The published result reports the same broad pattern, over 90% example-based <span class="math inline">\(F_1\)</span> for every appliance except AC, ILB, and LaptopCharger, once the decomposed distance feature is used <span class="citation" data-cites="faustine2020mlcfcd">[1]</span>. This run’s own weak point is sharper and different in its specifics: CoffeeMaker stays at 19.5% even after decomposition, its worst score by a wide margin. Coffee makers are simple resistive heating elements, the same category of appliance Chapter 2 found genuinely hard to tell apart in LILACD (Raclette and Coffee-machine confused each other more than any other pair there). The same physical reason plausibly applies here, and unlike in Chapter 2, it is checkable directly rather than left as a plausible story.</p>
+</section>
+<section id="why-the-coffee-maker-specifically" class="level2">
+<h2 class="anchored" data-anchor-id="why-the-coffee-maker-specifically">Why the coffee maker specifically?</h2>
+<p>Restricting to the 648 single-appliance activations (so each point is one appliance’s own current, not several summed together), the Fryze split gives a direct per-sample measurement: how much of an appliance’s own current is non-active, as a share of its total RMS current. A purely resistive load carries almost no non-active current by definition; a motor or a switching power supply carries much more.</p>
+<div class="quarto-embed-nb-cell" data-notebook="/home/runner/work/ml-energy-disaggregation/ml-energy-disaggregation/book/02-disaggregation/03-multi-appliance-recognition-code.ipynb" data-notebook-title="Multi-Appliance Recognition from High-Frequency Signals" data-notebook-cellid="4ce06fa9">
+<div id="4ce06fa9" class="cell">
+<div class="cell-output cell-output-display">
+   <div id="1lq3tZ"></div>
+   <script type="text/javascript" data-lets-plot-script="plot">
+   
+   (function() {
+   // ----------
+   
+   const forceImmediateRender = false;
+   const responsive = false;
+   
+   let sizing = {
+       width_mode: "MIN",
+       height_mode: "SCALED",
+       width: null, 
+       height: null 
+   };
+   
+   const preferredWidth = document.body.dataset.letsPlotPreferredWidth;
+   if (preferredWidth !== undefined) {
+       sizing = {
+           width_mode: 'FIXED',
+           height_mode: 'SCALED',
+           width: parseFloat(preferredWidth)
+       };
+   }
+   
+   const containerDiv = document.getElementById("1lq3tZ");
+   let fig = null;
+   
+   function renderPlot() {
+       if (fig === null) {
+           const plotSpec = {
+"mapping":{
+},
+"data_meta":{
+},
+"coord":{
+"name":"flip",
+"flip":true
+},
+"ggtitle":{
+"text":"Purely resistive appliances overlap near zero",
+"subtitle":"Non-active current share, single-appliance activations"
+},
+"guides":{
+"x":{
+"title":""
+},
+"y":{
+"title":"Non-active share (%)"
+}
+},
+"theme":{
+"text":{
+"color":"#2d2d2d",
+"family":"'Libre Franklin', 'Segoe UI', Roboto, Helvetica, Arial, sans-serif",
+"size":12.0,
+"blank":false
+},
+"axis_title_x":{
+"face":"bold",
+"size":14.0,
+"margin":[10.0,0.0,0.0,0.0],
+"blank":false
+},
+"axis_title_y":{
+"face":"bold",
+"size":14.0,
+"margin":[0.0,10.0,0.0,0.0],
+"blank":false
+},
+"axis_text_x":{
+"color":"#666666",
+"angle":0.0,
+"hjust":0.5,
+"margin":[8.0,0.0,0.0,0.0],
+"blank":false
+},
+"axis_text_y":{
+"color":"#666666",
+"margin":[0.0,0.0,0.0,8.0],
+"blank":false
+},
+"axis_ticks":{
+"color":"#bbbbbb",
+"size":0.75,
+"blank":false
+},
+"axis_line":{
+"color":"#bbbbbb",
+"size":1.0,
+"blank":false
+},
+"legend_background":{
+"blank":true
+},
+"legend_text":{
+"size":12.0,
+"blank":false
+},
+"legend_title":{
+"face":"bold",
+"size":14.0,
+"blank":false
+},
+"legend_position":"none",
+"legend_spacing":10.0,
+"legend_key":{
+"blank":true
+},
+"panel_background":{
+"blank":true
+},
+"panel_border":{
+"blank":true
+},
+"panel_grid_minor":{
+"blank":true
+},
+"panel_grid_major_x":{
+"blank":true
+},
+"panel_grid_major_y":{
+"blank":true
+},
+"plot_background":{
+"blank":true
+},
+"plot_title":{
+"color":"#333333",
+"face":"bold",
+"size":19.0,
+"hjust":0.0,
+"margin":[0.0,0.0,6.0,0.0],
+"blank":false
+},
+"plot_subtitle":{
+"color":"#6b6b6b",
+"size":16.0,
+"hjust":0.0,
+"margin":[0.0,0.0,18.0,0.0],
+"blank":false
+},
+"plot_caption":{
+"color":"#999999",
+"face":"italic",
+"size":9.0,
+"hjust":1.0,
+"margin":[12.0,0.0,0.0,0.0],
+"blank":false
+},
+"plot_margin":[16.0,16.0,10.0,10.0],
+"strip_background":{
+"blank":true
+},
+"strip_text":{
+"family":"'Libre Franklin', 'Segoe UI', Roboto, Helvetica, Arial, sans-serif",
+"face":"bold",
+"size":12.0,
+"hjust":0.0,
+"blank":false
+}
+},
+"ggsize":{
+"width":650.0,
+"height":420.0
+},
+"kind":"plot",
+"scales":[],
+"layers":[{
+"geom":"jitter",
+"data":{
+"appliance":["Fan","AC","Fan","Fan","CoffeeMaker","Fan","AC","ILB","AC","AC","ILB","ILB","ILB","AC","AC","Waterkettle","AC","AC","Waterkettle","Waterkettle","Waterkettle","AC","AC","CoffeeMaker","Vacuum","Vacuum","AC","AC","CoffeeMaker","CoffeeMaker","CoffeeMaker","AC","Fridge","ILB","Fridge","Fridge","ILB","ILB","ILB","Fridge","Fridge","Waterkettle","Fridge","Fridge","Waterkettle","Waterkettle","Vacuum","Fan","Waterkettle","Fridge","Fridge","CoffeeMaker","Fridge","Fridge","CoffeeMaker","CoffeeMaker","CoffeeMaker","Fridge","Vacuum","ILB","Vacuum","Vacuum","ILB","ILB","ILB","Vacuum","Vacuum","Waterkettle","AC","Fridge","Vacuum","Vacuum","Waterkettle","Waterkettle","Waterkettle","Vacuum","Vacuum","CoffeeMaker","Vacuum","Vacuum","CoffeeMaker","CoffeeMaker","CoffeeMaker","Vacuum","FridgeDefroster","Fan","FridgeDefroster","FridgeDefroster","Fan","Fan","AC","AC","Fan","FridgeDefroster","FridgeDefroster","AC","FridgeDefroster","FridgeDefroster","AC","AC","AC","FridgeDefroster","FridgeDefroster","Vacuum","FridgeDefroster","FridgeDefroster","Vacuum","Vacuum","Vacuum","FridgeDefroster","CFL","HairIron","Fridge","Fridge","CFL","CFL","SolderingIron","SolderingIron","SolderingIron","SolderingIron","SolderingIron","CFL","HairIron","LaptopCharger","HairIron","HairIron","LaptopCharger","LaptopCharger","LaptopCharger","HairIron","HairIron","SolderingIron","HairIron","HairIron","SolderingIron","SolderingIron","SolderingIron","Fridge","AC","CFL","CFL","SolderingIron","SolderingIron","HairIron","LaptopCharger","SolderingIron","LaptopCharger","LaptopCharger","SolderingIron","SolderingIron","SolderingIron","SolderingIron","SolderingIron","LaptopCharger","HairIron","HairIron","Waterkettle","ILB","CFL","LaptopCharger","CFL","CFL","AC","Vacuum","LaptopCharger","LaptopCharger","LaptopCharger","CFL","CFL","SolderingIron","Fan","ILB","Fridge","ILB","Fridge","LaptopCharger","Vacuum","HairIron","AC","CFL","Fridge","LaptopCharger","AC","HairIron","AC","AC","AC","SolderingIron","AC","SolderingIron","Vacuum","HairIron","Fridge","Waterkettle","Fan","CoffeeMaker","Fan","HairIron","HairIron","Waterkettle","LaptopCharger","ILB","HairIron","Waterkettle","Vacuum","Vacuum","HairIron","ILB","SolderingIron","SolderingIron","CoffeeMaker","LaptopCharger","Waterkettle","CFL","ILB","HairIron","Waterkettle","Fridge","Waterkettle","SolderingIron","SolderingIron","AC","SolderingIron","SolderingIron","Vacuum","HairIron","Vacuum","LaptopCharger","Vacuum","Fan","Fan","Vacuum","AC","CFL","Fridge","HairIron","Fridge","CFL","AC","LaptopCharger","Fan","HairIron","Vacuum","CFL","AC","Fan","CoffeeMaker","SolderingIron","SolderingIron","AC","CoffeeMaker","SolderingIron","CoffeeMaker","LaptopCharger","Fridge","Vacuum","CoffeeMaker","HairIron","Waterkettle","HairIron","ILB","CFL","Waterkettle","LaptopCharger","CoffeeMaker","LaptopCharger","ILB","CFL","CoffeeMaker","LaptopCharger","Fridge","ILB","ILB","LaptopCharger","ILB","Fridge","Waterkettle","Vacuum","ILB","AC","CoffeeMaker","Fan","CoffeeMaker","Vacuum","ILB","Vacuum","ILB","Fridge","Waterkettle","Fan","ILB","Fridge","AC","Waterkettle","ILB","Vacuum","Vacuum","Vacuum","Vacuum","FridgeDefroster","Vacuum","LaptopCharger","CFL","FridgeDefroster","CFL","Vacuum","FridgeDefroster","LaptopCharger","FridgeDefroster","Fan","Vacuum","ILB","Vacuum","Waterkettle","Fan","CoffeeMaker","ILB","ILB","Vacuum","Fridge","Waterkettle","Waterkettle","CoffeeMaker","CoffeeMaker","Waterkettle","Waterkettle","FridgeDefroster","ILB","FridgeDefroster","FridgeDefroster","ILB","ILB","ILB","FridgeDefroster","FridgeDefroster","Waterkettle","FridgeDefroster","FridgeDefroster","Waterkettle","Waterkettle","Fan","CFL","ILB","Waterkettle","Waterkettle","FridgeDefroster","FridgeDefroster","CoffeeMaker","FridgeDefroster","FridgeDefroster","CoffeeMaker","CoffeeMaker","CoffeeMaker","FridgeDefroster","Waterkettle","ILB","Waterkettle","Waterkettle","ILB","CoffeeMaker","ILB","ILB","Fan","Fan","CoffeeMaker","CoffeeMaker","CoffeeMaker","ILB","Waterkettle","CoffeeMaker","ILB","CFL","ILB","ILB","LaptopCharger","LaptopCharger","LaptopCharger","ILB","ILB","SolderingIron","ILB","ILB","SolderingIron","SolderingIron","SolderingIron","CFL","CFL","SolderingIron","SolderingIron","ILB","Waterkettle","CFL","Waterkettle","Waterkettle","CFL","CFL","ILB","ILB","CFL","Waterkettle","Waterkettle","HairIron","Waterkettle","Waterkettle","HairIron","HairIron","HairIron","Waterkettle","CFL","Fan","Waterkettle","LaptopCharger","Waterkettle","Waterkettle","LaptopCharger","LaptopCharger","LaptopCharger","Waterkettle","Waterkettle","SolderingIron","CFL","CFL","Waterkettle","Waterkettle","SolderingIron","SolderingIron","SolderingIron","SolderingIron","SolderingIron","Waterkettle","CoffeeMaker","CFL","Fan","HairIron","CoffeeMaker","CoffeeMaker","CFL","CFL","CFL","CoffeeMaker","CoffeeMaker","HairIron","CoffeeMaker","CoffeeMaker","HairIron","HairIron","CFL","ILB","HairIron","CoffeeMaker","CoffeeMaker","LaptopCharger","CoffeeMaker","CoffeeMaker","AC","AC","Fan","Fan","LaptopCharger","LaptopCharger","LaptopCharger","CoffeeMaker","CoffeeMaker","SolderingIron","CoffeeMaker","CoffeeMaker","SolderingIron","SolderingIron","SolderingIron","SolderingIron","SolderingIron","CoffeeMaker","FridgeDefroster","CFL","ILB","HairIron","FridgeDefroster","FridgeDefroster","CFL","CFL","HairIron","HairIron","CFL","FridgeDefroster","FridgeDefroster","HairIron","FridgeDefroster","FridgeDefroster","HairIron","HairIron","HairIron","FridgeDefroster","FridgeDefroster","LaptopCharger","FridgeDefroster","FridgeDefroster","LaptopCharger","LaptopCharger","ILB","ILB","LaptopCharger","FridgeDefroster","HairIron","Fan","FridgeDefroster","SolderingIron","FridgeDefroster","FridgeDefroster","SolderingIron","SolderingIron","SolderingIron","SolderingIron","SolderingIron","FridgeDefroster","HairIron","HairIron","HairIron","ILB","ILB","LaptopCharger","Fan","LaptopCharger","Fan","Fan","LaptopCharger","LaptopCharger","LaptopCharger","Fan","Fan","SolderingIron","Fan","Fan","SolderingIron","SolderingIron","SolderingIron","AC","Fan","SolderingIron","SolderingIron","Fan","AC","CFL","AC","AC","CFL","CFL","CFL","AC","AC","HairIron","AC","AC","HairIron","HairIron","HairIron","AC","AC","LaptopCharger","Fan","Fridge","AC","AC","LaptopCharger","LaptopCharger","LaptopCharger","AC","AC","SolderingIron","AC","AC","SolderingIron","SolderingIron","SolderingIron","SolderingIron","SolderingIron","AC","Fridge","CFL","Fridge","Fridge","CFL","CFL","Fan","Fan","CFL","Fridge","Fridge","HairIron","Fridge","Fridge","HairIron","HairIron","HairIron","Fridge","Fridge","LaptopCharger","Fridge","Fridge","LaptopCharger","LaptopCharger","LaptopCharger","Fridge","Fridge","SolderingIron","Fridge","Fridge","Fridge","Fridge","SolderingIron","SolderingIron","SolderingIron","SolderingIron","SolderingIron","Fridge","Vacuum","CFL","Vacuum","Vacuum","CFL","CFL","CFL","Vacuum","Vacuum","HairIron","Vacuum","Vacuum","HairIron","HairIron","Fridge","Fan","HairIron","Vacuum","Vacuum","LaptopCharger","Vacuum","Vacuum","LaptopCharger","LaptopCharger","LaptopCharger","Vacuum","Vacuum","SolderingIron","Vacuum","Vacuum","SolderingIron","SolderingIron","SolderingIron","SolderingIron","SolderingIron","Vacuum","Fan","ILB","Fan","Vacuum","Fan","Fan","ILB","ILB","ILB","Fan","Fan","Waterkettle","Fan","Fan","Waterkettle","Waterkettle","Waterkettle","Fan","Fan","CoffeeMaker","Fan","Fan","CoffeeMaker","CoffeeMaker"],
+"non_active_share":[22.67540247738608,3.7716635098129245,22.257219514448863,21.12436314850745,9.049876798040133,21.993925135310104,14.93964716047212,13.767747066231042,15.009450320354786,6.576356090317311,13.839370857319194,13.620401477104185,13.906025113945967,6.413304068289048,15.806530833157717,8.824956289114084,15.45105624353229,5.93835170853049,8.826398577722074,8.814483813806577,8.713567674055612,4.559495940988867,17.56316116233423,8.904090878959932,18.919982064776995,14.94460805469225,17.224629513334992,4.285514481765514,8.922831633470052,8.923520827902763,8.945204363960316,3.879226623523171,33.24622258858117,13.850318318644378,71.00388514768457,14.832015456953872,14.15963478798351,13.886967672287817,14.147306130525397,14.931109178745567,48.26331194949601,8.533776962675233,47.36071768553083,47.48206421921935,8.719841586740015,8.679589462745094,18.517000319336592,20.966802559158857,8.730732055692814,14.595685913434812,34.739392455850684,8.844320647155115,34.835767346593066,15.639257806346565,8.876823522950728,8.837369326076448,8.89474870498419,15.829376838038103,19.41280161930179,13.97358477930322,19.417559129769895,15.278495164602857,14.269102957169622,14.200824034388324,13.994137133021578,15.107822944215718,18.866768394660735,8.562176694148402,23.29077942384434,14.685674953232766,18.57059007146957,15.107414552956064,8.585269964639563,8.499697891369694,8.528483575478923,15.002882940056015,18.4092299309321,8.744191253605699,18.244768269266213,14.809670371915526,8.77221455281478,8.717027116922944,8.737063809245262,14.838306021965328,48.285823910809135,21.850664112922523,46.78231166171346,47.41009708363507,23.040756383554164,21.553755376248212,23.066116615311145,5.188310980381933,22.788257105551363,47.229842714101004,45.68379256578302,4.150041598350555,46.68641787089136,46.88101552554918,17.81013241292077,3.5658300912961094,18.299089828449702,46.780888501608594,44.9342279056468,15.696783456115535,46.46362183595951,46.77109540945493,18.782123741777884,15.208596134736293,18.594770158539628,46.57974382340614,86.61404669542614,42.156285278634286,33.538531857763175,14.972558678695258,86.42509276425486,86.40906425051676,77.62290486788763,8.32071912986766,7.857697737842153,76.81659345371295,8.580406555917598,86.1830618539964,42.228309107007036,91.71488207260867,42.25270582569823,42.328357765195705,94.0961002839934,91.45243498754327,94.16705982055957,42.37622440952645,42.20782392483035,8.3797894021891,42.080600140190725,42.14132915696216,76.17248532614525,8.554809321733005,8.236166692690496,33.39545398101564,5.047529097682948,86.53570864736015,86.60914188444364,79.16790992363724,8.668133523824977,42.47793652180514,94.49293242477376,7.971268645549098,92.67283911453916,91.31122483810654,77.75477776710909,8.04845122515696,7.6915903214676655,76.1131376355825,8.555997183411874,89.00693516071055,42.19843008787033,42.017440482940366,9.069010727086185,9.081829790302663,86.45702560211846,92.01206547256974,87.5934979193429,86.05629418438662,22.377669506319446,14.971976836644341,93.16646432864266,91.36700308940162,96.31011962236438,86.42206457101986,86.2998643389831,8.131175693470748,23.02923138210417,14.384926620997323,35.517793549038615,14.162957047216263,34.33296108502514,89.91458746224606,19.236379572465683,42.20148422782488,20.15772164532596,85.08716060004609,34.100620526008505,89.90567152701733,20.04374293365347,42.17983328442573,21.914999754687802,3.7382951913778393,19.366901343019777,7.1614967011125215,20.635458188622604,8.14872314674803,19.3552741051734,42.199548212280924,34.269510378904506,42.124273356077445,24.056353571033185,9.115026685992426,22.463888268609026,42.289726925066525,42.243559025694985,8.562178009729754,93.70156820576369,13.862298731735178,42.25240188157696,8.67798763614224,18.202030439482176,14.538973763821048,42.07363563527141,14.921840495838318,78.52435030720092,7.482700094439269,8.702299775655652,93.83831302819637,8.54823047074493,86.77644408257149,13.56793942402601,42.28618641308441,8.638560787710537,35.380151016606725,8.823711649790686,78.94626020293403,7.297224431196405,3.1732685776017795,79.05773473700793,7.08303678202814,14.838071451527195,42.25741547465845,15.101303764165285,83.3638775419242,14.757848424306871,22.593771636103558,21.32685571758504,18.186693554209825,3.745839572183338,86.40998199199159,14.616626013282646,42.147934914984845,14.28107018320319,85.41986951908042,3.570689004692614,93.9776068847129,21.792353584880892,42.212093389977994,14.697991557255971,85.00882174357555,5.584694121921397,24.053363748317604,9.13408336463116,80.5343415598164,7.29313062063056,3.1690718760386622,8.867755029660627,7.128147748767873,9.013888913456874,86.77174747811027,34.07950039448574,15.455633902315407,9.036012968722321,41.57197468612894,8.708765725763977,42.220165586127074,14.397436163088326,86.41428560140254,8.676269442793217,90.78762988948755,8.759442483475295,90.1980036002752,13.884870470211993,86.3679260969509,8.782530603506324,87.80588107351662,35.22920300195994,13.903461797203995,14.245125870060033,91.05781059849065,14.670124513281241,14.938977454551786,8.700307836981892,14.856941947536034,14.194414537958416,3.506667550431888,8.822194675214847,21.821754777703507,8.76710418752604,14.700586407281518,14.133035758741158,14.614547954796219,14.04208194984142,15.041234678686779,8.632170327648948,21.344978573075945,14.027906157211486,15.193641278798234,20.056719846950077,10.630996278870782,14.118247643596623,14.688370742546459,18.59377687372053,14.594329950499546,18.498752898872546,45.609440782644825,18.761807689694432,92.15825403325655,86.3780839795192,45.28942768908095,86.62746099952378,14.696349707543742,44.40948554134762,88.32115628550952,44.41398200277589,20.981679416193124,19.902988405720627,13.993383650004656,19.785434068122743,8.650467704166084,24.05829228715941,8.9064401376192,13.014901541744573,12.344679238304456,19.067286977957803,14.493220031931633,8.995285724441565,8.974859283168017,9.36015933023007,9.356816657018406,8.971118603354864,8.964662155726742,49.776821138871945,13.960035603105576,49.21127476099778,49.39567746816601,14.129827193027685,13.9717883524273,14.193996455267444,49.22098094552234,48.65606184311227,8.568098792235114,48.21056480492378,48.236911434864865,8.567512754768426,8.53478064475807,22.868625282732,86.46024102427351,12.564119609652739,9.099090164342847,8.572028030900482,47.94805869221313,47.92243355180323,8.739298143101255,47.37941422445409,47.14402445794128,8.784935951462224,8.74482722492064,8.784683464824468,46.85585147340859,9.110643081192343,12.511729768477906,9.0696970944085,9.066817373238655,12.445999636800359,9.403041818129134,12.489814846920885,12.35987258330504,22.471483271387736,21.329809592563993,9.405518504258666,9.398753675248482,9.425287294620144,12.397926925811728,9.009944875995634,9.370518314922236,14.251649771765507,86.1832537058216,14.357865139028217,14.507059346375511,93.56369309299475,90.23475712187228,92.85794212005986,14.336940906319992,14.652680525574949,6.965432251251995,14.343016871090766,14.229109106664131,78.57952948531288,7.304976830658588,6.942611736898097,85.82682781588149,86.53716227214676,80.20067749130263,7.611439165119623,14.367890091260568,8.836998820650415,86.4336817061823,8.859572609391776,8.857521209792441,86.10382885744079,86.01222202358694,13.941377385194217,14.002999165302626,86.06054606097447,8.842994381416782,8.880852245848263,42.14891209474828,8.826126173761297,8.819100664154481,42.18889857936545,42.18766698334016,42.18485554762286,8.831438723749077,87.45136536548814,21.118326821716856,8.801361835841544,91.74955834464942,8.81485074305137,8.823892423603267,94.59472216235717,92.76844084127987,93.01140991566047,8.851815090912346,8.922887097095861,6.960725146961834,86.06320262276853,85.95524792153071,8.913765679341381,8.92678418154242,78.15103491939654,7.2605049116477165,7.050511759154195,78.94671280885915,7.053817282459559,8.84646471752782,9.059978669701756,82.09603673731644,21.84761020830902,42.12877428848062,9.07629170342897,9.100697225409418,82.38063129402167,81.74490911835478,81.78075400636602,9.06953297904466,9.109594714579751,41.70914412062334,9.101297283347387,9.109212124622616,41.83885819724581,41.620974537417986,85.89742507882197,14.125783860768843,41.58387530871781,9.132659894449827,9.100237266080669,90.03383156999352,9.14983173724183,9.123364346056892,21.52753203636052,4.12381913825522,21.639184238250404,20.553593104535,84.99512737738387,89.81211509335134,82.16730517894995,9.199019287663148,9.000860552245923,7.390298783796878,9.029486993886653,9.026399511783943,80.67323947122748,7.216952486015879,7.692948819659423,78.88694033039194,7.081943818901555,9.034963368409036,45.63391853233536,86.17054390922387,14.939489872527535,42.16516424049182,46.338665771218935,46.228973590668154,86.08138596589987,86.10039858611796,42.147443272429044,42.1585742579391,86.06928016074495,45.78487684146232,45.253133395164944,42.094459005540855,45.6112837290467,45.5641736236237,42.06929196897363,42.07958633299641,42.162867399729336,44.933013323630746,44.18357348269577,92.25118934912396,44.781449048044095,44.63194026335883,92.62873869082277,92.47857960791043,14.636774272833176,14.92917069087498,93.13395362593164,44.72331658590339,42.15334369042636,20.242507707702483,46.035993558010006,11.177307384936752,44.41730531663271,44.35923236361905,80.91090100731586,7.318096219076573,11.956201578160597,79.09607085261844,7.542336192818124,44.69156411504216,42.20782594481703,42.19834606682444,42.155094649081626,15.106147623236804,14.22082259872785,91.19110924602572,21.717129181890773,92.75891160908493,21.309543844536638,20.65975980695694,93.38023689970395,92.89665290580382,93.55118504556879,20.638161635359157,21.76940947228106,6.910400656305573,21.343597488957737,20.425960825286527,79.67603660743721,7.248416151190222,6.797206556369945,20.08924481210295,21.25407222156697,78.52240853930923,7.297555791601624,20.66873377201875,19.515369141637123,84.77352768913697,18.616831874994322,5.165691684754722,84.85718830893035,84.33036851542724,84.7705151594903,5.3495094908114895,18.945014664233064,41.997983871006255,19.545137908542277,5.04033317487969,42.07235045815185,42.04909665082416,42.07359460130662,5.103123479266601,19.688961552413282,89.5687915280718,23.708297324601656,14.730356029350187,18.84242624347338,5.083327240136557,99.27496862852053,89.4951698091136,99.5091457559896,3.9865990647633067,19.434826864361803,7.1008185217529105,17.92930323683651,4.635355227136674,78.544993175891,7.074088667456616,6.96781062991225,78.25454989050243,7.101007963611678,4.8485715089923005,35.03937040533025,85.74635456010073,35.14073908906515,14.654415900733122,87.61289539003765,85.69907162257633,22.945752326590128,21.531143384697383,87.69542925127786,14.783736324607835,35.10970158490192,42.21307245668415,35.06520762037436,14.725742056328924,42.27785295202618,42.233933047987755,42.15404955750762,14.141091143663417,35.46917955725349,93.18899066639199,35.368759742500906,14.827662523478907,93.47032972823988,90.20522008144151,93.2175248653919,14.95284942976831,34.571328942815924,7.264073995399986,27.398877395148848,14.557115585628821,35.67455448056259,14.952227145022654,78.49370374923514,7.719879321234352,7.35154600722421,77.19857758068454,7.281701749426523,15.009005141302403,18.33358268879995,86.34622416255256,18.180148445875524,14.532709025958592,86.48325032215352,86.0802403881174,85.96699738003292,14.581988772998173,18.330035200689718,42.16294239807909,18.148376358405002,14.570584141337669,42.19692426921748,42.19577618817698,35.006447020791256,21.68612439098915,42.14656642649271,14.613140693721387,18.237988135354257,92.90837566943515,18.011820006563017,14.405408342466023,92.6026638618369,92.52593082861202,95.65118040143476,14.542261425195191,18.831985949256307,6.866452897442839,18.365911424382826,14.617033077144587,78.11639373384594,7.027371035514148,6.951748875790716,80.97683020164087,7.58579586683019,14.569882753665905,22.611453179939282,14.157532537855744,22.39432589836682,15.41853348169376,22.38372391231856,21.243961999780005,14.334135034360962,14.141465203351334,14.356758072291257,21.20695119594008,22.221922659600814,8.810052497489146,22.369267326544247,20.90120219200887,8.807658751758641,8.799087054330712,8.831407150030428,20.676347225174606,23.38264518549843,9.000560349373526,23.37276849042161,22.034034367911087,9.032629808661344,9.021996409877516]
+},
+"mapping":{
+"x":"appliance",
+"y":"non_active_share"
+},
+"data_meta":{
+"series_annotations":[{
+"type":"float",
+"column":"non_active_share"
+},{
+"type":"str",
+"factor_levels":["CoffeeMaker","Fan","Waterkettle","AC","SolderingIron","CFL","ILB","LaptopCharger","Fridge","FridgeDefroster","HairIron","Vacuum"],
+"column":"appliance"
+}]
+},
+"width":0.15,
+"alpha":0.4,
+"color":"#7DD3FC",
+"size":3.0
+},{
+"geom":"point",
+"data":{
+"appliance":["CoffeeMaker","Fan","Waterkettle","AC","SolderingIron","CFL","ILB","LaptopCharger","Fridge","FridgeDefroster","HairIron","Vacuum"],
+"non_active_share":[9.02419796083073,21.792353584880892,8.821406156972584,10.758001625394716,7.971268645549098,86.13718638333233,14.129827193027685,92.52593082861202,33.24622258858117,46.40114380358922,42.16405331928546,15.455633902315407]
+},
+"mapping":{
+"x":"appliance",
+"y":"non_active_share"
+},
+"data_meta":{
+"series_annotations":[{
+"type":"float",
+"column":"non_active_share"
+},{
+"type":"str",
+"factor_levels":["CoffeeMaker","Fan","Waterkettle","AC","SolderingIron","CFL","ILB","LaptopCharger","Fridge","FridgeDefroster","HairIron","Vacuum"],
+"column":"appliance"
+}]
+},
+"color":"#0369A1",
+"size":5.0,
+"shape":18.0
+}],
+"metainfo_list":[],
+"spec_id":"6"
+};
+           window.letsPlotCall(function() { fig = LetsPlot.buildPlotFromProcessedSpecs(plotSpec, containerDiv, sizing); });
+       } else {
+           fig.updateView({});
+       }
+   }
+   
+   const renderImmediately = 
+       forceImmediateRender || (
+           sizing.width_mode === 'FIXED' && 
+           (sizing.height_mode === 'FIXED' || sizing.height_mode === 'SCALED')
+       );
+   
+   if (renderImmediately) {
+       renderPlot();
+   }
+   
+   if (!renderImmediately || responsive) {
+       // Set up observer for initial sizing or continuous monitoring
+       var observer = new ResizeObserver(function(entries) {
+           for (let entry of entries) {
+               if (entry.contentBoxSize && 
+                   entry.contentBoxSize[0].inlineSize > 0) {
+                   if (!responsive && observer) {
+                       observer.disconnect();
+                       observer = null;
+                   }
+                   renderPlot();
+                   if (!responsive) {
+                       break;
+                   }
+               }
+           }
+       });
+       
+       observer.observe(containerDiv);
+   }
+   
+   // ----------
+   })();
+   
+   </script>
+</div>
+</div>
+</div>
+<p>The three lowest scorers on the decomposed distance matrix, SolderingIron, Waterkettle, and CoffeeMaker, are exactly the three appliances with the lowest median non-active share here (8.0%, 8.8%, and 9.0%), clustered on top of each other near zero. AC and ILB, also plain resistive loads, sit close behind at 10.8% and 14.1%. Motors and electronics separate cleanly from all of them: Fridge and HairIron sit in the 30-40% range, and CFL and LaptopCharger, both switching electronics, average above 85%. CoffeeMaker’s weak score is not a modelling failure; it is measuring an appliance whose own current genuinely looks like its resistive neighbours, decomposition or not.</p>
+</section>
+<section id="what-kind-of-mistake-is-it" class="level2">
+<h2 class="anchored" data-anchor-id="what-kind-of-mistake-is-it">What kind of mistake is it?</h2>
+<p>A multi-label miss is not one thing. Missing every active appliance is a different failure than mislabeling one of three, and lumping them into a single error rate hides which failure mode actually needs fixing. Following the same taxonomy the original paper used: <em>zero-error</em> (predicts nothing active when something is), <em>one-to-one</em> (gets the single active appliance wrong when only one is running), and <em>many-to-many</em> (confuses at least one appliance when several are active, split further by how many of them it got wrong) <span class="citation" data-cites="faustine2020mlcfcd">[1]</span>.</p>
+<div class="quarto-embed-nb-cell" data-notebook="/home/runner/work/ml-energy-disaggregation/ml-energy-disaggregation/book/02-disaggregation/03-multi-appliance-recognition-code.ipynb" data-notebook-title="Multi-Appliance Recognition from High-Frequency Signals" data-notebook-cellid="c469b850">
+<div id="c469b850" class="cell">
+<div class="cell-output cell-output-display">
+   <div id="7bEosm"></div>
+   <script type="text/javascript" data-lets-plot-script="plot">
+   
+   (function() {
+   // ----------
+   
+   const forceImmediateRender = false;
+   const responsive = false;
+   
+   let sizing = {
+       width_mode: "MIN",
+       height_mode: "SCALED",
+       width: null, 
+       height: null 
+   };
+   
+   const preferredWidth = document.body.dataset.letsPlotPreferredWidth;
+   if (preferredWidth !== undefined) {
+       sizing = {
+           width_mode: 'FIXED',
+           height_mode: 'SCALED',
+           width: parseFloat(preferredWidth)
+       };
+   }
+   
+   const containerDiv = document.getElementById("7bEosm");
+   let fig = null;
+   
+   function renderPlot() {
+       if (fig === null) {
+           const plotSpec = {
+"data":{
+"error_type":["zero-error","one-to-one","single-error","double-error","complete-error"],
+"count":[16.0,9.0,68.0,10.0,8.0]
+},
+"mapping":{
+"x":"error_type",
+"y":"count"
+},
+"data_meta":{
+"series_annotations":[{
+"type":"str",
+"factor_levels":["zero-error","one-to-one","single-error","double-error","complete-error"],
+"column":"error_type"
+},{
+"type":"int",
+"column":"count"
+}]
+},
+"ggtitle":{
+"text":"Most mistakes involve at least one correct appliance",
+"subtitle":"Error type, decomposed distance, held-out test set"
+},
+"guides":{
+"x":{
+"title":""
+},
+"y":{
+"title":"Number of incorrect samples"
+}
+},
+"theme":{
+"text":{
+"color":"#2d2d2d",
+"family":"'Libre Franklin', 'Segoe UI', Roboto, Helvetica, Arial, sans-serif",
+"size":12.0,
+"blank":false
+},
+"axis_title_x":{
+"face":"bold",
+"size":14.0,
+"margin":[10.0,0.0,0.0,0.0],
+"blank":false
+},
+"axis_title_y":{
+"face":"bold",
+"size":14.0,
+"margin":[0.0,10.0,0.0,0.0],
+"blank":false
+},
+"axis_text_x":{
+"color":"#666666",
+"angle":15.0,
+"hjust":0.5,
+"margin":[8.0,0.0,0.0,0.0],
+"blank":false
+},
+"axis_text_y":{
+"color":"#666666",
+"margin":[0.0,0.0,0.0,8.0],
+"blank":false
+},
+"axis_ticks":{
+"color":"#bbbbbb",
+"size":0.75,
+"blank":false
+},
+"axis_line":{
+"color":"#bbbbbb",
+"size":1.0,
+"blank":false
+},
+"legend_background":{
+"blank":true
+},
+"legend_text":{
+"size":12.0,
+"blank":false
+},
+"legend_title":{
+"face":"bold",
+"size":14.0,
+"blank":false
+},
+"legend_position":"top",
+"legend_spacing":10.0,
+"legend_key":{
+"blank":true
+},
+"panel_background":{
+"blank":true
+},
+"panel_border":{
+"blank":true
+},
+"panel_grid_minor":{
+"blank":true
+},
+"panel_grid_major_x":{
+"blank":true
+},
+"panel_grid_major_y":{
+"blank":true
+},
+"plot_background":{
+"blank":true
+},
+"plot_title":{
+"color":"#333333",
+"face":"bold",
+"size":19.0,
+"hjust":0.0,
+"margin":[0.0,0.0,6.0,0.0],
+"blank":false
+},
+"plot_subtitle":{
+"color":"#6b6b6b",
+"size":16.0,
+"hjust":0.0,
+"margin":[0.0,0.0,18.0,0.0],
+"blank":false
+},
+"plot_caption":{
+"color":"#999999",
+"face":"italic",
+"size":9.0,
+"hjust":1.0,
+"margin":[12.0,0.0,0.0,0.0],
+"blank":false
+},
+"plot_margin":[16.0,16.0,10.0,10.0],
+"strip_background":{
+"blank":true
+},
+"strip_text":{
+"family":"'Libre Franklin', 'Segoe UI', Roboto, Helvetica, Arial, sans-serif",
+"face":"bold",
+"size":12.0,
+"hjust":0.0,
+"blank":false
+}
+},
+"ggsize":{
+"width":650.0,
+"height":340.0
+},
+"kind":"plot",
+"scales":[],
+"layers":[{
+"geom":"bar",
+"stat":"identity",
+"mapping":{
+},
+"data_meta":{
+"series_annotations":[{
+"column":"error_type",
+"factor_levels":["zero-error","one-to-one","single-error","double-error","complete-error"]
+}]
+},
+"fill":"#0369A1",
+"width":0.6,
+"data":{
+}
+},{
+"geom":"text",
+"mapping":{
+"label":"count"
+},
+"data_meta":{
+"series_annotations":[{
+"column":"error_type",
+"factor_levels":["zero-error","one-to-one","single-error","double-error","complete-error"]
+}]
+},
+"nudge_y":0.3,
+"va":"bottom",
+"size":8.0,
+"data":{
+}
+}],
+"metainfo_list":[],
+"spec_id":"7"
+};
+           window.letsPlotCall(function() { fig = LetsPlot.buildPlotFromProcessedSpecs(plotSpec, containerDiv, sizing); });
+       } else {
+           fig.updateView({});
+       }
+   }
+   
+   const renderImmediately = 
+       forceImmediateRender || (
+           sizing.width_mode === 'FIXED' && 
+           (sizing.height_mode === 'FIXED' || sizing.height_mode === 'SCALED')
+       );
+   
+   if (renderImmediately) {
+       renderPlot();
+   }
+   
+   if (!renderImmediately || responsive) {
+       // Set up observer for initial sizing or continuous monitoring
+       var observer = new ResizeObserver(function(entries) {
+           for (let entry of entries) {
+               if (entry.contentBoxSize && 
+                   entry.contentBoxSize[0].inlineSize > 0) {
+                   if (!responsive && observer) {
+                       observer.disconnect();
+                       observer = null;
+                   }
+                   renderPlot();
+                   if (!responsive) {
+                       break;
+                   }
+               }
+           }
+       });
+       
+       observer.observe(containerDiv);
+   }
+   
+   // ----------
+   })();
+   
+   </script>
+</div>
+</div>
+</div>
+<p>Of 111 incorrect predictions on this held-out split, single-appliance confusions dominate: 68 samples where the model got every active appliance right except one. Zero-errors are rare (16), complete misses rarer still (8), and one-to-one errors, the case where only one appliance is running at all, are the least common failure of any type (9), the same result the published paper found: with over 50% of activations being single-appliance events, the model sees plenty of them and gets almost all of them right. Where this run’s own finding actually diverges from the published one is the many-to-many split itself. The paper reports double-errors as its most common failure; here, single-errors dominate instead. That is plausibly a consequence of the data itself: two-appliance activations outnumber three-appliance ones by roughly four to one, so when the model does slip on a multi-appliance window, the more likely window to slip on is a two-appliance one, where getting one of two wrong is, by construction, a single-error.</p>
+</section>
+<section id="why-bother" class="level2">
+<h2 class="anchored" data-anchor-id="why-bother">Why bother</h2>
+<p>Two concrete things this buys beyond “now it handles more than one appliance.” First, deployability: single-label recognition has a hidden dependency on a near-perfect event detector, one that guarantees clean, isolated activations. That holds in a curated dataset and fails constantly in a real home, a fridge compressor cycling in the background while a kettle switches on. Multi-label recognition removes that dependency entirely; it does not need the aggregate signal to cooperate.</p>
+<p>Second, co-occurrence is itself the information, not just a nuisance to model around. Knowing that a kettle, a hair dryer, and an air conditioner are all drawing power at the same instant is exactly what a time-of-use tariff, a demand-response program, or a circuit-capacity check needs, and it is something a sequence of clean, single-appliance events can never directly answer. Chapter 2’s own “why bother” was one machine’s signature drifting over months, an industrial, predictive-maintenance value. This chapter’s is the residential-facing counterpart: which appliances are drawing power together, right now.</p>
+</section>
+<section id="where-this-part-of-the-book-goes" class="level2">
+<h2 class="anchored" data-anchor-id="where-this-part-of-the-book-goes">Where this part of the book goes</h2>
+<p>This chapter and the last both stayed inside the same high-frequency, event-based world: a short activation window, a graph-like or distance-based image, a CNN. Real smart meters mostly do not offer that world at all.</p>
+<ul>
+<li><strong>Chapter 4, deep learning at low frequency</strong>, moves off event-based, high-frequency features entirely, onto the energy-estimation side of NILM introduced in Chapter 1, the kind of problem a meter reporting once every few seconds can actually be asked to solve.</li>
+</ul>
+<div class="ark-mistake">
+<p><span class="ark-mistake-title"><i class="bi bi-bug-fill"></i> Common Mistake</span></p>
+<p>Treating a low per-appliance macro <span class="math inline">\(F_1\)</span> as one failure with one cause. CoffeeMaker’s 19.5% here and the published paper’s own AC/ILB/LaptopCharger weak points are not evidence that decomposition “doesn’t work”; they are evidence that current-shape features cap out on appliances whose current shape is not very distinctive to begin with, mostly plain resistive loads. Fixing that needs a feature sensitive to something other than current shape, not a longer training run on the same one.</p>
+</div>
+</section>
+<section id="references" class="level2">
+<h2 class="anchored" data-anchor-id="references">References</h2>
+<div id="refs" class="references csl-bib-body" data-entry-spacing="0" role="list" style="display: none">
+<div id="ref-faustine2020mlcfcd" class="csl-entry" role="listitem">
+<div class="csl-left-margin">[1] </div><div class="csl-right-inline">A. Faustine and L. Pereira, <span>“Multi-label learning for appliance recognition in <span>NILM</span> using <span>Fryze</span>-current decomposition and convolutional neural network,”</span> <em>Energies</em>, vol. 13, no. 16, p. 4154, 2020, doi: <a href="https://doi.org/10.3390/en13164154">10.3390/en13164154</a>.</div>
+</div>
+</div>
+
+
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    // Ensure there is a toggle, if there isn't float one in the top right
+    if (window.document.querySelector('.quarto-color-scheme-toggle') === null) {
+      const a = window.document.createElement('a');
+      a.classList.add('top-right');
+      a.classList.add('quarto-color-scheme-toggle');
+      a.href = "";
+      a.onclick = function() { try { window.quartoToggleColorScheme(); } catch {} return false; };
+      const i = window.document.createElement("i");
+      i.classList.add('bi');
+      a.appendChild(i);
+      window.document.body.appendChild(a);
+    }
+    setColorSchemeToggle(hasAlternateSentinel())
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp("https:\/\/sambaiga\.github\.io\/ml-energy-disaggregation\/");
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+<nav class="page-navigation">
+  <div class="nav-page nav-page-previous">
+      <a href="../../book/02-disaggregation/02-feature-engineering.html" class="pagination-link" aria-label="Chapter 2: Appliance Recognition">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text"><span class="chapter-title">Chapter 2: Appliance Recognition</span></span>
+      </a>          
+  </div>
+  <div class="nav-page nav-page-next">
+      <a href="../../about.html" class="pagination-link" aria-label="About the Author">
+        <span class="nav-page-text"><span class="chapter-title">About the Author</span></span> <i class="bi bi-arrow-right-short"></i>
+      </a>
+  </div>
+</nav>
+</div> <!-- /content -->
+<footer class="footer">
+  <div class="nav-footer">
+    <div class="nav-footer-left">
+<p><span class="faux-block">© 2025–2026 <a href="https://sambaiga.github.io/">Anthony Faustine</a></span> <span class="faux-block">Code licensed under <a href="https://www.apache.org/licenses/LICENSE-2.0">Apache 2.0</a></span></p>
+</div>   
+    <div class="nav-footer-center">
+<div class="footer-social">
+<p><a href="mailto:sambaiga@gmail.com" title="Email"><i class="bi bi-envelope-at-fill"></i></a> <a href="https://github.com/sambaiga" title="GitHub"><i class="bi bi-github"></i></a> <a href="https://www.linkedin.com/in/sambaiga" title="LinkedIn"><i class="bi bi-linkedin"></i></a></p>
+</div>
+<div class="toc-actions d-sm-block d-md-none"><ul><li><a href="https://github.com/sambaiga/ml-energy-disaggregation/edit/main/book/02-disaggregation/03-multi-appliance-recognition.qmd" class="toc-action"><i class="bi bi-github"></i>Edit this page</a></li><li><a href="https://github.com/sambaiga/ml-energy-disaggregation/issues/new" class="toc-action"><i class="bi empty"></i>Report an issue</a></li><li><a href="https://github.com/sambaiga/ml-energy-disaggregation/blob/main/book/02-disaggregation/03-multi-appliance-recognition.qmd" class="toc-action"><i class="bi empty"></i>View source</a></li></ul></div></div>
+    <div class="nav-footer-right">
+<p><span class="faux-block">Made with <a href="https://quarto.org">Quarto</a></span> <span class="faux-block"><a href="https://github.com/sambaiga/ml-energy-disaggregation"><i class="bi bi-github"></i> View source</a></span></p>
+</div>
+  </div>
+</footer>
+
+
+
+
+<script src="../../site_libs/quarto-html/zenscroll-min.js"></script>
+</body></html>
