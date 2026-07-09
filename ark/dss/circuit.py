@@ -54,6 +54,30 @@ class Transformer:
     num_windings: int
 
 
+@dataclass(frozen=True)
+class PVSystem:
+    """One PV system element."""
+
+    name: str
+    bus1: str
+    kva: float
+    pmpp: float
+    pf: float
+    phases: int
+
+
+@dataclass(frozen=True)
+class StorageUnit:
+    """One storage (battery) element."""
+
+    name: str
+    bus1: str
+    kw_rated: float
+    kwh_rated: float
+    state: str
+    phases: int
+
+
 def _iterate(collection: Any, build) -> Iterator[Any]:
     """Walk an OpenDSSDirect `First()`/`Next()` collection, yielding `build()` per element."""
     if not collection.First():
@@ -188,6 +212,76 @@ class Circuit:
                 num_windings=transformers.NumWindings(),
             ),
         )
+
+    @property
+    def pvsystems(self) -> Iterator[PVSystem]:
+        """Iterate every PV system element in the circuit."""
+        pvsystems = self._dss.PVsystems
+        cktelement = self._dss.CktElement
+        yield from _iterate(
+            pvsystems,
+            lambda: PVSystem(
+                name=pvsystems.Name(),
+                bus1=cktelement.BusNames()[0],
+                kva=pvsystems.kVARated(),
+                pmpp=pvsystems.Pmpp(),
+                pf=pvsystems.pf(),
+                phases=cktelement.NumPhases(),
+            ),
+        )
+
+    @property
+    def storage_units(self) -> Iterator[StorageUnit]:
+        """Iterate every storage (battery) element in the circuit.
+
+        `kw_rated`/`kwh_rated` aren't exposed on OpenDSSDirect.py's own
+        `Storages` module (only `Name`/`State`/`puSOC` are), so this reads
+        them the same escape-hatch way `circuit.command` documents
+        elsewhere: a `?` property query against the active element.
+        """
+        storages = self._dss.Storages
+        cktelement = self._dss.CktElement
+        yield from _iterate(
+            storages,
+            lambda: StorageUnit(
+                name=storages.Name(),
+                bus1=cktelement.BusNames()[0],
+                kw_rated=float(self.command(f"? Storage.{storages.Name()}.kwrated")),
+                kwh_rated=float(self.command(f"? Storage.{storages.Name()}.kwhrated")),
+                state=self.command(f"? Storage.{storages.Name()}.state"),
+                phases=cktelement.NumPhases(),
+            ),
+        )
+
+    def solve_daily(self, steps: int = 48, stepsize: str = "30m") -> Iterator[int]:
+        """Step a `Set Mode=daily` time-series solve, yielding the step index after each solve.
+
+        LoadShapes attached via `daily=` (see the Chapter 2 notebook) drive
+        each load/PV system to a different point in its profile every step;
+        a single `circuit.solve()` only ever answers "what does this network
+        look like right now," this answers "what does it look like across a
+        day." Read any per-step result (`circuit.bus_voltages()`,
+        `circuit.element_powers(...)`) inside the loop, since each `Circuit`
+        query only ever reflects the most recently solved step.
+
+        Args:
+            steps: Number of steps to solve (48 half-hour steps covers one
+                full day at the default `stepsize`).
+            stepsize: OpenDSS time-step duration string, e.g. `"30m"`, `"1h"`.
+
+        Yields:
+            The zero-based step index, after that step's solve has run.
+
+        Examples:
+            >>> circuit = Circuit.load("simple_lv/Master.dss", solve=False)
+            >>> voltages = []
+            >>> for step in circuit.solve_daily(steps=48):
+            ...     voltages.append(circuit.bus_voltages().assign(step=step))
+        """
+        self._dss.Text.Command(f"Set Mode=daily number=1 stepsize={stepsize}")
+        for step in range(steps):
+            self.solve()
+            yield step
 
     def bus_voltages(self) -> pd.DataFrame:
         """Per-phase bus voltage magnitude and angle for every bus. See :func:`ark.dss.results.bus_voltages`."""
