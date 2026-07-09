@@ -35,9 +35,9 @@ transformer to the meter on the wall.
 
 A real feeder branches the way a tree does: one three-phase backbone leaves
 the transformer, then splits into single-phase taps, called service drops,
-each reaching one customer, dozens of them on a real feeder. Left side of
-@fig-grid-centralized-decentralized: this chain has moved power exactly one
-way for decades, plant to customer, no exceptions.
+each reaching one customer, dozens of them on a real feeder. The left side
+of @fig-grid-centralized-decentralized shows this chain: power has moved
+exactly one way for decades, plant to customer, no exceptions.
 
 ## Why that stopped being true
 
@@ -122,6 +122,8 @@ a bus against exactly that band.
 
 ## Building and reading a first network
 
+### Building it
+
 Every simulation in this part of the book runs on
 [OpenDSS](https://www.epri.com/pages/sa/opendss), EPRI's open-source
 distribution power-flow solver, through
@@ -153,9 +155,12 @@ Once every element is defined, solving the network is one call:
 
 A converged solve means OpenDSS found a self-consistent set of voltages and
 currents across the whole network, the power-flow equivalent of balancing
-a set of equations. A solved circuit holds more than bus voltages, and
-`Circuit` turns every element into a plain Python iterator, no manual
-bookkeeping required:
+a set of equations.
+
+### Reading it back
+
+A solved circuit holds more than bus voltages, and `Circuit` turns every
+element into a plain Python iterator, no manual bookkeeping required:
 
 {{< embed 01-opendss-lv-modeling-code.ipynb#359836e6 >}}
 
