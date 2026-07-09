@@ -2,38 +2,42 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
     <loc>https://sambaiga.github.io/ml-energy-disaggregation/index.html</loc>
-    <lastmod>2026-07-08T21:26:08.376Z</lastmod>
+    <lastmod>2026-07-09T09:22:25.612Z</lastmod>
   </url>
   <url>
     <loc>https://sambaiga.github.io/ml-energy-disaggregation/preface.html</loc>
-    <lastmod>2026-07-08T21:26:08.376Z</lastmod>
+    <lastmod>2026-07-09T09:22:25.612Z</lastmod>
   </url>
   <url>
     <loc>https://sambaiga.github.io/ml-energy-disaggregation/how-to-use.html</loc>
-    <lastmod>2026-07-08T21:26:08.376Z</lastmod>
+    <lastmod>2026-07-09T09:22:25.612Z</lastmod>
   </url>
   <url>
     <loc>https://sambaiga.github.io/ml-energy-disaggregation/book/02-disaggregation/01-what-is-nilm.html</loc>
-    <lastmod>2026-07-08T21:26:08.369Z</lastmod>
+    <lastmod>2026-07-09T09:22:25.602Z</lastmod>
   </url>
   <url>
     <loc>https://sambaiga.github.io/ml-energy-disaggregation/book/02-disaggregation/02-feature-engineering.html</loc>
-    <lastmod>2026-07-08T21:26:08.373Z</lastmod>
+    <lastmod>2026-07-09T09:22:25.605Z</lastmod>
   </url>
   <url>
     <loc>https://sambaiga.github.io/ml-energy-disaggregation/book/02-disaggregation/03-multi-appliance-recognition.html</loc>
-    <lastmod>2026-07-08T21:26:08.374Z</lastmod>
+    <lastmod>2026-07-09T09:22:25.606Z</lastmod>
   </url>
   <url>
     <loc>https://sambaiga.github.io/ml-energy-disaggregation/book/02-disaggregation/04-multi-task-low-frequency.html</loc>
-    <lastmod>2026-07-08T21:26:08.375Z</lastmod>
+    <lastmod>2026-07-09T09:22:25.607Z</lastmod>
+  </url>
+  <url>
+    <loc>https://sambaiga.github.io/ml-energy-disaggregation/book/04-grid-edge/01-opendss-lv-modeling.html</loc>
+    <lastmod>2026-07-09T09:22:25.611Z</lastmod>
   </url>
   <url>
     <loc>https://sambaiga.github.io/ml-energy-disaggregation/about.html</loc>
-    <lastmod>2026-07-08T21:26:08.366Z</lastmod>
+    <lastmod>2026-07-09T09:22:25.597Z</lastmod>
   </url>
   <url>
     <loc>https://sambaiga.github.io/ml-energy-disaggregation/acronyms.html</loc>
-    <lastmod>2026-07-08T21:26:08.366Z</lastmod>
+    <lastmod>2026-07-09T09:22:25.597Z</lastmod>
   </url>
 </urlset>
