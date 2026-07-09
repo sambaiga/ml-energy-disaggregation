@@ -53,10 +53,10 @@ description: "A structured, project-based path through smart meter data: disaggr
 <span class="pipeline-label">Forecasting</span>
 </div>
 <span class="pipeline-arrow">&#8594;</span>
-<div class="pipeline-step">
+<a class="pipeline-step" href="book/04-grid-edge/01-opendss-lv-modeling.qmd">
 <span class="pipeline-dot pipeline-dot-4"><i class="bi bi-diagram-3-fill"></i></span>
 <span class="pipeline-label">Grid-Edge Value</span>
-</div>
+</a>
 </div>
 </div>
 

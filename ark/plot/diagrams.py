@@ -396,6 +396,34 @@ def _grid_panel(ax: plt.Axes, title: str, decentralized: bool) -> None:
                 va="center",
                 zorder=6,
             )
+        if i == 1:
+            # One labeled example, not one badge per house: the point is
+            # "this is where a smart meter sits," a concept, not a claim
+            # that every house in this schematic has one. Same icon the
+            # book's own cover page already uses for "Meter Signal," so
+            # the two pages read as the same visual language.
+            meter_xy = (house_xy[0] + 0.19, house_xy[1] - 0.16)
+            ax.add_patch(Circle(meter_xy, 0.105, facecolor=INFO, edgecolor="white", linewidth=0.8, zorder=5))
+            ax.text(
+                meter_xy[0],
+                meter_xy[1],
+                ICONS["speedometer2"],
+                fontproperties=icon_font(9),
+                color="white",
+                ha="center",
+                va="center",
+                zorder=6,
+            )
+            ax.text(
+                meter_xy[0] + 0.14,
+                meter_xy[1],
+                "smart meter",
+                fontsize=6.5,
+                color=INFO,
+                ha="left",
+                va="center",
+                style="italic",
+            )
 
     caption = "power flows both ways" if decentralized else "power flows one way only"
     caption_color = WARNING if decentralized else TEXT_MUTED

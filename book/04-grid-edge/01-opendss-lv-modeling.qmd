@@ -20,7 +20,7 @@ anyway: a real, small low-voltage network, modeled and solved with
 open-source power-flow software, the same network every later chapter in
 this part reuses.
 
-## What a low-voltage network actually is
+## The low-voltage network
 
 Every home and business gets electricity through the same three-tier chain.
 A power plant generates it. {{< acr HV >}} transmission lines carry it over
@@ -33,88 +33,76 @@ pole or the green cabinet on a street corner, steps {{< acr MV >}} down to
 The **low-voltage network** is that last tier: everything from the local
 transformer to the meter on the wall.
 
-```{python}
-#| label: fig-grid-centralized-decentralized
-#| fig-cap: "The traditional grid moves power one way, plant to customer. A DER-rich low-voltage network moves it both ways."
-from ark.plot.diagrams import centralized_vs_decentralized_grid_diagram
+A real feeder branches the way a tree does: one three-phase backbone leaves
+the transformer, then splits into single-phase taps, called service drops,
+each reaching one customer, dozens of them on a real feeder. Left side of
+@fig-grid-centralized-decentralized: this chain has moved power exactly one
+way for decades, plant to customer, no exceptions.
 
-centralized_vs_decentralized_grid_diagram()
-```
+## Why that stopped being true
 
-A real low-voltage feeder branches the way a tree does: one three-phase
-backbone leaves the transformer, then splits into single-phase taps,
-called service drops, each reaching one customer. @fig-lvcircuit-topology
-shows a real one, an anonymized residential circuit with 31 customers
-spread across three phases. The data comes from [AusNet
-Services](https://www.ausnetservices.com.au/), an Australian distribution
-utility, via [Team-Nando's DER hosting-capacity tutorial
-series](https://github.com/Team-Nando). The network this chapter builds has
-exactly the same shape, a transformer, a backbone, single-phase taps, just
-three customers instead of 31. Small enough to read every line of its
-definition, large enough that everything it teaches scales up unchanged.
-
-![A real low-voltage feeder: 31 single-phase customers on three phases, fed from one distribution transformer. Source: Team-Nando's DER hosting-capacity tutorial series, built on AusNet Services data.](LVcircuit-topology.png){#fig-lvcircuit-topology}
-
-## Why the low-voltage network matters now
-
-Clean-energy investment reached \$1.7 trillion globally in 2023
-[@iea2023investment], and a growing share of it is landing somewhere new.
-For decades, power flowed one way through the chain above: plant,
-transmission, substation, feeder, meter. Consumers only ever received.
-
-Rooftop {{< acr PV >}}, home batteries, and {{< acr EV >}} charging break
-that one-way assumption, and almost all of them connect at the low-voltage
-level, not the transmission or medium-voltage tiers above it
+The right side of the same diagram is what changed. Clean-energy investment
+reached \$1.7 trillion globally in 2023 [@iea2023investment], and a growing
+share of it is landing at the low-voltage tier specifically. Rooftop
+{{< acr PV >}}, home batteries, and {{< acr EV >}} charging almost all
+connect there, not at the transmission or medium-voltage tiers above it
 [@bystrom2022distribution]. A household with solar panels is not a passive
-consumer anymore; on a sunny afternoon it can be exporting power back
-through the exact feeder that used to only deliver it. The low-voltage
-network was never designed to carry power in both directions, and it is
-where the energy transition is actually showing up, meter by meter.
+consumer anymore; on a sunny afternoon it can export power back through the
+exact feeder that used to only deliver it.
 
-## From smart meter to network model
+![The traditional grid moves power one way, plant to customer. A DER-rich low-voltage network moves it both ways.](../../assets/grid-centralized-vs-decentralized.svg){#fig-grid-centralized-decentralized}
 
-A smart meter and a network model answer two different questions, and
-mixing them up is the mistake this whole chapter exists to prevent. A meter
-answers "how much power is this customer using right now," a single Load's
-kW and kvar, reported once per interval. A network model answers "what does
-that demand do to the rest of the feeder," a question no single meter, or
-even every meter on the street added together, can answer on its own,
-because it depends on where each customer sits relative to the others and
-how the wire between them behaves.
-
-The bridge between the two is direct: a meter's own reading becomes a
-network model's input. One customer's demand becomes one `Load`'s `kW`; a
-whole time series of meter readings becomes what OpenDSS calls a
-`LoadShape`, the mechanism Chapter 2 picks up directly. Combine that meter
-data with the network's topology, the impedance of every line, the phase
-each customer connects to. None of that comes from any meter. Solving the
-network with both answers the harder question: not just what one customer
-is doing, but what it means for the voltage one pole over, or the
-transformer three poles up the street. That combination, real meter data
-plus real topology, is the mechanism behind every thread the rest of
-Part 4 follows.
-
-## Three ways {{< acr DER >}} strain a feeder
-
-Distributed energy resources do not strain a low-voltage network in one
-way. They strain it in three, and each has a distinct signature:
+That reversal does not strain a feeder in one way. It strains it in three,
+and each has a distinct signature:
 
 - **Fluctuation.** Solar output rises and falls with the sun, not with
   demand. A feeder with heavy {{< acr PV >}} penetration can see demand
   drop sharply at midday and ramp back up steeply at sunset, a shape well
   known enough to have its own name, the duck curve. A {{< acr DSO >}} has
-  to compensate for that swing every single day.
+  to compensate for that swing every single day, and the same variability
+  that produces the swing also makes demand harder to predict, which makes
+  the feeder harder to plan and manage well in advance.
 - **Load growth.** Unmanaged {{< acr EV >}} charging can push a feeder's
   peak demand up by as much as 64% in some reported cases
   [@ucer2020congestion; @bystrom2022distribution], and unlike a kettle or a
   washing machine, a car can draw power for hours at a stretch, stretching
-  out the peak instead of just raising it.
+  out the peak instead of just raising it. Most low-voltage feeders were
+  designed decades before any of this, sized for predictable household
+  demand, not a street where several homes might charge an EV or export
+  rooftop solar at once.
 - **Constraint violations.** Every feeder operates inside three limits:
   thermal (how much current a line or transformer can carry before it
   overheats), voltage (how far the actual voltage can drift from nominal),
   and phase balance (how evenly current is spread across the three phases).
   Fluctuation and load growth are what push a feeder toward one of these
-  three limits; the limits themselves are what actually gets violated.
+  three limits; the limits themselves are what actually gets violated, and
+  a real violation is not just a number out of range, it risks equipment
+  damage, real power losses, a shortened lifespan for feeder assets, and,
+  in the worst case, an outage.
+
+## Why a meter alone can't show it
+
+Given all that, the obvious question is why a {{< acr DSO >}} would not just
+read the strain off its smart meters. It cannot, and the reason is exact,
+not a limitation of degree: a meter and a network model answer two
+different questions. A meter answers "how much power is this customer
+using right now," a single Load's kW and kvar, reported once per interval.
+A network model answers "what does that demand do to the rest of the
+feeder," a question no single meter, or even every meter on the street
+added together, can answer on its own, because it depends on where each
+customer sits relative to the others and how the wire between them behaves.
+Two houses on the same street can report identical, perfectly normal meter
+readings while one sits at 0.95 pu and the other at 1.08 pu.
+
+The bridge between the two is direct, and it is what the rest of this
+chapter builds: a meter's own reading becomes a network model's input. One
+customer's demand becomes one `Load`'s `kW`; a whole time series of meter
+readings becomes what OpenDSS calls a `LoadShape`, the mechanism Chapter 2
+picks up directly. Combine that meter data with the network's topology, the
+impedance of every line, the phase each customer connects to, none of which
+any meter reports, and solving the network answers the harder question.
+That combination, real meter data plus real topology, is the mechanism
+behind every thread the rest of Part 4 follows.
 
 ::: {.ark-concept}
 <span class="ark-concept-title"><i class="bi bi-info-circle-fill"></i> Key Concept</span>
@@ -132,7 +120,7 @@ A typical statutory limit allows voltage to drift +10%/-6% from nominal,
 a bus against exactly that band.
 :::
 
-## A first OpenDSS simulation
+## Building and reading a first network
 
 Every simulation in this part of the book runs on
 [OpenDSS](https://www.epri.com/pages/sa/opendss), EPRI's open-source
@@ -147,10 +135,10 @@ Windows: no separate application to install, no Windows-only binding.
 
 The network this chapter builds is small on purpose: one 11kV/0.4kV
 transformer, a three-phase line, and three single-phase houses, one per
-phase, the same shape as @fig-lvcircuit-topology above, just smaller. The
-full sequence of commands that builds it, transformer, linecodes, lines,
-loads, one line at a time, is in the companion notebook; here is the shape
-of it:
+phase, the same branching shape as the real feeder above, just three
+customers instead of dozens. The full sequence of commands that builds it,
+transformer, linecodes, lines, loads, one line at a time, is in the
+companion notebook; here is the shape of it:
 
 ```python
 circuit.command("New transformer.LVTR Buses=[sourcebus, A.1.2.3] ...")
@@ -165,27 +153,9 @@ Once every element is defined, solving the network is one call:
 
 A converged solve means OpenDSS found a self-consistent set of voltages and
 currents across the whole network, the power-flow equivalent of balancing
-a set of equations. From there, the per-unit voltage at every bus is a
-DataFrame away:
-
-{{< embed 01-opendss-lv-modeling-code.ipynb#b517c96d >}}
-
-Every house here sits comfortably inside the 0.94-1.10 pu band from the
-concept box above. Reading a table of numbers is one way to check that;
-seeing the network is another, and it is usually the faster one. The same
-solved circuit, drawn as a diagram, colored by exactly that compliance
-band:
-
-{{< embed 01-opendss-lv-modeling-code.ipynb#3042acef >}}
-
-Green means comfortably compliant, amber means close to a limit, red means
-a real violation, the same three-way status this book's later Part 4
-chapters use to talk about a feeder's health.
-
-## Reading what's already there
-
-A solved circuit holds more than bus voltages. `Circuit` turns every
-element into a plain Python iterator, no manual bookkeeping required:
+a set of equations. A solved circuit holds more than bus voltages, and
+`Circuit` turns every element into a plain Python iterator, no manual
+bookkeeping required:
 
 {{< embed 01-opendss-lv-modeling-code.ipynb#359836e6 >}}
 
@@ -198,18 +168,16 @@ attributes:
 {{< embed 01-opendss-lv-modeling-code.ipynb#d46445ca >}}
 
 For anything `Circuit`'s dataclasses don't model, `circuit.command` doubles
-as a query, the same escape hatch OpenDSS scripting always offers:
+as a query, the same escape hatch OpenDSS scripting always offers, and
+iteration combines naturally with it, no different from looping over any
+other Python collection:
 
 {{< embed 01-opendss-lv-modeling-code.ipynb#37141e33 >}}
 
-Iteration and results combine naturally, no different from looping over
-any other Python collection:
-
 {{< embed 01-opendss-lv-modeling-code.ipynb#7b4d8ac2 >}}
 
-The same pattern that produced a bus-voltage table produces a power table
-for any element type, one row per phase, not a flat list to index into by
-hand:
+The same iterate-and-read pattern produces a power table for any element
+type, one row per phase, not a flat list to index into by hand:
 
 {{< embed 01-opendss-lv-modeling-code.ipynb#d5eeeca4 >}}
 
@@ -220,6 +188,22 @@ place to reach for `circuit.dss`, the full native OpenDSSDirect.py API,
 unwrapped, one property away:
 
 {{< embed 01-opendss-lv-modeling-code.ipynb#8283e121 >}}
+
+And the per-unit voltage at every bus, the number the concept box above
+just defined, is a DataFrame away:
+
+{{< embed 01-opendss-lv-modeling-code.ipynb#b517c96d >}}
+
+Every house here sits comfortably inside the 0.94-1.10 pu band. Reading a
+table of numbers is one way to check that; seeing the network is another,
+and it is usually the faster one. Everything above, in one diagram, colored
+by exactly that compliance band:
+
+{{< embed 01-opendss-lv-modeling-code.ipynb#3042acef >}}
+
+Green means comfortably compliant, amber means close to a limit, red means
+a real violation, the same three-way status this book's later Part 4
+chapters use to talk about a feeder's health.
 
 ::: {.ark-mistake}
 <span class="ark-mistake-title"><i class="bi bi-bug-fill"></i> Common Mistake</span>
@@ -232,7 +216,7 @@ exactly the fluctuation the duck curve describes above. Checking a feeder
 properly means solving it across a range of realistic conditions, not once.
 :::
 
-## Checking a feeder across a full day
+## Checking a feeder over time
 
 Here is what checking several conditions actually looks like, using the
 same network expanded to six houses and a real annual load-duration curve:

@@ -40,6 +40,7 @@ ICONS: dict[str, str] = {
     "building-fill": "",
     "ev-front-fill": "",
     "arrow-down-up": "",
+    "speedometer2": "",
 }
 
 
