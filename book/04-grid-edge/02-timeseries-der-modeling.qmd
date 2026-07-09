@@ -1,0 +1,240 @@
+---
+title: "Chapter 2: Time-Series Simulation and DER Modeling"
+bibliography: ../../references.bib
+---
+
+Chapter 1 ended on a warning, not a conclusion: a single power-flow solve is
+a photograph, not a verdict, and the `.ark-mistake` box there proved it with
+one feeder at three different loading levels. But an engineer deciding
+whether to approve one more rooftop solar application doesn't get to pick a
+loading level. They get a real feeder, a real year of smart-meter readings,
+and a question that only a real time series can answer: not "is this
+network healthy right now," but "is it healthy enough, on its worst day,
+for what's about to be connected to it."
+
+This chapter builds the rest of `ark.dss.Circuit` around exactly that
+question. By the end, the same 31-customer AusNet feeder from Chapter 1
+runs a full day, half hour by half hour, with real smart-meter demand and
+real rooftop solar attached, and answers a real question: how much
+{{< acr PV >}} can this specific feeder actually take before it breaks its
+own voltage limit.
+
+## Getting the data
+
+Everything below runs on Team-Nando's real AusNet network and smart-meter
+data, the same source Chapter 1 introduced. It isn't checked into this
+repository (someone else's licensed data, vendored locally instead of
+committed), so fetch it once before running the notebook:
+
+```bash
+uv run python scripts/fetch_part4_ausnet_data.py
+```
+
+That pulls the network model and two real datasets into
+`resources/cvar_flexibility/data/timeseries-lv/`: 342 anonymized customers'
+active-power readings, and their matched normalized {{< acr PV >}}
+generation, both at 30-minute resolution for a full year.
+
+## A year, not a moment
+
+A smart meter's real output is a time series: one active-power reading
+every half hour, for as long as the meter has been installed. OpenDSS's
+equivalent is a `LoadShape`, an array of readings a `Load` or `PVSystem` can
+be told to follow instead of holding one fixed value. Building one from a
+real reading is the whole bridge between what Chapter 1 modeled (a network)
+and what this chapter runs (a network under real, changing demand).
+
+The notebook's own `build_simple_lv_network()` rebuilds Chapter 1's
+three-house network exactly, transformer, backbone, three single-phase
+houses, wrapped in a function so every section below can start from a
+clean copy rather than one circuit's accumulated state.
+
+{{< embed 02-timeseries-der-modeling-code.ipynb#b2096981 >}}
+
+`load_data` is 342 real customers by 365 days by 48 half-hour readings:
+one full year of actual AusNet smart-meter data. `pv_data` is one
+normalized generation profile per day, since the sun doesn't run on a
+per-customer schedule the way demand does.
+
+{{< embed 02-timeseries-der-modeling-code.ipynb#47ed9cd1 >}}
+
+A meter only measures active power; reactive power (`qmult`) isn't
+metered, so it's derived from an assumed power factor, the same 0.95-0.99
+range Team-Nando's own tutorials use. `useactual=1` tells OpenDSS the
+`pmult`/`qmult` arrays are already in kW/kvar, not multipliers on the
+load's rated capacity. From `edit load.Load_1 daily=customer0_profile`
+onward, every time-series solve reads `Load_1`'s demand from this real
+reading instead of a fixed number.
+
+{{< embed 02-timeseries-der-modeling-code.ipynb#08294d4f >}}
+
+Customer 0's day 45: quiet overnight, a small midday bump, a sharp evening
+peak past 3kW. An ordinary residential profile, and now something a
+network can actually be driven by.
+
+## Solving across a day
+
+`circuit.solve_daily(steps, stepsize)` is the piece Chapter 1 didn't have:
+it sets `Mode=daily` and steps through one solve per interval, the
+LoadShape supplying a different reading at each step instead of a value
+frozen in time.
+
+{{< embed 02-timeseries-der-modeling-code.ipynb#08fc2bde >}}
+
+{{< embed 02-timeseries-der-modeling-code.ipynb#3a53ec25 >}}
+
+Voltage barely moves, 0.976820 to 0.976823 pu, a swing of about 0.000003
+pu, nothing a real meter would ever register. That's a real result, not a
+failed demo. Chapter 1's backbone (a 250kVA transformer feeding a short,
+heavy three-phase line) is strong relative to one house's ordinary swing
+between roughly 0.3kW overnight and 3kW at its evening peak. A network's
+strength matters as much as a load's size, and the mechanism this section
+demonstrates, solving across time instead of once, is exactly as real even
+on a feeder that barely shows it. The hosting-capacity study at the end of
+this chapter puts real demand from 31 real customers on a thinner, real
+feeder, and there the same mechanism produces a result worth acting on.
+
+## Modeling PV properly
+
+A `PVSystem` can run on a flat rating, constant output regardless of the
+time of day, the same way Chapter 1's own exercises added PV. A more
+realistic model drives it from an irradiance profile and a temperature
+profile instead, a `LoadShape` for sunlight and a `Tshape` for panel
+temperature.
+
+{{< embed 02-timeseries-der-modeling-code.ipynb#3f176432 >}}
+
+::: {.ark-mistake}
+
+**A 20% default nearly zeroed out the morning and evening.** OpenDSS's
+`PVSystem` defaults `%cutin`/`%cutout` to 20%, the inverter output
+threshold below which it won't turn on or stays off. At 10% irradiance
+(hour 6 above), a real inverter still produces something, 0.1 x 5kW =
+0.5kW, but a 20%-cutin model reports flat `0.0`, and it's easy to miss
+unless every hour gets checked individually: hours 12-16, the middle of the
+day, look identical either way. Team-Nando's own tutorials always override
+this to `%cutin=0.05 %cutout=0.05`.
+
+:::
+
+{{< embed 02-timeseries-der-modeling-code.ipynb#fbac9946 >}}
+
+{{< embed 02-timeseries-der-modeling-code.ipynb#04938480 >}}
+
+Rebuilding the same PV system with the lower threshold recovers exactly the
+two hours the default silently dropped, visible directly against the
+default in the chart above.
+
+## Mitigation strategies: Volt-Watt and Volt-VAr
+
+A large rooftop system on a weak feeder connection can push local voltage
+above the statutory limit long before the transformer itself is stressed.
+{{< acr IEEE >}} 1547-2018 standardizes exactly this kind of smart-inverter
+response [@ieee1547-2018], and OpenDSS models it through an `InvControl`
+element driven by an `XYCurve` of voltage/output setpoints. Volt-Watt
+curtails real-power export as voltage rises past a threshold; Volt-VAr
+absorbs reactive power instead, trading export for headroom without
+necessarily cutting generation at all.
+
+The network below is deliberately a stress case, one house with a 10kVA
+system on a long, thin service cable, so the effect is visible without
+guesswork about whether it would ever actually trigger.
+
+{{< embed 02-timeseries-der-modeling-code.ipynb#ad28e9ab >}}
+
+{{< embed 02-timeseries-der-modeling-code.ipynb#d80b7647 >}}
+
+{{< embed 02-timeseries-der-modeling-code.ipynb#23b7bbc2 >}}
+
+Volt-Watt cuts this house's export from 10kW to 7.32kW and pulls voltage
+back from 1.0887 to 1.0637 pu, a direct, working trade of generation for
+headroom.
+
+{{< embed 02-timeseries-der-modeling-code.ipynb#7bb48503 >}}
+
+Volt-VAr only commands reactive power, `Q`, yet real power dropped too,
+from 10kW to 8.35kW. The inverter's own `kVA` rating is the reason:
+`sqrt(P^2 + Q^2)` is capped at 10kVA, so absorbing 5.5kvar of reactive
+power leaves less apparent-power headroom for real power within that same
+limit. Volt-Watt and Volt-VAr aren't really two independent levers, they
+share one inverter's capacity.
+
+## Storage: the third DER
+
+A `Storage` element is a dispatchable battery: `state=CHARGING` draws power
+from the network, `state=DISCHARGING` supplies it, both bounded by
+`kwrated` (power) and `kwhrated`/`kwhstored` (energy). Unlike a `Load` or a
+`PVSystem`, its output sign flips with its own commanded state, not with
+the weather or the time of day.
+
+{{< embed 02-timeseries-der-modeling-code.ipynb#95961602 >}}
+
+The comment in that cell is worth reading as carefully as the code:
+OpenDSSDirect.py is a singleton engine, one compiled circuit per process,
+so building a second `Circuit` `Clear`s and recompiles the same global
+state Chapter 1's own `base_peak_loss_kw` note already warned about. Two
+`Circuit` objects can exist in Python at once, but only one of them is ever
+telling the truth about what's currently solved. Reading each result
+immediately after its own solve avoided a real version of this bug caught
+while drafting this notebook, not just a hypothetical one.
+
+## A real PV hosting-capacity study
+
+Every piece above comes together here: real load data becomes LoadShapes
+on the real 31-customer AusNet feeder, a chosen share of customers get real
+PV profiles, and the network solves across a full day, half hour by half
+hour, at increasing PV penetration, the same methodology Team-Nando's own
+hosting-capacity tutorials use.
+
+{{< embed 02-timeseries-der-modeling-code.ipynb#c405ad16 >}}
+
+The notebook's own `run_penetration` function allocates one of the 342
+real customer profiles to each of the network's 31 loads (more real
+customers exist than houses on this feeder, so every run samples a fresh
+31), gives a chosen percentage of them a real 5kVA PV system, and records
+the worst bus voltage anywhere on the feeder at every half-hour step.
+
+{{< embed 02-timeseries-der-modeling-code.ipynb#d94722a5 >}}
+
+Day 363 is the sunniest day in the dataset, the highest normalized PV
+profile of the year, and the worst case for a hosting-capacity study: if a
+penetration level is ever going to cause a violation, a low-demand,
+high-sun day is where it shows up first.
+
+{{< embed 02-timeseries-der-modeling-code.ipynb#816008f5 >}}
+
+The feeder-wide maximum stays inside the compliant band through 60%
+penetration, then crosses the 1.10 pu statutory limit at 80%. That's a real
+answer to a real question, not a theoretical ceiling: this specific feeder,
+on its sunniest day, with realistically-sized rooftop systems, can host
+roughly six in ten customers with solar before it needs an intervention,
+Volt-Watt, Volt-VAr, or a network upgrade, to host more. A utility engineer
+asking the same question on a different feeder would run this exact
+notebook, swap the network files, and get their own number.
+
+## Where Part 4 goes from here
+
+Chapter 1 built the vocabulary: a network, a solve, a per-unit voltage
+reading. This chapter turned that into something closer to how a utility
+actually studies a feeder, real smart-meter data driving a real time
+series, DER models with real physics behind them, and a hosting-capacity
+result with a real number attached. Part 4 now follows four threads, each
+building on the same `ark.dss.Circuit` this chapter just extended:
+
+1. **Phase detection**, recovering which phase a customer is actually
+   connected to from nothing but voltage patterns, a real, common gap in
+   utility records.
+2. **Customer and feeder clustering**, grouping customers and feeders by
+   how they actually behave, not just how they are labeled.
+3. **Voltage-violation and power-quality anomaly detection**, catching a
+   compliance problem, or a meter reporting bad data, as it happens rather
+   than after a complaint call.
+4. **Grid health under forecasted {{< acr DER >}} growth**, where Part 3's
+   forecasts become the scenario driver for exactly the kind of
+   hosting-capacity study this chapter just ran, and mitigation strategies
+   like Volt-Watt and Volt-VAr get evaluated against it directly.
+
+## References
+
+::: {#refs}
+:::

@@ -504,26 +504,82 @@ worth working around.
       so an id only changes when that specific cell's content does; a
       one-time migration re-pointed all 17 of this chapter's embeds at
       their new stable ids.
-- [ ] Write `book/04-grid-edge/02-timeseries-der-modeling`, covering what
+- [x] Write `book/04-grid-edge/02-timeseries-der-modeling`, covering what
       Chapter 1 doesn't: `LoadShape` mechanics, `Set Mode=daily` time-series
       solving, irradiance/temperature-driven PV models, Volt-Watt/Volt-VAr
       control via `InvControl`, the `Storage` element, and a PV hosting-
-      capacity study. Source material identified and reviewed in full:
-      `resources/cvar_flexibility/notebook/Opendss_der-model.ipynb` and
-      `Oendss_timeseries.ipynb`, both confirmed (by fetching and reading
-      Team-Nando's own repos directly, not assumed) to be local adaptations
-      of `Tutorial-DERHostingCapacity-{2-TimeSeries_LV,3-VoltWatt_LV}`.
-      Real data resolved: the AusNet smart-meter `.npy` files these local
-      notebooks reference are absent from this repo but exist, real,
-      licensed, one download away, in
-      `Tutorial-DERHostingCapacity-2-TimeSeries_LV` (342 customers, 30-min
-      resolution, one year, plus the matching real 31-customer network
-      definition). Not yet started.
+      capacity study. Source material: `resources/cvar_flexibility/notebook/
+      Opendss_der-model.ipynb` and `Oendss_timeseries.ipynb`, both confirmed
+      to be local adaptations of
+      `Tutorial-DERHostingCapacity-{2-TimeSeries_LV,3-VoltWatt_LV}`. Real
+      data vendored via a new `scripts/fetch_part4_ausnet_data.py` (342
+      real AusNet customers, 30-min resolution, one year, plus the real
+      31-customer network definition, from `Tutorial-DERHostingCapacity-
+      {2-TimeSeries_LV,3-VoltWatt_LV}`, both fetched into the gitignored
+      `resources/cvar_flexibility/data/` tree). A companion
+      `scripts/fetch_part3_mendeley_data.py` vendors the Maree et al.
+      dataset for Part 3 the same way (real API endpoint reverse-engineered
+      from Mendeley Data's own frontend bundle, since its public REST API
+      caps a naive `/files` listing at 100 of 7,372 entries with no working
+      pagination; the whole-dataset zip endpoint their own "Download All"
+      button calls, `/public-api/zip/{id}/download/{version}`, has none of
+      that limit).
+
+      `ark/dss/circuit.py` extended, not just used as-is: `PVSystem`/
+      `StorageUnit` dataclasses and `circuit.pvsystems`/`circuit.storage_units`
+      iterators (mirroring `Load`/`Line`/`Transformer`), and
+      `circuit.solve_daily(steps, stepsize)`, a generator stepping a
+      `Set Mode=daily` solve, both genuinely repeated patterns across the
+      chapter's six sections, the same notebook-first-then-promote
+      discipline as everything else in `ark/`. Caught and fixed a latent
+      bug while extending it: `element_powers("pvsystems")` guessed the
+      `opendssdirect` module name via `.capitalize()`, which produces
+      `"Pvsystems"`, not the real `"PVsystems"` attribute; never exercised
+      before since Chapter 1 only ever called it with `"loads"`/
+      `"transformers"`. Replaced the guess with an explicit mapping and
+      added `"storages"`.
+
+      Real bugs caught only by executing, not by review, same discipline
+      as Chapter 1: (1) `PVSystem` defaults `%cutin`/`%cutout` to 20%, not
+      the 5% every Team-Nando tutorial actually uses, silently zeroing two
+      real hours of PV output at low irradiance, now the chapter's own
+      worked example rather than something glossed over. (2) `InvControl`
+      needs `Set maxcontroliter=1000`, without it the solve raises "Max
+      Control Iterations Exceeded" instead of converging. (3) Building a
+      second `Circuit` while holding a reference to a first one (the
+      Storage charge/discharge comparison) reproduced the exact singleton-
+      engine bug Chapter 1's own `base_peak_loss_kw` note already warned
+      about; fixed by reading each result immediately after its own solve.
+      (4) A first-draft "voltage over a day" chart let its y-axis
+      auto-scale to the data's actual ~0.000003 pu range, drawing a
+      dramatic-looking cliff out of what the surrounding text says is
+      noise; fixed with a fixed axis spanning the real statutory band
+      instead, so the chart's shape actually matches its own caption.
+      Real hosting-capacity result found, not fabricated: on the sunniest
+      day in the real AusNet data, with realistic 5kVA rooftop systems,
+      this feeder stays voltage-compliant through 60% PV penetration and
+      breaches the 1.10 pu limit at 80%.
+
+      `ark/plot/diagrams.py::centralized_vs_decentralized_grid_diagram()`'s
+      two panels also reworked in this pass: they previously shared one
+      geometry (coordinates, box sizes, arrow curvature) recolored per
+      side, which read as a template despite the curved-arrow styling;
+      each panel now has its own hand-picked numbers. `ieee1547-2018` and
+      `IEEE` added to `references.bib`/`acronyms.yml`. Full book render
+      verified clean, including a Playwright-rendered visual check of
+      every chart (the lets-plot HTML widgets don't show up in the raw
+      notebook JSON, so a browser check is the only way to actually see
+      them).
 - [ ] Pick/build the base LV feeder model(s) and DER-penetration scenarios
       for Part 4 (SMART-DS candidates already identified above).
-- [ ] Download and vendor the Maree et al. Mendeley dataset for Part 3
+- [x] Download and vendor the Maree et al. Mendeley dataset for Part 3
       (gitignored, same pattern as `resources/nilm-code/`, not checked into
-      git given its size).
+      git given its size). Vendored via `scripts/fetch_part3_mendeley_data.py`
+      into `resources/mendeley-lede-porsgrunn-ami/`: 6,809 real Lede AS/
+      Porsgrunn AMI customers (hourly active/reactive power, 2022-01-01 to
+      2024-09-30), plus weather, spot-price, and pandapower topology data,
+      confirmed by loading a sample file directly (24,030 hourly rows per
+      customer, matching the stated date range). Not yet used in a chapter.
 - [x] Part 4 network/DER data: evaluate NREL SMART-DS against Team-Nando's
       real AusNet MV-LV topology (real GIS network, BSD-3 OpenDSS/`dss_python`
       tutorial code, reused as methodology regardless of which network data
