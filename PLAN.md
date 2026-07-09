@@ -101,16 +101,89 @@ prediction, Bayesian NNs, quantile regression) rather than reimplemented from
 scratch. Evaluated with proper probabilistic metrics (CRPS, PICP, Winkler score),
 not just MAE/RMSE.
 
+**Data**: the "Medium-Low Voltage Energy Distribution Network and Smart Meter
+Dataset" (Maree et al., Mendeley Data, published March 2025,
+[data.mendeley.com/datasets/jv3rz8k35r/1](https://data.mendeley.com/datasets/jv3rz8k35r/1)),
+verified directly. A real Norwegian DSO network (Lede AS, Porsgrunn) with
+~6,809 customers, hourly AMI active/reactive power from 2022-01-01 to
+2024-09-30 (~2.75 years, enough real seasonal structure for a forecasting
+chapter), plus regional weather and electricity spot prices, network topology
+already in pandapower/CGMES format. Freely downloadable, no signup gate.
+
+The dataset has no PV/EV sub-metering, only net active/reactive power per
+meter. This is a deliberate framing choice, not a gap to patch around: the
+chapter forecasts *net* load with PV and EV as invisible confounders, the
+realistic problem a utility actually faces, since most real smart meters
+never expose behind-the-meter generation or EV charging separately. Pecan
+Street's Dataport has real combined load + PV + EV readings from the same
+households, but its genuinely free tier is capped at 75 homes (25 each in
+Austin, New York, and California) and restricted to "academic research
+purposes, no funded research" (verified against
+[pecanstreet.org/dataport/licenses](https://www.pecanstreet.org/dataport/licenses/);
+full access is $10k-15k/year). Useful as a small, optional illustrative
+example of what's hiding inside a net-load signal, not as the chapter's
+backbone dataset.
+
 ### Part 4: Grid-Edge Value (amber, flagship)
 
-- Customer/feeder clustering and segmentation from meter data
-- Anomaly and electricity-theft detection
-- LV network hosting-capacity / DER-stress estimation under DER growth
+Four threads, ordered so each builds on the last, all against the same
+SMART-DS feeder (see the Open Items entry below for the exact real,
+tutorial-sized subfolder identified: `AUS/P1U/.../p1uhs0_1247--p1udt12703/`,
+~2.4 MB, 8 `.dss` files):
 
-Case-study data: real public smart-meter load shapes replayed through an
-OpenDSS-simulated LV feeder (via `OpenDSSDirect.py`), not private substation
-datasets. This is fully reproducible by readers, with controllable
-DER-penetration scenarios (e.g. the same feeder at 0% vs. 40% PV penetration).
+1. **Phase detection and topology identification**: which phase ($A$, $B$,
+   or $C$) each meter is connected to, purely from voltage correlation, no
+   field audit. `Eneida.io`'s phase-clustering work is not usable as a data
+   source, checked directly: it is a commercial LV-analytics vendor
+   showcasing a CIRED 2025 paper, not a public dataset, and this book only
+   uses reproducible public data. The actual plan: run OpenDSS power flow on
+   the chosen SMART-DS feeder to generate realistic bus-level voltage
+   timeseries, then cluster them (correlation matrices, spectral clustering,
+   or PCA) to recover phase connectivity, checked against the real answer
+   already sitting in that feeder's own `Loads.dss` (each load's phase is
+   explicit ground truth in the model). A fully reproducible, self-checking
+   exercise real unlabeled utility data could never offer.
+2. **Customer/feeder clustering and segmentation from meter data**: segment
+   SMART-DS's synthetic smart meters into consumer archetypes (residential,
+   commercial, industrial). `AUS/P1U` (mixed commercial/residential) is the
+   confirmed fit, real load-curve-shape diversity to cluster.
+3. **Voltage violation / power-quality anomaly detection**: catching
+   sustained over/undervoltage events in real time. The single biggest real
+   constraint DSOs actually hit today, since PV back-feed pushing feeder
+   voltage out of statutory limits is what caps hosting capacity in
+   practice, not a hypothetical. Reuses the same SMART-DS feeder and
+   OpenDSS-simulated bus-voltage timeseries as thread 1, this time treated
+   as a live monitoring stream (control limits, isolation forest, or
+   autoencoder reconstruction error) rather than a phase-clustering input.
+   Paired with thread 4 below: this thread catches a violation as it
+   happens, thread 4 forecasts whether one is coming. A short companion
+   section on meter/sensor data-quality anomalies (stuck readings,
+   communication dropouts, calibration drift), using Maree's real data,
+   closes the thread: not a separate chapter, but the cross-cutting practice
+   every earlier forecasting/clustering chapter quietly assumed away.
+   Electricity-theft detection was considered and dropped: real,
+   publicly-labeled theft data essentially does not exist (utilities will
+   not release it), so almost every academic theft-detection paper works by
+   synthetically injecting fake tampering patterns onto real load data, a
+   step away from this book's real-verified-numbers discipline.
+4. **Smart grid analytics and network management**: evaluate grid health
+   (voltage violations, thermal overloading) under *forecasted* DER growth
+   scenarios, then test mitigation strategies, the scenario-based
+   counterpart to thread 3's real-time detection. This is the chapter where
+   Part 3 stops being standalone: its forecasts (from the Maree dataset)
+   become the DER-penetration scenario driver here, not just a chapter that
+   happens to come before this one. "Mitigation strategies" maps directly to
+   Team-Nando's Operating-Envelope/ANM/Volt-Watt-control tutorial code
+   (BSD-3, reused as methodology per the `nilm-code-reference`-skill pattern
+   of reusing algorithms, not raw data or figures).
+
+Case-study data: real public smart-meter load shapes and a real (or, for
+phase ID, ground-truth-bearing synthetic) network topology replayed through
+an OpenDSS-simulated LV feeder (via `OpenDSSDirect.py`/`dss_python`), not
+private substation datasets. Fully reproducible by readers, with
+controllable DER-penetration scenarios (SMART-DS already ships a real
+13-scenario solar x battery penetration matrix per feeder, no need to
+synthesize penetration levels from scratch).
 
 ## Chapter authoring format: paired .qmd + notebook
 
@@ -180,7 +253,68 @@ Layout mechanics, two different mechanisms depending on figure type:
 - `scipy` moved from a transitive dependency to an explicit one (core
   `dependencies`, not an extra): Chapter 2's notebook imports
   `scipy.signal.medfilt` directly.
-- `OpenDSSDirect.py`: needed for Part 4, not yet added.
+- `OpenDSSDirect.py>=0.9.4`: added as the `grid` extra for Part 4. Verified
+  cross-platform directly this session (installs and solves correctly on
+  macOS arm64, unlike `py_dss_interface`, which crashes on instantiation
+  there, confirmed both from its source, no macOS branch in `DSS.py`, and
+  by reproducing the crash live). `uv lock` + `uv sync --extra grid`
+  succeed.
+- `ark/dss/`: a new sibling to `ark/plot/` (`ark/__init__.py` is empty, so
+  each domain gets its own self-contained sub-package). Two files:
+  - `results.py`: module-level functions reading a solved `opendssdirect`
+    module's state into tidy pandas DataFrames (`bus_voltages`,
+    `line_currents`, `line_losses`, `element_powers`, `circuit_summary`).
+  - `circuit.py`: a pythonic `Circuit` class wrapping OpenDSSDirect.py's
+    COM-style API (manual `First()`/`Next()` iteration over a shared
+    "active element" pointer) behind ordinary Python iteration and small
+    frozen dataclasses (`Line`, `Load`, `Transformer`), e.g.
+    `for line in circuit.lines:` instead of a manual loop. `Circuit.load()`
+    compiles + solves a circuit; `circuit.command(...)` sends a raw OpenDSS
+    command and returns its text result (reads `Text.Result()`, since
+    `opendssdirect.Command()` itself always returns `None`, a real bug
+    caught by executing the ported notebook end-to-end, not just unit
+    checks); `circuit.dss` exposes the raw `opendssdirect` module as an
+    explicit escape hatch for anything not wrapped (monitors, meters,
+    per-terminal currents). `results.py`'s functions are reused as
+    `Circuit`'s DataFrame-returning methods, not duplicated.
+  - Deliberately minimal: no visualization (routes through `ark.plot`
+    instead, this project's existing house charting library) and no
+    scenario-sweep or workflow-class abstractions yet (`py-dss-toolkit` has
+    these, but depends on `py_dss_interface` and inherits its macOS
+    breakage; wait for a real Part 4 chapter to reveal the actual repeated
+    pattern before adding them, the same notebook-first-then-promote
+    discipline as everything else in this project).
+  - Verified against the author's own OpenDSS tutorial
+    (`resources/cvar_flexibility/notebook/Opendss_basic.ipynb`)'s simple
+    3-house LV network, both directly and via the full ported notebook
+    executing end-to-end with 0 errors (see the Open Items entry below):
+    `circuit_summary` matches the known circuit (6 buses, 4 lines, 3 loads,
+    1 transformer, 0.455 kW total line losses) and `bus_voltages`
+    reproduces the known per-phase spread at buses C/D/E
+    (0.977/0.983/0.972 pu).
+- `ark/plot/icons.py`: a new, general-purpose (not OpenDSS-specific)
+  addition to `ark.plot`, for diagrams that need a real pictographic icon
+  at a data point, not just a marker shape. Vendors
+  `ark/plot/assets/bootstrap-icons.ttf`, converted once from the `.woff`
+  Quarto already bundles into `_book/site_libs/bootstrap/` at render time
+  (this book's own site icon set, MIT licensed, see the `bi bi-*` classes
+  in `_quarto.yml`): matplotlib's bundled FreeType cannot open `.woff`
+  directly (`FT_Open_Face ... broken table`, verified live), only
+  `.ttf`/`.otf`, so `fontTools` (already a transitive dependency) converts
+  it once. No new runtime dependency either way. `ICONS` maps icon name to
+  its Bootstrap Icons v1.13.1 codepoint, `icon_font()` returns a
+  `FontProperties` for drawing a glyph via `ax.text(...)`; only the
+  handful of icons `book/04-grid-edge/01-opendss-lv-modeling-code.ipynb`
+  actually needed (house/sun/lightning-bolt/network-hub/a ring-in-circle
+  for a plain bus junction, `record-circle-fill`, picked over
+  `node-plus-fill`/`diagram-3-fill`/`broadcast-pin`/`share-fill` after
+  rendering all of them side by side, since a plain colored dot for
+  non-load buses read as an unfinished node next to the pictographic ones)
+  are mapped so far. Considered and rejected: Plotly's `layout.images` can also place
+  per-point icon images, but it's a new dependency this book doesn't use
+  anywhere else, and its interactive HTML output is heavier (CDN
+  dependency or ~3.5MB inline JS bundle per chart) for no benefit here
+  over matplotlib, which was already a hard dependency.
 
 ## Known limitation: citation links don't scope to a chapter
 
@@ -237,8 +371,182 @@ worth working around.
 - [ ] Design a social-preview (Open Graph) image; none exists yet.
       `open-graph`/`twitter-card` are enabled in `_quarto.yml` but render without a
       picture until a 1200x630 image is added.
-- [ ] Add `OpenDSSDirect.py` as a dependency; pick/build the base LV feeder
-      model(s) and DER-penetration scenarios for Part 4.
+- [x] Add `OpenDSSDirect.py` as a dependency (`grid` extra) and build
+      `ark/dss/`, see the Dependencies section above.
+- [x] Port the author's own OpenDSS-LV-modeling tutorial
+      (`resources/cvar_flexibility/notebook/Opendss_basic.ipynb`, originally
+      `py_dss_interface`) to `ark.dss.Circuit` and place it at
+      `book/04-grid-edge/01-opendss-lv-modeling-code.ipynb` (notebook only,
+      no `.qmd` narrative yet). Preserves the original's section-by-section
+      structure; the five circuit-topology figures were copied alongside it.
+      Executes end-to-end with 0 errors.
+      - Adds a "Visualizing the network" section: `topology_layout` (a
+        plain BFS hop-distance layout, since this hand-built circuit has no
+        bus coordinate data), `bus_roles`, `voltage_status`, and
+        `plot_topology`, all notebook-local functions (not yet promoted to
+        `ark.dss`, same notebook-first-then-promote discipline), reused
+        across all three networks in the notebook. Renders in matplotlib,
+        not Lets-Plot (every other chart in the book), specifically because
+        Lets-Plot has no per-point pictographic marker (`geom_raster` is a
+        continuous field, `geom_point`'s `shape` aesthetic is built-in
+        shapes only); matplotlib's font manager can place real icon glyphs
+        via `ark.plot.icons` (see the Dependencies entry below), styled
+        through `ark.plot.matplot_theme.configure_matplotlib_style()` for
+        brand-consistent fonts. Nodes are colored by a fixed,
+        threshold-anchored status scale (green/amber/red at 0.94/1.10 pu),
+        not a continuous gradient normalized to the current data's own
+        min/max, a real design bug caught by looking at the rendered
+        output: the first version painted a perfectly healthy 0.972-1.000
+        pu feeder end-to-end red-to-blue, which reads as "half this network
+        is in trouble" when none of it is. All non-node sizes (transformer/
+        PV badges, icon glyphs, label spacing) are a fixed ratio of the one
+        `node_radius` parameter rather than independently hardcoded, so the
+        diagram stays proportional if a caller changes it; `low`/`high`/
+        `near_margin` are parameters too, threaded through to
+        `voltage_status`. The legend is a real `ax.legend()` (a custom
+        `_IconHandler(HandlerBase)` teaches it to draw a Bootstrap Icon
+        glyph as a swatch), not a second independent set of hand-placed
+        `ax.text()` calls at hardcoded axes-fraction coordinates, an
+        earlier version did that and needed 10+ magic numbers tuned by
+        hand; the real legend inherits frame/font-size/spacing from
+        `configure_matplotlib_style()`'s rcParams for free. Also fixed: the
+        function used to return a Figure that was still open, so Jupyter's
+        inline backend auto-displayed it *and* separately reprs the
+        returned object, rendering every diagram twice; `plt.close(fig)`
+        right before `return fig` leaves only the one correct render. Every
+        bus gets an icon now, not just source/load/PV buses: a plain
+        junction previously rendered as a bare colored disc (looked like
+        an unfinished node next to the pictographic ones), now uses
+        `record-circle-fill`, picked by rendering seven Bootstrap Icons
+        candidates side by side (`node-plus-fill`, `diagram-3-fill`,
+        `broadcast-pin`, `share-fill`, ... ) and comparing legibility at
+        small node sizes and semantic fit. `plot_topology(...,
+        orientation="horizontal")` grows the tree left-to-right instead of
+        top-to-bottom; `topology_layout` just swaps which axis carries
+        BFS-depth vs. sibling-spread, with sibling spacing widened in
+        horizontal mode specifically (labels are always placed "below" a
+        node, and "below" is the tight sibling-spacing axis in horizontal
+        mode, not the generously-spaced depth axis like in vertical mode,
+        so it has to widen or labels collide with the next sibling down).
+      - Adds worked solutions for all three "Do It Yourself" exercises
+        (the exercise prompts themselves are kept verbatim as the unsolved
+        text first): E1 (network expansion + annual-loss/voltage-compliance
+        analysis across a load-duration curve), E2 (PV systems on the new
+        houses), E3 (an entirely new from-scratch network per Figure 4/5,
+        with and without PV). The voltage-compliance charts (still
+        Lets-Plot, unlike the topology diagram above; a plain points-plus-
+        two-dashed-lines chart doesn't need per-point icons) shade the
+        compliant band green (`geom_rect` with finite bounds sized to the
+        discrete x-axis's category count, verified live: `-Inf`/`Inf`
+        bounds silently fail to render against a discrete axis in
+        Lets-Plot) and connect each house's points into a line, so the
+        trend across loading levels reads directly. Two real, non-obvious
+        OpenDSS bugs were
+        caught only by executing the ported solutions, not by writing them:
+        `status=fixed` loads ignore `set LoadMult=...` entirely (each
+        load's `kW` has to be edited directly per loading level instead),
+        and `opendssdirect` is a *singleton engine*, so a `Circuit` object
+        built earlier in the notebook silently starts reporting a
+        different network's state once a later cell `Clear`s and rebuilds
+        (fixed by capturing scalar results like `base_peak_loss_kw` into
+        plain variables at computation time, not re-querying a stale
+        `Circuit` handle later). Also caught by execution, not review:
+        `opendssdirect.Command()` always returns `None` (`Circuit.command`
+        reads `Text.Result()` instead, see the Dependencies entry above),
+        and lets-plot needs `LetsPlot.setup_html()` called once per
+        notebook (matches the convention in every `book/02-disaggregation/`
+        notebook) or every chart silently renders as an inert placeholder
+        div instead of erroring.
+- [x] Write the `.qmd` narrative for `book/04-grid-edge/01-opendss-lv-modeling`
+      and wire it into `_quarto.yml` under a new `Part 4: Grid-Edge Value`
+      block. Written, then substantially revised after user review flagged
+      five gaps: no concrete LV-to-smart-meter-data connection, no LV-
+      network/power-grid fundamentals before diving into OpenDSS mechanics,
+      thesis diagrams not consulted, and the OpenDSS coverage should extend
+      to everything already built in the companion notebook, not just a
+      curated four-cell subset. Final structure: opening hook, "What a
+      low-voltage network actually is" (HV/MV/LV chain, a new branded
+      centralized-vs-decentralized diagram, a real 31-customer AusNet
+      feeder photo via Team-Nando as contrast to the toy 3-house example),
+      "Why the low-voltage network matters now", "From smart meter to
+      network model" (the concrete bridge: a meter reading becomes a
+      `LoadShape`, combined with topology no meter reports), "Three ways
+      DER strain a feeder", the per-unit-voltage concept box, the OpenDSS
+      walkthrough (build/solve/voltages/topology diagram), "Reading what's
+      already there" (iteration, the `circuit.command` escape hatch,
+      per-element power extraction, transformer currents via `circuit.dss`,
+      8 embeds pulled in from notebook sections the first draft skipped),
+      the `.ark-mistake` callout (repositioned as setup, not the closing
+      beat), "Checking a feeder across a full day" (the notebook's own
+      Exercise 1 solution narrated in full: `evaluate_loading_levels`
+      against the real load-duration curve and the `plot_voltage_compliance`
+      shaded-band chart, explicitly requested), then the closing thread
+      preview, now naming Chapter 2 as the immediate next step. Also added
+      `ark/plot/diagrams.py::centralized_vs_decentralized_grid_diagram()`
+      (new Bootstrap-icon-based concept diagram, curved arrows and dashed
+      zone boundaries for a hand-composed feel rather than an auto-generated
+      flowchart look, reused `ICONS["building-fill"]`/`"ev-front-fill"`/
+      `"arrow-down-up"` added to `ark/plot/icons.py` for it) and 5 new
+      `references.bib` entries sourced directly from the thesis's own
+      bibliography (`iea2023investment`, `bystrom2022distribution`,
+      `ucer2020congestion`, plus `azizivahed2020reconfiguration` and
+      `kumari2020substation` for future Part 4 use), and `EV`/`DSO`/`BESS`/
+      `HV`/`RES` to `acronyms.yml`. Full book render verified clean twice
+      (once per revision pass), `index.qmd`'s Part 4 card updated to link
+      Chapter 1 and drop a stale "theft detection" mention left over from
+      before that thread was explicitly dropped. One more real bug caught
+      only by the pre-commit hook, not review: the notebook-generator
+      script's `code()`/`md()` helpers let `nbformat` assign a *random*
+      cell id on every run, so any later regeneration (even for an
+      unrelated fix elsewhere) silently changed every cell id, breaking
+      every `{{< embed notebook.ipynb#cellid >}}` reference in the paired
+      qmd. Fixed by hashing each cell's own content into its id instead,
+      so an id only changes when that specific cell's content does; a
+      one-time migration re-pointed all 17 of this chapter's embeds at
+      their new stable ids.
+- [ ] Write `book/04-grid-edge/02-timeseries-der-modeling`, covering what
+      Chapter 1 doesn't: `LoadShape` mechanics, `Set Mode=daily` time-series
+      solving, irradiance/temperature-driven PV models, Volt-Watt/Volt-VAr
+      control via `InvControl`, the `Storage` element, and a PV hosting-
+      capacity study. Source material identified and reviewed in full:
+      `resources/cvar_flexibility/notebook/Opendss_der-model.ipynb` and
+      `Oendss_timeseries.ipynb`, both confirmed (by fetching and reading
+      Team-Nando's own repos directly, not assumed) to be local adaptations
+      of `Tutorial-DERHostingCapacity-{2-TimeSeries_LV,3-VoltWatt_LV}`.
+      Real data resolved: the AusNet smart-meter `.npy` files these local
+      notebooks reference are absent from this repo but exist, real,
+      licensed, one download away, in
+      `Tutorial-DERHostingCapacity-2-TimeSeries_LV` (342 customers, 30-min
+      resolution, one year, plus the matching real 31-customer network
+      definition). Not yet started.
+- [ ] Pick/build the base LV feeder model(s) and DER-penetration scenarios
+      for Part 4 (SMART-DS candidates already identified above).
+- [ ] Download and vendor the Maree et al. Mendeley dataset for Part 3
+      (gitignored, same pattern as `resources/nilm-code/`, not checked into
+      git given its size).
+- [x] Part 4 network/DER data: evaluate NREL SMART-DS against Team-Nando's
+      real AusNet MV-LV topology (real GIS network, BSD-3 OpenDSS/`dss_python`
+      tutorial code, reused as methodology regardless of which network data
+      is chosen). SMART-DS's real S3 layout, verified directly (the actual
+      structure is `SMART-DS/v1.0/2018/<Region>/<category>/scenarios/<scenario>/opendss[_no_loadshapes]/`,
+      not the flat `<Region>/<Substation>/<Feeder>` initially assumed):
+      - `GSO/urban-suburban` (Greensboro) and `AUS/P1U` (Austin) are whole
+        multi-feeder regions, not single feeders: 634-1,630 files, 87-109 MB
+        of topology alone (`Buscoords.dss` for `AUS/P1U` is 9 MB by itself,
+        thousands of buses). Both already ship a real 13-scenario DER matrix
+        (`base_timeseries` + solar penetration extreme/high/medium/low crossed
+        with battery penetration high/low/none), exactly the "same feeder at
+        different DER penetration" structure Part 4 wants, no synthesis
+        needed.
+      - A single feeder-transformer circuit nested inside, e.g.
+        `AUS/P1U/.../opendss_no_loadshapes/p1uhs0_1247/p1uhs0_1247--p1udt12703/`,
+        is ~2.4 MB across 8 `.dss` files, genuinely tutorial-sized. This is
+        the right granularity for a book chapter, not the whole region.
+      - GSO has no AUS-style `p12u`/`p13u` per-feeder codes at the region
+        level (only `urban-suburban`/`rural`/`industrial` categories); AUS's
+        `P1U`-`P5U`/`P1R` categories do contain individually-addressable
+        `<hs-id>/<hs-id>--<dt-id>/` feeder subfolders. Pick the specific
+        feeder subfolder up front rather than downloading a whole category.
 
 ## Already applied to the repo
 

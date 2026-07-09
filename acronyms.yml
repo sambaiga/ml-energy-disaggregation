@@ -11,6 +11,16 @@ acronyms:
       longname: Distributed Energy Resources
     - shortname: PV
       longname: Photovoltaic
+    - shortname: EV
+      longname: Electric Vehicle
+    - shortname: DSO
+      longname: Distribution System Operator
+    - shortname: BESS
+      longname: Battery Energy Storage System
+    - shortname: HV
+      longname: High Voltage
+    - shortname: RES
+      longname: Renewable Energy Sources
     - shortname: CRPS
       longname: Continuously Ranked Probability Score
 ...

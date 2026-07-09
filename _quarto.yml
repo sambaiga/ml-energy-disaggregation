@@ -56,6 +56,9 @@ book:
         - book/02-disaggregation/02-feature-engineering.qmd
         - book/02-disaggregation/03-multi-appliance-recognition.qmd
         - book/02-disaggregation/04-multi-task-low-frequency.qmd
+    - part: "Part 4: Grid-Edge Value"
+      chapters:
+        - book/04-grid-edge/01-opendss-lv-modeling.qmd
     - about.qmd
     - acronyms.qmd
 
