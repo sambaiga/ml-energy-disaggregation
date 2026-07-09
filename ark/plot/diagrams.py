@@ -296,42 +296,67 @@ def _grid_tier_zone(ax: plt.Axes, xy: tuple[float, float], width: float, height:
 
 def _grid_panel(ax: plt.Axes, title: str, decentralized: bool) -> None:
     """One side of the centralized/decentralized comparison; see `centralized_vs_decentralized_grid_diagram`."""
-    # Deliberately not a symmetric grid: a real single-line diagram reads as
-    # a considered illustration, not an auto-generated flowchart, so the
-    # three house positions and both curved arrows carry small, intentional
-    # offsets rather than perfect alignment.
-    plant_xy = (0.5, 5.55)
-    sub_xy = (0.47, 3.65)
-    house_xys = [(0.14, 1.05), (0.5, 0.85), (0.86, 1.1)]
+    # Deliberately not a repeated template: the two panels use their own
+    # hand-picked coordinates, box sizes, and arrow curvatures rather than
+    # one geometry shared by both and recolored, the thing that made the
+    # first version of this diagram read as auto-generated despite the
+    # curved arrows. Every number below was chosen for this specific panel.
+    if decentralized:
+        plant_xy = (0.53, 5.62)
+        sub_xy = (0.49, 3.7)
+        house_xys = [(0.11, 1.1), (0.52, 0.86), (0.88, 1.16)]
+        zones = [(0.0, 4.9, 1.0, 1.02), (0.01, 2.7, 0.99, 1.5), (0.03, 0.02, 0.95, 2.08)]
+        node_r, sub_r = 0.175, 0.235
+        icon_sizes = (26, 17, 12)
+    else:
+        plant_xy = (0.47, 5.5)
+        sub_xy = (0.45, 3.62)
+        house_xys = [(0.16, 1.0), (0.48, 0.83), (0.83, 1.04)]
+        zones = [(0.03, 4.82, 0.94, 1.08), (0.0, 2.62, 1.0, 1.58), (0.01, 0.08, 0.98, 2.0)]
+        node_r, sub_r = 0.165, 0.245
+        icon_sizes = (25, 18, 12)
 
-    _grid_tier_zone(ax, (0.02, 4.85), 0.96, 1.05, "HV transmission")
-    _grid_tier_zone(ax, (0.02, 2.65), 0.96, 1.55, "MV substation")
-    _grid_tier_zone(ax, (0.02, 0.05), 0.96, 2.05, "LV feeder")
+    _grid_tier_zone(ax, zones[0][:2], zones[0][2], zones[0][3], "HV transmission")
+    _grid_tier_zone(ax, zones[1][:2], zones[1][2], zones[1][3], "MV substation")
+    _grid_tier_zone(ax, zones[2][:2], zones[2][2], zones[2][3], "LV feeder")
+
+    # Hand-picked per panel too: a real illustrator wouldn't re-derive one
+    # arrow curvature from a loop index for six different arrows, they'd
+    # nudge each one until it looked right. These numbers are that nudging.
+    if decentralized:
+        plant_sub_rad = 0.13
+        down_rads = [-0.19, -0.04, 0.09]
+        up_rads = [-0.06, 0.07, 0.19]
+    else:
+        plant_sub_rad = 0.06
+        feed_rads = [-0.16, 0.01, 0.13]
 
     ax.text(
         plant_xy[0],
         plant_xy[1],
         ICONS["building-fill"],
-        fontproperties=icon_font(26),
+        fontproperties=icon_font(icon_sizes[0]),
         color=PRIMARY,
         ha="center",
         va="center",
     )
     ax.text(plant_xy[0], plant_xy[1] - 0.38, "power plant", fontsize=7.5, color=TEXT_MUTED, ha="center")
 
-    ax.add_patch(Circle(sub_xy, 0.24, facecolor="white", edgecolor=PRIMARY, linewidth=1.4))
+    ax.add_patch(Circle(sub_xy, sub_r, facecolor="white", edgecolor=PRIMARY, linewidth=1.4))
     ax.text(
         sub_xy[0],
         sub_xy[1],
         ICONS["hdd-network-fill"],
-        fontproperties=icon_font(17),
+        fontproperties=icon_font(icon_sizes[1]),
         color=PRIMARY,
         ha="center",
         va="center",
     )
     ax.text(sub_xy[0], sub_xy[1] - 0.42, "substation", fontsize=7.5, color=TEXT_MUTED, ha="center")
 
-    _curved_flow_arrow(ax, (plant_xy[0], plant_xy[1] - 0.3), (sub_xy[0], sub_xy[1] + 0.3), TEXT_MUTED, rad=0.1)
+    _curved_flow_arrow(
+        ax, (plant_xy[0], plant_xy[1] - 0.3), (sub_xy[0], sub_xy[1] + 0.3), TEXT_MUTED, rad=plant_sub_rad
+    )
 
     for i, house_xy in enumerate(house_xys):
         if decentralized:
@@ -343,7 +368,7 @@ def _grid_panel(ax: plt.Axes, title: str, decentralized: bool) -> None:
                 (sub_xy[0] - 0.05, sub_xy[1] - 0.28),
                 (house_xy[0] - 0.05, house_xy[1] + 0.24),
                 TEXT_MUTED,
-                rad=0.12 * (i - 1) - 0.05,
+                rad=down_rads[i],
                 linewidth=1.2,
             )
             _curved_flow_arrow(
@@ -351,7 +376,7 @@ def _grid_panel(ax: plt.Axes, title: str, decentralized: bool) -> None:
                 (house_xy[0] + 0.05, house_xy[1] + 0.24),
                 (sub_xy[0] + 0.05, sub_xy[1] - 0.28),
                 WARNING,
-                rad=0.12 * (i - 1) + 0.05,
+                rad=up_rads[i],
                 linewidth=1.4,
             )
         else:
@@ -360,7 +385,7 @@ def _grid_panel(ax: plt.Axes, title: str, decentralized: bool) -> None:
                 (sub_xy[0], sub_xy[1] - 0.28),
                 (house_xy[0], house_xy[1] + 0.24),
                 TEXT_MUTED,
-                rad=0.12 * (i - 1),
+                rad=feed_rads[i],
                 linewidth=1.3,
             )
 
@@ -370,12 +395,12 @@ def _grid_panel(ax: plt.Axes, title: str, decentralized: bool) -> None:
         # a feeder past its limits; a diagram that shows only green would
         # undersell the point the surrounding chapter is actually making.
         node_color = DANGER if (decentralized and i == 2) else SUCCESS
-        ax.add_patch(Circle(house_xy, 0.17, facecolor=node_color, edgecolor="white", linewidth=1.2, zorder=3))
+        ax.add_patch(Circle(house_xy, node_r, facecolor=node_color, edgecolor="white", linewidth=1.2, zorder=3))
         ax.text(
             house_xy[0],
             house_xy[1],
             ICONS["house-fill"],
-            fontproperties=icon_font(12),
+            fontproperties=icon_font(icon_sizes[2]),
             color="white",
             ha="center",
             va="center",
