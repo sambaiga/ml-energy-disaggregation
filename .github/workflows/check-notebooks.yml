@@ -115,7 +115,7 @@ jobs:
 
       - name: Install dependencies
         if: steps.changed.outputs.notebooks != ''
-        run: uv sync --extra dev --extra modelling --extra test
+        run: uv sync --extra dev --extra modelling --extra test --extra grid
 
       - name: Configure nbdime git drivers
         if: steps.changed.outputs.notebooks != ''

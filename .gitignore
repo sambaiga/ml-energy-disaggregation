@@ -135,3 +135,9 @@ tutorials/**/*_files/
 CLAUDE.md
 
 resources/*
+
+# OpenDSS auto-writes a monitor CSV (<Circuit>_Mon_<name>_<n>.csv) to the
+# working directory on solve whenever a Monitor object exists, independent
+# of any explicit `export` command. Stray output from book/04-grid-edge/'s
+# OpenDSS notebooks, not something to commit.
+*_Mon_*.csv

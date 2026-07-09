@@ -53,10 +53,10 @@ description: "A structured, project-based path through smart meter data: disaggr
 <span class="pipeline-label">Forecasting</span>
 </div>
 <span class="pipeline-arrow">&#8594;</span>
-<div class="pipeline-step">
+<a class="pipeline-step" href="book/04-grid-edge/01-opendss-lv-modeling.qmd">
 <span class="pipeline-dot pipeline-dot-4"><i class="bi bi-diagram-3-fill"></i></span>
 <span class="pipeline-label">Grid-Edge Value</span>
-</div>
+</a>
 </div>
 </div>
 
@@ -110,9 +110,10 @@ description: "A structured, project-based path through smart meter data: disaggr
 <div class="act-inner">
 <i class="bi bi-diagram-3-fill act-icon act-icon-4"></i>
 <span class="act-eyebrow">Part 4 · Grid-Edge Value</span>
-<p class="act-desc">Clustering, anomaly and theft detection, and LV hosting-capacity questions as DER growth reshapes the grid.</p>
+<p class="act-desc">Phase detection, customer/feeder clustering, voltage-violation and power-quality anomaly detection, and grid health under forecasted DER growth, modeled with open-source power-flow simulation.</p>
 <ul class="act-chapters">
-<li><span class="ch-row"><span class="ch-num">04</span><span class="ch-name">Value at the grid edge</span><span class="ch-soon">Soon</span></span></li>
+<li><a href="book/04-grid-edge/01-opendss-lv-modeling.qmd"><span class="ch-num">01</span><span class="ch-name">Modeling the Low-Voltage Network</span><i class="bi bi-check-circle-fill ch-check"></i></a></li>
+<li><span class="ch-row"><span class="ch-num">02</span><span class="ch-name">Value at the grid edge</span><span class="ch-soon">Soon</span></span></li>
 </ul>
 </div>
 </div>
