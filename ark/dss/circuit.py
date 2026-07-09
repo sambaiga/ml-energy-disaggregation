@@ -169,6 +169,25 @@ class Circuit:
         return self._dss.Circuit.AllBusNames()
 
     @property
+    def source_bus(self) -> str:
+        """The circuit's voltage-source (slack) bus name.
+
+        A slack bus is held at its own fixed per-unit setpoint by
+        construction (whatever `pu=` the `Vsource`/`Edit vsource.source`
+        command set), not by anything the network does, so it reads as a
+        real voltage everywhere `bus_voltages()` is used but says nothing
+        about customer voltage. Any network-wide min/max over
+        `bus_voltages()` should exclude it first
+        (`voltages.query("bus != @circuit.source_bus")`), the same way a
+        caller interested in one customer bus already filters `bus ==` to
+        that name.
+        """
+        vsources = self._dss.Vsources
+        vsources.First()
+        self._dss.Circuit.SetActiveElement(f"Vsource.{vsources.Name()}")
+        return self._dss.CktElement.BusNames()[0].split(".")[0]
+
+    @property
     def lines(self) -> Iterator[Line]:
         """Iterate every line element in the circuit."""
         lines = self._dss.Lines
