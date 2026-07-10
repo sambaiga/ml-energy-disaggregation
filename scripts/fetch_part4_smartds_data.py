@@ -100,6 +100,16 @@ def _list_feeders(substation: str) -> list[str]:
     return sorted(feeders)
 
 
+def _is_valid(dest: Path) -> bool:
+    """A previously-downloaded file is only worth skipping if it's non-empty.
+
+    A process killed mid-download (this happened once, during development:
+    an earlier run hung and was force-killed) can leave a 0-byte file
+    behind; existence alone isn't enough to trust it.
+    """
+    return dest.exists() and dest.stat().st_size > 0
+
+
 def _download(url: str, dest: Path) -> int:
     dest.parent.mkdir(parents=True, exist_ok=True)
     request = urllib.request.Request(url, headers={"User-Agent": "ml-energy-disaggregation-data-fetch"})  # noqa: S310
@@ -162,7 +172,7 @@ def fetch(force: bool, n_substations: int, n_profiles_per_feeder: int) -> None:
         for feeder in feeders:
             for filename in FEEDER_FILES:
                 dest = DATA_ROOT / substation / feeder / filename
-                if dest.exists() and not force:
+                if _is_valid(dest) and not force:
                     print(f"  skip  {feeder}/{filename} (already present)")
                     continue
                 url = f"{S3_BASE}/{S3_PREFIX}/{substation}/{feeder}/{filename}"
@@ -196,7 +206,7 @@ def fetch(force: bool, n_substations: int, n_profiles_per_feeder: int) -> None:
         kvar_id = profile_id.replace("_kw_", "_kvar_", 1)
         for filename in (f"{profile_id}.csv", f"{kvar_id}.csv"):
             dest = PROFILES_ROOT / filename
-            if dest.exists() and not force:
+            if _is_valid(dest) and not force:
                 continue
             url = f"{S3_BASE}/{S3_PROFILES_PREFIX}/{filename}"
             try:
