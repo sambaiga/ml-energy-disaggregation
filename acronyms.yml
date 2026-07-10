@@ -35,4 +35,8 @@ acronyms:
       longname: Davies-Bouldin Index
     - shortname: SOM
       longname: Self-Organizing Map
+    - shortname: ARI
+      longname: Adjusted Rand Index
+    - shortname: NREL
+      longname: National Renewable Energy Laboratory
 ...
