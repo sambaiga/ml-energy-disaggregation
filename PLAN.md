@@ -126,13 +126,18 @@ backbone dataset.
 
 ### Part 4: Grid-Edge Value (amber, flagship)
 
-Four threads, ordered so each builds on the last. Threads 2-4 are still
-planned around the same SMART-DS feeder (see the Open Items entry below
-for the exact real, tutorial-sized subfolder identified:
+Four threads, ordered so each builds on the last. Threads 3-4 are still
+planned around SMART-DS (see the Open Items entry below for the exact
+real, tutorial-sized subfolder identified:
 `AUS/P1U/.../p1uhs0_1247--p1udt12703/`, ~2.4 MB, 8 `.dss` files); thread 1
 was revised after Chapters 1-2 shipped to reuse the real 31-customer
 AusNet feeder those chapters already built and vendored, rather than
-introduce a new dataset for one thread only.
+introduce a new dataset for one thread only. Thread 2 was revised the
+same way after checking directly: AusNet's own 342-customer real
+smart-meter pool carries its customer-archetype clustering core, SMART-DS
+`AUS/P1U` is kept only as a secondary source for the thread's
+feeder-level clustering section, where AusNet's single feeder can't
+provide enough feeders to cluster.
 
 1. **Phase detection and topology identification** (Chapter 3, branch
    `part4-ch3-phase-identification`): which phase ($A$, $B$, or $C$) each
@@ -190,10 +195,47 @@ introduce a new dataset for one thread only.
    labels feed back into Chapter 2's own hosting-capacity machinery)
    -> a pointer to thread 2. Notebook first, matching Chapter 2's own
    build discipline; `.qmd` narrative after the notebook is reviewed.
-2. **Customer/feeder clustering and segmentation from meter data**: segment
-   SMART-DS's synthetic smart meters into consumer archetypes (residential,
-   commercial, industrial). `AUS/P1U` (mixed commercial/residential) is the
-   confirmed fit, real load-curve-shape diversity to cluster.
+2. **Customer/feeder clustering and segmentation from meter data**
+   (Chapter 4, branch `part4-ch4-customer-feeder-clustering`): grouping
+   customers and feeders by how they actually behave, not how they're
+   labeled. Revised plan, decided after checking data directly rather
+   than assuming SMART-DS was still the right fit: AusNet's own
+   342-customer real smart-meter pool (Chapters 1-3's dataset, no new
+   fetch step, genuinely real household readings, not synthetic) carries
+   the chapter's core customer-archetype clustering, a direct payoff of
+   Chapter 2's own "Real customers, real diversity" finding ("no two
+   profiles agree"). SMART-DS `AUS/P1U` (~8-10 substations, ~24-30 LV
+   feeders, CC-BY-4.0, confirmed reachable) supports a smaller, secondary
+   feeder-level clustering section, since AusNet's single 31-customer
+   feeder can't support feeder-level clustering on its own. Ten real
+   reference papers (five foundational 2014-2017, five current 2020-2026,
+   full citations in `references.bib` once added): McLoughlin et al.
+   (2015), Kwac et al. (2014), Haben et al. (2016), Li et al. (2015),
+   Guo et al. (2017, IDEC); Rajabi et al. (2020), Michalakopoulos et al.
+   (2024), Kumar & Mallipeddi (2024), Yerbury et al. (2026, CROCS), Ledva
+   & Mathieu (2020). Structure: hook (Chapter 2's diversity chart) ->
+   theory (clustering vs. classification, shape not magnitude) -> data ->
+   baseline k-means with a real optimal-k check -> a deep-clustering
+   (IDEC) contrast, genuinely tested not assumed to win -> feeder-level
+   clustering -> a novel contribution none of the 10 papers test, are
+   archetypes stable across a year or a snapshot artifact, reusing
+   `adjusted_rand_score` (Chapter 3's own tool) to measure stability
+   instead of correctness -> a real archetype-vs-DER-risk cross-check
+   using Chapter 2's own `run_penetration(seed=42)` per-customer subset
+   (exactly reproducible) against this chapter's archetype labels -> a
+   sensitivity "Do it yourself" -> a "Why bother" section (matching Part
+   2's own closing pattern) tied explicitly to Chapter 1's three DER
+   strain modes and Chapter 2's PV-vs-EV constraint finding, with both
+   utility-side (proactive connection triage, targeted mitigation) and
+   customer-side (faster approval, fairer tariffs) value made concrete by
+   the risk cross-check and stability finding, not asserted narratively.
+   Reusable assets found in `resources/profiling 3/src/`: a real,
+   MIT-licensed IDEC implementation (`net/idec.py`, matches
+   `dawnranger/IDEC-pytorch`) to adapt rather than build from scratch, and
+   `utils/prepare_feature.py`'s `create_seasonal_features` for the
+   stability contribution. Notebook first, matching Chapters 1-3's own
+   build discipline; `.qmd` narrative after the notebook is reviewed. Not
+   yet started.
 3. **Voltage violation / power-quality anomaly detection**: catching
    sustained over/undervoltage events in real time. The single biggest real
    constraint DSOs actually hit today, since PV back-feed pushing feeder
