@@ -135,7 +135,7 @@ exclude = ["tests/"]
 
 [tool.codespell]
 skip = "*.ipynb,_freeze/*,_extensions/*"
-ignore-words-list = "mape,fpr,rouge,hart"
+ignore-words-list = "mape,fpr,rouge,hart,som"
 
 [tool.commitizen]
 bump_message = "bump: v$current_version → v$new_version"

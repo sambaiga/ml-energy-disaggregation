@@ -29,4 +29,10 @@ acronyms:
       longname: Principal Component Analysis
     - shortname: PPS
       longname: Predictive Power Score
+    - shortname: IDEC
+      longname: Improved Deep Embedded Clustering
+    - shortname: DBI
+      longname: Davies-Bouldin Index
+    - shortname: SOM
+      longname: Self-Organizing Map
 ...
