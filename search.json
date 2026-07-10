@@ -4,7 +4,7 @@
     "href": "index.html",
     "title": "Machine Learning for Smart Meter Data",
     "section": "",
-    "text": "A practical book for energy analytics and ML practitioners\n\n\nMachine Learning for Smart Meter Data\n\n\nFrom raw meter signal to business decision: disaggregation, forecasting, and grid-edge value, built to be run, not just read.\n\n\nBy Anthony Faustine    \n\n\n Read the preface  View on GitHub\n\n\n\n\n Meter Signal\n\n\n\n Data & ML\n\n\n\n Business Value\n\n\n\n\n\n Meter Signal\n\n→   Disaggregation  →\n\n Forecasting\n\n→   Grid-Edge Value \n\n\n\n\nYour learning path\n\n\n\n\n\n\n\n Part 1 · Foundations\n\nSmart meter data fundamentals, signal processing, and the data pipelines every later chapter builds on.\n\n\n\n01Reading a meter signalSoon\n\n\n\n\n\n\n\n\n\n Part 2 · Disaggregation\n\nNon-intrusive load monitoring: from the aggregate signal to appliance-level insight.\n\n\n\n01Non-Intrusive Load Monitoring\n\n\n02Appliance Recognition\n\n\n03Multi-Appliance Recognition\n\n\n04Multi-Task Deep Learning\n\n\n\n\n\n\n\n\n\n Part 3 · Forecasting\n\nProbabilistic load and PV forecasting, built on Twiga: point forecasts and calibrated uncertainty.\n\n\n\n03Forecasting with uncertaintySoon\n\n\n\n\n\n\n\n\n\n Part 4 · Grid-Edge Value\n\nPhase detection, customer/feeder clustering, voltage-violation and power-quality anomaly detection, and grid health under forecasted DER growth, modeled with open-source power-flow simulation.\n\n\n\n01Modeling the Low-Voltage Network\n\n\n02Value at the grid edgeSoon\n\n\n\n\n\n\nChapters are being written part by part. Follow progress on GitHub.",
+    "text": "A practical book for energy analytics and ML practitioners\n\n\nMachine Learning for Smart Meter Data\n\n\nFrom raw meter signal to business decision: disaggregation, forecasting, and grid-edge value, built to be run, not just read.\n\n\nBy Anthony Faustine    \n\n\n Read the preface  View on GitHub\n\n\n\n\n Meter Signal\n\n\n\n Data & ML\n\n\n\n Business Value\n\n\n\n\n\n Meter Signal\n\n→   Disaggregation  →\n\n Forecasting\n\n→   Grid-Edge Value \n\n\n\n\nYour learning path\n\n\n\n\n\n\n\n Part 1 · Foundations\n\nSmart meter data fundamentals, signal processing, and the data pipelines every later chapter builds on.\n\n\n\n01Reading a meter signalSoon\n\n\n\n\n\n\n\n\n\n Part 2 · Disaggregation\n\nNon-intrusive load monitoring: from the aggregate signal to appliance-level insight.\n\n\n\n01Non-Intrusive Load Monitoring\n\n\n02Appliance Recognition\n\n\n03Multi-Appliance Recognition\n\n\n04Multi-Task Deep Learning\n\n\n\n\n\n\n\n\n\n Part 3 · Forecasting\n\nProbabilistic load and PV forecasting, built on Twiga: point forecasts and calibrated uncertainty.\n\n\n\n03Forecasting with uncertaintySoon\n\n\n\n\n\n\n\n\n\n Part 4 · Grid-Edge Value\n\nPhase detection, customer/feeder clustering, voltage-violation and power-quality anomaly detection, and grid health under forecasted DER growth, modeled with open-source power-flow simulation.\n\n\n\n01Modeling the Low-Voltage Network\n\n\n02Time-Series Simulation and DER Modeling\n\n\n\n\n\n\nChapters are being written part by part. Follow progress on GitHub.",
     "crumbs": [
       "<span class='chapter-number'>1</span>  <span class='chapter-title'>Welcome</span>"
     ]
@@ -591,13 +591,167 @@
     ]
   },
   {
+    "objectID": "book/04-grid-edge/02-timeseries-der-modeling.html",
+    "href": "book/04-grid-edge/02-timeseries-der-modeling.html",
+    "title": "Chapter 2: Time-Series Simulation and DER Modeling",
+    "section": "",
+    "text": "Getting the data\nThis book’s whole premise is that a smart-meter reading is worth more than its own number: aggregated, modeled, and combined with what a meter alone can’t see, network topology, everyone else’s demand at the same moment, it becomes a real business decision. Chapter 1 built the network side of that combination, an OpenDSS model of a real Low Voltage (LV) feeder, and ended on a warning: one solved snapshot is not a verdict on a feeder’s health.\nThis chapter is where the meter-signal side of that premise finally meets the network. The same 31-customer AusNet feeder runs across a real week of demand, then answers two business questions: how much rooftop solar, and how much Electric Vehicle (EV) charging, can this specific feeder actually take before someone has to act on it. The two answers turn out to be very different problems, at different times of day, binding on different constraints, and the fix built for the first one does not generalize to the second.\nThis chapter needs the same AusNet LV network and smart-meter data Chapter 1 introduced, plus one more dataset: EV home-charging profiles. Neither is checked into this repository (someone else’s licensed data, vendored locally instead), so fetch both once before running the notebook:\nThe first downloads the network model and two datasets, 342 anonymized customers’ active-power readings and their matched normalized Photovoltaic (PV) generation, both at 30-minute resolution for a full year. The second downloads EV home-charging profiles derived from a UK metering trial. That second source ships no license, so this chapter uses it as a reference for building its own scenario, not as data reused verbatim; every number reported below is this notebook’s own.",
+    "crumbs": [
+      "Part 4: Grid-Edge Value",
+      "<span class='chapter-number'>9</span>  <span class='chapter-title'>Chapter 2: Time-Series Simulation and DER Modeling</span>"
+    ]
+  },
+  {
+    "objectID": "book/04-grid-edge/02-timeseries-der-modeling.html#getting-the-data",
+    "href": "book/04-grid-edge/02-timeseries-der-modeling.html#getting-the-data",
+    "title": "Chapter 2: Time-Series Simulation and DER Modeling",
+    "section": "",
+    "text": "uv run python scripts/fetch_part4_ausnet_data.py\nuv run python scripts/fetch_part4_ev_profiles.py",
+    "crumbs": [
+      "Part 4: Grid-Edge Value",
+      "<span class='chapter-number'>9</span>  <span class='chapter-title'>Chapter 2: Time-Series Simulation and DER Modeling</span>"
+    ]
+  },
+  {
+    "objectID": "book/04-grid-edge/02-timeseries-der-modeling.html#this-chapters-feeder",
+    "href": "book/04-grid-edge/02-timeseries-der-modeling.html#this-chapters-feeder",
+    "title": "Chapter 2: Time-Series Simulation and DER Modeling",
+    "section": "This chapter’s feeder",
+    "text": "This chapter’s feeder\nEvery section below runs on one network: the 31-customer AusNet feeder Chapter 1 introduced, the same distribution transformer, the same 24 line segments and 31 single-phase service cables. A result from the middle of this chapter and a result from the end describe the same physical feeder, not two unrelated ones.\n\n\n\n{'converged': True,\n 'n_buses': 61,\n 'n_lines': 59,\n 'n_loads': 31,\n 'n_transformers': 1,\n 'total_p_loss_kw': 0.6107992120127365,\n 'total_q_loss_kvar': 0.15519491021295995}",
+    "crumbs": [
+      "Part 4: Grid-Edge Value",
+      "<span class='chapter-number'>9</span>  <span class='chapter-title'>Chapter 2: Time-Series Simulation and DER Modeling</span>"
+    ]
+  },
+  {
+    "objectID": "book/04-grid-edge/02-timeseries-der-modeling.html#real-customers-real-diversity",
+    "href": "book/04-grid-edge/02-timeseries-der-modeling.html#real-customers-real-diversity",
+    "title": "Chapter 2: Time-Series Simulation and DER Modeling",
+    "section": "Real customers, real diversity",
+    "text": "Real customers, real diversity\nBefore driving this feeder with real data, it is worth seeing what that data actually looks like: not one representative household, but hundreds of different ones.\n\n\n\nload_data: (342, 365, 48) (customers, days, half-hours)\npv_data:   (365, 48) (days, half-hours), one normalised profile per day\n\n\n\n\n\n\n\n        \n        \n        \n\n\n   \n   \n\n\n\n342 households, one day, and no two profiles agree: some barely draw half a kilowatt all day, others spike past 5kW in the evening. Averaging this away into “the” residential load shape would erase exactly the variability a real feeder has to survive.\n\n\n\n   \n   \n\n\n\nPV varies day to day the same way: cloudy days barely clear a third of a clear day’s peak. The hosting-capacity study later in this chapter deliberately picks the single sunniest of these 365 days, the worst case for that particular question.\nThat diversity is also why this chapter bothers deriving a LoadShape from an actual reading rather than assuming one: a network fed by a made-up “typical” profile would never show the swings the chart above just did.",
+    "crumbs": [
+      "Part 4: Grid-Edge Value",
+      "<span class='chapter-number'>9</span>  <span class='chapter-title'>Chapter 2: Time-Series Simulation and DER Modeling</span>"
+    ]
+  },
+  {
+    "objectID": "book/04-grid-edge/02-timeseries-der-modeling.html#from-readings-to-loadshapes",
+    "href": "book/04-grid-edge/02-timeseries-der-modeling.html#from-readings-to-loadshapes",
+    "title": "Chapter 2: Time-Series Simulation and DER Modeling",
+    "section": "From readings to LoadShapes",
+    "text": "From readings to LoadShapes\nFor residential customers, most utilities only bill on active energy, so many residential smart-meter datasets only retain active power, even though the meter hardware could measure more. This dataset reports only active power for exactly that reason; reactive power is derived here from an assumed power factor in the 0.95-0.99 range, the same convention the network’s original tutorial uses.\n\n\n\nAll 31 houses now follow a real customer's day-45 reading\n\n\n\nEvery one of the feeder’s 31 loads gets its own customer profile, sampled from the 342 available. Attaching a LoadShape is one command, but trusting it silently is a habit worth breaking: it costs little to cross-check the underlying data array, what a live solve reports back, and what the LoadShape object itself has stored, against each other.\n\n\n\nLargest gap, real data vs. what OpenDSS solved:        0.000006 kW\nLargest gap, real data vs. the LoadShape's own pmult:   0.000000 kW\n\n\n\nA gap at solver-tolerance scale, well under a watt, confirms all three views describe the same house. Catching a mismatch here is far cheaper than noticing it three sections later in a chart that looks slightly off.",
+    "crumbs": [
+      "Part 4: Grid-Edge Value",
+      "<span class='chapter-number'>9</span>  <span class='chapter-title'>Chapter 2: Time-Series Simulation and DER Modeling</span>"
+    ]
+  },
+  {
+    "objectID": "book/04-grid-edge/02-timeseries-der-modeling.html#a-week-of-simulation",
+    "href": "book/04-grid-edge/02-timeseries-der-modeling.html#a-week-of-simulation",
+    "title": "Chapter 2: Time-Series Simulation and DER Modeling",
+    "section": "A week of simulation",
+    "text": "A week of simulation\ncircuit.solve_daily(steps, stepsize) steps through a Set Mode=daily solve, but a single call only ever covers one day’s worth of LoadShape data. A genuine time-series study covers more than one day, so every LoadShape gets rebuilt at the start of each new day and the solve runs seven times over, a full real week.\n\n\n\nConverged: True\n336 half-hour solves across 7 days\n\n\n\n\n\n\n\n        \n        \n        \n\n\n   \n   \n\n\n\nThree phases, one real week: demand rises and falls with the daily cycle, and no two days look quite the same, exactly the kind of pattern a single snapshot could never show.\n\n\n\n   \n   \n\n\n\nComfortably inside the 0.94-1.10 pu band all week, no PV yet attached. The rest of this chapter revisits this same feeder twice, once with rooftop solar added, once with EV charging, and the envelope stops staying so comfortable.",
+    "crumbs": [
+      "Part 4: Grid-Edge Value",
+      "<span class='chapter-number'>9</span>  <span class='chapter-title'>Chapter 2: Time-Series Simulation and DER Modeling</span>"
+    ]
+  },
+  {
+    "objectID": "book/04-grid-edge/02-timeseries-der-modeling.html#modeling-pv-properly",
+    "href": "book/04-grid-edge/02-timeseries-der-modeling.html#modeling-pv-properly",
+    "title": "Chapter 2: Time-Series Simulation and DER Modeling",
+    "section": "Modeling PV properly",
+    "text": "Modeling PV properly\nA PVSystem can run on a flat rating, constant output regardless of the time of day. A more realistic model drives it from an irradiance profile and a temperature profile instead, attached to an actual house on this same feeder rather than a separate demonstration network.\n\n\n\nPV export by hour, OpenDSS's default %cutin/%cutout: [np.float64(-0.0), np.float64(-0.0), np.float64(-0.0), np.float64(-0.0), np.float64(-0.0), np.float64(-0.0), np.float64(-0.0), np.float64(1.0), np.float64(1.5), np.float64(2.5), np.float64(4.0), np.float64(4.5), np.float64(5.0), np.float64(5.0), np.float64(4.95), np.float64(4.5), np.float64(3.5), np.float64(2.0), np.float64(-0.0), np.float64(-0.0), np.float64(-0.0), np.float64(-0.0), np.float64(-0.0), np.float64(-0.0)]\n\n\n\n\nA 20% default nearly zeroed out the morning and evening. OpenDSS’s PVSystem defaults %cutin/%cutout to 20%, the inverter output threshold below which it will not turn on or stays off. At 10% irradiance, a real inverter still produces something, but a 20%-cutin model reports flat zero, and it is easy to miss unless every hour gets checked individually: the middle of the day looks identical either way. A realistic PV system instead sets %cutin=0.05 %cutout=0.05.\n\n\n\n\n   \n   \n\n\n\nRebuilding the same PV system with the lower threshold recovers exactly the two hours the default silently dropped.\nA single house’s PV system modeled correctly is a technical fix. Whether a whole feeder full of them still passes muster is a business question, and it is the one this chapter has been building toward since the first solved snapshot.",
+    "crumbs": [
+      "Part 4: Grid-Edge Value",
+      "<span class='chapter-number'>9</span>  <span class='chapter-title'>Chapter 2: Time-Series Simulation and DER Modeling</span>"
+    ]
+  },
+  {
+    "objectID": "book/04-grid-edge/02-timeseries-der-modeling.html#the-hosting-capacity-crisis",
+    "href": "book/04-grid-edge/02-timeseries-der-modeling.html#the-hosting-capacity-crisis",
+    "title": "Chapter 2: Time-Series Simulation and DER Modeling",
+    "section": "The hosting-capacity crisis",
+    "text": "The hosting-capacity crisis\nThis is the business question a Distribution System Operator (DSO) faces every time a new rooftop solar application arrives: does connecting one more customer’s PV system push this specific feeder past its statutory voltage limit? Say yes too often and customers wait months for a grid upgrade that may not have been necessary; say yes too rarely and a feeder starts violating compliance. A hosting-capacity study is how that question gets a feeder-specific answer instead of a guess.\nA feeder can fail this test two different ways, not one. Chapter 1 introduced the three constraints an LV network operates under: thermal, voltage, and phase balance. The notebook’s own run_penetration function checks the first two together at every step: the worst bus voltage against the statutory limit, and the transformer’s apparent power against its own 500 kVA nameplate rating.\nDay 363 is the sunniest day in the dataset, the tallest curve in this chapter’s own PV diversity chart, and the worst case for a hosting-capacity study: if a penetration level is ever going to cause a violation, a low-demand, high-sun day is where it shows up first.\n\n\n\npenetration\n0      1.0823\n20     1.0876\n40     1.0956\n60     1.0973\n80     1.1047\n100    1.1046\nName: vmax_pu, dtype: float64\n\n\n\n\n\n\n   \n   \n\n\n\nThe feeder-wide maximum stays inside the compliant band through 60% penetration, then crosses the 1.10 pu statutory limit at 80%. That is a real answer to a real question, not a theoretical ceiling: this specific feeder, on its sunniest day, with realistically-sized rooftop systems, can host roughly six in ten customers with solar before it needs an intervention to host more.\nVoltage is the constraint that binds first here, but it is worth checking the other one too, since a feeder that passes the voltage test can still fail the thermal one on a different network.\n\n\n\n   \n   \n\n\n\nNowhere close: even at 100% penetration, the transformer peaks under 30% of its 500 kVA rating, an order of magnitude of headroom left. On this feeder, voltage is the real limit, not heat. That is not true of every LV feeder; a longer or more heavily loaded one can hit its thermal ceiling well before its voltage limit, which is exactly why a proper hosting-capacity study checks both rather than assuming one always dominates.",
+    "crumbs": [
+      "Part 4: Grid-Edge Value",
+      "<span class='chapter-number'>9</span>  <span class='chapter-title'>Chapter 2: Time-Series Simulation and DER Modeling</span>"
+    ]
+  },
+  {
+    "objectID": "book/04-grid-edge/02-timeseries-der-modeling.html#fixing-the-crisis",
+    "href": "book/04-grid-edge/02-timeseries-der-modeling.html#fixing-the-crisis",
+    "title": "Chapter 2: Time-Series Simulation and DER Modeling",
+    "section": "Fixing the crisis",
+    "text": "Fixing the crisis\n80% penetration is the violation found above. The same scenario, the same 25 PV systems on the same feeder, gets Volt-Watt and Volt-VAr control applied directly rather than a fresh demonstration network. Both are smart-inverter functions standardized by Institute of Electrical and Electronics Engineers (IEEE) 1547-2018 [1], modeled in OpenDSS as an InvControl element driven by an XYCurve of four voltage/output setpoints. A single InvControl with no explicit PVSystemList applies to every PVSystem in the circuit at once, all 25 of them here, no per-house wiring required.\nVolt-Watt curtails real-power export once voltage crosses a threshold: full output stays available up to 1.05 pu, then ramps linearly down to zero at 1.10 pu. It works, but it reduces the total generation exported. Volt-VAr takes a different lever: instead of cutting real power, it asks the inverter to absorb or supply reactive power, the same principle behind Conservative Voltage Reduction, flattening a feeder’s voltage profile without reducing real generation.\n\n\n\n\n\n\n\n\n\n\nscenario\nvmax_pu\n\n\n\n\n0\nNo control\n1.104739\n\n\n1\nVolt-Watt\n1.087822\n\n\n2\nVolt-VAr\n1.070996\n\n\n\n\n\n\n\n\n\n\n\n   \n   \n\n\n\nBoth bring the feeder back under the 1.10 pu line, and Volt-VAr does it without curtailing a single kilowatt of generation. Volt-Watt curtails real power directly; Volt-VAr does not, which makes it the better first option to try before accepting reduced generation.\nThat single point, 80% penetration, is where the violation happens to show up first, but the question worth asking is bigger than one point: does either control raise the feeder’s hosting capacity across the board, not just patch this one level?\n\n\n\n   \n   \n\n\n\nNeither control ever crosses the 1.10 pu line across the entire sweep, all the way to 100% penetration. The 80%-penetration ceiling this section opened with was not a hard limit on the feeder; it was a limit on running PV without mitigation. With either control active, this same feeder can host every customer on it.",
+    "crumbs": [
+      "Part 4: Grid-Edge Value",
+      "<span class='chapter-number'>9</span>  <span class='chapter-title'>Chapter 2: Time-Series Simulation and DER Modeling</span>"
+    ]
+  },
+  {
+    "objectID": "book/04-grid-edge/02-timeseries-der-modeling.html#storage-a-third-lever",
+    "href": "book/04-grid-edge/02-timeseries-der-modeling.html#storage-a-third-lever",
+    "title": "Chapter 2: Time-Series Simulation and DER Modeling",
+    "section": "Storage: a third lever",
+    "text": "Storage: a third lever\nVolt-Watt and Volt-VAr both react to a violation the instant it happens. A battery can act ahead of it instead: charge on a sunny midday when PV export is pushing voltage up, discharge into the evening peak when demand is pulling it down. A Storage element is a dispatchable battery, bounded by its own rated power and energy capacity, its output sign set by its commanded state rather than by the weather or the time of day.\n\n\n\nDischarging: state=Discharging, P=-3.00 kW (negative = supplying the network)\nCharging:    state=Charging, P=+3.00 kW (positive = drawing from the network)\n\n\n\nThe comment in that cell is worth reading as carefully as the code: OpenDSSDirect.py is a singleton engine, one compiled circuit per process, so two Circuit objects can exist in Python at once, but only one of them is ever telling the truth about what is currently solved. Reading each result immediately after its own solve avoided a real version of this bug, caught while drafting this notebook, not just a hypothetical one.",
+    "crumbs": [
+      "Part 4: Grid-Edge Value",
+      "<span class='chapter-number'>9</span>  <span class='chapter-title'>Chapter 2: Time-Series Simulation and DER Modeling</span>"
+    ]
+  },
+  {
+    "objectID": "book/04-grid-edge/02-timeseries-der-modeling.html#ev-demand-the-opposite-failure-mode",
+    "href": "book/04-grid-edge/02-timeseries-der-modeling.html#ev-demand-the-opposite-failure-mode",
+    "title": "Chapter 2: Time-Series Simulation and DER Modeling",
+    "section": "EV demand: the opposite failure mode",
+    "text": "EV demand: the opposite failure mode\nEvery section so far has been about PV pushing power out onto the feeder at midday. Electric vehicles push demand the other way: an EV charger is a load, not a generator, and it draws power precisely when a feeder is already under the most strain, the evening, after commuters get home and plug in, right on top of ordinary dinner-time demand. This chapter’s own transformer-loading chart already showed the week’s sharpest peaks land in the evening, before a single EV was in the picture. The question this section asks: does the same feeder that nearly failed a PV test at midday also fail an EV test in the evening, and if Volt-Watt and Volt-VAr fixed the first problem, do they do anything for the second?\n\n\n\n\n\n\nFigure 9.1: Same feeder, opposite failure mode: PV exports power at midday and pushes voltage toward its ceiling first; EV charging imports power at the evening peak and pushes the transformer toward its thermal rating first.\n\n\n\nThis chapter also draws on EV home-charging profiles derived from a UK metering trial: metered charging behavior, not a synthetic assumption, for Level 1 (3.68kW) and Level 2 (7.36kW) chargers, diversified across a group of vehicles to account for the fact that not everyone charges at the same time. The source repository for this data ships no license, unlike the network and smart-meter data behind the rest of this chapter, so it is used here as a reference for building this chapter’s own scenario, not reused verbatim.\n\n\n\nRaw resolution: 1440 points (24 hours at 1-minute steps)\nDownsampled to 48 half-hour points; peak 1.49 kW/EV at hour 21:00\n\n\n\n\n\n\n   \n   \n\n\n\nA late-afternoon-into-evening peak, exactly the window this chapter’s own transformer chart already flagged as the feeder’s busiest. The diversified curve peaks around 1.5kW per EV, not the charger’s full 7.36kW rating: most vehicles in the group are not charging at any given moment, so the average demand per EV stays well under the rated maximum. That diversity is a genuine, physical mitigating effect, worth testing directly rather than assuming.\nEvery EV-owning house on this feeder gets its own copy of the diversified shape, an additional Load that adds demand on top of a house’s existing consumption rather than offsetting it. This time the worst-case day is not the sunniest, it is the day with the highest evening demand across the whole customer population, found the same way this chapter’s PV study found day 363: by checking, not assuming.\n\n\n\nWorst evening-demand day: 13 (highest total 18:00-21:00 demand across all real customers)\n\n\n\n\n\n\n\n\n\nvmin_pu\nutilization_pct\n\n\n\nmin\nmax\nmin\nmax\n\n\nadoption\n\n\n\n\n\n\n\n\n0\n1.067\n1.081\n1.878\n12.318\n\n\n20\n1.066\n1.081\n1.906\n13.964\n\n\n40\n1.066\n1.080\n1.907\n15.737\n\n\n60\n1.065\n1.080\n1.907\n17.856\n\n\n80\n1.063\n1.081\n1.907\n19.639\n\n\n100\n1.062\n1.080\n1.907\n21.455\n\n\n\n\n\n\n\n\n\n\n\n   \n   \n\n\n\n\n\n\n   \n   \n\n\n\nEven at 100% adoption, every house on the feeder charging an EV, neither constraint moves far from baseline: worst-case voltage stays above 1.06 pu and transformer utilization tops out around 20%. Diversity is doing real work here: the UK-trial data says not enough EVs charge at the same instant for this feeder to notice, even at full adoption.\nThat is the realistic case. It is worth asking what breaks the mitigating effect diversity provides, since a feeder should not be sized assuming every driver charges considerately. An uncoordinated scenario, common in hosting-capacity studies precisely because it is the assumption a DSO cannot rule out, has every EV owner plug in at the same evening peak and charge at the charger’s full rated power, no diversity at all.\n\n\n\n   \n   \n\n\n\n\n\n\n   \n   \n\n\n\nWorse than the realistic case, as expected, but still not a violation: even every one of the 31 houses charging simultaneously at full rated power tops out around 61% transformer utilization and 1.02 pu, comfortably inside both limits. This feeder’s 500 kVA transformer, sized for 31 customers, has more headroom than either EV scenario tested so far actually needs.\nA finding of “no violation” is only useful if it comes with a sense of margin, so the same uncoordinated scenario scales to multiple EVs per house, a real possibility for any household with more than one car.\n\n\n\n\n\n\n\n\n\n\nevs_per_house\nvmin_pu\nutilization_pct\n\n\n\n\n0\n1\n1.024\n61.107\n\n\n1\n2\n0.972\n113.901\n\n\n2\n3\n0.911\n172.068\n\n\n\n\n\n\n\n\n\nThermal breaks first here, not voltage, the opposite order from the PV story. At two EVs per house, transformer utilization crosses 100% while voltage is still compliant; it takes three EVs per house, well past realistic, before voltage also fails. PV pushed this feeder into a voltage violation first; heavy EV charging would push it into a thermal violation first. Checking only one constraint because it was the one that mattered for the last Distributed Energy Resources (DER) studied would have missed this.\n\nVolt-Watt and Volt-VAr both work by controlling PVSystem elements: an InvControl with no PVSystemList reaches every PV inverter on the feeder. An EV charger modeled as a Load is a different kind of element entirely, so the mitigation that solved the midday violation has nothing to act on in an evening EV scenario. Of the levers this chapter has built, only Storage can help both peaks: charge from midday PV surplus, discharge into the evening EV-and-dinner peak, the two problems this feeder’s own daily cycle actually produces. That is precisely the kind of DER-aware mitigation strategy Part 4’s fourth thread evaluates in full.",
+    "crumbs": [
+      "Part 4: Grid-Edge Value",
+      "<span class='chapter-number'>9</span>  <span class='chapter-title'>Chapter 2: Time-Series Simulation and DER Modeling</span>"
+    ]
+  },
+  {
+    "objectID": "book/04-grid-edge/02-timeseries-der-modeling.html#do-it-yourself",
+    "href": "book/04-grid-edge/02-timeseries-der-modeling.html#do-it-yourself",
+    "title": "Chapter 2: Time-Series Simulation and DER Modeling",
+    "section": "Do it yourself",
+    "text": "Do it yourself\nThe EV story just closed on a question about how a mitigation strategy is chosen; this chapter’s own PV hosting-capacity study is worth revisiting with a question about how its answer was chosen in the first place. The hosting-capacity crisis earlier in this chapter answered one version of “how much PV is too much,” on this feeder’s single sunniest day of the year. A related but different version of that same question is worth working through before reading the solution below.\n\nExercise: does the answer depend on which “worst case” you pick?\nDay 363 is the single most extreme day in an entire year of data, the tallest curve in this chapter’s own PV diversity chart. A DSO planning for the future might instead ask a seasonal version of the same question: for a typical summer day, a typical winter day, and so on, each with its own representative worst-case solar profile, does this feeder still hit a violation?\nThe vendored data includes four seasonal PV files, each holding three candidate daily profiles for that season, drawn from the same AusNet dataset, paired with a specific demand day per season.\nE1: For each season, find the candidate PV profile with the highest peak, then run the same penetration sweep from earlier in this chapter using that season’s demand day and worst PV profile. Does every season cross 1.10 pu the way day 363 did? While you are at it, check the transformer’s thermal utilization for each season too.\n\nSolution\nrun_penetration’s pv_profile_override parameter exists for exactly this, passing in a specific PV array instead of indexing into the full year of data by day.\n\n\n\nPeak transformer utilization by season:\nseason\nSummer    24.7\nAutumn    20.5\nWinter    12.9\nSpring    25.5\nName: utilization_pct, dtype: float64\n\n\n\n\n\n\n\n\nseason\nSummer\nAutumn\nWinter\nSpring\n\n\npenetration\n\n\n\n\n\n\n\n\n0\n1.0823\n1.0823\n1.0825\n1.0825\n\n\n20\n1.0867\n1.0860\n1.0848\n1.0868\n\n\n40\n1.0938\n1.0923\n1.0869\n1.0938\n\n\n60\n1.0956\n1.0929\n1.0911\n1.0955\n\n\n80\n1.1021\n1.0983\n1.0952\n1.1017\n\n\n100\n1.1020\n1.0982\n1.0951\n1.1017\n\n\n\n\n\n\n\n\n\n\n\n   \n   \n\n\n\n\nNo season crosses 1.10 pu, even at 100% penetration, and the thermal check agrees: every season’s peak transformer utilization stays under 30%, the same order of magnitude as the earlier result. That does not contradict the earlier finding, it sharpens it. Day 363’s PV profile peaks at the single highest reading in the entire 365-day year; the seasonal files’ own worst case tops out lower, around 0.92 even for spring, the strongest season here. “Worst case” is a modeling choice, not a fact about the world, and this feeder’s answer to “how much PV can it host” depends on which worst case gets asked for: the single most extreme real day on record, or the worst of three representative candidates per season. A properly documented hosting-capacity study states which one it used, the same way this chapter just did twice, with two different, both defensible, answers.",
+    "crumbs": [
+      "Part 4: Grid-Edge Value",
+      "<span class='chapter-number'>9</span>  <span class='chapter-title'>Chapter 2: Time-Series Simulation and DER Modeling</span>"
+    ]
+  },
+  {
+    "objectID": "book/04-grid-edge/02-timeseries-der-modeling.html#where-this-leaves-part-4",
+    "href": "book/04-grid-edge/02-timeseries-der-modeling.html#where-this-leaves-part-4",
+    "title": "Chapter 2: Time-Series Simulation and DER Modeling",
+    "section": "Where this leaves Part 4",
+    "text": "Where this leaves Part 4\nEvery section in this chapter ran on one real feeder: honest customer diversity, a full week of demand, a real violation at 80% PV penetration, and two working fixes for it, then a second, genuinely different violation from EV charging that neither fix could touch. Part 4 now follows four threads, each building on the same ark.dss.Circuit this chapter just extended:\n\nPhase detection, recovering which phase a customer is actually connected to from nothing but voltage patterns, a real, common gap in utility records.\nCustomer and feeder clustering, grouping customers and feeders by how they actually behave, not just how they are labeled.\nVoltage-violation and power-quality anomaly detection, catching a compliance problem, or a meter reporting bad data, as it happens rather than after a complaint call.\nGrid health under forecasted DER growth, where Part 3’s forecasts become the scenario driver for exactly the kind of hosting-capacity study this chapter just ran, and mitigation strategies like Volt-Watt, Volt-VAr, and storage get evaluated against it directly.",
+    "crumbs": [
+      "Part 4: Grid-Edge Value",
+      "<span class='chapter-number'>9</span>  <span class='chapter-title'>Chapter 2: Time-Series Simulation and DER Modeling</span>"
+    ]
+  },
+  {
+    "objectID": "book/04-grid-edge/02-timeseries-der-modeling.html#references",
+    "href": "book/04-grid-edge/02-timeseries-der-modeling.html#references",
+    "title": "Chapter 2: Time-Series Simulation and DER Modeling",
+    "section": "References",
+    "text": "References\n\n\n[1] IEEE Standards Association, “IEEE standard for interconnection and interoperability of distributed energy resources with associated electric power systems interfaces,” IEEE, 1547-2018, 2018. doi: 10.1109/IEEESTD.2018.8332112.",
+    "crumbs": [
+      "Part 4: Grid-Edge Value",
+      "<span class='chapter-number'>9</span>  <span class='chapter-title'>Chapter 2: Time-Series Simulation and DER Modeling</span>"
+    ]
+  },
+  {
     "objectID": "about.html",
     "href": "about.html",
     "title": "About the Author",
     "section": "",
     "text": "Anthony Faustine\n    Principal ML Engineer  ·  Analog Devices, Ireland\n    \n       sambaiga.github.io\n       sambaiga\n       sambaiga\n       0000-0002-7838-533X\n       sambaiga@gmail.com\n    \n  \n\nEvery part of this book started as something I had to solve for real, not as a topic I picked to write about.\nThe earliest was disaggregation: teaching a model to look at one aggregate power reading and say which appliance was drawing it, the same problem Part 2 of this book covers. That question led to the one utilities actually pay for: not just what’s running now, but what demand and solar output will look like tomorrow, with an honest estimate of how wrong that forecast might be. My PhD took that question to the low-voltage substation, forecasting net load in the presence of solar and EV charging when a headline accuracy number wasn’t good enough to act on. At Eaton’s Centre for Intelligent Power, I ran that same question as Lead Data Scientist and Principal Investigator, securing €1.6M in competitive research funding and picking up the Eaton STAR Leadership Award along the way.\nToday, as Principal ML Engineer at Analog Devices, the question is the same one this book keeps returning to: not whether a model works in a notebook, but whether it survives contact with production, supply chain demand planning and edge inference in my case. That is the bar every chapter here holds itself to.\nThe open-source side of that decade is public: Twiga (point and probabilistic forecasting, one interface, every model), MLPForecast (uncertainty-aware net-load forecasting), and Deep-NILMtk (a community toolkit for non-intrusive load monitoring, the same disaggregation problem this book opens with).\nProjects  →  sambaiga.github.io/pages/projects\nThe published record runs the same thread: non-intrusive load monitoring, probabilistic forecasting, uncertainty quantification, physics-based intelligence, and AI for reliability engineering, across 10+ peer-reviewed papers in IEEE Transactions on Smart Grid, IEEE Transactions on Power Systems, and IEEE Transactions on Industrial Informatics.\nPublications  →  sambaiga.github.io/pages/publication  ·  ORCID\nI also write about machine learning, Bayesian thinking, and applied AI at:\nBlog  →  sambaiga.github.io/pages/blog",
     "crumbs": [
-      "<span class='chapter-number'>9</span>  <span class='chapter-title'>About the Author</span>"
+      "<span class='chapter-number'>10</span>  <span class='chapter-title'>About the Author</span>"
     ]
   },
   {
@@ -605,9 +759,9 @@
     "href": "acronyms.html",
     "title": "List of Acronyms",
     "section": "",
-    "text": "List Of Acronyms\n\nBESS\n\nBattery Energy Storage System\n\nCRPS\n\nContinuously Ranked Probability Score\n\nDER\n\nDistributed Energy Resources\n\nDSO\n\nDistribution System Operator\n\nEV\n\nElectric Vehicle\n\nHV\n\nHigh Voltage\n\nLV\n\nLow Voltage\n\nMV\n\nMedium Voltage\n\nNILM\n\nNon-Intrusive Load Monitoring\n\nPV\n\nPhotovoltaic\n\nRES\n\nRenewable Energy Sources",
+    "text": "List Of Acronyms\n\nBESS\n\nBattery Energy Storage System\n\nCRPS\n\nContinuously Ranked Probability Score\n\nDER\n\nDistributed Energy Resources\n\nDSO\n\nDistribution System Operator\n\nEV\n\nElectric Vehicle\n\nHV\n\nHigh Voltage\n\nIEEE\n\nInstitute of Electrical and Electronics Engineers\n\nLV\n\nLow Voltage\n\nMV\n\nMedium Voltage\n\nNILM\n\nNon-Intrusive Load Monitoring\n\nPV\n\nPhotovoltaic\n\nRES\n\nRenewable Energy Sources",
     "crumbs": [
-      "<span class='chapter-number'>10</span>  <span class='chapter-title'>List of Acronyms</span>"
+      "<span class='chapter-number'>11</span>  <span class='chapter-title'>List of Acronyms</span>"
     ]
   }
 ]
