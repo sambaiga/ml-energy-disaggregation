@@ -25,4 +25,6 @@ acronyms:
       longname: Continuously Ranked Probability Score
     - shortname: IEEE
       longname: Institute of Electrical and Electronics Engineers
+    - shortname: PCA
+      longname: Principal Component Analysis
 ...
