@@ -745,13 +745,178 @@
     ]
   },
   {
+    "objectID": "book/04-grid-edge/03-phase-identification.html",
+    "href": "book/04-grid-edge/03-phase-identification.html",
+    "title": "Chapter 3: Phase Identification from Smart-Meter Data",
+    "section": "",
+    "text": "Why voltage carries a phase signature\nChapter 1 named phase balance as one of three limits every low-voltage feeder operates under, alongside thermal and voltage constraints, and made a quieter claim alongside it: the phase each customer connects to is information no meter reports. Every study in Chapters 1 and 2 relied on that information anyway, taken directly from the network model’s own bus1 definitions, and never checked. This chapter examines what that assumption is worth.\nIn practice, a utility’s phase records rarely match the network exactly. Service connections get re-terminated during storm repairs and equipment swaps without the change reaching the record system; decades of ad hoc feeder edits accumulate drift between the as-built network and the as-documented one. Short’s own motivation for building a metering-based correction method was exactly this gap: utility phase records are compiled by hand over decades of field work and are known, chronically, to disagree with the physical network in ways no one catches until something downstream stops making sense [1]. Every unbalance calculation, every hosting-capacity study like the one Chapter 2 ran, and every state estimate a distribution system operator (Distribution System Operator (DSO)) produces inherits whatever phase labels the model happens to carry, correct or not, with no independent way to catch the difference from the network model alone.\nThis chapter asks whether that gap can be closed without sending anyone into the field. A smart meter cannot report its own phase directly, no more than it can report a neighboring bus’s voltage, but it reports something that turns out to depend on phase in a very specific way: its own voltage, read over time. What follows works through why that dependency exists, tests a method built on it against a real, known answer, and is honest about where the method breaks.\nA three-phase low-voltage feeder splits into single-phase service drops at various points along its length, each drop landing on phase A, B, or C. Every customer on the same phase shares two things no customer on a different phase shares: the same upstream conductor path back to the transformer, and therefore the same phase-to-neutral voltage reference riding on that path. When aggregate demand on phase A rises anywhere along the feeder, every customer downstream on phase A sees a correlated dip in its own voltage, driven by the same current flowing through the same shared impedance. A customer on phase B, drawing a similar amount of power at the same moment, sees no such dip, because phase B’s conductor and phase B’s demand are what set its voltage instead.\nActive or reactive power consumption carries no equivalent signal. Two households on different phases can have nearly identical demand profiles simply because they keep similar schedules, while two households on the same phase can have very different demand and still show near-identical voltage fluctuation, because it is the shared electrical path, not the shared behavior, that produces the correlation. Phase identification from smart-meter data is therefore a voltage problem, not a power problem, and any method that starts from power alone is starting from the wrong signal.\nThis is not a new observation. Short first proposed recovering phase connectivity from correlated voltage magnitude at scale, using advanced metering infrastructure already deployed for billing [1]. Two directions have extended that idea since. Blakely and Reno built an ensemble spectral-clustering method around the co-association matrix formed by resampling the correlation-based clustering many times, avoiding a dependency on any prior phase labels at all [2]. Hangawatta, Gargoom, and Kouzani took a supervised route instead, training a neural network directly on consumption data at the low sampling rates typical of real deployments, closer to the resolution this chapter’s own data uses [3]. Hoogsteyn, Vanin, Koirala, and Van Hertem benchmarked a range of these methods against each other under varying meter accuracy and deployment density, producing exactly the kind of sensitivity findings this chapter reproduces independently in its own closing section [4].\nOne study sits closer to this chapter than any of the others. Simonovska and Ochoa combined principal component analysis with unconstrained k-means clustering on smart-meter voltage traces and tested it on a real, anonymized 31-customer low-voltage feeder under varying levels of Photovoltaic (PV) penetration [5]. That feeder is the same one this book has used since Chapter 1. The method built and tested below follows the same principle, correlation structure over raw readings, dimensionality reduction, then clustering, checked here against this feeder’s own real phase records rather than assumed correct.",
+    "crumbs": [
+      "Part 4: Grid-Edge Value",
+      "<span class='chapter-number'>10</span>  <span class='chapter-title'>Chapter 3: Phase Identification from Smart-Meter Data</span>"
+    ]
+  },
+  {
+    "objectID": "book/04-grid-edge/03-phase-identification.html#why-voltage-carries-a-phase-signature",
+    "href": "book/04-grid-edge/03-phase-identification.html#why-voltage-carries-a-phase-signature",
+    "title": "Chapter 3: Phase Identification from Smart-Meter Data",
+    "section": "",
+    "text": "Key Concept\nCorrelation, not magnitude, is the signal. Two voltage traces that look similar in absolute level can be weakly correlated, and two traces at different absolute levels can be strongly correlated, if they move together over time. A phase-identification method that clusters on raw voltage magnitude is answering “which customers have a similar voltage level,” a question dominated by each customer’s distance from the transformer. A method that clusters on the correlation between voltage traces is answering “which customers’ voltage moves together,” the question that actually tracks phase membership. The rest of this chapter tests both and reports what the difference costs in practice.",
+    "crumbs": [
+      "Part 4: Grid-Edge Value",
+      "<span class='chapter-number'>10</span>  <span class='chapter-title'>Chapter 3: Phase Identification from Smart-Meter Data</span>"
+    ]
+  },
+  {
+    "objectID": "book/04-grid-edge/03-phase-identification.html#getting-the-data",
+    "href": "book/04-grid-edge/03-phase-identification.html#getting-the-data",
+    "title": "Chapter 3: Phase Identification from Smart-Meter Data",
+    "section": "Getting the data",
+    "text": "Getting the data\nThis chapter reuses the same Low Voltage (LV) network and smart-meter data Chapters 1 and 2 vendored, no new fetch step required:\nuv run python scripts/fetch_part4_ausnet_data.py",
+    "crumbs": [
+      "Part 4: Grid-Edge Value",
+      "<span class='chapter-number'>10</span>  <span class='chapter-title'>Chapter 3: Phase Identification from Smart-Meter Data</span>"
+    ]
+  },
+  {
+    "objectID": "book/04-grid-edge/03-phase-identification.html#the-feeder-again",
+    "href": "book/04-grid-edge/03-phase-identification.html#the-feeder-again",
+    "title": "Chapter 3: Phase Identification from Smart-Meter Data",
+    "section": "The feeder, again",
+    "text": "The feeder, again\nEvery result below runs on the same 31-customer AusNet feeder Chapters 1 and 2 already built and solved: the same distribution transformer, the same line segments, the same single-phase service cables. This chapter’s only new question is whether the phase label attached to each of those service cables in the network model is actually correct.\n\n\n\n{'converged': True,\n 'n_buses': 61,\n 'n_lines': 59,\n 'n_loads': 31,\n 'n_transformers': 1,\n 'total_p_loss_kw': 0.6107992120127365,\n 'total_q_loss_kvar': 0.15519491021295995}",
+    "crumbs": [
+      "Part 4: Grid-Edge Value",
+      "<span class='chapter-number'>10</span>  <span class='chapter-title'>Chapter 3: Phase Identification from Smart-Meter Data</span>"
+    ]
+  },
+  {
+    "objectID": "book/04-grid-edge/03-phase-identification.html#where-the-real-answer-is-hiding",
+    "href": "book/04-grid-edge/03-phase-identification.html#where-the-real-answer-is-hiding",
+    "title": "Chapter 3: Phase Identification from Smart-Meter Data",
+    "section": "Where the real answer is hiding",
+    "text": "Where the real answer is hiding\nChecking a method against a known answer requires a known answer, and this feeder happens to have one, buried one level deeper in the network model than it first appears. Every load’s own bus1 in this network ends in .1, the same for all 31 customers, which looks like it means every customer sits on phase A. It does not: a single-phase bus only ever has one local node, so its own node index is always 1, regardless of which physical phase actually feeds it. The real phase assignment lives one step upstream, on the service line that feeds that bus. That line’s own bus1, the tap point on the three-phase backbone, ends in .1, .2, or .3, and that suffix is the customer’s actual phase.\n\n\n\nReal phase distribution across 31 customers: {1: 11, 2: 10, 3: 10}\n\n\n\nEleven customers on phase 1, ten on phase 2, ten on phase 3, matching this feeder’s own documentation exactly. Every method tested in the rest of this chapter is checked against this same real answer, not against its own assumptions.",
+    "crumbs": [
+      "Part 4: Grid-Edge Value",
+      "<span class='chapter-number'>10</span>  <span class='chapter-title'>Chapter 3: Phase Identification from Smart-Meter Data</span>"
+    ]
+  },
+  {
+    "objectID": "book/04-grid-edge/03-phase-identification.html#a-voltage-time-series-one-per-customer",
+    "href": "book/04-grid-edge/03-phase-identification.html#a-voltage-time-series-one-per-customer",
+    "title": "Chapter 3: Phase Identification from Smart-Meter Data",
+    "section": "A voltage time series, one per customer",
+    "text": "A voltage time series, one per customer\nDriving each customer with its own smart-meter reading, the same LoadShape mechanics Chapter 2 introduced, and solving across a full day produces one voltage time series per customer, the raw material every method below draws from.\n\n\n\nload_data: (342, 365, 48) (customers, days, half-hours)\nAll 31 houses now follow a real customer's day-45 reading\n\n\n\n\n\n\n48 half-hour steps x 31 customers",
+    "crumbs": [
+      "Part 4: Grid-Edge Value",
+      "<span class='chapter-number'>10</span>  <span class='chapter-title'>Chapter 3: Phase Identification from Smart-Meter Data</span>"
+    ]
+  },
+  {
+    "objectID": "book/04-grid-edge/03-phase-identification.html#a-first-naive-attempt",
+    "href": "book/04-grid-edge/03-phase-identification.html#a-first-naive-attempt",
+    "title": "Chapter 3: Phase Identification from Smart-Meter Data",
+    "section": "A first, naive attempt",
+    "text": "A first, naive attempt\nThe most direct application of the theory above skips a step. Treat each customer’s 48-point voltage trace as a feature vector, reduce it to two dimensions with Principal Component Analysis (PCA), and cluster the result into three groups. It is worth running this exact approach before reaching for anything more careful, and checking it honestly against the real answer already in hand, rather than assuming a plausible-sounding method works.\n\n\n\nPCA on raw voltage + k-means: adjusted Rand index = 0.24 (1.0 is perfect)\n\n\n\n\nPCA on raw voltage barely beats a coin flip. An adjusted Rand index of 0.24, where 1.0 is a perfect match to the real phase labels and 0.0 is no better than random assignment, means the clusters this approach finds only weakly track the real answer. Nothing here is a coding error: every customer’s raw voltage trace is dominated by the same feeder-wide daily demand cycle, the shared shape PCA finds first because it explains the most overall variance in the raw data. Phase membership is a smaller effect sitting underneath that shared pattern, exactly the distinction the concept box above predicted, and standard PCA on raw magnitude has no reason to prioritize it.",
+    "crumbs": [
+      "Part 4: Grid-Edge Value",
+      "<span class='chapter-number'>10</span>  <span class='chapter-title'>Chapter 3: Phase Identification from Smart-Meter Data</span>"
+    ]
+  },
+  {
+    "objectID": "book/04-grid-edge/03-phase-identification.html#clustering-the-correlation-instead",
+    "href": "book/04-grid-edge/03-phase-identification.html#clustering-the-correlation-instead",
+    "title": "Chapter 3: Phase Identification from Smart-Meter Data",
+    "section": "Clustering the correlation instead",
+    "text": "Clustering the correlation instead\nThe fix is not a different clustering algorithm. It is a different question asked of the same underlying data: instead of asking which customers have similar voltage traces, ask which customers’ voltage moves together. The pairwise correlation matrix between customers directly answers that question, with the shared feeder-wide pattern present in every pair roughly equally and therefore no longer the dominant source of variance.\n\n\n\n\n\n\n\n\n\n\nload_mg1_1\nload_mg1_2\nload_mg1_3\nload_mg1_4\nload_mg1_5\n\n\n\n\nload_mg1_1\n1.000000\n0.803656\n0.638365\n0.989828\n0.706010\n\n\nload_mg1_2\n0.803656\n1.000000\n0.480316\n0.770728\n0.965884\n\n\nload_mg1_3\n0.638365\n0.480316\n1.000000\n0.629764\n0.340544\n\n\nload_mg1_4\n0.989828\n0.770728\n0.629764\n1.000000\n0.657308\n\n\nload_mg1_5\n0.706010\n0.965884\n0.340544\n0.657308\n1.000000\n\n\n\n\n\n\n\n\nCustomers on the same real phase already correlate above 0.98 in this matrix; customers on different phases sit closer to 0.5 to 0.8. The phase signal is visible directly in the numbers before any clustering algorithm runs at all.\n\n\n\nPCA on the correlation matrix + k-means: adjusted Rand index = 1.00\n\n\n\nThe same PCA-plus-k-means recipe as the naive attempt, applied to the correlation matrix instead of the raw readings, recovers every one of the 31 customers’ real phases exactly, an adjusted Rand index of 1.0. Nothing about the clustering step changed; only what it was asked to cluster did.\n\n\n\n   \n   \n\n\n\nThree tight, well-separated groups, colored here by the real phase label rather than the predicted one, since the two are identical for every customer on this feeder.",
+    "crumbs": [
+      "Part 4: Grid-Edge Value",
+      "<span class='chapter-number'>10</span>  <span class='chapter-title'>Chapter 3: Phase Identification from Smart-Meter Data</span>"
+    ]
+  },
+  {
+    "objectID": "book/04-grid-edge/03-phase-identification.html#would-this-have-found-three-groups-unsupervised",
+    "href": "book/04-grid-edge/03-phase-identification.html#would-this-have-found-three-groups-unsupervised",
+    "title": "Chapter 3: Phase Identification from Smart-Meter Data",
+    "section": "Would this have found three groups unsupervised?",
+    "text": "Would this have found three groups unsupervised?\nThe number of phases, three, was supplied going in. A working deployment often does not know the right number of groups in advance, so it is worth asking whether the data itself would have revealed it. The silhouette score, a measure of how well separated a given clustering is, answers that directly.\n\n\n\nk=2: silhouette = 0.696\nk=3: silhouette = 0.894  &lt;- used above\nk=4: silhouette = 0.850\nk=5: silhouette = 0.745\nk=6: silhouette = 0.698\n\n\n\nThree is the clear peak across the range tested, not an assumption smuggled into the method. This same correlation structure could have surfaced the right number of phase groups without being told what to look for.",
+    "crumbs": [
+      "Part 4: Grid-Edge Value",
+      "<span class='chapter-number'>10</span>  <span class='chapter-title'>Chapter 3: Phase Identification from Smart-Meter Data</span>"
+    ]
+  },
+  {
+    "objectID": "book/04-grid-edge/03-phase-identification.html#how-much-data-does-this-actually-need",
+    "href": "book/04-grid-edge/03-phase-identification.html#how-much-data-does-this-actually-need",
+    "title": "Chapter 3: Phase Identification from Smart-Meter Data",
+    "section": "How much data does this actually need?",
+    "text": "How much data does this actually need?\nA perfect result on one full day, from all 31 meters, answers the methodological question but not the practical one. Two questions matter before recommending this method for actual use: how long a voltage history is required, and how many meters actually need to be reporting. Both are worth checking directly rather than assumed.\n\n\n\n\n\n\n\n\n\n\nhours\nari\n\n\n\n\n0\n2.0\n0.528789\n\n\n1\n4.0\n0.899784\n\n\n2\n6.0\n0.899784\n\n\n3\n12.0\n1.000000\n\n\n4\n24.0\n1.000000\n\n\n\n\n\n\n\n\n\n\n\n   \n   \n\n\n\nTwo hours of readings is unreliable, an adjusted Rand index of 0.53. By twelve hours, half a day, recovery is already perfect on this feeder. A shorter deployment window is possible, but it trades away margin, not just convenience.\nMeter density is the second question: how many of the feeder’s 31 customers actually need to be reporting, tested here by sampling smaller subsets at random, ten trials per subset size, since which specific customers get chosen matters as much as how many.\n\n\n\n\n\n\n\n\n\n\nmean\nmin\n\n\nn_meters\n\n\n\n\n\n\n3\n0.40\n0.00\n\n\n4\n0.63\n0.33\n\n\n5\n0.95\n0.55\n\n\n6\n0.92\n0.59\n\n\n7\n1.00\n1.00\n\n\n8\n0.94\n0.56\n\n\n12\n1.00\n1.00\n\n\n20\n1.00\n1.00\n\n\n31\n1.00\n1.00\n\n\n\n\n\n\n\n\n\n\n\n   \n   \n\n\n\n\nBelow about seven meters, results stop being trustworthy, not just noisier. Above seven, roughly two to three per phase on this three-phase feeder, recovery is consistently perfect across every random subset tried. Below it, results swing widely: sometimes still perfect, sometimes failing outright, because a small random draw can miss one phase entirely or leave a phase group down to a single member with nothing to correlate against. The method does not degrade gracefully as data shrinks; it fails unpredictably, which matters more for an actual rollout than the average case alone, and matches the meter-density sensitivity Hoogsteyn et al. report across other phase-identification methods [4].",
+    "crumbs": [
+      "Part 4: Grid-Edge Value",
+      "<span class='chapter-number'>10</span>  <span class='chapter-title'>Chapter 3: Phase Identification from Smart-Meter Data</span>"
+    ]
+  },
+  {
+    "objectID": "book/04-grid-edge/03-phase-identification.html#does-the-choice-of-association-measure-matter",
+    "href": "book/04-grid-edge/03-phase-identification.html#does-the-choice-of-association-measure-matter",
+    "title": "Chapter 3: Phase Identification from Smart-Meter Data",
+    "section": "Does the choice of association measure matter?",
+    "text": "Does the choice of association measure matter?\nEvery result so far clusters on Pearson correlation, a measure of linear relationship. That was a choice, not the only option, and it is worth checking directly. Spearman and Kendall generalize Pearson to monotonic relationships rather than strictly linear ones. Mutual information and the Predictive Power Score (PPS) go further still, capturing any dependency a model can exploit, linear or not. The full 24-hour window this chapter has used throughout is the easy case, every method tested recovers phase perfectly there. The real test is whether that holds under the same 2-hour window that already broke Pearson. Spearman and Kendall come from voltage_df.corr(method=...) directly; mutual information and PPS each need their own small helper to turn a per-pair score into the same kind of customer-by-customer similarity matrix the correlation-based methods already produce, one call to sklearn.feature_selection.mutual_info_regression per customer for the first, one call to ppscore.matrix for the second.\n\n\n\n\n\n\n\n\n\nwindow\n24h\n2h\n\n\nmethod\n\n\n\n\n\n\nkendall\n1.0\n0.541176\n\n\nmutual_information\n1.0\n0.900161\n\n\npearson\n1.0\n0.528789\n\n\npps\n1.0\n0.900161\n\n\nspearman\n1.0\n0.528789\n\n\n\n\n\n\n\n\nPearson, Spearman, and Kendall, three different ways of measuring a monotonic relationship, all degrade together under 2 hours of data. Mutual information and PPS do not: both hold onto most of their accuracy well past the point where linear and rank correlation give out, because they capture dependency structure those three measures cannot see. A sixth measure, xicor, a newer asymmetric rank-based coefficient, was checked the same way in a separate environment (its latest release requires an older pandas than the rest of this book uses, so it cannot be pinned as a project dependency here) and degraded with the other rank-based measures rather than with mutual information and PPS, consistent with being fundamentally a rank measure itself, not a Pearson-specific weakness. The distinction that matters is not linear versus nonlinear correlation values, all six methods report numbers on different scales, it is which measures still separate phases correctly when the window is barely longer than the noise itself, worth checking before trusting a chosen method on a short deployment window.",
+    "crumbs": [
+      "Part 4: Grid-Edge Value",
+      "<span class='chapter-number'>10</span>  <span class='chapter-title'>Chapter 3: Phase Identification from Smart-Meter Data</span>"
+    ]
+  },
+  {
+    "objectID": "book/04-grid-edge/03-phase-identification.html#naming-the-clusters-with-a-handful-of-known-customers",
+    "href": "book/04-grid-edge/03-phase-identification.html#naming-the-clusters-with-a-handful-of-known-customers",
+    "title": "Chapter 3: Phase Identification from Smart-Meter Data",
+    "section": "Naming the clusters with a handful of known customers",
+    "text": "Naming the clusters with a handful of known customers\nEverything so far assumes the full, real phase list is available to check against, but an actual rollout does not start with that. Clustering on voltage correlation groups customers correctly, an adjusted Rand index of 1.0 says so, but a cluster label like “0” or “1” carries no information about which real phase it actually is. Naming the clusters requires some reference: a handful of customers whose real phase is already known, from a recent service record or a spot check, used to vote on what each cluster should be called. The practical question is how many of those known customers are actually needed.\n\n\n\n\n\n\n\n\n\n\nn_anchors\nmean_accuracy\nfrac_fully_correct\n\n\n\n\n0\n1\n0.335645\n0.000\n\n\n1\n2\n0.577097\n0.000\n\n\n2\n3\n0.718871\n0.235\n\n\n3\n5\n0.890484\n0.690\n\n\n4\n8\n0.973387\n0.920\n\n\n5\n12\n0.996774\n0.990\n\n\n\n\n\n\n\n\nOne known customer names, on average, only one of the three clusters correctly, the other two stay unresolved. Naming reliably, getting every customer’s label right nearly every time, takes about eight to twelve known customers, roughly three to four per phase. That is a much smaller ask than full ground truth, and it turns clustering, which only groups customers, into labeling, which names them.",
+    "crumbs": [
+      "Part 4: Grid-Edge Value",
+      "<span class='chapter-number'>10</span>  <span class='chapter-title'>Chapter 3: Phase Identification from Smart-Meter Data</span>"
+    ]
+  },
+  {
+    "objectID": "book/04-grid-edge/03-phase-identification.html#beyond-a-point-estimate-conformal-phase-assignment-confidence",
+    "href": "book/04-grid-edge/03-phase-identification.html#beyond-a-point-estimate-conformal-phase-assignment-confidence",
+    "title": "Chapter 3: Phase Identification from Smart-Meter Data",
+    "section": "Beyond a point estimate: conformal phase-assignment confidence",
+    "text": "Beyond a point estimate: conformal phase-assignment confidence\nNaming the clusters still produces one label per customer, with no signal for which labels to trust. A utility deciding where to send a limited field crew needs exactly that signal: which assignments are solid, and which deserve a second look before anyone relies on them. Split conformal prediction supplies it with a statistical guarantee attached, not just an ad hoc score.\nThe idea: for each candidate phase, measure how far a customer’s own correlation-embedding position sits from that phase’s centroid, built only from the known anchor customers. Calibrate a distance threshold using the anchors’ own leave-one-out scores against their real phase, at a chosen confidence level. Then, for every customer, report the set of phases within that threshold, not a single guess. A confident customer gets a single-phase set. An uncertain one gets more than one phase, or none at all if it does not sit close enough to any of the three centroids, itself a signal that something about that customer’s data is unusual and worth a closer look. Four small functions implement this: one to build each phase’s centroid from its anchor customers, one to score a point’s distance to a given phase’s centroid, one to calibrate the distance threshold from the anchors’ own leave-one-out scores, and one to assemble the resulting prediction sets.\nA calibration set of ten known customers is enough to test this, the same order of magnitude the labeling sweep above already found reliable. On the full 24-hour correlation embedding, where the point estimate is already perfect, most customers get a clean single-phase set.\n\n\n\ncalibration threshold: 0.519\nset sizes: {0: 1, 1: 30}\nempirical coverage: 0.968 (target &gt;= 0.90)\n\n\n\nConfidence only earns its keep when the point estimate can actually be wrong. The window-length sensitivity earlier in this chapter already found that case: a 4-hour window still clusters well, an adjusted Rand index near 0.90, but not perfectly. Running the same conformal method on that shorter, noisier embedding checks whether it flags the customer the point estimate actually gets wrong, or just adds noise of its own.\n\n\n\npoint-estimate misclassified: ['load_mg1_1']\nconformal flagged as not confident: ['load_mg1_1', 'load_mg1_4', 'load_mg1_7', 'load_mg1_10']\n\n\n\n\n Key Concept\nFour customers get flagged, all four the same real phase, and the one customer the point estimate actually mislabels is among them. The other three happen to keep their correct point-estimate label anyway, but their embedding position under the noisier 4-hour window sits too far from the anchor-derived centroid to earn a confident single-phase set. That is a more useful result than flagging one lucky-or-unlucky customer alone: it says an entire phase group’s evidence has gotten weaker under this window, not just that one guess happened to land wrong. A point estimate alone offers no way to tell a solid label from a lucky guess. A conformal prediction set does, with a statistical coverage guarantee behind it rather than an arbitrary score, at the cost of only the same handful of known customers the labeling step already needed.",
+    "crumbs": [
+      "Part 4: Grid-Edge Value",
+      "<span class='chapter-number'>10</span>  <span class='chapter-title'>Chapter 3: Phase Identification from Smart-Meter Data</span>"
+    ]
+  },
+  {
+    "objectID": "book/04-grid-edge/03-phase-identification.html#where-this-leaves-part-4",
+    "href": "book/04-grid-edge/03-phase-identification.html#where-this-leaves-part-4",
+    "title": "Chapter 3: Phase Identification from Smart-Meter Data",
+    "section": "Where this leaves Part 4",
+    "text": "Where this leaves Part 4\nPhase connectivity for this feeder is no longer an assumption inherited from its .dss files; it is a checked, reproducible result. Correlating real smart-meter voltage readings and clustering on that correlation structure, rather than on the raw readings themselves, recovers every customer’s real phase exactly, using no more than seven meters and twelve hours of data. The same feeder Chapter 2 ran a hosting-capacity study and an Electric Vehicle (EV)-demand study on now has its phase labels independently confirmed rather than merely assumed correct. The deployment story goes one step further than clustering alone: a handful of known customers is enough to name the clusters, and a conformal confidence set on top of that naming tells a utility exactly which assignments to trust and which to send a field crew to check first, a statistically grounded answer none of this chapter’s own references provide.\nPart 4 continues with the second of its four threads: customer and feeder clustering, grouping customers by how they actually behave rather than how they are labeled, reusing the ark.plot.clustering tools this chapter introduced.",
+    "crumbs": [
+      "Part 4: Grid-Edge Value",
+      "<span class='chapter-number'>10</span>  <span class='chapter-title'>Chapter 3: Phase Identification from Smart-Meter Data</span>"
+    ]
+  },
+  {
+    "objectID": "book/04-grid-edge/03-phase-identification.html#references",
+    "href": "book/04-grid-edge/03-phase-identification.html#references",
+    "title": "Chapter 3: Phase Identification from Smart-Meter Data",
+    "section": "References",
+    "text": "References\n\n\n[1] T. A. Short, “Advanced metering for phase identification, transformer identification, and secondary modeling,” IEEE Transactions on Smart Grid, vol. 4, no. 2, pp. 651–658, 2013, doi: 10.1109/TSG.2012.2219081.\n\n\n[2] L. Blakely and M. J. Reno, “Phase identification using co-association matrix ensemble clustering,” IET Smart Grid, vol. 3, no. 4, pp. 490–499, 2020, doi: 10.1049/iet-stg.2019.0280.\n\n\n[3] D. C. Hangawatta, A. Gargoom, and A. Z. Kouzani, “Machine-learning-driven identification of electrical phases in low-sampling-rate consumer data,” Energies, vol. 18, no. 1, p. 128, 2025, doi: 10.3390/en18010128.\n\n\n[4] A. Hoogsteyn, M. Vanin, A. Koirala, and D. Van Hertem, “Low voltage customer phase identification methods based on smart meter data,” Electric Power Systems Research, vol. 212, p. 108524, 2022, doi: 10.1016/j.epsr.2022.108524.\n\n\n[5] A. Simonovska and L. F. Ochoa, “Phase grouping in PV-rich LV feeders: Smart meter data and unconstrained k-means,” in 2021 IEEE madrid PowerTech, 2021. doi: 10.1109/PowerTech46648.2021.9495097.",
+    "crumbs": [
+      "Part 4: Grid-Edge Value",
+      "<span class='chapter-number'>10</span>  <span class='chapter-title'>Chapter 3: Phase Identification from Smart-Meter Data</span>"
+    ]
+  },
+  {
     "objectID": "about.html",
     "href": "about.html",
     "title": "About the Author",
     "section": "",
     "text": "Anthony Faustine\n    Principal ML Engineer  ·  Analog Devices, Ireland\n    \n       sambaiga.github.io\n       sambaiga\n       sambaiga\n       0000-0002-7838-533X\n       sambaiga@gmail.com\n    \n  \n\nEvery part of this book started as something I had to solve for real, not as a topic I picked to write about.\nThe earliest was disaggregation: teaching a model to look at one aggregate power reading and say which appliance was drawing it, the same problem Part 2 of this book covers. That question led to the one utilities actually pay for: not just what’s running now, but what demand and solar output will look like tomorrow, with an honest estimate of how wrong that forecast might be. My PhD took that question to the low-voltage substation, forecasting net load in the presence of solar and EV charging when a headline accuracy number wasn’t good enough to act on. At Eaton’s Centre for Intelligent Power, I ran that same question as Lead Data Scientist and Principal Investigator, securing €1.6M in competitive research funding and picking up the Eaton STAR Leadership Award along the way.\nToday, as Principal ML Engineer at Analog Devices, the question is the same one this book keeps returning to: not whether a model works in a notebook, but whether it survives contact with production, supply chain demand planning and edge inference in my case. That is the bar every chapter here holds itself to.\nThe open-source side of that decade is public: Twiga (point and probabilistic forecasting, one interface, every model), MLPForecast (uncertainty-aware net-load forecasting), and Deep-NILMtk (a community toolkit for non-intrusive load monitoring, the same disaggregation problem this book opens with).\nProjects  →  sambaiga.github.io/pages/projects\nThe published record runs the same thread: non-intrusive load monitoring, probabilistic forecasting, uncertainty quantification, physics-based intelligence, and AI for reliability engineering, across 10+ peer-reviewed papers in IEEE Transactions on Smart Grid, IEEE Transactions on Power Systems, and IEEE Transactions on Industrial Informatics.\nPublications  →  sambaiga.github.io/pages/publication  ·  ORCID\nI also write about machine learning, Bayesian thinking, and applied AI at:\nBlog  →  sambaiga.github.io/pages/blog",
     "crumbs": [
-      "<span class='chapter-number'>10</span>  <span class='chapter-title'>About the Author</span>"
+      "<span class='chapter-number'>11</span>  <span class='chapter-title'>About the Author</span>"
     ]
   },
   {
@@ -759,9 +924,9 @@
     "href": "acronyms.html",
     "title": "List of Acronyms",
     "section": "",
-    "text": "List Of Acronyms\n\nBESS\n\nBattery Energy Storage System\n\nCRPS\n\nContinuously Ranked Probability Score\n\nDER\n\nDistributed Energy Resources\n\nDSO\n\nDistribution System Operator\n\nEV\n\nElectric Vehicle\n\nHV\n\nHigh Voltage\n\nIEEE\n\nInstitute of Electrical and Electronics Engineers\n\nLV\n\nLow Voltage\n\nMV\n\nMedium Voltage\n\nNILM\n\nNon-Intrusive Load Monitoring\n\nPV\n\nPhotovoltaic\n\nRES\n\nRenewable Energy Sources",
+    "text": "List Of Acronyms\n\nBESS\n\nBattery Energy Storage System\n\nCRPS\n\nContinuously Ranked Probability Score\n\nDER\n\nDistributed Energy Resources\n\nDSO\n\nDistribution System Operator\n\nEV\n\nElectric Vehicle\n\nHV\n\nHigh Voltage\n\nIEEE\n\nInstitute of Electrical and Electronics Engineers\n\nLV\n\nLow Voltage\n\nMV\n\nMedium Voltage\n\nNILM\n\nNon-Intrusive Load Monitoring\n\nPCA\n\nPrincipal Component Analysis\n\nPPS\n\nPredictive Power Score\n\nPV\n\nPhotovoltaic\n\nRES\n\nRenewable Energy Sources",
     "crumbs": [
-      "<span class='chapter-number'>11</span>  <span class='chapter-title'>List of Acronyms</span>"
+      "<span class='chapter-number'>12</span>  <span class='chapter-title'>List of Acronyms</span>"
     ]
   }
 ]

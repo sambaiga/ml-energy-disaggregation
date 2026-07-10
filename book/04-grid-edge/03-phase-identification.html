@@ -1,0 +1,2190 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.9.38">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="description" content="A structured, project-based path through smart meter data: disaggregation, forecasting, anomaly detection, and grid-edge value, from raw signal to business insight.">
+
+<title>Chapter 3: Phase Identification from Smart-Meter Data – Machine Learning for Smart Meter Data</title>
+<style>
+/* Default styles provided by pandoc.
+** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+*/
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+/* CSS for citations */
+div.csl-bib-body { }
+div.csl-entry {
+  clear: both;
+  margin-bottom: 0em;
+}
+.hanging-indent div.csl-entry {
+  margin-left:2em;
+  text-indent:-2em;
+}
+div.csl-left-margin {
+  min-width:2em;
+  float:left;
+}
+div.csl-right-inline {
+  margin-left:2em;
+  padding-left:1em;
+}
+div.csl-indent {
+  margin-left: 2em;
+}</style>
+
+
+<script src="https://cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.min.js" integrity="sha384-ZvpUoO/+PpLXR1lu4jmpXWu80pZlYUAfxl5NsBMWOEPSjUn/6Z/hRTt8+pR6L4N2" crossorigin="anonymous"></script><script src="../../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../../">
+<link href="../../about.html" rel="next">
+<link href="../../book/04-grid-edge/02-timeseries-der-modeling.html" rel="prev">
+<link href="../../assets/favicon.svg" rel="icon" type="image/svg+xml">
+<script src="../../site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="../../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="../../site_libs/quarto-html/popper.min.js"></script>
+<script src="../../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-de63f62b328812d8e578a4d74e282472.css" rel="stylesheet" class="quarto-color-scheme" id="quarto-text-highlighting-styles">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-dark-6b6957c917596b414ec0b78690761e87.css" rel="stylesheet" class="quarto-color-scheme quarto-color-alternate" id="quarto-text-highlighting-styles">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-de63f62b328812d8e578a4d74e282472.css" rel="stylesheet" class="quarto-color-scheme-extra" id="quarto-text-highlighting-styles">
+<script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../../site_libs/bootstrap/bootstrap-36bd8577216834d23b435baa2ce28cca.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
+<link href="../../site_libs/bootstrap/bootstrap-dark-0aba252a5ad676c385980f30b0449bb6.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="dark">
+<link href="../../site_libs/bootstrap/bootstrap-36bd8577216834d23b435baa2ce28cca.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme-extra" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+<style>html{ scroll-behavior: smooth; }</style>
+<script src="https://cdn.jsdelivr.net/npm/requirejs@2.3.6/require.min.js" integrity="sha384-c9c+LnTbwQ3aujuU7ULEPVvgLs+Fn6fJUvIGTsuu1ZcCf11fiEubah0ttpca4ntM sha384-6V1/AdqZRWk1KAlWbKBlGhN7VG4iE/yAZcO6NZPMF8od0vukrvr0tg4qY6NSrItx" crossorigin="anonymous"></script>
+
+<script type="application/javascript">define('jquery', [],function() {return window.jQuery;})</script>
+
+
+<meta property="og:title" content="Chapter 3: Phase Identification from Smart-Meter Data – Machine Learning for Smart Meter Data">
+<meta property="og:description" content="A structured, project-based path through smart meter data: disaggregation, forecasting, anomaly detection, and grid-edge value, from raw signal to business insight.">
+<meta property="og:site_name" content="Machine Learning for Smart Meter Data">
+<meta name="twitter:title" content="Chapter 3: Phase Identification from Smart-Meter Data – Machine Learning for Smart Meter Data">
+<meta name="twitter:description" content="A structured, project-based path through smart meter data: disaggregation, forecasting, anomaly detection, and grid-edge value, from raw signal to business insight.">
+<meta name="twitter:card" content="summary">
+</head>
+
+<body class="nav-sidebar floating nav-fixed quarto-light"><script id="quarto-html-before-body" type="application/javascript">
+    const toggleBodyColorMode = (bsSheetEl) => {
+      const mode = bsSheetEl.getAttribute("data-mode");
+      const bodyEl = window.document.querySelector("body");
+      if (mode === "dark") {
+        bodyEl.classList.add("quarto-dark");
+        bodyEl.classList.remove("quarto-light");
+      } else {
+        bodyEl.classList.add("quarto-light");
+        bodyEl.classList.remove("quarto-dark");
+      }
+    }
+    const toggleBodyColorPrimary = () => {
+      const bsSheetEl = window.document.querySelector("link#quarto-bootstrap:not([rel=disabled-stylesheet])");
+      if (bsSheetEl) {
+        toggleBodyColorMode(bsSheetEl);
+      }
+    }
+    const setColorSchemeToggle = (alternate) => {
+      const toggles = window.document.querySelectorAll('.quarto-color-scheme-toggle');
+      for (let i=0; i < toggles.length; i++) {
+        const toggle = toggles[i];
+        if (toggle) {
+          if (alternate) {
+            toggle.classList.add("alternate");
+          } else {
+            toggle.classList.remove("alternate");
+          }
+        }
+      }
+    };
+    const toggleColorMode = (alternate) => {
+      // Switch the stylesheets
+      const primaryStylesheets = window.document.querySelectorAll('link.quarto-color-scheme:not(.quarto-color-alternate)');
+      const alternateStylesheets = window.document.querySelectorAll('link.quarto-color-scheme.quarto-color-alternate');
+      manageTransitions('#quarto-margin-sidebar .nav-link', false);
+      if (alternate) {
+        // note: dark is layered on light, we don't disable primary!
+        enableStylesheet(alternateStylesheets);
+        for (const sheetNode of alternateStylesheets) {
+          if (sheetNode.id === "quarto-bootstrap") {
+            toggleBodyColorMode(sheetNode);
+          }
+        }
+      } else {
+        disableStylesheet(alternateStylesheets);
+        enableStylesheet(primaryStylesheets)
+        toggleBodyColorPrimary();
+      }
+      manageTransitions('#quarto-margin-sidebar .nav-link', true);
+      // Switch the toggles
+      setColorSchemeToggle(alternate)
+      // Hack to workaround the fact that safari doesn't
+      // properly recolor the scrollbar when toggling (#1455)
+      if (navigator.userAgent.indexOf('Safari') > 0 && navigator.userAgent.indexOf('Chrome') == -1) {
+        manageTransitions("body", false);
+        window.scrollTo(0, 1);
+        setTimeout(() => {
+          window.scrollTo(0, 0);
+          manageTransitions("body", true);
+        }, 40);
+      }
+    }
+    const disableStylesheet = (stylesheets) => {
+      for (let i=0; i < stylesheets.length; i++) {
+        const stylesheet = stylesheets[i];
+        stylesheet.rel = 'disabled-stylesheet';
+      }
+    }
+    const enableStylesheet = (stylesheets) => {
+      for (let i=0; i < stylesheets.length; i++) {
+        const stylesheet = stylesheets[i];
+        if(stylesheet.rel !== 'stylesheet') { // for Chrome, which will still FOUC without this check
+          stylesheet.rel = 'stylesheet';
+        }
+      }
+    }
+    const manageTransitions = (selector, allowTransitions) => {
+      const els = window.document.querySelectorAll(selector);
+      for (let i=0; i < els.length; i++) {
+        const el = els[i];
+        if (allowTransitions) {
+          el.classList.remove('notransition');
+        } else {
+          el.classList.add('notransition');
+        }
+      }
+    }
+    const isFileUrl = () => {
+      return window.location.protocol === 'file:';
+    }
+    const hasAlternateSentinel = () => {
+      let styleSentinel = getColorSchemeSentinel();
+      if (styleSentinel !== null) {
+        return styleSentinel === "alternate";
+      } else {
+        return false;
+      }
+    }
+    const setStyleSentinel = (alternate) => {
+      const value = alternate ? "alternate" : "default";
+      if (!isFileUrl()) {
+        window.localStorage.setItem("quarto-color-scheme", value);
+      } else {
+        localAlternateSentinel = value;
+      }
+    }
+    const getColorSchemeSentinel = () => {
+      if (!isFileUrl()) {
+        const storageValue = window.localStorage.getItem("quarto-color-scheme");
+        return storageValue != null ? storageValue : localAlternateSentinel;
+      } else {
+        return localAlternateSentinel;
+      }
+    }
+    const toggleGiscusIfUsed = (isAlternate, darkModeDefault) => {
+      const baseTheme = document.querySelector('#giscus-base-theme')?.value ?? 'light';
+      const alternateTheme = document.querySelector('#giscus-alt-theme')?.value ?? 'dark';
+      let newTheme = '';
+      if(authorPrefersDark) {
+        newTheme = isAlternate ? baseTheme : alternateTheme;
+      } else {
+        newTheme = isAlternate ? alternateTheme : baseTheme;
+      }
+      const changeGiscusTheme = () => {
+        // From: https://github.com/giscus/giscus/issues/336
+        const sendMessage = (message) => {
+          const iframe = document.querySelector('iframe.giscus-frame');
+          if (!iframe) return;
+          iframe.contentWindow.postMessage({ giscus: message }, 'https://giscus.app');
+        }
+        sendMessage({
+          setConfig: {
+            theme: newTheme
+          }
+        });
+      }
+      const isGiscussLoaded = window.document.querySelector('iframe.giscus-frame') !== null;
+      if (isGiscussLoaded) {
+        changeGiscusTheme();
+      }
+    };
+    const authorPrefersDark = false;
+    const darkModeDefault = authorPrefersDark;
+      document.querySelector('link#quarto-text-highlighting-styles.quarto-color-scheme-extra').rel = 'disabled-stylesheet';
+      document.querySelector('link#quarto-bootstrap.quarto-color-scheme-extra').rel = 'disabled-stylesheet';
+    let localAlternateSentinel = darkModeDefault ? 'alternate' : 'default';
+    // Dark / light mode switch
+    window.quartoToggleColorScheme = () => {
+      // Read the current dark / light value
+      let toAlternate = !hasAlternateSentinel();
+      toggleColorMode(toAlternate);
+      setStyleSentinel(toAlternate);
+      toggleGiscusIfUsed(toAlternate, darkModeDefault);
+      window.dispatchEvent(new Event('resize'));
+    };
+    // Switch to dark mode if need be
+    if (hasAlternateSentinel()) {
+      toggleColorMode(true);
+    } else {
+      toggleColorMode(false);
+    }
+  </script>
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+    <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container mx-auto">
+    <a class="navbar-brand" href="../../index.html">
+    <span class="navbar-title">Machine Learning for Smart Meter Data</span>
+    </a>
+  </div>
+            <div id="quarto-search" class="" title="Search"></div>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" role="menu" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav navbar-nav-scroll ms-auto">
+  <li class="nav-item compact">
+    <a class="nav-link" href="mailto:sambaiga@gmail.com"> <i class="bi bi-envelope-at" role="img" aria-label="Email Anthony Faustine">
+</i> 
+<span class="menu-text"></span></a>
+  </li>  
+  <li class="nav-item compact">
+    <a class="nav-link" href="https://www.linkedin.com/in/sambaiga"> <i class="bi bi-linkedin" role="img" aria-label="LinkedIn">
+</i> 
+<span class="menu-text"></span></a>
+  </li>  
+  <li class="nav-item compact">
+    <a class="nav-link" href="https://github.com/sambaiga/ml-energy-disaggregation"> <i class="bi bi-github" role="img" aria-label="View source on GitHub">
+</i> 
+<span class="menu-text"></span></a>
+  </li>  
+</ul>
+          </div> <!-- /navcollapse -->
+            <div class="quarto-navbar-tools">
+    <a href="https://github.com/sambaiga/ml-energy-disaggregation" title="Source Code" class="quarto-navigation-tool px-1" aria-label="Source Code"><i class="bi bi-github"></i></a>
+  <a href="" class="quarto-color-scheme-toggle quarto-navigation-tool  px-1" onclick="window.quartoToggleColorScheme(); return false;" title="Toggle dark mode"><i class="bi"></i></a>
+</div>
+      </div> <!-- /container-fluid -->
+    </nav>
+  <nav class="quarto-secondary-nav">
+    <div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
+      </button>
+        <a class="flex-grow-1 no-decor" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+          <h1 class="quarto-secondary-nav-title"><span class="chapter-title">Chapter 3: Phase Identification from Smart-Meter Data</span></h1>
+        </a>     
+    </div>
+  </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation floating overflow-auto">
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../index.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">Welcome</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../preface.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">Preface</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../how-to-use.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">How to Use This Book</span></a>
+  </div>
+</li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="false">
+ <span class="menu-text">Part 2: Disaggregation</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="false" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../book/02-disaggregation/01-what-is-nilm.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">Chapter 1: Non-Intrusive Load Monitoring</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../book/02-disaggregation/02-feature-engineering.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">Chapter 2: Appliance Recognition</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../book/02-disaggregation/03-multi-appliance-recognition.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">Chapter 3: Multi-Appliance Recognition</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../book/02-disaggregation/04-multi-task-low-frequency.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">Chapter 4: Multi-Task Deep Learning at Low Frequency</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true">
+ <span class="menu-text">Part 4: Grid-Edge Value</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../book/04-grid-edge/01-opendss-lv-modeling.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">Chapter 1: Modeling the Low-Voltage Network</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../book/04-grid-edge/02-timeseries-der-modeling.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">Chapter 2: Time-Series Simulation and DER Modeling</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../book/04-grid-edge/03-phase-identification.html" class="sidebar-item-text sidebar-link active"><span class="chapter-title">Chapter 3: Phase Identification from Smart-Meter Data</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../about.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">About the Author</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../acronyms.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">List of Acronyms</span></a>
+  </div>
+</li>
+    </ul>
+    </div>
+</nav>
+<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">In this chapter</h2>
+   
+  <ul>
+  <li><a href="#why-voltage-carries-a-phase-signature" id="toc-why-voltage-carries-a-phase-signature" class="nav-link active" data-scroll-target="#why-voltage-carries-a-phase-signature">Why voltage carries a phase signature</a></li>
+  <li><a href="#getting-the-data" id="toc-getting-the-data" class="nav-link" data-scroll-target="#getting-the-data">Getting the data</a></li>
+  <li><a href="#the-feeder-again" id="toc-the-feeder-again" class="nav-link" data-scroll-target="#the-feeder-again">The feeder, again</a></li>
+  <li><a href="#where-the-real-answer-is-hiding" id="toc-where-the-real-answer-is-hiding" class="nav-link" data-scroll-target="#where-the-real-answer-is-hiding">Where the real answer is hiding</a></li>
+  <li><a href="#a-voltage-time-series-one-per-customer" id="toc-a-voltage-time-series-one-per-customer" class="nav-link" data-scroll-target="#a-voltage-time-series-one-per-customer">A voltage time series, one per customer</a></li>
+  <li><a href="#a-first-naive-attempt" id="toc-a-first-naive-attempt" class="nav-link" data-scroll-target="#a-first-naive-attempt">A first, naive attempt</a></li>
+  <li><a href="#clustering-the-correlation-instead" id="toc-clustering-the-correlation-instead" class="nav-link" data-scroll-target="#clustering-the-correlation-instead">Clustering the correlation instead</a></li>
+  <li><a href="#would-this-have-found-three-groups-unsupervised" id="toc-would-this-have-found-three-groups-unsupervised" class="nav-link" data-scroll-target="#would-this-have-found-three-groups-unsupervised">Would this have found three groups unsupervised?</a></li>
+  <li><a href="#how-much-data-does-this-actually-need" id="toc-how-much-data-does-this-actually-need" class="nav-link" data-scroll-target="#how-much-data-does-this-actually-need">How much data does this actually need?</a></li>
+  <li><a href="#does-the-choice-of-association-measure-matter" id="toc-does-the-choice-of-association-measure-matter" class="nav-link" data-scroll-target="#does-the-choice-of-association-measure-matter">Does the choice of association measure matter?</a></li>
+  <li><a href="#naming-the-clusters-with-a-handful-of-known-customers" id="toc-naming-the-clusters-with-a-handful-of-known-customers" class="nav-link" data-scroll-target="#naming-the-clusters-with-a-handful-of-known-customers">Naming the clusters with a handful of known customers</a></li>
+  <li><a href="#beyond-a-point-estimate-conformal-phase-assignment-confidence" id="toc-beyond-a-point-estimate-conformal-phase-assignment-confidence" class="nav-link" data-scroll-target="#beyond-a-point-estimate-conformal-phase-assignment-confidence">Beyond a point estimate: conformal phase-assignment confidence</a></li>
+  <li><a href="#where-this-leaves-part-4" id="toc-where-this-leaves-part-4" class="nav-link" data-scroll-target="#where-this-leaves-part-4">Where this leaves Part 4</a></li>
+  <li><a href="#references" id="toc-references" class="nav-link" data-scroll-target="#references">References</a></li>
+  </ul>
+<div class="toc-actions"><ul><li><a href="https://github.com/sambaiga/ml-energy-disaggregation/edit/main/book/04-grid-edge/03-phase-identification.qmd" class="toc-action"><i class="bi bi-github"></i>Edit this page</a></li><li><a href="https://github.com/sambaiga/ml-energy-disaggregation/issues/new" class="toc-action"><i class="bi empty"></i>Report an issue</a></li><li><a href="https://github.com/sambaiga/ml-energy-disaggregation/blob/main/book/04-grid-edge/03-phase-identification.qmd" class="toc-action"><i class="bi empty"></i>View source</a></li></ul></div></nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title d-none d-lg-block"><span class="chapter-title">Chapter 3: Phase Identification from Smart-Meter Data</span></h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<p>Chapter 1 named phase balance as one of three limits every low-voltage feeder operates under, alongside thermal and voltage constraints, and made a quieter claim alongside it: the phase each customer connects to is information no meter reports. Every study in Chapters 1 and 2 relied on that information anyway, taken directly from the network model’s own <code>bus1</code> definitions, and never checked. This chapter examines what that assumption is worth.</p>
+<p>In practice, a utility’s phase records rarely match the network exactly. Service connections get re-terminated during storm repairs and equipment swaps without the change reaching the record system; decades of ad hoc feeder edits accumulate drift between the as-built network and the as-documented one. Short’s own motivation for building a metering-based correction method was exactly this gap: utility phase records are compiled by hand over decades of field work and are known, chronically, to disagree with the physical network in ways no one catches until something downstream stops making sense <span class="citation" data-cites="short2013phaseid">[1]</span>. Every unbalance calculation, every hosting-capacity study like the one Chapter 2 ran, and every state estimate a distribution system operator (<a href="#acronyms_DSO">Distribution System Operator (DSO)</a>) produces inherits whatever phase labels the model happens to carry, correct or not, with no independent way to catch the difference from the network model alone.</p>
+<p>This chapter asks whether that gap can be closed without sending anyone into the field. A smart meter cannot report its own phase directly, no more than it can report a neighboring bus’s voltage, but it reports something that turns out to depend on phase in a very specific way: its own voltage, read over time. What follows works through why that dependency exists, tests a method built on it against a real, known answer, and is honest about where the method breaks.</p>
+<section id="why-voltage-carries-a-phase-signature" class="level2">
+<h2 class="anchored" data-anchor-id="why-voltage-carries-a-phase-signature">Why voltage carries a phase signature</h2>
+<p>A three-phase low-voltage feeder splits into single-phase service drops at various points along its length, each drop landing on phase A, B, or C. Every customer on the same phase shares two things no customer on a different phase shares: the same upstream conductor path back to the transformer, and therefore the same phase-to-neutral voltage reference riding on that path. When aggregate demand on phase A rises anywhere along the feeder, every customer downstream on phase A sees a correlated dip in its own voltage, driven by the same current flowing through the same shared impedance. A customer on phase B, drawing a similar amount of power at the same moment, sees no such dip, because phase B’s conductor and phase B’s demand are what set its voltage instead.</p>
+<p>Active or reactive power consumption carries no equivalent signal. Two households on different phases can have nearly identical demand profiles simply because they keep similar schedules, while two households on the same phase can have very different demand and still show near-identical voltage fluctuation, because it is the shared electrical path, not the shared behavior, that produces the correlation. Phase identification from smart-meter data is therefore a voltage problem, not a power problem, and any method that starts from power alone is starting from the wrong signal.</p>
+<p>This is not a new observation. Short first proposed recovering phase connectivity from correlated voltage magnitude at scale, using advanced metering infrastructure already deployed for billing <span class="citation" data-cites="short2013phaseid">[1]</span>. Two directions have extended that idea since. Blakely and Reno built an ensemble spectral-clustering method around the co-association matrix formed by resampling the correlation-based clustering many times, avoiding a dependency on any prior phase labels at all <span class="citation" data-cites="blakely2020coassociation">[2]</span>. Hangawatta, Gargoom, and Kouzani took a supervised route instead, training a neural network directly on consumption data at the low sampling rates typical of real deployments, closer to the resolution this chapter’s own data uses <span class="citation" data-cites="hangawatta2025phaseid">[3]</span>. Hoogsteyn, Vanin, Koirala, and Van Hertem benchmarked a range of these methods against each other under varying meter accuracy and deployment density, producing exactly the kind of sensitivity findings this chapter reproduces independently in its own closing section <span class="citation" data-cites="hoogsteyn2022phaseid">[4]</span>.</p>
+<p>One study sits closer to this chapter than any of the others. Simonovska and Ochoa combined principal component analysis with unconstrained k-means clustering on smart-meter voltage traces and tested it on a real, anonymized 31-customer low-voltage feeder under varying levels of <a href="#acronyms_PV">Photovoltaic (PV)</a> penetration <span class="citation" data-cites="simonovska2021phasegrouping">[5]</span>. That feeder is the same one this book has used since Chapter 1. The method built and tested below follows the same principle, correlation structure over raw readings, dimensionality reduction, then clustering, checked here against this feeder’s own real phase records rather than assumed correct.</p>
+<div class="ark-concept">
+<p><span class="ark-concept-title"><i class="bi bi-info-circle-fill"></i> Key Concept</span></p>
+<p><strong>Correlation, not magnitude, is the signal.</strong> Two voltage traces that look similar in absolute level can be weakly correlated, and two traces at different absolute levels can be strongly correlated, if they move together over time. A phase-identification method that clusters on raw voltage magnitude is answering “which customers have a similar voltage level,” a question dominated by each customer’s distance from the transformer. A method that clusters on the correlation between voltage traces is answering “which customers’ voltage moves together,” the question that actually tracks phase membership. The rest of this chapter tests both and reports what the difference costs in practice.</p>
+</div>
+</section>
+<section id="getting-the-data" class="level2">
+<h2 class="anchored" data-anchor-id="getting-the-data">Getting the data</h2>
+<p>This chapter reuses the same <a href="#acronyms_LV">Low Voltage (LV)</a> network and smart-meter data Chapters 1 and 2 vendored, no new fetch step required:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb1"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="ex">uv</span> run python scripts/fetch_part4_ausnet_data.py</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</section>
+<section id="the-feeder-again" class="level2">
+<h2 class="anchored" data-anchor-id="the-feeder-again">The feeder, again</h2>
+<p>Every result below runs on the same 31-customer AusNet feeder Chapters 1 and 2 already built and solved: the same distribution transformer, the same line segments, the same single-phase service cables. This chapter’s only new question is whether the phase label attached to each of those service cables in the network model is actually correct.</p>
+<div class="quarto-embed-nb-cell" data-notebook="/home/runner/work/ml-energy-disaggregation/ml-energy-disaggregation/book/04-grid-edge/03-phase-identification-code.ipynb" data-notebook-title="Phase Identification" data-notebook-cellid="489bf60b">
+<div id="489bf60b" class="cell">
+<div class="cell-output cell-output-display">
+<pre><code>{'converged': True,
+ 'n_buses': 61,
+ 'n_lines': 59,
+ 'n_loads': 31,
+ 'n_transformers': 1,
+ 'total_p_loss_kw': 0.6107992120127365,
+ 'total_q_loss_kvar': 0.15519491021295995}</code></pre>
+</div>
+</div>
+</div>
+</section>
+<section id="where-the-real-answer-is-hiding" class="level2">
+<h2 class="anchored" data-anchor-id="where-the-real-answer-is-hiding">Where the real answer is hiding</h2>
+<p>Checking a method against a known answer requires a known answer, and this feeder happens to have one, buried one level deeper in the network model than it first appears. Every load’s own <code>bus1</code> in this network ends in <code>.1</code>, the same for all 31 customers, which looks like it means every customer sits on phase A. It does not: a single-phase bus only ever has one local node, so its own node index is always 1, regardless of which physical phase actually feeds it. The real phase assignment lives one step upstream, on the service line that feeds that bus. That line’s own <code>bus1</code>, the tap point on the three-phase backbone, ends in <code>.1</code>, <code>.2</code>, or <code>.3</code>, and that suffix is the customer’s actual phase.</p>
+<div class="quarto-embed-nb-cell" data-notebook="/home/runner/work/ml-energy-disaggregation/ml-energy-disaggregation/book/04-grid-edge/03-phase-identification-code.ipynb" data-notebook-title="Phase Identification" data-notebook-cellid="8f3e1b95">
+<div id="8f3e1b95" class="cell">
+<div class="cell-output cell-output-stdout">
+<pre><code>Real phase distribution across 31 customers: {1: 11, 2: 10, 3: 10}</code></pre>
+</div>
+</div>
+</div>
+<p>Eleven customers on phase 1, ten on phase 2, ten on phase 3, matching this feeder’s own documentation exactly. Every method tested in the rest of this chapter is checked against this same real answer, not against its own assumptions.</p>
+</section>
+<section id="a-voltage-time-series-one-per-customer" class="level2">
+<h2 class="anchored" data-anchor-id="a-voltage-time-series-one-per-customer">A voltage time series, one per customer</h2>
+<p>Driving each customer with its own smart-meter reading, the same <code>LoadShape</code> mechanics Chapter 2 introduced, and solving across a full day produces one voltage time series per customer, the raw material every method below draws from.</p>
+<div class="quarto-embed-nb-cell" data-notebook="/home/runner/work/ml-energy-disaggregation/ml-energy-disaggregation/book/04-grid-edge/03-phase-identification-code.ipynb" data-notebook-title="Phase Identification" data-notebook-cellid="4b52bbe8">
+<div id="4b52bbe8" class="cell">
+<div class="cell-output cell-output-stdout">
+<pre><code>load_data: (342, 365, 48) (customers, days, half-hours)
+All 31 houses now follow a real customer's day-45 reading</code></pre>
+</div>
+</div>
+</div>
+<div class="quarto-embed-nb-cell" data-notebook="/home/runner/work/ml-energy-disaggregation/ml-energy-disaggregation/book/04-grid-edge/03-phase-identification-code.ipynb" data-notebook-title="Phase Identification" data-notebook-cellid="5ab14a2e">
+<div id="5ab14a2e" class="cell">
+<div class="cell-output cell-output-stdout">
+<pre><code>48 half-hour steps x 31 customers</code></pre>
+</div>
+</div>
+</div>
+</section>
+<section id="a-first-naive-attempt" class="level2">
+<h2 class="anchored" data-anchor-id="a-first-naive-attempt">A first, naive attempt</h2>
+<p>The most direct application of the theory above skips a step. Treat each customer’s 48-point voltage trace as a feature vector, reduce it to two dimensions with <a href="#acronyms_PCA">Principal Component Analysis (PCA)</a>, and cluster the result into three groups. It is worth running this exact approach before reaching for anything more careful, and checking it honestly against the real answer already in hand, rather than assuming a plausible-sounding method works.</p>
+<div class="quarto-embed-nb-cell" data-notebook="/home/runner/work/ml-energy-disaggregation/ml-energy-disaggregation/book/04-grid-edge/03-phase-identification-code.ipynb" data-notebook-title="Phase Identification" data-notebook-cellid="1da22105">
+<div id="1da22105" class="cell">
+<div class="cell-output cell-output-stdout">
+<pre><code>PCA on raw voltage + k-means: adjusted Rand index = 0.24 (1.0 is perfect)</code></pre>
+</div>
+</div>
+</div>
+<div class="ark-mistake">
+<p><strong><a href="#acronyms_PCA">PCA</a> on raw voltage barely beats a coin flip.</strong> An adjusted Rand index of 0.24, where 1.0 is a perfect match to the real phase labels and 0.0 is no better than random assignment, means the clusters this approach finds only weakly track the real answer. Nothing here is a coding error: every customer’s raw voltage trace is dominated by the same feeder-wide daily demand cycle, the shared shape <a href="#acronyms_PCA">PCA</a> finds first because it explains the most overall variance in the raw data. Phase membership is a smaller effect sitting underneath that shared pattern, exactly the distinction the concept box above predicted, and standard <a href="#acronyms_PCA">PCA</a> on raw magnitude has no reason to prioritize it.</p>
+</div>
+</section>
+<section id="clustering-the-correlation-instead" class="level2">
+<h2 class="anchored" data-anchor-id="clustering-the-correlation-instead">Clustering the correlation instead</h2>
+<p>The fix is not a different clustering algorithm. It is a different question asked of the same underlying data: instead of asking which customers have similar voltage traces, ask which customers’ voltage moves together. The pairwise correlation matrix between customers directly answers that question, with the shared feeder-wide pattern present in every pair roughly equally and therefore no longer the dominant source of variance.</p>
+<div class="quarto-embed-nb-cell" data-notebook="/home/runner/work/ml-energy-disaggregation/ml-energy-disaggregation/book/04-grid-edge/03-phase-identification-code.ipynb" data-notebook-title="Phase Identification" data-notebook-cellid="7fa6dff9">
+<div id="7fa6dff9" class="cell">
+<div class="cell-output cell-output-display">
+<div>
+
+
+<table class="dataframe caption-top table table-sm table-striped small" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">load_mg1_1</th>
+<th data-quarto-table-cell-role="th">load_mg1_2</th>
+<th data-quarto-table-cell-role="th">load_mg1_3</th>
+<th data-quarto-table-cell-role="th">load_mg1_4</th>
+<th data-quarto-table-cell-role="th">load_mg1_5</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<th data-quarto-table-cell-role="th">load_mg1_1</th>
+<td>1.000000</td>
+<td>0.803656</td>
+<td>0.638365</td>
+<td>0.989828</td>
+<td>0.706010</td>
+</tr>
+<tr class="even">
+<th data-quarto-table-cell-role="th">load_mg1_2</th>
+<td>0.803656</td>
+<td>1.000000</td>
+<td>0.480316</td>
+<td>0.770728</td>
+<td>0.965884</td>
+</tr>
+<tr class="odd">
+<th data-quarto-table-cell-role="th">load_mg1_3</th>
+<td>0.638365</td>
+<td>0.480316</td>
+<td>1.000000</td>
+<td>0.629764</td>
+<td>0.340544</td>
+</tr>
+<tr class="even">
+<th data-quarto-table-cell-role="th">load_mg1_4</th>
+<td>0.989828</td>
+<td>0.770728</td>
+<td>0.629764</td>
+<td>1.000000</td>
+<td>0.657308</td>
+</tr>
+<tr class="odd">
+<th data-quarto-table-cell-role="th">load_mg1_5</th>
+<td>0.706010</td>
+<td>0.965884</td>
+<td>0.340544</td>
+<td>0.657308</td>
+<td>1.000000</td>
+</tr>
+</tbody>
+</table>
+
+</div>
+</div>
+</div>
+</div>
+<p>Customers on the same real phase already correlate above 0.98 in this matrix; customers on different phases sit closer to 0.5 to 0.8. The phase signal is visible directly in the numbers before any clustering algorithm runs at all.</p>
+<div class="quarto-embed-nb-cell" data-notebook="/home/runner/work/ml-energy-disaggregation/ml-energy-disaggregation/book/04-grid-edge/03-phase-identification-code.ipynb" data-notebook-title="Phase Identification" data-notebook-cellid="1fb859ea">
+<div id="1fb859ea" class="cell">
+<div class="cell-output cell-output-stdout">
+<pre><code>PCA on the correlation matrix + k-means: adjusted Rand index = 1.00</code></pre>
+</div>
+</div>
+</div>
+<p>The same <a href="#acronyms_PCA">PCA</a>-plus-k-means recipe as the naive attempt, applied to the correlation matrix instead of the raw readings, recovers every one of the 31 customers’ real phases exactly, an adjusted Rand index of 1.0. Nothing about the clustering step changed; only what it was asked to cluster did.</p>
+<div class="quarto-embed-nb-cell" data-notebook="/home/runner/work/ml-energy-disaggregation/ml-energy-disaggregation/book/04-grid-edge/03-phase-identification-code.ipynb" data-notebook-title="Phase Identification" data-notebook-cellid="509c276d">
+<div id="509c276d" class="cell">
+<div class="cell-output cell-output-display">
+   <div id="ACNjcp"></div>
+   <script type="text/javascript" data-lets-plot-script="plot">
+   
+   (function() {
+   // ----------
+   
+   const forceImmediateRender = false;
+   const responsive = false;
+   
+   let sizing = {
+       width_mode: "MIN",
+       height_mode: "SCALED",
+       width: null, 
+       height: null 
+   };
+   
+   const preferredWidth = document.body.dataset.letsPlotPreferredWidth;
+   if (preferredWidth !== undefined) {
+       sizing = {
+           width_mode: 'FIXED',
+           height_mode: 'SCALED',
+           width: parseFloat(preferredWidth)
+       };
+   }
+   
+   const containerDiv = document.getElementById("ACNjcp");
+   let fig = null;
+   
+   function renderPlot() {
+       if (fig === null) {
+           const plotSpec = {
+"data":{
+"x":[-0.27937401910541654,-1.0724047809748602,1.6270725037694558,-0.14968223031339684,-1.4771206581944416,1.7048524643543201,-0.281720886077795,-1.6271603539956931,1.787877345322197,-0.27627921111051246,-1.6999983679924504,1.835518662559952,-0.2606397260445122,-1.7027109453292963,1.8394134948171486,-0.25083385747886316,-1.6794656533040477,1.877391559150258,-0.2648752878925288,-1.6794916191685219,1.9984953100364815,-0.21784854238659757,-1.6998917162270806,1.986960636704299,-0.3075586923655139,-1.6557210838334868,1.9943852140622833,-0.24696120964369692,-1.596227906402719,2.00582786542304,-0.23182830835800386],
+"y":[0.859055525701645,0.04059943603026813,-0.25169344850812947,0.9593940415207923,-0.3461344021522306,-0.4213872936105878,1.0162392373320073,-0.6324442512504482,-0.3078147762898935,1.0352245467383678,-0.6762839828005267,-0.4061574680122656,1.0491224646408537,-0.7665972319303409,-0.37868553782679837,1.0557388173340598,-0.8955170594616646,-0.5414464990337682,1.0577943861379613,-0.9188942022173618,-0.5404538373892245,1.0516134807614925,-0.9188834245390746,-0.5594175999120826,1.0242038232296111,-0.8747896249216476,-0.4847732641318702,1.0589414659121308,-0.7767156090884081,-0.5632691525686404,1.0534314403057732],
+"cluster":["Phase A","Phase B","Phase C","Phase A","Phase B","Phase C","Phase A","Phase B","Phase C","Phase A","Phase B","Phase C","Phase A","Phase B","Phase C","Phase A","Phase B","Phase C","Phase A","Phase B","Phase C","Phase A","Phase B","Phase C","Phase A","Phase B","Phase C","Phase A","Phase B","Phase C","Phase A"]
+},
+"mapping":{
+"x":"x",
+"y":"y",
+"color":"cluster"
+},
+"data_meta":{
+"series_annotations":[{
+"type":"float",
+"column":"x"
+},{
+"type":"float",
+"column":"y"
+},{
+"type":"str",
+"column":"cluster"
+}]
+},
+"ggtitle":{
+"text":"Real feeder: recovered phase clusters"
+},
+"guides":{
+"x":{
+"title":"PCA 1"
+},
+"y":{
+"title":"PCA 2"
+},
+"color":{
+"title":"Cluster"
+}
+},
+"theme":{
+"text":{
+"color":"#2d2d2d",
+"family":"'Libre Franklin', 'Segoe UI', Roboto, Helvetica, Arial, sans-serif",
+"size":12.0,
+"blank":false
+},
+"axis_title_x":{
+"face":"bold",
+"size":14.0,
+"margin":[10.0,0.0,0.0,0.0],
+"blank":false
+},
+"axis_title_y":{
+"face":"bold",
+"size":14.0,
+"margin":[0.0,10.0,0.0,0.0],
+"blank":false
+},
+"axis_text_x":{
+"color":"#666666",
+"angle":0.0,
+"hjust":0.5,
+"margin":[8.0,0.0,0.0,0.0],
+"blank":false
+},
+"axis_text_y":{
+"color":"#666666",
+"margin":[0.0,0.0,0.0,8.0],
+"blank":false
+},
+"axis_ticks":{
+"color":"#bbbbbb",
+"size":0.75,
+"blank":false
+},
+"axis_line":{
+"color":"#bbbbbb",
+"size":1.0,
+"blank":false
+},
+"legend_background":{
+"blank":true
+},
+"legend_text":{
+"size":12.0,
+"blank":false
+},
+"legend_title":{
+"face":"bold",
+"size":14.0,
+"blank":false
+},
+"legend_position":"top",
+"legend_spacing":10.0,
+"legend_key":{
+"blank":true
+},
+"panel_background":{
+"blank":true
+},
+"panel_border":{
+"blank":true
+},
+"panel_grid_minor":{
+"blank":true
+},
+"panel_grid_major_x":{
+"blank":true
+},
+"panel_grid_major_y":{
+"blank":true
+},
+"plot_background":{
+"blank":true
+},
+"plot_title":{
+"color":"#333333",
+"face":"bold",
+"size":19.0,
+"hjust":0.0,
+"margin":[0.0,0.0,6.0,0.0],
+"blank":false
+},
+"plot_subtitle":{
+"color":"#6b6b6b",
+"size":16.0,
+"hjust":0.0,
+"margin":[0.0,0.0,18.0,0.0],
+"blank":false
+},
+"plot_caption":{
+"color":"#999999",
+"face":"italic",
+"size":9.0,
+"hjust":1.0,
+"margin":[12.0,0.0,0.0,0.0],
+"blank":false
+},
+"plot_margin":[16.0,16.0,10.0,10.0],
+"strip_background":{
+"blank":true
+},
+"strip_text":{
+"family":"'Libre Franklin', 'Segoe UI', Roboto, Helvetica, Arial, sans-serif",
+"face":"bold",
+"size":12.0,
+"hjust":0.0,
+"blank":false
+}
+},
+"ggsize":{
+"width":600.0,
+"height":450.0
+},
+"kind":"plot",
+"scales":[{
+"aesthetic":"color",
+"values":["#0369A1","#EA580C","#059669"]
+}],
+"layers":[{
+"geom":"point",
+"mapping":{
+},
+"tooltips":{
+"formats":[],
+"disable_splitting":true
+},
+"data_meta":{
+},
+"size":4.0,
+"alpha":0.85,
+"data":{
+}
+}],
+"metainfo_list":[],
+"spec_id":"1"
+};
+           window.letsPlotCall(function() { fig = LetsPlot.buildPlotFromProcessedSpecs(plotSpec, containerDiv, sizing); });
+       } else {
+           fig.updateView({});
+       }
+   }
+   
+   const renderImmediately = 
+       forceImmediateRender || (
+           sizing.width_mode === 'FIXED' && 
+           (sizing.height_mode === 'FIXED' || sizing.height_mode === 'SCALED')
+       );
+   
+   if (renderImmediately) {
+       renderPlot();
+   }
+   
+   if (!renderImmediately || responsive) {
+       // Set up observer for initial sizing or continuous monitoring
+       var observer = new ResizeObserver(function(entries) {
+           for (let entry of entries) {
+               if (entry.contentBoxSize && 
+                   entry.contentBoxSize[0].inlineSize > 0) {
+                   if (!responsive && observer) {
+                       observer.disconnect();
+                       observer = null;
+                   }
+                   renderPlot();
+                   if (!responsive) {
+                       break;
+                   }
+               }
+           }
+       });
+       
+       observer.observe(containerDiv);
+   }
+   
+   // ----------
+   })();
+   
+   </script>
+</div>
+</div>
+</div>
+<p>Three tight, well-separated groups, colored here by the real phase label rather than the predicted one, since the two are identical for every customer on this feeder.</p>
+</section>
+<section id="would-this-have-found-three-groups-unsupervised" class="level2">
+<h2 class="anchored" data-anchor-id="would-this-have-found-three-groups-unsupervised">Would this have found three groups unsupervised?</h2>
+<p>The number of phases, three, was supplied going in. A working deployment often does not know the right number of groups in advance, so it is worth asking whether the data itself would have revealed it. The silhouette score, a measure of how well separated a given clustering is, answers that directly.</p>
+<div class="quarto-embed-nb-cell" data-notebook="/home/runner/work/ml-energy-disaggregation/ml-energy-disaggregation/book/04-grid-edge/03-phase-identification-code.ipynb" data-notebook-title="Phase Identification" data-notebook-cellid="62b6a69a">
+<div id="62b6a69a" class="cell">
+<div class="cell-output cell-output-stdout">
+<pre><code>k=2: silhouette = 0.696
+k=3: silhouette = 0.894  &lt;- used above
+k=4: silhouette = 0.850
+k=5: silhouette = 0.745
+k=6: silhouette = 0.698</code></pre>
+</div>
+</div>
+</div>
+<p>Three is the clear peak across the range tested, not an assumption smuggled into the method. This same correlation structure could have surfaced the right number of phase groups without being told what to look for.</p>
+</section>
+<section id="how-much-data-does-this-actually-need" class="level2">
+<h2 class="anchored" data-anchor-id="how-much-data-does-this-actually-need">How much data does this actually need?</h2>
+<p>A perfect result on one full day, from all 31 meters, answers the methodological question but not the practical one. Two questions matter before recommending this method for actual use: how long a voltage history is required, and how many meters actually need to be reporting. Both are worth checking directly rather than assumed.</p>
+<div class="quarto-embed-nb-cell" data-notebook="/home/runner/work/ml-energy-disaggregation/ml-energy-disaggregation/book/04-grid-edge/03-phase-identification-code.ipynb" data-notebook-title="Phase Identification" data-notebook-cellid="18157d3d">
+<div id="18157d3d" class="cell">
+<div class="cell-output cell-output-display">
+<div>
+
+
+<table class="dataframe caption-top table table-sm table-striped small" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">hours</th>
+<th data-quarto-table-cell-role="th">ari</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<th data-quarto-table-cell-role="th">0</th>
+<td>2.0</td>
+<td>0.528789</td>
+</tr>
+<tr class="even">
+<th data-quarto-table-cell-role="th">1</th>
+<td>4.0</td>
+<td>0.899784</td>
+</tr>
+<tr class="odd">
+<th data-quarto-table-cell-role="th">2</th>
+<td>6.0</td>
+<td>0.899784</td>
+</tr>
+<tr class="even">
+<th data-quarto-table-cell-role="th">3</th>
+<td>12.0</td>
+<td>1.000000</td>
+</tr>
+<tr class="odd">
+<th data-quarto-table-cell-role="th">4</th>
+<td>24.0</td>
+<td>1.000000</td>
+</tr>
+</tbody>
+</table>
+
+</div>
+</div>
+</div>
+</div>
+<div class="quarto-embed-nb-cell" data-notebook="/home/runner/work/ml-energy-disaggregation/ml-energy-disaggregation/book/04-grid-edge/03-phase-identification-code.ipynb" data-notebook-title="Phase Identification" data-notebook-cellid="c0529987">
+<div id="c0529987" class="cell">
+<div class="cell-output cell-output-display">
+   <div id="Q6A2RE"></div>
+   <script type="text/javascript" data-lets-plot-script="plot">
+   
+   (function() {
+   // ----------
+   
+   const forceImmediateRender = false;
+   const responsive = false;
+   
+   let sizing = {
+       width_mode: "MIN",
+       height_mode: "SCALED",
+       width: null, 
+       height: null 
+   };
+   
+   const preferredWidth = document.body.dataset.letsPlotPreferredWidth;
+   if (preferredWidth !== undefined) {
+       sizing = {
+           width_mode: 'FIXED',
+           height_mode: 'SCALED',
+           width: parseFloat(preferredWidth)
+       };
+   }
+   
+   const containerDiv = document.getElementById("Q6A2RE");
+   let fig = null;
+   
+   function renderPlot() {
+       if (fig === null) {
+           const plotSpec = {
+"data":{
+"hours":[2.0,4.0,6.0,12.0,24.0],
+"ari":[0.5287885766927684,0.8997844827586207,0.8997844827586207,1.0,1.0]
+},
+"mapping":{
+"x":"hours",
+"y":"ari"
+},
+"data_meta":{
+"series_annotations":[{
+"type":"float",
+"column":"hours"
+},{
+"type":"float",
+"column":"ari"
+}]
+},
+"ggtitle":{
+"text":"Accuracy vs. how long you watch"
+},
+"guides":{
+"x":{
+"title":"Observation window (hours)"
+},
+"y":{
+"title":"Adjusted Rand index"
+}
+},
+"theme":{
+"text":{
+"color":"#2d2d2d",
+"family":"'Libre Franklin', 'Segoe UI', Roboto, Helvetica, Arial, sans-serif",
+"size":12.0,
+"blank":false
+},
+"axis_title_x":{
+"face":"bold",
+"size":14.0,
+"margin":[10.0,0.0,0.0,0.0],
+"blank":false
+},
+"axis_title_y":{
+"face":"bold",
+"size":14.0,
+"margin":[0.0,10.0,0.0,0.0],
+"blank":false
+},
+"axis_text_x":{
+"color":"#666666",
+"angle":0.0,
+"hjust":0.5,
+"margin":[8.0,0.0,0.0,0.0],
+"blank":false
+},
+"axis_text_y":{
+"color":"#666666",
+"margin":[0.0,0.0,0.0,8.0],
+"blank":false
+},
+"axis_ticks":{
+"color":"#bbbbbb",
+"size":0.75,
+"blank":false
+},
+"axis_line":{
+"color":"#bbbbbb",
+"size":1.0,
+"blank":false
+},
+"legend_background":{
+"blank":true
+},
+"legend_text":{
+"size":12.0,
+"blank":false
+},
+"legend_title":{
+"face":"bold",
+"size":14.0,
+"blank":false
+},
+"legend_position":"top",
+"legend_spacing":10.0,
+"legend_key":{
+"blank":true
+},
+"panel_background":{
+"blank":true
+},
+"panel_border":{
+"blank":true
+},
+"panel_grid_minor":{
+"blank":true
+},
+"panel_grid_major_x":{
+"blank":true
+},
+"panel_grid_major_y":{
+"blank":true
+},
+"plot_background":{
+"blank":true
+},
+"plot_title":{
+"color":"#333333",
+"face":"bold",
+"size":19.0,
+"hjust":0.0,
+"margin":[0.0,0.0,6.0,0.0],
+"blank":false
+},
+"plot_subtitle":{
+"color":"#6b6b6b",
+"size":16.0,
+"hjust":0.0,
+"margin":[0.0,0.0,18.0,0.0],
+"blank":false
+},
+"plot_caption":{
+"color":"#999999",
+"face":"italic",
+"size":9.0,
+"hjust":1.0,
+"margin":[12.0,0.0,0.0,0.0],
+"blank":false
+},
+"plot_margin":[16.0,16.0,10.0,10.0],
+"strip_background":{
+"blank":true
+},
+"strip_text":{
+"family":"'Libre Franklin', 'Segoe UI', Roboto, Helvetica, Arial, sans-serif",
+"face":"bold",
+"size":12.0,
+"hjust":0.0,
+"blank":false
+}
+},
+"ggsize":{
+"width":650.0,
+"height":320.0
+},
+"kind":"plot",
+"scales":[],
+"layers":[{
+"geom":"hline",
+"mapping":{
+},
+"data_meta":{
+},
+"yintercept":1.0,
+"linetype":"dashed",
+"color":"#DC2626",
+"size":0.7,
+"data":{
+}
+},{
+"geom":"line",
+"mapping":{
+},
+"data_meta":{
+},
+"color":"#0369A1",
+"size":1.0,
+"data":{
+}
+},{
+"geom":"point",
+"mapping":{
+},
+"data_meta":{
+},
+"color":"#0369A1",
+"size":3.0,
+"data":{
+}
+}],
+"metainfo_list":[],
+"spec_id":"2"
+};
+           window.letsPlotCall(function() { fig = LetsPlot.buildPlotFromProcessedSpecs(plotSpec, containerDiv, sizing); });
+       } else {
+           fig.updateView({});
+       }
+   }
+   
+   const renderImmediately = 
+       forceImmediateRender || (
+           sizing.width_mode === 'FIXED' && 
+           (sizing.height_mode === 'FIXED' || sizing.height_mode === 'SCALED')
+       );
+   
+   if (renderImmediately) {
+       renderPlot();
+   }
+   
+   if (!renderImmediately || responsive) {
+       // Set up observer for initial sizing or continuous monitoring
+       var observer = new ResizeObserver(function(entries) {
+           for (let entry of entries) {
+               if (entry.contentBoxSize && 
+                   entry.contentBoxSize[0].inlineSize > 0) {
+                   if (!responsive && observer) {
+                       observer.disconnect();
+                       observer = null;
+                   }
+                   renderPlot();
+                   if (!responsive) {
+                       break;
+                   }
+               }
+           }
+       });
+       
+       observer.observe(containerDiv);
+   }
+   
+   // ----------
+   })();
+   
+   </script>
+</div>
+</div>
+</div>
+<p>Two hours of readings is unreliable, an adjusted Rand index of 0.53. By twelve hours, half a day, recovery is already perfect on this feeder. A shorter deployment window is possible, but it trades away margin, not just convenience.</p>
+<p>Meter density is the second question: how many of the feeder’s 31 customers actually need to be reporting, tested here by sampling smaller subsets at random, ten trials per subset size, since which specific customers get chosen matters as much as how many.</p>
+<div class="quarto-embed-nb-cell" data-notebook="/home/runner/work/ml-energy-disaggregation/ml-energy-disaggregation/book/04-grid-edge/03-phase-identification-code.ipynb" data-notebook-title="Phase Identification" data-notebook-cellid="d095cfeb">
+<div id="d095cfeb" class="cell">
+<div class="cell-output cell-output-display">
+<div>
+
+
+<table class="dataframe caption-top table table-sm table-striped small" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">mean</th>
+<th data-quarto-table-cell-role="th">min</th>
+</tr>
+<tr class="even">
+<th data-quarto-table-cell-role="th">n_meters</th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<th data-quarto-table-cell-role="th">3</th>
+<td>0.40</td>
+<td>0.00</td>
+</tr>
+<tr class="even">
+<th data-quarto-table-cell-role="th">4</th>
+<td>0.63</td>
+<td>0.33</td>
+</tr>
+<tr class="odd">
+<th data-quarto-table-cell-role="th">5</th>
+<td>0.95</td>
+<td>0.55</td>
+</tr>
+<tr class="even">
+<th data-quarto-table-cell-role="th">6</th>
+<td>0.92</td>
+<td>0.59</td>
+</tr>
+<tr class="odd">
+<th data-quarto-table-cell-role="th">7</th>
+<td>1.00</td>
+<td>1.00</td>
+</tr>
+<tr class="even">
+<th data-quarto-table-cell-role="th">8</th>
+<td>0.94</td>
+<td>0.56</td>
+</tr>
+<tr class="odd">
+<th data-quarto-table-cell-role="th">12</th>
+<td>1.00</td>
+<td>1.00</td>
+</tr>
+<tr class="even">
+<th data-quarto-table-cell-role="th">20</th>
+<td>1.00</td>
+<td>1.00</td>
+</tr>
+<tr class="odd">
+<th data-quarto-table-cell-role="th">31</th>
+<td>1.00</td>
+<td>1.00</td>
+</tr>
+</tbody>
+</table>
+
+</div>
+</div>
+</div>
+</div>
+<div class="quarto-embed-nb-cell" data-notebook="/home/runner/work/ml-energy-disaggregation/ml-energy-disaggregation/book/04-grid-edge/03-phase-identification-code.ipynb" data-notebook-title="Phase Identification" data-notebook-cellid="b2c42ee5">
+<div id="b2c42ee5" class="cell">
+<div class="cell-output cell-output-display">
+   <div id="4UkfAV"></div>
+   <script type="text/javascript" data-lets-plot-script="plot">
+   
+   (function() {
+   // ----------
+   
+   const forceImmediateRender = false;
+   const responsive = false;
+   
+   let sizing = {
+       width_mode: "MIN",
+       height_mode: "SCALED",
+       width: null, 
+       height: null 
+   };
+   
+   const preferredWidth = document.body.dataset.letsPlotPreferredWidth;
+   if (preferredWidth !== undefined) {
+       sizing = {
+           width_mode: 'FIXED',
+           height_mode: 'SCALED',
+           width: parseFloat(preferredWidth)
+       };
+   }
+   
+   const containerDiv = document.getElementById("4UkfAV");
+   let fig = null;
+   
+   function renderPlot() {
+       if (fig === null) {
+           const plotSpec = {
+"data":{
+"n_meters":[3.0,3.0,3.0,3.0,3.0,3.0,3.0,3.0,3.0,3.0,4.0,4.0,4.0,4.0,4.0,4.0,4.0,4.0,4.0,4.0,5.0,5.0,5.0,5.0,5.0,5.0,5.0,5.0,5.0,5.0,6.0,6.0,6.0,6.0,6.0,6.0,6.0,6.0,6.0,6.0,7.0,7.0,7.0,7.0,7.0,7.0,7.0,7.0,7.0,7.0,8.0,8.0,8.0,8.0,8.0,8.0,8.0,8.0,8.0,8.0,12.0,12.0,12.0,12.0,12.0,12.0,12.0,12.0,12.0,12.0,20.0,20.0,20.0,20.0,20.0,20.0,20.0,20.0,20.0,20.0,31.0,31.0,31.0,31.0,31.0,31.0,31.0,31.0,31.0,31.0],
+"ari":[0.0,0.0,0.0,0.0,1.0,0.0,1.0,0.0,1.0,1.0,0.5714285714285714,0.5714285714285714,0.5714285714285714,0.3333333333333333,1.0,1.0,0.3333333333333333,0.5714285714285714,1.0,0.3333333333333333,1.0,1.0,1.0,1.0,1.0,1.0,0.5454545454545454,1.0,1.0,1.0,1.0,0.5871559633027523,0.5871559633027523,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,0.5555555555555556,1.0,1.0,0.8502673796791443,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0]
+},
+"mapping":{
+"x":"n_meters",
+"y":"ari"
+},
+"data_meta":{
+"series_annotations":[{
+"type":"int",
+"column":"n_meters"
+},{
+"type":"float",
+"column":"ari"
+}]
+},
+"ggtitle":{
+"text":"Accuracy vs. how many meters report"
+},
+"guides":{
+"x":{
+"title":"Number of reporting meters"
+},
+"y":{
+"title":"Adjusted Rand index"
+}
+},
+"theme":{
+"text":{
+"color":"#2d2d2d",
+"family":"'Libre Franklin', 'Segoe UI', Roboto, Helvetica, Arial, sans-serif",
+"size":12.0,
+"blank":false
+},
+"axis_title_x":{
+"face":"bold",
+"size":14.0,
+"margin":[10.0,0.0,0.0,0.0],
+"blank":false
+},
+"axis_title_y":{
+"face":"bold",
+"size":14.0,
+"margin":[0.0,10.0,0.0,0.0],
+"blank":false
+},
+"axis_text_x":{
+"color":"#666666",
+"angle":0.0,
+"hjust":0.5,
+"margin":[8.0,0.0,0.0,0.0],
+"blank":false
+},
+"axis_text_y":{
+"color":"#666666",
+"margin":[0.0,0.0,0.0,8.0],
+"blank":false
+},
+"axis_ticks":{
+"color":"#bbbbbb",
+"size":0.75,
+"blank":false
+},
+"axis_line":{
+"color":"#bbbbbb",
+"size":1.0,
+"blank":false
+},
+"legend_background":{
+"blank":true
+},
+"legend_text":{
+"size":12.0,
+"blank":false
+},
+"legend_title":{
+"face":"bold",
+"size":14.0,
+"blank":false
+},
+"legend_position":"top",
+"legend_spacing":10.0,
+"legend_key":{
+"blank":true
+},
+"panel_background":{
+"blank":true
+},
+"panel_border":{
+"blank":true
+},
+"panel_grid_minor":{
+"blank":true
+},
+"panel_grid_major_x":{
+"blank":true
+},
+"panel_grid_major_y":{
+"blank":true
+},
+"plot_background":{
+"blank":true
+},
+"plot_title":{
+"color":"#333333",
+"face":"bold",
+"size":19.0,
+"hjust":0.0,
+"margin":[0.0,0.0,6.0,0.0],
+"blank":false
+},
+"plot_subtitle":{
+"color":"#6b6b6b",
+"size":16.0,
+"hjust":0.0,
+"margin":[0.0,0.0,18.0,0.0],
+"blank":false
+},
+"plot_caption":{
+"color":"#999999",
+"face":"italic",
+"size":9.0,
+"hjust":1.0,
+"margin":[12.0,0.0,0.0,0.0],
+"blank":false
+},
+"plot_margin":[16.0,16.0,10.0,10.0],
+"strip_background":{
+"blank":true
+},
+"strip_text":{
+"family":"'Libre Franklin', 'Segoe UI', Roboto, Helvetica, Arial, sans-serif",
+"face":"bold",
+"size":12.0,
+"hjust":0.0,
+"blank":false
+}
+},
+"ggsize":{
+"width":650.0,
+"height":320.0
+},
+"kind":"plot",
+"scales":[],
+"layers":[{
+"geom":"hline",
+"mapping":{
+},
+"data_meta":{
+},
+"yintercept":1.0,
+"linetype":"dashed",
+"color":"#DC2626",
+"size":0.7,
+"data":{
+}
+},{
+"geom":"point",
+"mapping":{
+},
+"data_meta":{
+},
+"color":"#0369A1",
+"size":3.0,
+"alpha":0.5,
+"data":{
+}
+}],
+"metainfo_list":[],
+"spec_id":"3"
+};
+           window.letsPlotCall(function() { fig = LetsPlot.buildPlotFromProcessedSpecs(plotSpec, containerDiv, sizing); });
+       } else {
+           fig.updateView({});
+       }
+   }
+   
+   const renderImmediately = 
+       forceImmediateRender || (
+           sizing.width_mode === 'FIXED' && 
+           (sizing.height_mode === 'FIXED' || sizing.height_mode === 'SCALED')
+       );
+   
+   if (renderImmediately) {
+       renderPlot();
+   }
+   
+   if (!renderImmediately || responsive) {
+       // Set up observer for initial sizing or continuous monitoring
+       var observer = new ResizeObserver(function(entries) {
+           for (let entry of entries) {
+               if (entry.contentBoxSize && 
+                   entry.contentBoxSize[0].inlineSize > 0) {
+                   if (!responsive && observer) {
+                       observer.disconnect();
+                       observer = null;
+                   }
+                   renderPlot();
+                   if (!responsive) {
+                       break;
+                   }
+               }
+           }
+       });
+       
+       observer.observe(containerDiv);
+   }
+   
+   // ----------
+   })();
+   
+   </script>
+</div>
+</div>
+</div>
+<div class="ark-mistake">
+<p><strong>Below about seven meters, results stop being trustworthy, not just noisier.</strong> Above seven, roughly two to three per phase on this three-phase feeder, recovery is consistently perfect across every random subset tried. Below it, results swing widely: sometimes still perfect, sometimes failing outright, because a small random draw can miss one phase entirely or leave a phase group down to a single member with nothing to correlate against. The method does not degrade gracefully as data shrinks; it fails unpredictably, which matters more for an actual rollout than the average case alone, and matches the meter-density sensitivity Hoogsteyn et al.&nbsp;report across other phase-identification methods <span class="citation" data-cites="hoogsteyn2022phaseid">[4]</span>.</p>
+</div>
+</section>
+<section id="does-the-choice-of-association-measure-matter" class="level2">
+<h2 class="anchored" data-anchor-id="does-the-choice-of-association-measure-matter">Does the choice of association measure matter?</h2>
+<p>Every result so far clusters on Pearson correlation, a measure of linear relationship. That was a choice, not the only option, and it is worth checking directly. Spearman and Kendall generalize Pearson to monotonic relationships rather than strictly linear ones. Mutual information and the <a href="#acronyms_PPS">Predictive Power Score (PPS)</a> go further still, capturing any dependency a model can exploit, linear or not. The full 24-hour window this chapter has used throughout is the easy case, every method tested recovers phase perfectly there. The real test is whether that holds under the same 2-hour window that already broke Pearson. Spearman and Kendall come from <code>voltage_df.corr(method=...)</code> directly; mutual information and <a href="#acronyms_PPS">PPS</a> each need their own small helper to turn a per-pair score into the same kind of customer-by-customer similarity matrix the correlation-based methods already produce, one call to <code>sklearn.feature_selection.mutual_info_regression</code> per customer for the first, one call to <code>ppscore.matrix</code> for the second.</p>
+<div class="quarto-embed-nb-cell" data-notebook="/home/runner/work/ml-energy-disaggregation/ml-energy-disaggregation/book/04-grid-edge/03-phase-identification-code.ipynb" data-notebook-title="Phase Identification" data-notebook-cellid="5281f978">
+<div id="5281f978" class="cell">
+<div class="cell-output cell-output-display">
+<div>
+
+
+<table class="dataframe caption-top table table-sm table-striped small" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th">window</th>
+<th data-quarto-table-cell-role="th">24h</th>
+<th data-quarto-table-cell-role="th">2h</th>
+</tr>
+<tr class="even">
+<th data-quarto-table-cell-role="th">method</th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<th data-quarto-table-cell-role="th">kendall</th>
+<td>1.0</td>
+<td>0.541176</td>
+</tr>
+<tr class="even">
+<th data-quarto-table-cell-role="th">mutual_information</th>
+<td>1.0</td>
+<td>0.900161</td>
+</tr>
+<tr class="odd">
+<th data-quarto-table-cell-role="th">pearson</th>
+<td>1.0</td>
+<td>0.528789</td>
+</tr>
+<tr class="even">
+<th data-quarto-table-cell-role="th">pps</th>
+<td>1.0</td>
+<td>0.900161</td>
+</tr>
+<tr class="odd">
+<th data-quarto-table-cell-role="th">spearman</th>
+<td>1.0</td>
+<td>0.528789</td>
+</tr>
+</tbody>
+</table>
+
+</div>
+</div>
+</div>
+</div>
+<p>Pearson, Spearman, and Kendall, three different ways of measuring a monotonic relationship, all degrade together under 2 hours of data. Mutual information and <a href="#acronyms_PPS">PPS</a> do not: both hold onto most of their accuracy well past the point where linear and rank correlation give out, because they capture dependency structure those three measures cannot see. A sixth measure, xicor, a newer asymmetric rank-based coefficient, was checked the same way in a separate environment (its latest release requires an older pandas than the rest of this book uses, so it cannot be pinned as a project dependency here) and degraded with the other rank-based measures rather than with mutual information and <a href="#acronyms_PPS">PPS</a>, consistent with being fundamentally a rank measure itself, not a Pearson-specific weakness. The distinction that matters is not linear versus nonlinear correlation values, all six methods report numbers on different scales, it is which measures still separate phases correctly when the window is barely longer than the noise itself, worth checking before trusting a chosen method on a short deployment window.</p>
+</section>
+<section id="naming-the-clusters-with-a-handful-of-known-customers" class="level2">
+<h2 class="anchored" data-anchor-id="naming-the-clusters-with-a-handful-of-known-customers">Naming the clusters with a handful of known customers</h2>
+<p>Everything so far assumes the full, real phase list is available to check against, but an actual rollout does not start with that. Clustering on voltage correlation groups customers correctly, an adjusted Rand index of 1.0 says so, but a cluster label like “0” or “1” carries no information about which real phase it actually is. Naming the clusters requires some reference: a handful of customers whose real phase is already known, from a recent service record or a spot check, used to vote on what each cluster should be called. The practical question is how many of those known customers are actually needed.</p>
+<div class="quarto-embed-nb-cell" data-notebook="/home/runner/work/ml-energy-disaggregation/ml-energy-disaggregation/book/04-grid-edge/03-phase-identification-code.ipynb" data-notebook-title="Phase Identification" data-notebook-cellid="790c5dec">
+<div id="790c5dec" class="cell">
+<div class="cell-output cell-output-display">
+<div>
+
+
+<table class="dataframe caption-top table table-sm table-striped small" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">n_anchors</th>
+<th data-quarto-table-cell-role="th">mean_accuracy</th>
+<th data-quarto-table-cell-role="th">frac_fully_correct</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<th data-quarto-table-cell-role="th">0</th>
+<td>1</td>
+<td>0.335645</td>
+<td>0.000</td>
+</tr>
+<tr class="even">
+<th data-quarto-table-cell-role="th">1</th>
+<td>2</td>
+<td>0.577097</td>
+<td>0.000</td>
+</tr>
+<tr class="odd">
+<th data-quarto-table-cell-role="th">2</th>
+<td>3</td>
+<td>0.718871</td>
+<td>0.235</td>
+</tr>
+<tr class="even">
+<th data-quarto-table-cell-role="th">3</th>
+<td>5</td>
+<td>0.890484</td>
+<td>0.690</td>
+</tr>
+<tr class="odd">
+<th data-quarto-table-cell-role="th">4</th>
+<td>8</td>
+<td>0.973387</td>
+<td>0.920</td>
+</tr>
+<tr class="even">
+<th data-quarto-table-cell-role="th">5</th>
+<td>12</td>
+<td>0.996774</td>
+<td>0.990</td>
+</tr>
+</tbody>
+</table>
+
+</div>
+</div>
+</div>
+</div>
+<p>One known customer names, on average, only one of the three clusters correctly, the other two stay unresolved. Naming reliably, getting every customer’s label right nearly every time, takes about eight to twelve known customers, roughly three to four per phase. That is a much smaller ask than full ground truth, and it turns clustering, which only groups customers, into labeling, which names them.</p>
+</section>
+<section id="beyond-a-point-estimate-conformal-phase-assignment-confidence" class="level2">
+<h2 class="anchored" data-anchor-id="beyond-a-point-estimate-conformal-phase-assignment-confidence">Beyond a point estimate: conformal phase-assignment confidence</h2>
+<p>Naming the clusters still produces one label per customer, with no signal for which labels to trust. A utility deciding where to send a limited field crew needs exactly that signal: which assignments are solid, and which deserve a second look before anyone relies on them. Split conformal prediction supplies it with a statistical guarantee attached, not just an ad hoc score.</p>
+<p>The idea: for each candidate phase, measure how far a customer’s own correlation-embedding position sits from that phase’s centroid, built only from the known anchor customers. Calibrate a distance threshold using the anchors’ own leave-one-out scores against their real phase, at a chosen confidence level. Then, for every customer, report the <em>set</em> of phases within that threshold, not a single guess. A confident customer gets a single-phase set. An uncertain one gets more than one phase, or none at all if it does not sit close enough to any of the three centroids, itself a signal that something about that customer’s data is unusual and worth a closer look. Four small functions implement this: one to build each phase’s centroid from its anchor customers, one to score a point’s distance to a given phase’s centroid, one to calibrate the distance threshold from the anchors’ own leave-one-out scores, and one to assemble the resulting prediction sets.</p>
+<p>A calibration set of ten known customers is enough to test this, the same order of magnitude the labeling sweep above already found reliable. On the full 24-hour correlation embedding, where the point estimate is already perfect, most customers get a clean single-phase set.</p>
+<div class="quarto-embed-nb-cell" data-notebook="/home/runner/work/ml-energy-disaggregation/ml-energy-disaggregation/book/04-grid-edge/03-phase-identification-code.ipynb" data-notebook-title="Phase Identification" data-notebook-cellid="63b8ddfc">
+<div id="63b8ddfc" class="cell">
+<div class="cell-output cell-output-stdout">
+<pre><code>calibration threshold: 0.519
+set sizes: {0: 1, 1: 30}
+empirical coverage: 0.968 (target &gt;= 0.90)</code></pre>
+</div>
+</div>
+</div>
+<p>Confidence only earns its keep when the point estimate can actually be wrong. The window-length sensitivity earlier in this chapter already found that case: a 4-hour window still clusters well, an adjusted Rand index near 0.90, but not perfectly. Running the same conformal method on that shorter, noisier embedding checks whether it flags the customer the point estimate actually gets wrong, or just adds noise of its own.</p>
+<div class="quarto-embed-nb-cell" data-notebook="/home/runner/work/ml-energy-disaggregation/ml-energy-disaggregation/book/04-grid-edge/03-phase-identification-code.ipynb" data-notebook-title="Phase Identification" data-notebook-cellid="1490fd0e">
+<div id="1490fd0e" class="cell">
+<div class="cell-output cell-output-stdout">
+<pre><code>point-estimate misclassified: ['load_mg1_1']
+conformal flagged as not confident: ['load_mg1_1', 'load_mg1_4', 'load_mg1_7', 'load_mg1_10']</code></pre>
+</div>
+</div>
+</div>
+<div class="ark-concept">
+<p><span class="ark-concept-title"><i class="bi bi-info-circle-fill"></i> Key Concept</span></p>
+<p>Four customers get flagged, all four the same real phase, and the one customer the point estimate actually mislabels is among them. The other three happen to keep their correct point-estimate label anyway, but their embedding position under the noisier 4-hour window sits too far from the anchor-derived centroid to earn a confident single-phase set. That is a more useful result than flagging one lucky-or-unlucky customer alone: it says an entire phase group’s evidence has gotten weaker under this window, not just that one guess happened to land wrong. A point estimate alone offers no way to tell a solid label from a lucky guess. A conformal prediction set does, with a statistical coverage guarantee behind it rather than an arbitrary score, at the cost of only the same handful of known customers the labeling step already needed.</p>
+</div>
+</section>
+<section id="where-this-leaves-part-4" class="level2">
+<h2 class="anchored" data-anchor-id="where-this-leaves-part-4">Where this leaves Part 4</h2>
+<p>Phase connectivity for this feeder is no longer an assumption inherited from its <code>.dss</code> files; it is a checked, reproducible result. Correlating real smart-meter voltage readings and clustering on that correlation structure, rather than on the raw readings themselves, recovers every customer’s real phase exactly, using no more than seven meters and twelve hours of data. The same feeder Chapter 2 ran a hosting-capacity study and an <a href="#acronyms_EV">Electric Vehicle (EV)</a>-demand study on now has its phase labels independently confirmed rather than merely assumed correct. The deployment story goes one step further than clustering alone: a handful of known customers is enough to name the clusters, and a conformal confidence set on top of that naming tells a utility exactly which assignments to trust and which to send a field crew to check first, a statistically grounded answer none of this chapter’s own references provide.</p>
+<p>Part 4 continues with the second of its four threads: customer and feeder clustering, grouping customers by how they actually behave rather than how they are labeled, reusing the <code>ark.plot.clustering</code> tools this chapter introduced.</p>
+</section>
+<section id="references" class="level2">
+<h2 class="anchored" data-anchor-id="references">References</h2>
+<div id="refs" class="references csl-bib-body" data-entry-spacing="0" role="list" style="display: none">
+<div id="ref-short2013phaseid" class="csl-entry" role="listitem">
+<div class="csl-left-margin">[1] </div><div class="csl-right-inline">T. A. Short, <span>“Advanced metering for phase identification, transformer identification, and secondary modeling,”</span> <em>IEEE Transactions on Smart Grid</em>, vol. 4, no. 2, pp. 651–658, 2013, doi: <a href="https://doi.org/10.1109/TSG.2012.2219081">10.1109/TSG.2012.2219081</a>.</div>
+</div>
+<div id="ref-blakely2020coassociation" class="csl-entry" role="listitem">
+<div class="csl-left-margin">[2] </div><div class="csl-right-inline">L. Blakely and M. J. Reno, <span>“Phase identification using co-association matrix ensemble clustering,”</span> <em>IET Smart Grid</em>, vol. 3, no. 4, pp. 490–499, 2020, doi: <a href="https://doi.org/10.1049/iet-stg.2019.0280">10.1049/iet-stg.2019.0280</a>.</div>
+</div>
+<div id="ref-hangawatta2025phaseid" class="csl-entry" role="listitem">
+<div class="csl-left-margin">[3] </div><div class="csl-right-inline">D. C. Hangawatta, A. Gargoom, and A. Z. Kouzani, <span>“Machine-learning-driven identification of electrical phases in low-sampling-rate consumer data,”</span> <em>Energies</em>, vol. 18, no. 1, p. 128, 2025, doi: <a href="https://doi.org/10.3390/en18010128">10.3390/en18010128</a>.</div>
+</div>
+<div id="ref-hoogsteyn2022phaseid" class="csl-entry" role="listitem">
+<div class="csl-left-margin">[4] </div><div class="csl-right-inline">A. Hoogsteyn, M. Vanin, A. Koirala, and D. Van Hertem, <span>“Low voltage customer phase identification methods based on smart meter data,”</span> <em>Electric Power Systems Research</em>, vol. 212, p. 108524, 2022, doi: <a href="https://doi.org/10.1016/j.epsr.2022.108524">10.1016/j.epsr.2022.108524</a>.</div>
+</div>
+<div id="ref-simonovska2021phasegrouping" class="csl-entry" role="listitem">
+<div class="csl-left-margin">[5] </div><div class="csl-right-inline">A. Simonovska and L. F. Ochoa, <span>“Phase grouping in <span>PV</span>-rich <span>LV</span> feeders: Smart meter data and unconstrained k-means,”</span> in <em>2021 IEEE madrid PowerTech</em>, 2021. doi: <a href="https://doi.org/10.1109/PowerTech46648.2021.9495097">10.1109/PowerTech46648.2021.9495097</a>.</div>
+</div>
+</div>
+
+
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    // Ensure there is a toggle, if there isn't float one in the top right
+    if (window.document.querySelector('.quarto-color-scheme-toggle') === null) {
+      const a = window.document.createElement('a');
+      a.classList.add('top-right');
+      a.classList.add('quarto-color-scheme-toggle');
+      a.href = "";
+      a.onclick = function() { try { window.quartoToggleColorScheme(); } catch {} return false; };
+      const i = window.document.createElement("i");
+      i.classList.add('bi');
+      a.appendChild(i);
+      window.document.body.appendChild(a);
+    }
+    setColorSchemeToggle(hasAlternateSentinel())
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp("https:\/\/sambaiga\.github\.io\/ml-energy-disaggregation\/");
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+<nav class="page-navigation">
+  <div class="nav-page nav-page-previous">
+      <a href="../../book/04-grid-edge/02-timeseries-der-modeling.html" class="pagination-link" aria-label="Chapter 2: Time-Series Simulation and DER Modeling">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text"><span class="chapter-title">Chapter 2: Time-Series Simulation and DER Modeling</span></span>
+      </a>          
+  </div>
+  <div class="nav-page nav-page-next">
+      <a href="../../about.html" class="pagination-link" aria-label="About the Author">
+        <span class="nav-page-text"><span class="chapter-title">About the Author</span></span> <i class="bi bi-arrow-right-short"></i>
+      </a>
+  </div>
+</nav>
+</div> <!-- /content -->
+<footer class="footer">
+  <div class="nav-footer">
+    <div class="nav-footer-left">
+<p><span class="faux-block">© 2025–2026 <a href="https://sambaiga.github.io/">Anthony Faustine</a></span> <span class="faux-block">Code licensed under <a href="https://www.apache.org/licenses/LICENSE-2.0">Apache 2.0</a></span></p>
+</div>   
+    <div class="nav-footer-center">
+<div class="footer-social">
+<p><a href="mailto:sambaiga@gmail.com" title="Email"><i class="bi bi-envelope-at-fill"></i></a> <a href="https://github.com/sambaiga" title="GitHub"><i class="bi bi-github"></i></a> <a href="https://www.linkedin.com/in/sambaiga" title="LinkedIn"><i class="bi bi-linkedin"></i></a></p>
+</div>
+<div class="toc-actions d-sm-block d-md-none"><ul><li><a href="https://github.com/sambaiga/ml-energy-disaggregation/edit/main/book/04-grid-edge/03-phase-identification.qmd" class="toc-action"><i class="bi bi-github"></i>Edit this page</a></li><li><a href="https://github.com/sambaiga/ml-energy-disaggregation/issues/new" class="toc-action"><i class="bi empty"></i>Report an issue</a></li><li><a href="https://github.com/sambaiga/ml-energy-disaggregation/blob/main/book/04-grid-edge/03-phase-identification.qmd" class="toc-action"><i class="bi empty"></i>View source</a></li></ul></div></div>
+    <div class="nav-footer-right">
+<p><span class="faux-block">Made with <a href="https://quarto.org">Quarto</a></span> <span class="faux-block"><a href="https://github.com/sambaiga/ml-energy-disaggregation"><i class="bi bi-github"></i> View source</a></span></p>
+</div>
+  </div>
+</footer>
+
+
+
+
+<script src="../../site_libs/quarto-html/zenscroll-min.js"></script>
+</body></html>
