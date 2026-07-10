@@ -17,26 +17,30 @@ _FONT_NAMES = ["Libre Franklin", "Segoe UI", "Roboto", "Helvetica Neue", "sans-s
 
 
 def themed_gt(
-    gt: GT,
+    gt: GT | pd.DataFrame,
     *,
     width: str = "100%",
     striped: bool = True,
     n_rows: int | None = None,
 ) -> GT:
-    """Apply the project's brand theme to any Great Tables `GT` object.
+    """Apply the project's brand theme to a `GT` object or a plain DataFrame.
 
     Call this last, after `.tab_header()`, `.cols_label()`,
-    `.tab_source_note()`, etc.
+    `.tab_source_note()`, etc. Passing a `pd.DataFrame` directly is a
+    shortcut for `themed_gt(GT(df))`, for the common case of just wanting a
+    styled table with no header/label customization.
 
     Args:
-        gt: Any GT object to style.
+        gt: A GT object, or a DataFrame to wrap with `GT()` first.
         width: CSS width for the table container.
         striped: If True, apply alternating muted-fill row stripes.
             Requires n_rows to take effect.
         n_rows: Number of data rows in the table (needed for striping).
+            Inferred from the DataFrame's length when `gt` is a DataFrame
+            and this is left unset.
 
     Returns:
-        The same GT object with brand styling applied.
+        The styled GT object.
 
     Examples:
         >>> from great_tables import GT, md
@@ -46,7 +50,13 @@ def themed_gt(
         ...     n_rows=len(df),
         ... )
         >>> table
+        >>> themed_gt(df)  # equivalent to themed_gt(GT(df), n_rows=len(df))
     """
+    if isinstance(gt, pd.DataFrame):
+        if n_rows is None:
+            n_rows = len(gt)
+        gt = GT(gt)
+
     gt = (
         gt.tab_options(
             table_width=width,
