@@ -88,7 +88,7 @@ def _list_feeders(substation: str) -> list[str]:
     """List real feeder subfolder names for a substation via the S3 REST API."""
     url = f"{S3_BASE}/?list-type=2&prefix={S3_PREFIX}/{substation}/&delimiter=/"
     request = urllib.request.Request(url, headers={"User-Agent": "ml-energy-disaggregation-data-fetch"})  # noqa: S310
-    with urllib.request.urlopen(request) as response:  # noqa: S310
+    with urllib.request.urlopen(request, timeout=30) as response:  # noqa: S310
         body = response.read().decode("utf-8")
     prefixes = re.findall(r"<Prefix>([^<]+)</Prefix>", body)
     feeders = []
@@ -103,7 +103,7 @@ def _list_feeders(substation: str) -> list[str]:
 def _download(url: str, dest: Path) -> int:
     dest.parent.mkdir(parents=True, exist_ok=True)
     request = urllib.request.Request(url, headers={"User-Agent": "ml-energy-disaggregation-data-fetch"})  # noqa: S310
-    with urllib.request.urlopen(request) as response, dest.open("wb") as f:  # noqa: S310
+    with urllib.request.urlopen(request, timeout=30) as response, dest.open("wb") as f:  # noqa: S310
         total_read = 0
         while chunk := response.read(1 << 20):
             f.write(chunk)
