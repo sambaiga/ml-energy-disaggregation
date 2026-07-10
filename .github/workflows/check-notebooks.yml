@@ -129,6 +129,10 @@ jobs:
         if: steps.changed.outputs.notebooks != ''
         run: uv run python scripts/fetch_part4_ausnet_data.py
 
+      - name: Fetch Part 4 EV profiles
+        if: steps.changed.outputs.notebooks != ''
+        run: uv run python scripts/fetch_part4_ev_profiles.py
+
       - name: Execute changed notebooks
         if: steps.changed.outputs.notebooks != ''
         run: |
