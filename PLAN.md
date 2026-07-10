@@ -686,24 +686,49 @@ worth working around.
       earlier numbered-heading draft (this chapter's headings were never
       numbered). PR #7 (later renumbered #8 after a rebase) merged to
       `main` 2026-07-10.
-- [ ] Write `book/04-grid-edge/03-phase-identification` (branch
+- [x] Write `book/04-grid-edge/03-phase-identification` (branch
       `part4-ch3-phase-identification`), Part 4's thread 1: recovering
       which phase each customer is actually connected to from voltage
       correlation alone, no field audit. Reuses the real 31-customer
       AusNet feeder and smart-meter data Chapters 1-2 already vendored
       (no new data-fetch work), checked against the real per-load phase
-      ground truth already sitting in `LVcircuit-loads.txt`. Five real
-      reference papers identified (see the thread-1 entry above for full
-      citations): Short (2013, the foundational correlation method);
-      Simonovska & Ochoa (2021, PCA + k-means, tested on this exact
-      AusNet feeder, the direct precedent this plan is built on); Blakely
-      & Reno (2020, Sandia, ensemble spectral clustering needing no
-      existing labels); Hoogsteyn et al. (2022, a benchmark across meter
-      accuracy/density, the basis for a planned sensitivity exercise);
-      Hangawatta et al. (2025, a neural-network approach for low-frequency
-      data closer to this book's own 30-minute resolution). Notebook
-      first, matching Chapter 2's own build discipline; `.qmd` narrative
-      after the notebook is reviewed. Not yet started.
+      ground truth (extracted from each service line's own source-side
+      bus suffix, not the load's own `bus1`, which is uniformly `.1`).
+      Five real reference papers cited: Short (2013, the foundational
+      correlation method); Simonovska & Ochoa (2021, PCA + k-means,
+      tested on this exact AusNet feeder, the direct precedent this
+      chapter is built on); Blakely & Reno (2020, Sandia, ensemble
+      spectral clustering needing no existing labels); Hoogsteyn et al.
+      (2022, a benchmark across meter accuracy/density, the basis for
+      this chapter's own sensitivity section); Hangawatta et al. (2025,
+      a neural-network approach for low-frequency data closer to this
+      book's own 30-minute resolution). Core methodology: naive PCA on
+      raw voltage underperforms (ARI 0.24), PCA on the correlation
+      matrix recovers all 31 real phases exactly (ARI 1.0), matching
+      Simonovska & Ochoa's own published result. Sensitivity: reliable
+      down to 12 hours of data and 7 meters, degrading unpredictably
+      below either threshold. Extended beyond the five cited papers with
+      two genuinely novel contributions: minimum-anchor labeling (how
+      many known-phase customers are needed to name, not just group, the
+      clusters; reliable at 8-12 anchors) and split conformal prediction
+      sets built on those same anchors, giving each customer a
+      statistically calibrated confidence set rather than a bare point
+      estimate, validated on a degraded window where it correctly flags
+      the customer the point estimate actually misclassifies. Also
+      compared six pairwise association measures (Pearson, Spearman,
+      Kendall, xicor, mutual information, PPS) under a severe 2-hour
+      window: linear/rank-based measures degrade together, mutual
+      information and PPS hold up. A planned 200-customer scale-up story
+      was investigated and abandoned: three independent candidate
+      networks (SMART-DS, a locally vendored four-feeders network, and
+      the real Australian CRE21 network) were tested directly and none
+      of them produce a phase-differentiated voltage signal, confirmed
+      with a deterministic 80x demand-imbalance test on each, because all
+      three model a customer's final connection as a bundled multi-phase
+      conductor rather than AusNet's genuinely separate single-phase
+      service drop. Notebook and `.qmd` both complete, rendered, and
+      committed on branch `part4-ch3-phase-identification`; not yet
+      merged.
 - [ ] Pick/build the base LV feeder model(s) and DER-penetration scenarios
       for Part 4 threads 2-4 (SMART-DS candidates already identified
       above; thread 1 no longer needs this, see above).
