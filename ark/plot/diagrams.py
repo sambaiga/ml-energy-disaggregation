@@ -489,3 +489,132 @@ def centralized_vs_decentralized_grid_diagram() -> plt.Figure:
     fig.tight_layout()
     plt.close(fig)
     return fig
+
+
+def _failure_mode_panel(
+    ax: plt.Axes,
+    title: str,
+    badge_icon: str,
+    badge_color: str,
+    arrow_up: bool,
+    arrow_color: str,
+    gauge_label: str,
+    gauge_color: str,
+) -> None:
+    """One panel of `pv_vs_ev_failure_mode_diagram`: a substation, one house, and one flow arrow."""
+    sub_xy = (0.5, 1.42)
+    house_xy = (0.5, 0.32)
+
+    ax.add_patch(Circle(sub_xy, 0.26, facecolor="white", edgecolor=PRIMARY, linewidth=1.6, zorder=2))
+    ax.text(
+        sub_xy[0],
+        sub_xy[1],
+        ICONS["hdd-network-fill"],
+        fontproperties=icon_font(19),
+        color=PRIMARY,
+        ha="center",
+        va="center",
+        zorder=3,
+    )
+
+    ax.add_patch(Circle(house_xy, 0.22, facecolor=SUCCESS, edgecolor="white", linewidth=1.6, zorder=2))
+    ax.text(
+        house_xy[0],
+        house_xy[1],
+        ICONS["house-fill"],
+        fontproperties=icon_font(15),
+        color="white",
+        ha="center",
+        va="center",
+        zorder=3,
+    )
+    badge_xy = (house_xy[0] + 0.22, house_xy[1] + 0.17)
+    ax.add_patch(Circle(badge_xy, 0.135, facecolor=badge_color, edgecolor="white", linewidth=1.0, zorder=4))
+    ax.text(
+        badge_xy[0],
+        badge_xy[1],
+        ICONS[badge_icon],
+        fontproperties=icon_font(11),
+        color="white",
+        ha="center",
+        va="center",
+        zorder=5,
+    )
+
+    start, end = (house_xy, sub_xy) if arrow_up else (sub_xy, house_xy)
+    _curved_flow_arrow(
+        ax,
+        (start[0] + 0.07, start[1] + (0.28 if arrow_up else -0.28)),
+        (end[0] + 0.07, end[1] + (-0.28 if arrow_up else 0.28)),
+        arrow_color,
+        rad=0.2 if arrow_up else -0.2,
+        linewidth=2.4,
+    )
+
+    gauge_xy = (0.98, 1.42)
+    ax.add_patch(Circle(gauge_xy, 0.155, facecolor="white", edgecolor=gauge_color, linewidth=2.6, zorder=2))
+    ax.text(
+        gauge_xy[0],
+        gauge_xy[1],
+        ICONS["speedometer2"],
+        fontproperties=icon_font(11),
+        color=gauge_color,
+        ha="center",
+        va="center",
+        zorder=3,
+    )
+    ax.text(
+        gauge_xy[0],
+        gauge_xy[1] - 0.24,
+        gauge_label,
+        fontsize=7.5,
+        color=gauge_color,
+        ha="center",
+        va="top",
+        fontweight="bold",
+    )
+
+    ax.set_title(title, fontsize=13, color=PRIMARY, fontweight="bold", loc="center", pad=10)
+    ax.set_xlim(0.02, 1.24)
+    ax.set_ylim(-0.02, 1.85)
+    ax.set_aspect("equal")
+    ax.axis("off")
+
+
+def pv_vs_ev_failure_mode_diagram() -> plt.Figure:
+    """Draw the PV-vs-EV contrast Chapter 2 builds its second half around.
+
+    Same feeder, same house, two different real problems: PV exports
+    power at midday and pushes voltage toward its statutory ceiling
+    first; EV charging imports power at the evening peak and pushes the
+    transformer toward its thermal rating first, the opposite direction,
+    the opposite time of day, and a different binding constraint, exactly
+    the finding Chapter 2's own hosting-capacity sweeps land on.
+
+    Returns:
+        The matplotlib Figure, ready to display in a notebook cell.
+    """
+    fig, axes = plt.subplots(1, 2, figsize=(8.6, 4.6))
+    _failure_mode_panel(
+        axes[0],
+        "PV, midday",
+        badge_icon="sun-fill",
+        badge_color=WARNING,
+        arrow_up=True,
+        arrow_color=WARNING,
+        gauge_label="voltage\nbinds first",
+        gauge_color=DANGER,
+    )
+    _failure_mode_panel(
+        axes[1],
+        "EV, evening",
+        badge_icon="ev-front-fill",
+        badge_color=INFO,
+        arrow_up=False,
+        arrow_color=INFO,
+        gauge_label="thermal\nbinds first",
+        gauge_color=DANGER,
+    )
+    fig.tight_layout()
+    plt.close(fig)
+    return fig

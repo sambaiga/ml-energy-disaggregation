@@ -570,6 +570,66 @@ worth working around.
       every chart (the lets-plot HTML widgets don't show up in the raw
       notebook JSON, so a browser check is the only way to actually see
       them).
+
+      Substantially extended in a second pass, after review flagged the
+      first draft as reading like a tour of disconnected OpenDSS features
+      (three separate networks: a toy 3-house continuity demo, a synthetic
+      PV stress network, and the real feeder only in the final section)
+      rather than one throughline. Rebuilt around the same real feeder end
+      to end: real load/PV diversity across all 342 customers and 365
+      days, a genuine multi-day (week-long) time-series simulation
+      matching `Oendss_timeseries.ipynb`'s own `start_day`/`total_days`
+      structure, a load-shape verification cross-check (real data vs. live
+      solve vs. stored `LoadShape`), a transformer thermal constraint
+      alongside the voltage one, Volt-Watt/Volt-VAr applied directly to
+      the real 80%-penetration violation (not a fresh demo network) plus
+      a full 0-100% sweep under control showing both mitigations raise
+      hosting capacity outright, and a "Do it yourself" section built on
+      the source tutorial's own seasonal worst-case exercise (using the
+      four vendored seasonal PV files), which finds a genuinely different,
+      more optimistic answer than the single-sunniest-day sweep, a real
+      lesson about how "worst case" gets defined, not a contradiction.
+
+      Added a new `## 9. EV demand` section, the opposite failure mode:
+      EV charging adds demand instead of generation, at the evening peak
+      instead of midday. Real UK "Electric Nation" trial charging data
+      (via Team-Nando's `EV-Demand-Profiles` repo, vendored by a new
+      `scripts/fetch_part4_ev_profiles.py`) informs a customized scenario
+      rather than being reused verbatim, since that source repo ships no
+      LICENSE unlike every other Team-Nando repo this project draws on.
+      Real, non-obvious finding: realistic diversified EV charging barely
+      moves either constraint even at 100% adoption (diversity across many
+      vehicles does real mitigating work on its own); an uncoordinated
+      stress test (every charger at full rated power, no smart charging)
+      still doesn't violate at 100% adoption; scaling to multiple EVs per
+      house finds where it actually breaks, and thermal crosses its limit
+      before voltage does, the opposite order from the PV story. Volt-Watt
+      and Volt-VAr only control `PVSystem` elements, so they have nothing
+      to act on for an EV `Load`, setting up `Storage` as the one lever
+      that helps both the midday PV peak and the evening EV peak.
+
+      One more real bug caught while extending `ark/dss/circuit.py` for
+      this section: a naive network-wide `bus_voltages()["vmag_pu"].min()`
+      silently picked up the source (slack) bus's own fixed per-unit
+      setpoint, not a real customer voltage, since Chapter 1 never took
+      this kind of blind aggregate (it always filtered to named customer
+      buses first). Fixed by adding `Circuit.source_bus` (found via the
+      `Vsources` collection, not hardcoded) and excluding it from every
+      network-wide voltage aggregate; the bug had been silently flattening
+      the chapter's own "voltage envelope" chart to a flat, meaningless
+      line at the source's ~1.0 pu setpoint regardless of load.
+
+      `.qmd` narrative written last, after the notebook was fully reviewed
+      and approved: a three-act structure (infrastructure, the PV crisis
+      and its fix, the EV twist the first fix can't touch), curated to
+      roughly 30 embeds out of the notebook's 71 cells rather than
+      embedding everything, the same "wall of embeds" lesson Chapter 1's
+      own review already surfaced. New
+      `ark/plot/diagrams.py::pv_vs_ev_failure_mode_diagram()` (a small
+      two-panel diagram contrasting the two failure modes: same feeder,
+      opposite flow direction, opposite time of day, opposite binding
+      constraint) placed at the exact narrative pivot into the EV
+      section. Full book render and a Playwright visual check both clean.
 - [ ] Pick/build the base LV feeder model(s) and DER-penetration scenarios
       for Part 4 (SMART-DS candidates already identified above).
 - [x] Download and vendor the Maree et al. Mendeley dataset for Part 3
