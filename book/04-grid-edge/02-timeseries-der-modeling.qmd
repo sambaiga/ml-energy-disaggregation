@@ -11,18 +11,18 @@ combination, an OpenDSS model of a real {{< acr LV >}} feeder, and ended on
 a warning: one solved snapshot is not a verdict on a feeder's health.
 
 This chapter is where the meter-signal side of that premise finally meets
-the network. The same real 31-customer AusNet feeder runs across a real
-week of demand, then answers two real business questions: how much rooftop
-solar, and how much {{< acr EV >}} charging, can this specific feeder
-actually take before someone has to act on it. The two answers turn out to
-be very different problems, at different times of day, binding on
-different constraints, and the fix built for the first one does not
-generalize to the second.
+the network. The same 31-customer AusNet feeder runs across a real week
+of demand, then answers two business questions: how much rooftop solar,
+and how much {{< acr EV >}} charging, can this specific feeder actually
+take before someone has to act on it. The two answers turn out to be very
+different problems, at different times of day, binding on different
+constraints, and the fix built for the first one does not generalize to
+the second.
 
 ## Getting the data
 
-This chapter needs the same real AusNet {{< acr LV >}} network and
-smart-meter data Chapter 1 introduced, plus one more real dataset: EV
+This chapter needs the same AusNet {{< acr LV >}} network and smart-meter
+data Chapter 1 introduced, plus one more dataset: {{< acr EV >}}
 home-charging profiles. Neither is checked into this repository (someone
 else's licensed data, vendored locally instead), so fetch both once before
 running the notebook:
@@ -32,21 +32,21 @@ uv run python scripts/fetch_part4_ausnet_data.py
 uv run python scripts/fetch_part4_ev_profiles.py
 ```
 
-The first downloads the network model and two real datasets, 342
-anonymized customers' active-power readings and their matched normalized
+The first downloads the network model and two datasets, 342 anonymized
+customers' active-power readings and their matched normalized
 {{< acr PV >}} generation, both at 30-minute resolution for a full year.
-The second downloads real EV home-charging profiles derived from a UK
-metering trial. That second source ships no license, so this chapter uses
-it as a reference for building its own scenario, not as data reused
+The second downloads {{< acr EV >}} home-charging profiles derived from a
+UK metering trial. That second source ships no license, so this chapter
+uses it as a reference for building its own scenario, not as data reused
 verbatim; every number reported below is this notebook's own.
 
 ## This chapter's feeder
 
-Every section below runs on one network: the real 31-customer AusNet
-feeder Chapter 1 introduced, the same distribution transformer, the same
-24 line segments and 31 single-phase service cables. A result from the
-middle of this chapter and a result from the end describe the same
-physical feeder, not two unrelated ones.
+Every section below runs on one network: the 31-customer AusNet feeder
+Chapter 1 introduced, the same distribution transformer, the same 24 line
+segments and 31 single-phase service cables. A result from the middle of
+this chapter and a result from the end describe the same physical feeder,
+not two unrelated ones.
 
 {{< embed 02-timeseries-der-modeling-code.ipynb#489bf60b >}}
 
@@ -54,7 +54,7 @@ physical feeder, not two unrelated ones.
 
 Before driving this feeder with real data, it is worth seeing what that
 data actually looks like: not one representative household, but hundreds
-of real, different ones.
+of different ones.
 
 {{< embed 02-timeseries-der-modeling-code.ipynb#b2096981 >}}
 
@@ -72,6 +72,11 @@ third of a clear day's peak. The hosting-capacity study later in this
 chapter deliberately picks the single sunniest of these 365 days, the
 worst case for that particular question.
 
+That diversity is also why this chapter bothers deriving a `LoadShape`
+from an actual reading rather than assuming one: a network fed by a
+made-up "typical" profile would never show the swings the chart above
+just did.
+
 ## From readings to LoadShapes
 
 For residential customers, most utilities only bill on active energy, so
@@ -83,11 +88,11 @@ network's original tutorial uses.
 
 {{< embed 02-timeseries-der-modeling-code.ipynb#999b706c >}}
 
-Every one of the feeder's 31 loads gets its own real customer profile,
-sampled from the 342 available. Attaching a `LoadShape` is one command,
-but trusting it silently is a habit worth breaking: it costs little to
-cross-check the real data array, what a live solve reports back, and what
-the `LoadShape` object itself has stored, against each other.
+Every one of the feeder's 31 loads gets its own customer profile, sampled
+from the 342 available. Attaching a `LoadShape` is one command, but
+trusting it silently is a habit worth breaking: it costs little to
+cross-check the underlying data array, what a live solve reports back,
+and what the `LoadShape` object itself has stored, against each other.
 
 {{< embed 02-timeseries-der-modeling-code.ipynb#f6c19f49 >}}
 
@@ -99,7 +104,7 @@ than noticing it three sections later in a chart that looks slightly off.
 
 `circuit.solve_daily(steps, stepsize)` steps through a `Set Mode=daily`
 solve, but a single call only ever covers one day's worth of `LoadShape`
-data. A real time-series study covers more than one day, so every
+data. A genuine time-series study covers more than one day, so every
 `LoadShape` gets rebuilt at the start of each new day and the solve runs
 seven times over, a full real week.
 
@@ -122,8 +127,8 @@ staying so comfortable.
 
 A `PVSystem` can run on a flat rating, constant output regardless of the
 time of day. A more realistic model drives it from an irradiance profile
-and a temperature profile instead, attached to a real house on this same
-feeder rather than a separate demonstration network.
+and a temperature profile instead, attached to an actual house on this
+same feeder rather than a separate demonstration network.
 
 {{< embed 02-timeseries-der-modeling-code.ipynb#ccc2db96 >}}
 
@@ -144,18 +149,23 @@ realistic {{< acr PV >}} system instead sets `%cutin=0.05 %cutout=0.05`.
 Rebuilding the same {{< acr PV >}} system with the lower threshold
 recovers exactly the two hours the default silently dropped.
 
+A single house's {{< acr PV >}} system modeled correctly is a technical
+fix. Whether a whole feeder full of them still passes muster is a
+business question, and it is the one this chapter has been building
+toward since the first solved snapshot.
+
 ## The hosting-capacity crisis
 
-This is the real business question a {{< acr DSO >}} faces every time a
-new rooftop solar application arrives: does connecting one more customer's
+This is the business question a {{< acr DSO >}} faces every time a new
+rooftop solar application arrives: does connecting one more customer's
 {{< acr PV >}} system push this specific feeder past its statutory
 voltage limit? Say yes too often and customers wait months for a grid
-upgrade that may not have been necessary; say yes too rarely and a real
-feeder starts violating compliance. A hosting-capacity study is how that
+upgrade that may not have been necessary; say yes too rarely and a feeder
+starts violating compliance. A hosting-capacity study is how that
 question gets a feeder-specific answer instead of a guess.
 
 A feeder can fail this test two different ways, not one. Chapter 1
-introduced the three real constraints an {{< acr LV >}} network operates
+introduced the three constraints an {{< acr LV >}} network operates
 under: thermal, voltage, and phase balance. The notebook's own
 `run_penetration` function checks the first two together at every step:
 the worst bus voltage against the statutory limit, and the transformer's
@@ -187,8 +197,8 @@ Nowhere close: even at 100% penetration, the transformer peaks under 30%
 of its 500 kVA rating, an order of magnitude of headroom left. On this
 feeder, voltage is the real limit, not heat. That is not true of every
 {{< acr LV >}} feeder; a longer or more heavily loaded one can hit its
-thermal ceiling well before its voltage limit, which is exactly why a real
-hosting-capacity study checks both rather than assuming one always
+thermal ceiling well before its voltage limit, which is exactly why a
+proper hosting-capacity study checks both rather than assuming one always
 dominates.
 
 ## Fixing the crisis
@@ -217,7 +227,7 @@ voltage profile without reducing real generation.
 Both bring the feeder back under the 1.10 pu line, and Volt-VAr does it
 without curtailing a single kilowatt of generation. Volt-Watt curtails
 real power directly; Volt-VAr does not, which makes it the better first
-option to try on a real feeder before accepting reduced generation.
+option to try before accepting reduced generation.
 
 That single point, 80% penetration, is where the violation happens to
 show up first, but the question worth asking is bigger than one point:
@@ -267,13 +277,13 @@ problem, do they do anything for the second?
 
 ![Same feeder, opposite failure mode: PV exports power at midday and pushes voltage toward its ceiling first; EV charging imports power at the evening peak and pushes the transformer toward its thermal rating first.](../../assets/pv-vs-ev-failure-mode.svg){#fig-pv-vs-ev-failure-mode}
 
-This chapter also draws on real {{< acr EV >}} home-charging profiles
-derived from a UK metering trial: real metered charging behavior, not a
-synthetic assumption, for Level 1 (3.68kW) and Level 2 (7.36kW) chargers,
-diversified across a group of real vehicles to account for the fact that
-not everyone charges at the same time. The source repository for this
-data ships no license, unlike the network and smart-meter data behind the
-rest of this chapter, so it is used here as a reference for building this
+This chapter also draws on {{< acr EV >}} home-charging profiles derived
+from a UK metering trial: metered charging behavior, not a synthetic
+assumption, for Level 1 (3.68kW) and Level 2 (7.36kW) chargers,
+diversified across a group of vehicles to account for the fact that not
+everyone charges at the same time. The source repository for this data
+ships no license, unlike the network and smart-meter data behind the rest
+of this chapter, so it is used here as a reference for building this
 chapter's own scenario, not reused verbatim.
 
 {{< embed 02-timeseries-der-modeling-code.ipynb#93b0d29a >}}
@@ -285,13 +295,13 @@ transformer chart already flagged as the feeder's busiest. The diversified
 curve peaks around 1.5kW per {{< acr EV >}}, not the charger's full
 7.36kW rating: most vehicles in the group are not charging at any given
 moment, so the average demand per {{< acr EV >}} stays well under the
-rated maximum. That diversity is a real, physical mitigating effect,
+rated maximum. That diversity is a genuine, physical mitigating effect,
 worth testing directly rather than assuming.
 
-Every {{< acr EV >}}-owning house on this feeder gets its own copy of
-the real diversified shape, an additional `Load` that adds demand on top
-of a house's existing consumption rather than offsetting it. This time the
-worst-case day is not the sunniest, it is the day with the highest real
+Every {{< acr EV >}}-owning house on this feeder gets its own copy of the
+diversified shape, an additional `Load` that adds demand on top of a
+house's existing consumption rather than offsetting it. This time the
+worst-case day is not the sunniest, it is the day with the highest
 evening demand across the whole customer population, found the same way
 this chapter's {{< acr PV >}} study found day 363: by checking, not
 assuming.
@@ -305,7 +315,7 @@ assuming.
 Even at 100% adoption, every house on the feeder charging an {{< acr EV >}},
 neither constraint moves far from baseline: worst-case voltage stays
 above 1.06 pu and transformer utilization tops out around 20%. Diversity
-is doing real work here: real UK-trial data says not enough
+is doing real work here: the UK-trial data says not enough
 {{< acr EV >}}s charge at the same instant for this feeder to notice,
 even at full adoption.
 
@@ -314,8 +324,8 @@ mitigating effect diversity provides, since a feeder should not be sized
 assuming every driver charges considerately. An uncoordinated scenario,
 common in hosting-capacity studies precisely because it is the assumption
 a {{< acr DSO >}} cannot rule out, has every {{< acr EV >}} owner plug in
-at the same real evening peak and charge at the charger's full rated
-power, no diversity at all.
+at the same evening peak and charge at the charger's full rated power, no
+diversity at all.
 
 {{< embed 02-timeseries-der-modeling-code.ipynb#2bee3243 >}}
 
@@ -351,36 +361,39 @@ this.
 
 Volt-Watt and Volt-VAr both work by controlling `PVSystem` elements: an
 `InvControl` with no `PVSystemList` reaches every {{< acr PV >}} inverter
-on the feeder, but an {{< acr EV >}} charger modeled as a `Load` is not a
-{{< acr PV >}} inverter, and is not affected by either control at all.
-The mitigation that solved the midday violation has nothing to act on in
-an evening {{< acr EV >}} scenario. Of the levers this chapter has built,
-only `Storage` can help both peaks: charge from midday {{< acr PV >}}
+on the feeder. An {{< acr EV >}} charger modeled as a `Load` is a
+different kind of element entirely, so the mitigation that solved the
+midday violation has nothing to act on in an evening {{< acr EV >}}
+scenario. Of the levers this chapter has built, only `Storage` can help
+both peaks: charge from midday {{< acr PV >}}
 surplus, discharge into the evening {{< acr EV >}}-and-dinner peak, the
-two real problems this feeder's own daily cycle actually produces. That
-is precisely the kind of {{< acr DER >}}-aware mitigation strategy Part
+two problems this feeder's own daily cycle actually produces. That is
+precisely the kind of {{< acr DER >}}-aware mitigation strategy Part
 4's fourth thread evaluates in full.
 
 ## Do it yourself
 
-This chapter's hosting-capacity study answered one question: on this
-feeder's single sunniest day of the year, how much {{< acr PV >}} is too
-much. A related but different question is worth working through before
+The {{< acr EV >}} story just closed on a question about how a mitigation
+strategy is chosen; this chapter's own {{< acr PV >}} hosting-capacity
+study is worth revisiting with a question about how its answer was
+chosen in the first place. The hosting-capacity crisis earlier in this
+chapter answered one version of "how much {{< acr PV >}} is too much,"
+on this feeder's single sunniest day of the year. A related but
+different version of that same question is worth working through before
 reading the solution below.
 
 ### Exercise: does the answer depend on which "worst case" you pick?
 
-Day 363 is the single most extreme day in an entire real year of data,
-the tallest curve in this chapter's own {{< acr PV >}} diversity chart. A
+Day 363 is the single most extreme day in an entire year of data, the
+tallest curve in this chapter's own {{< acr PV >}} diversity chart. A
 {{< acr DSO >}} planning for the future might instead ask a seasonal
 version of the same question: for a typical summer day, a typical winter
 day, and so on, each with its own representative worst-case solar
 profile, does this feeder still hit a violation?
 
 The vendored data includes four seasonal {{< acr PV >}} files, each
-holding three candidate daily profiles for that season, real data from
-the same AusNet dataset, paired with a specific real demand day per
-season.
+holding three candidate daily profiles for that season, drawn from the
+same AusNet dataset, paired with a specific demand day per season.
 
 **E1:** For each season, find the candidate {{< acr PV >}} profile with
 the highest peak, then run the same penetration sweep from earlier in
@@ -411,20 +424,20 @@ spring, the strongest season here. "Worst case" is a modeling choice, not
 a fact about the world, and this feeder's answer to "how much
 {{< acr PV >}} can it host" depends on which worst case gets asked for:
 the single most extreme real day on record, or the worst of three
-representative candidates per season. A real hosting-capacity study
-states which one it used, the same way this chapter just did twice, with
-two different, both defensible, answers.
+representative candidates per season. A properly documented
+hosting-capacity study states which one it used, the same way this
+chapter just did twice, with two different, both defensible, answers.
 
 :::
 
 ## Where this leaves Part 4
 
-Every section in this chapter ran on one real feeder: real customer
-diversity, a real week of demand, a real violation at 80% {{< acr PV >}}
-penetration, and two real fixes for it, then a second, genuinely
-different violation from {{< acr EV >}} charging that neither fix could
-touch. Part 4 now follows four threads, each building on the same
-`ark.dss.Circuit` this chapter just extended:
+Every section in this chapter ran on one real feeder: honest customer
+diversity, a full week of demand, a real violation at 80%
+{{< acr PV >}} penetration, and two working fixes for it, then a second,
+genuinely different violation from {{< acr EV >}} charging that neither
+fix could touch. Part 4 now follows four threads, each building on the
+same `ark.dss.Circuit` this chapter just extended:
 
 1. **Phase detection**, recovering which phase a customer is actually
    connected to from nothing but voltage patterns, a real, common gap in
