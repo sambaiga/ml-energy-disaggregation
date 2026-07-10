@@ -44,11 +44,16 @@ jobs:
           # book/02-disaggregation/04-multi-task-low-frequency-code.ipynb
           # loads real UK-DALE data from resources/nilm-code/UNETNiLM, same
           # reason.
-          # All three notebooks' outputs are committed and {{< embed >}}
+          # book/04-grid-edge/04-customer-feeder-clustering-code.ipynb's
+          # feeder-level section loads resources/smart-ds/AUS_P1U, fetched
+          # locally via scripts/fetch_part4_smartds_data.py (~340MB across
+          # 500+ individual S3 requests), gitignored and too slow/fragile
+          # to fetch fresh on every CI run.
+          # All four notebooks' outputs are committed and {{< embed >}}
           # reads them directly without re-executing the notebook, so the
           # rendered book is unaffected; only this from-scratch CI
           # re-execution can't run them.
-          SKIP_LIST="book/02-disaggregation/02-feature-engineering-code.ipynb book/02-disaggregation/03-multi-appliance-recognition-code.ipynb book/02-disaggregation/04-multi-task-low-frequency-code.ipynb"
+          SKIP_LIST="book/02-disaggregation/02-feature-engineering-code.ipynb book/02-disaggregation/03-multi-appliance-recognition-code.ipynb book/02-disaggregation/04-multi-task-low-frequency-code.ipynb book/04-grid-edge/04-customer-feeder-clustering-code.ipynb"
 
           # Helper: find all notebooks, excluding archived ones
           find_notebooks() {
