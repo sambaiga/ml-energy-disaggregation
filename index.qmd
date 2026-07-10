@@ -113,7 +113,7 @@ description: "A structured, project-based path through smart meter data: disaggr
 <p class="act-desc">Phase detection, customer/feeder clustering, voltage-violation and power-quality anomaly detection, and grid health under forecasted DER growth, modeled with open-source power-flow simulation.</p>
 <ul class="act-chapters">
 <li><a href="book/04-grid-edge/01-opendss-lv-modeling.qmd"><span class="ch-num">01</span><span class="ch-name">Modeling the Low-Voltage Network</span><i class="bi bi-check-circle-fill ch-check"></i></a></li>
-<li><span class="ch-row"><span class="ch-num">02</span><span class="ch-name">Value at the grid edge</span><span class="ch-soon">Soon</span></span></li>
+<li><a href="book/04-grid-edge/02-timeseries-der-modeling.qmd"><span class="ch-num">02</span><span class="ch-name">Time-Series Simulation and DER Modeling</span><i class="bi bi-check-circle-fill ch-check"></i></a></li>
 </ul>
 </div>
 </div>

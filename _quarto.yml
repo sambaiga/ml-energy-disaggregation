@@ -59,6 +59,7 @@ book:
     - part: "Part 4: Grid-Edge Value"
       chapters:
         - book/04-grid-edge/01-opendss-lv-modeling.qmd
+        - book/04-grid-edge/02-timeseries-der-modeling.qmd
     - about.qmd
     - acronyms.qmd
 

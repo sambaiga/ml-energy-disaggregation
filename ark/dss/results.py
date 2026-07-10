@@ -17,13 +17,18 @@ from types import ModuleType
 
 import pandas as pd
 
-# OpenDSS's own singular class-name prefix for `Circuit.SetActiveElement`,
-# keyed by the plural collection name callers pass to `element_powers`.
-_ELEMENT_PREFIXES = {
-    "loads": "Load",
-    "lines": "Line",
-    "transformers": "Transformer",
-    "pvsystems": "PVSystem",
+# (opendssdirect module attribute, OpenDSS class-name prefix for
+# `Circuit.SetActiveElement`), keyed by the plural collection name callers
+# pass to `element_powers`. Not derivable by `.capitalize()`-ing the key:
+# `dss.PVsystems`/`dss.Storages` don't follow the plain-plural casing
+# `dss.Loads`/`dss.Lines`/`dss.Transformers` do (`"pvsystems".capitalize()`
+# gives `"Pvsystems"`, which doesn't exist on the module).
+_ELEMENTS = {
+    "loads": ("Loads", "Load"),
+    "lines": ("Lines", "Line"),
+    "transformers": ("Transformers", "Transformer"),
+    "pvsystems": ("PVsystems", "PVSystem"),
+    "storages": ("Storages", "Storage"),
 }
 
 
@@ -131,7 +136,7 @@ def element_powers(dss: ModuleType, element_type: str) -> pd.DataFrame:
     Args:
         dss: An `opendssdirect` module pointed at a solved circuit.
         element_type: One of `"loads"`, `"lines"`, `"transformers"`,
-            `"pvsystems"`.
+            `"pvsystems"`, `"storages"`.
 
     Returns:
         One row per (element, phase): `name`, `phase`, `p_kw`, `q_kvar`.
@@ -139,10 +144,10 @@ def element_powers(dss: ModuleType, element_type: str) -> pd.DataFrame:
     Raises:
         ValueError: If `element_type` isn't one of the supported collections.
     """
-    if element_type not in _ELEMENT_PREFIXES:
-        raise ValueError(f"element_type must be one of {sorted(_ELEMENT_PREFIXES)}, got {element_type!r}")
-    prefix = _ELEMENT_PREFIXES[element_type]
-    collection = getattr(dss, element_type.capitalize())
+    if element_type not in _ELEMENTS:
+        raise ValueError(f"element_type must be one of {sorted(_ELEMENTS)}, got {element_type!r}")
+    module_attr, prefix = _ELEMENTS[element_type]
+    collection = getattr(dss, module_attr)
 
     rows = []
     if not collection.First():
