@@ -27,4 +27,6 @@ acronyms:
       longname: Institute of Electrical and Electronics Engineers
     - shortname: PCA
       longname: Principal Component Analysis
+    - shortname: PPS
+      longname: Predictive Power Score
 ...

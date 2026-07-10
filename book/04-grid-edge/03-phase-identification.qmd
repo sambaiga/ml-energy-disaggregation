@@ -239,6 +239,43 @@ twelve hours, half a day, recovery is already perfect on this feeder. A
 shorter deployment window is possible, but it trades away margin, not
 just convenience.
 
+## Does the choice of association measure matter?
+
+Every result so far clusters on Pearson correlation, a measure of linear
+relationship. That was a choice, not the only option, and it is worth
+checking directly. Spearman and Kendall generalize Pearson to monotonic
+relationships rather than strictly linear ones. Mutual information and
+the {{< acr PPS >}} go further still, capturing any dependency a model
+can exploit, linear or not. The full 24-hour window this chapter has
+used throughout is the easy case, every method tested recovers phase
+perfectly there. The real test is whether that holds under the same
+2-hour window that already broke Pearson. Spearman and Kendall come from
+`voltage_df.corr(method=...)` directly; mutual information and
+{{< acr PPS >}} each need their own small helper to turn a per-pair score
+into the same kind of customer-by-customer similarity matrix the
+correlation-based methods already produce, one call to
+`sklearn.feature_selection.mutual_info_regression` per customer for the
+first, one call to `ppscore.matrix` for the second.
+
+{{< embed 03-phase-identification-code.ipynb#5281f978 >}}
+
+Pearson, Spearman, and Kendall, three different ways of measuring a
+monotonic relationship, all degrade together under 2 hours of data.
+Mutual information and {{< acr PPS >}} do not: both hold onto most of
+their accuracy well past the point where linear and rank correlation
+give out, because they capture dependency structure those three measures
+cannot see. A sixth measure, xicor, a newer asymmetric rank-based
+coefficient, was checked the same way in a separate environment (its
+latest release requires an older pandas than the rest of this book uses,
+so it cannot be pinned as a project dependency here) and degraded with
+the other rank-based measures rather than with mutual information and
+{{< acr PPS >}}, consistent with being fundamentally a rank measure
+itself, not a Pearson-specific weakness. The distinction that matters is
+not linear versus nonlinear correlation values, all six methods report
+numbers on different scales, it is which measures still separate phases
+correctly when the window is barely longer than the noise itself, worth
+checking before trusting a chosen method on a short deployment window.
+
 Meter density is the second question: how many of the feeder's 31
 customers actually need to be reporting, tested here by sampling smaller
 subsets at random, ten trials per subset size, since which specific
@@ -264,6 +301,85 @@ methods [@hoogsteyn2022phaseid].
 
 :::
 
+## Naming the clusters with a handful of known customers
+
+Everything so far assumes the full, real phase list is available to
+check against, but a real deployment does not start with that.
+Clustering on voltage correlation groups customers correctly, an
+adjusted Rand index of 1.0 says so, but a cluster label like "0" or "1"
+carries no information about which real phase it actually is. Naming the
+clusters requires some reference: a handful of customers whose real
+phase is already known, from a recent service record or a spot check,
+used to vote on what each cluster should be called. The practical
+question is how many of those known customers are actually needed.
+
+{{< embed 03-phase-identification-code.ipynb#790c5dec >}}
+
+One known customer names, on average, only one of the three clusters
+correctly, the other two stay unresolved. Naming reliably, getting every
+customer's label right nearly every time, takes about eight to twelve
+known customers, roughly three to four per phase. That is a much smaller
+ask than full ground truth, and it turns clustering, which only groups
+customers, into labeling, which names them.
+
+## Beyond a point estimate: conformal phase-assignment confidence
+
+Naming the clusters still produces one label per customer, with no
+signal for which labels to trust. A utility deciding where to send a
+limited field crew needs exactly that signal: which assignments are
+solid, and which deserve a second look before anyone relies on them.
+Split conformal prediction supplies it with a statistical guarantee
+attached, not just an ad hoc score.
+
+The idea: for each candidate phase, measure how far a customer's own
+correlation-embedding position sits from that phase's centroid, built
+only from the known anchor customers. Calibrate a distance threshold
+using the anchors' own leave-one-out scores against their real phase, at
+a chosen confidence level. Then, for every customer, report the *set* of
+phases within that threshold, not a single guess. A confident customer
+gets a single-phase set. An uncertain one gets more than one phase, or
+none at all if it does not sit close enough to any of the three
+centroids, itself a signal that something about that customer's data is
+unusual and worth a closer look. Four small functions implement this:
+one to build each phase's centroid from its anchor customers, one to
+score a point's distance to a given phase's centroid, one to calibrate
+the distance threshold from the anchors' own leave-one-out scores, and
+one to assemble the resulting prediction sets.
+
+A calibration set of ten known customers is enough to test this, the
+same order of magnitude the labeling sweep above already found reliable.
+On the full 24-hour correlation embedding, where the point estimate is
+already perfect, most customers get a clean single-phase set.
+
+{{< embed 03-phase-identification-code.ipynb#63b8ddfc >}}
+
+Confidence only earns its keep when the point estimate can actually be
+wrong. The window-length sensitivity earlier in this chapter already
+found that case: a 4-hour window still clusters well, an adjusted Rand
+index near 0.90, but not perfectly. Running the same conformal method on
+that shorter, noisier embedding checks whether it flags the customer the
+point estimate actually gets wrong, or just adds noise of its own.
+
+{{< embed 03-phase-identification-code.ipynb#1490fd0e >}}
+
+::: {.ark-concept}
+<span class="ark-concept-title"><i class="bi bi-info-circle-fill"></i> Key Concept</span>
+
+Four customers get flagged, all four the same real phase, and the one
+customer the point estimate actually mislabels is among them. The other
+three happen to keep their correct point-estimate label anyway, but their
+embedding position under the noisier 4-hour window sits too far from the
+anchor-derived centroid to earn a confident single-phase set. That is a
+more useful result than flagging one lucky-or-unlucky customer alone: it
+says an entire phase group's evidence has gotten weaker under this
+window, not just that one guess happened to land wrong. A point estimate
+alone offers no way to tell a solid label from a lucky guess. A conformal
+prediction set does, with a statistical coverage guarantee behind it
+rather than an arbitrary score, at the cost of only the same handful of
+known customers the labeling step already needed.
+
+:::
+
 ## Where this leaves Part 4
 
 Phase connectivity for this feeder is no longer an assumption inherited
@@ -273,7 +389,12 @@ structure, rather than on the raw readings themselves, recovers every
 customer's real phase exactly, using no more than seven meters and twelve
 hours of data. The same feeder Chapter 2 ran a hosting-capacity study and
 an {{< acr EV >}}-demand study on now has its phase labels independently
-confirmed rather than merely assumed correct.
+confirmed rather than merely assumed correct. The deployment story goes
+one step further than clustering alone: a handful of known customers is
+enough to name the clusters, and a conformal confidence set on top of
+that naming tells a utility exactly which assignments to trust and which
+to send a field crew to check first, a statistically grounded answer none
+of this chapter's own references provide.
 
 Part 4 continues with the second of its four threads: customer and
 feeder clustering, grouping customers by how they actually behave rather
