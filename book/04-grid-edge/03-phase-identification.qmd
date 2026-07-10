@@ -1,0 +1,286 @@
+---
+title: "Chapter 3: Phase Identification from Smart-Meter Data"
+bibliography: ../../references.bib
+---
+
+Chapter 1 named phase balance as one of three limits every low-voltage
+feeder operates under, alongside thermal and voltage constraints, and
+made a quieter claim alongside it: the phase each customer connects to is
+information no meter reports. Every study in Chapters 1 and 2 relied on
+that information anyway, taken directly from the network model's own
+`bus1` definitions, and never checked. This chapter examines what that
+assumption is worth.
+
+In practice, a utility's phase records rarely match the network exactly.
+Service connections get re-terminated during storm repairs and equipment
+swaps without the change reaching the record system; decades of ad hoc
+feeder edits accumulate drift between the as-built network and the
+as-documented one. Short's own motivation for building a metering-based
+correction method was exactly this gap: utility phase records are compiled
+by hand over decades of field work and are known, chronically, to disagree
+with the physical network in ways no one catches until something downstream
+stops making sense [@short2013phaseid]. Every unbalance calculation, every
+hosting-capacity study like the one Chapter 2 ran, and every state estimate
+a distribution system operator ({{< acr DSO >}}) produces inherits whatever
+phase labels the model happens to carry, correct or not, with no
+independent way to catch the difference from the network model alone.
+
+This chapter asks whether that gap can be closed without sending anyone
+into the field. A smart meter cannot report its own phase directly, no
+more than it can report a neighboring bus's voltage, but it reports
+something that turns out to depend on phase in a very specific way: its
+own voltage, read over time. What follows works through why that
+dependency exists, tests a method built on it against a real, known
+answer, and is honest about where the method breaks.
+
+## Why voltage carries a phase signature
+
+A three-phase low-voltage feeder splits into single-phase service drops
+at various points along its length, each drop landing on phase A, B, or
+C. Every customer on the same phase shares two things no customer on a
+different phase shares: the same upstream conductor path back to the
+transformer, and therefore the same phase-to-neutral voltage reference
+riding on that path. When aggregate demand on phase A rises anywhere
+along the feeder, every customer downstream on phase A sees a correlated
+dip in its own voltage, driven by the same current flowing through the
+same shared impedance. A customer on phase B, drawing a similar amount of
+power at the same moment, sees no such dip, because phase B's conductor
+and phase B's demand are what set its voltage instead.
+
+Active or reactive power consumption carries no equivalent signal.
+Two households on different phases can have nearly identical demand
+profiles simply because they keep similar schedules, while two households
+on the same phase can have very different demand and still show
+near-identical voltage fluctuation, because it is the shared electrical
+path, not the shared behavior, that produces the correlation. Phase
+identification from smart-meter data is therefore a voltage problem, not
+a power problem, and any method that starts from power alone is starting
+from the wrong signal.
+
+This is not a new observation. Short first proposed recovering phase
+connectivity from correlated voltage magnitude at scale, using advanced
+metering infrastructure already deployed for billing
+[@short2013phaseid]. Two directions have extended that idea since.
+Blakely and Reno built an ensemble spectral-clustering method around the
+co-association matrix formed by resampling the correlation-based
+clustering many times, avoiding a dependency on any prior phase labels at
+all [@blakely2020coassociation]. Hangawatta, Gargoom, and Kouzani took a
+supervised route instead, training a neural network directly on
+consumption data at the low sampling rates typical of real deployments,
+closer to the resolution this chapter's own data uses
+[@hangawatta2025phaseid]. Hoogsteyn, Vanin, Koirala, and Van Hertem
+benchmarked a range of these methods against each other under varying
+meter accuracy and deployment density, producing exactly the kind of
+sensitivity findings this chapter reproduces independently in its own
+closing section [@hoogsteyn2022phaseid].
+
+One study sits closer to this chapter than any of the others. Simonovska
+and Ochoa combined principal component analysis with unconstrained
+k-means clustering on smart-meter voltage traces and tested it on a real,
+anonymized 31-customer low-voltage feeder under varying levels of
+{{< acr PV >}} penetration [@simonovska2021phasegrouping]. That feeder is
+the same one this book has used since Chapter 1. The method built and
+tested below follows the same principle, correlation structure over raw
+readings, dimensionality reduction, then clustering, checked here against
+this feeder's own real phase records rather than assumed correct.
+
+::: {.ark-concept}
+<span class="ark-concept-title"><i class="bi bi-info-circle-fill"></i> Key Concept</span>
+
+**Correlation, not magnitude, is the signal.** Two voltage traces that
+look similar in absolute level can be weakly correlated, and two traces
+at different absolute levels can be strongly correlated, if they move
+together over time. A phase-identification method that clusters on raw
+voltage magnitude is answering "which customers have a similar voltage
+level," a question dominated by each customer's distance from the
+transformer. A method that clusters on the correlation between voltage
+traces is answering "which customers' voltage moves together," the
+question that actually tracks phase membership. The rest of this chapter
+tests both and reports what the difference costs in practice.
+
+:::
+
+## Getting the data
+
+This chapter reuses the same real {{< acr LV >}} network and smart-meter
+data Chapters 1 and 2 vendored, no new fetch step required:
+
+```bash
+uv run python scripts/fetch_part4_ausnet_data.py
+```
+
+## The feeder, again
+
+Every result below runs on the same 31-customer AusNet feeder Chapters 1
+and 2 already built and solved: the same distribution transformer, the
+same line segments, the same single-phase service cables. This chapter's
+only new question is whether the phase label attached to each of those
+service cables in the network model is actually correct.
+
+{{< embed 03-phase-identification-code.ipynb#489bf60b >}}
+
+## Where the real answer is hiding
+
+Checking a method against a known answer requires a known answer, and
+this feeder happens to have one, buried one level deeper in the network
+model than it first appears. Every load's own `bus1` in this network ends
+in `.1`, the same for all 31 customers, which looks like it means every
+customer sits on phase A. It does not: a single-phase bus only ever has
+one local node, so its own node index is always 1, regardless of which
+physical phase actually feeds it. The real phase assignment lives one
+step upstream, on the service line that feeds that bus. That line's own
+`bus1`, the tap point on the three-phase backbone, ends in `.1`, `.2`, or
+`.3`, and that suffix is the customer's actual phase.
+
+{{< embed 03-phase-identification-code.ipynb#8f3e1b95 >}}
+
+Eleven customers on phase 1, ten on phase 2, ten on phase 3, matching this
+feeder's own documentation exactly. Every method tested in the rest of
+this chapter is checked against this same real answer, not against its
+own assumptions.
+
+## A voltage time series, one per customer
+
+Driving each customer with its own real smart-meter reading, the same
+`LoadShape` mechanics Chapter 2 introduced, and solving across a full day
+produces one voltage time series per customer, the raw material every
+method below draws from.
+
+{{< embed 03-phase-identification-code.ipynb#4b52bbe8 >}}
+
+{{< embed 03-phase-identification-code.ipynb#5ab14a2e >}}
+
+## A first, naive attempt
+
+The most direct application of the theory above skips a step. Treat each
+customer's 48-point voltage trace as a feature vector, reduce it to two
+dimensions with {{< acr PCA >}}, and cluster the result into three
+groups. It is worth running this exact approach before reaching for
+anything more careful, and checking it honestly against the real answer
+already in hand, rather than assuming a plausible-sounding method works.
+
+{{< embed 03-phase-identification-code.ipynb#1da22105 >}}
+
+::: {.ark-mistake}
+
+**{{< acr PCA >}} on raw voltage barely beats a coin flip.** An adjusted
+Rand index of 0.24, where 1.0 is a perfect match to the real phase labels
+and 0.0 is no better than random assignment, means the clusters this
+approach finds only weakly track the real answer. Nothing here is a
+coding error: every customer's raw voltage trace is dominated by the same
+feeder-wide daily demand cycle, the shared shape {{< acr PCA >}} finds
+first because it explains the most overall variance in the raw data.
+Phase membership is a smaller effect sitting underneath that shared
+pattern, exactly the distinction the concept box above predicted, and
+standard {{< acr PCA >}} on raw magnitude has no reason to prioritize it.
+
+:::
+
+## Clustering the correlation instead
+
+The fix is not a different clustering algorithm. It is a different
+question asked of the same underlying data: instead of asking which
+customers have similar voltage traces, ask which customers' voltage moves
+together. The pairwise correlation matrix between customers directly
+answers that question, with the shared feeder-wide pattern present in
+every pair roughly equally and therefore no longer the dominant source of
+variance.
+
+{{< embed 03-phase-identification-code.ipynb#7fa6dff9 >}}
+
+Customers on the same real phase already correlate above 0.98 in this
+matrix; customers on different phases sit closer to 0.5 to 0.8. The phase
+signal is visible directly in the numbers before any clustering algorithm
+runs at all.
+
+{{< embed 03-phase-identification-code.ipynb#1fb859ea >}}
+
+The same {{< acr PCA >}}-plus-k-means recipe as the naive attempt,
+applied to the correlation matrix instead of the raw readings, recovers
+every one of the 31 customers' real phases exactly, an adjusted Rand
+index of 1.0. Nothing about the clustering step changed; only what it was
+asked to cluster did.
+
+{{< embed 03-phase-identification-code.ipynb#509c276d >}}
+
+Three tight, well-separated groups, colored here by the real phase label
+rather than the predicted one, since the two are identical for every
+customer on this feeder.
+
+## Would this have found three groups unsupervised?
+
+The number of phases, three, was supplied going in. A real deployment
+often does not know the right number of groups in advance, so it is worth
+asking whether the data itself would have revealed it. The silhouette
+score, a measure of how well separated a given clustering is, answers
+that directly.
+
+{{< embed 03-phase-identification-code.ipynb#62b6a69a >}}
+
+Three is the clear peak across the range tested, not an assumption
+smuggled into the method. A real deployment could recover the right
+number of phase groups from this same correlation structure, without
+being told what to look for.
+
+## How much data does this actually need?
+
+A perfect result on one full day, from all 31 meters, answers the
+methodological question but not the practical one. Two questions matter
+before recommending this method for a real deployment: how long a voltage
+history is required, and how many meters actually need to be reporting.
+Both are worth checking directly rather than assumed.
+
+{{< embed 03-phase-identification-code.ipynb#18157d3d >}}
+
+{{< embed 03-phase-identification-code.ipynb#c0529987 >}}
+
+Two hours of readings is unreliable, an adjusted Rand index of 0.53. By
+twelve hours, half a day, recovery is already perfect on this feeder. A
+shorter deployment window is possible, but it trades away margin, not
+just convenience.
+
+Meter density is the second question: how many of the feeder's 31
+customers actually need to be reporting, tested here by sampling smaller
+subsets at random, ten trials per subset size, since which specific
+customers get chosen matters as much as how many.
+
+{{< embed 03-phase-identification-code.ipynb#d095cfeb >}}
+
+{{< embed 03-phase-identification-code.ipynb#b2c42ee5 >}}
+
+::: {.ark-mistake}
+
+**Below about seven meters, results stop being trustworthy, not just
+noisier.** Above seven, roughly two to three per phase on this
+three-phase feeder, recovery is consistently perfect across every random
+subset tried. Below it, results swing widely: sometimes still perfect,
+sometimes failing outright, because a small random draw can miss one
+phase entirely or leave a phase group down to a single member with
+nothing to correlate against. The method does not degrade gracefully as
+data shrinks; it fails unpredictably, which matters more for a real
+deployment than the average case alone, and matches the meter-density
+sensitivity Hoogsteyn et al. report across other phase-identification
+methods [@hoogsteyn2022phaseid].
+
+:::
+
+## Where this leaves Part 4
+
+Phase connectivity for this feeder is no longer an assumption inherited
+from its `.dss` files; it is a checked, reproducible result. Correlating
+real smart-meter voltage readings and clustering on that correlation
+structure, rather than on the raw readings themselves, recovers every
+customer's real phase exactly, using no more than seven meters and twelve
+hours of data. The same feeder Chapter 2 ran a hosting-capacity study and
+an {{< acr EV >}}-demand study on now has its phase labels independently
+confirmed rather than merely assumed correct.
+
+Part 4 continues with the second of its four threads: customer and
+feeder clustering, grouping customers by how they actually behave rather
+than how they are labeled, reusing the `ark.plot.clustering` tools this
+chapter introduced.
+
+## References
+
+::: {#refs}
+:::
