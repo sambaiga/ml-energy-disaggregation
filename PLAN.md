@@ -126,23 +126,70 @@ backbone dataset.
 
 ### Part 4: Grid-Edge Value (amber, flagship)
 
-Four threads, ordered so each builds on the last, all against the same
-SMART-DS feeder (see the Open Items entry below for the exact real,
-tutorial-sized subfolder identified: `AUS/P1U/.../p1uhs0_1247--p1udt12703/`,
-~2.4 MB, 8 `.dss` files):
+Four threads, ordered so each builds on the last. Threads 2-4 are still
+planned around the same SMART-DS feeder (see the Open Items entry below
+for the exact real, tutorial-sized subfolder identified:
+`AUS/P1U/.../p1uhs0_1247--p1udt12703/`, ~2.4 MB, 8 `.dss` files); thread 1
+was revised after Chapters 1-2 shipped to reuse the real 31-customer
+AusNet feeder those chapters already built and vendored, rather than
+introduce a new dataset for one thread only.
 
-1. **Phase detection and topology identification**: which phase ($A$, $B$,
-   or $C$) each meter is connected to, purely from voltage correlation, no
-   field audit. `Eneida.io`'s phase-clustering work is not usable as a data
-   source, checked directly: it is a commercial LV-analytics vendor
-   showcasing a CIRED 2025 paper, not a public dataset, and this book only
-   uses reproducible public data. The actual plan: run OpenDSS power flow on
-   the chosen SMART-DS feeder to generate realistic bus-level voltage
-   timeseries, then cluster them (correlation matrices, spectral clustering,
-   or PCA) to recover phase connectivity, checked against the real answer
-   already sitting in that feeder's own `Loads.dss` (each load's phase is
-   explicit ground truth in the model). A fully reproducible, self-checking
-   exercise real unlabeled utility data could never offer.
+1. **Phase detection and topology identification** (Chapter 3, branch
+   `part4-ch3-phase-identification`): which phase ($A$, $B$, or $C$) each
+   meter is connected to, purely from voltage correlation, no field audit.
+   `Eneida.io`'s phase-clustering work is not usable as a data source,
+   checked directly: it is a commercial LV-analytics vendor showcasing a
+   CIRED 2025 paper, not a public dataset, and this book only uses
+   reproducible public data. Revised plan, decided after a literature
+   search turned up a direct precedent: reuse the same real 31-customer
+   AusNet feeder and smart-meter data Chapters 1-2 already vendored
+   (`resources/cvar_flexibility/data/timeseries-lv/`, via
+   `scripts/fetch_part4_ausnet_data.py`, no new data-fetch work needed),
+   compute voltage correlations from real customer LoadShapes, and cluster
+   them (correlation matrices, then PCA + k-means) to recover phase
+   connectivity, checked against the real answer already sitting in that
+   feeder's own `LVcircuit-loads.txt` (each load's phase is explicit
+   ground truth in the model). A fully reproducible, self-checking
+   exercise real unlabeled utility data could never offer. Five real,
+   verified reference papers (checked directly, not assumed):
+   - Short, T.A. (2013), "Advanced Metering for Phase Identification,
+     Transformer Identification, and Secondary Modeling," *IEEE Trans.
+     Smart Grid*, 4(2):651-658. The foundational correlation-based method.
+   - Simonovska, A. & Ochoa, L.F. (2021), "Phase Grouping in PV-Rich LV
+     Feeders: Smart Meter Data and Unconstrained k-Means," *IEEE Madrid
+     PowerTech*. PCA + k-means, tested on this book's own 31-customer
+     AusNet feeder under different PV penetrations, same author lineage
+     as Team-Nando's own DER-hosting-capacity tutorials (L.F. Ochoa is
+     "Nando" Ochoa). The direct precedent the revised plan is built on.
+   - Blakely, L. & Reno, M.J. (2020), "Phase Identification Using
+     Co-Association Matrix Ensemble Clustering," *IET Smart Grid*. Sandia
+     National Labs; ensemble spectral clustering that needs no existing
+     phase labels.
+   - Hoogsteyn, A., Vanin, M., Koirala, A., Van Hertem, D. (2022), "Low
+     Voltage Customer Phase Identification Methods Based on Smart Meter
+     Data," *Electric Power Systems Research*, 212. Benchmarks multiple
+     methods across meter accuracy and deployment density, the basis for
+     a planned sensitivity exercise.
+   - Hangawatta, D.C., Gargoom, A., Kouzani, A. (2025),
+     "Machine-Learning-Driven Identification of Electrical Phases in
+     Low-Sampling-Rate Consumer Data," *Energies*, 18(1):128. A neural-
+     network approach for low-frequency data, closer to this book's own
+     30-minute AusNet resolution than most of the above.
+
+   Planned structure: stakes (a wrong phase record silently poisons every
+   hosting-capacity/balance calculation Chapter 2 already ran) -> the
+   idea (phase-mates share correlated voltage fluctuations from common
+   upstream impedance and simultaneous demand) -> a ground-truth check
+   against the feeder's own known answer (mirrors Chapter 1's own
+   verification habit) -> method (correlation matrix first, Short-style
+   and transparent, then PCA + k-means, matching Simonovska & Ochoa's real
+   published benchmark on this exact feeder) -> a real result with an
+   honest failure mode, not glossed over -> a sensitivity "Do it
+   yourself" (accuracy vs. fewer meters/shorter windows/lower resolution,
+   per Hoogsteyn et al.'s own finding) -> payoff (corrected phase
+   labels feed back into Chapter 2's own hosting-capacity machinery)
+   -> a pointer to thread 2. Notebook first, matching Chapter 2's own
+   build discipline; `.qmd` narrative after the notebook is reviewed.
 2. **Customer/feeder clustering and segmentation from meter data**: segment
    SMART-DS's synthetic smart meters into consumer archetypes (residential,
    commercial, industrial). `AUS/P1U` (mixed commercial/residential) is the
@@ -630,8 +677,61 @@ worth working around.
       opposite flow direction, opposite time of day, opposite binding
       constraint) placed at the exact narrative pivot into the EV
       section. Full book render and a Playwright visual check both clean.
+
+      Final review pass against the book-writing-craft skill found "real"
+      overused as a modifier past the point of deliberate emphasis (25+
+      instances, trimmed throughout, kept only where it makes an actual
+      real-vs-synthetic contrast), two section boundaries with no bridging
+      sentence, and a stale "Section 6" cross-reference left over from an
+      earlier numbered-heading draft (this chapter's headings were never
+      numbered). PR #7 (later renumbered #8 after a rebase) merged to
+      `main` 2026-07-10.
+- [x] Write `book/04-grid-edge/03-phase-identification` (branch
+      `part4-ch3-phase-identification`), Part 4's thread 1: recovering
+      which phase each customer is actually connected to from voltage
+      correlation alone, no field audit. Reuses the real 31-customer
+      AusNet feeder and smart-meter data Chapters 1-2 already vendored
+      (no new data-fetch work), checked against the real per-load phase
+      ground truth (extracted from each service line's own source-side
+      bus suffix, not the load's own `bus1`, which is uniformly `.1`).
+      Five real reference papers cited: Short (2013, the foundational
+      correlation method); Simonovska & Ochoa (2021, PCA + k-means,
+      tested on this exact AusNet feeder, the direct precedent this
+      chapter is built on); Blakely & Reno (2020, Sandia, ensemble
+      spectral clustering needing no existing labels); Hoogsteyn et al.
+      (2022, a benchmark across meter accuracy/density, the basis for
+      this chapter's own sensitivity section); Hangawatta et al. (2025,
+      a neural-network approach for low-frequency data closer to this
+      book's own 30-minute resolution). Core methodology: naive PCA on
+      raw voltage underperforms (ARI 0.24), PCA on the correlation
+      matrix recovers all 31 real phases exactly (ARI 1.0), matching
+      Simonovska & Ochoa's own published result. Sensitivity: reliable
+      down to 12 hours of data and 7 meters, degrading unpredictably
+      below either threshold. Extended beyond the five cited papers with
+      two genuinely novel contributions: minimum-anchor labeling (how
+      many known-phase customers are needed to name, not just group, the
+      clusters; reliable at 8-12 anchors) and split conformal prediction
+      sets built on those same anchors, giving each customer a
+      statistically calibrated confidence set rather than a bare point
+      estimate, validated on a degraded window where it correctly flags
+      the customer the point estimate actually misclassifies. Also
+      compared six pairwise association measures (Pearson, Spearman,
+      Kendall, xicor, mutual information, PPS) under a severe 2-hour
+      window: linear/rank-based measures degrade together, mutual
+      information and PPS hold up. A planned 200-customer scale-up story
+      was investigated and abandoned: three independent candidate
+      networks (SMART-DS, a locally vendored four-feeders network, and
+      the real Australian CRE21 network) were tested directly and none
+      of them produce a phase-differentiated voltage signal, confirmed
+      with a deterministic 80x demand-imbalance test on each, because all
+      three model a customer's final connection as a bundled multi-phase
+      conductor rather than AusNet's genuinely separate single-phase
+      service drop. Notebook and `.qmd` both complete, rendered, and
+      committed on branch `part4-ch3-phase-identification`; not yet
+      merged.
 - [ ] Pick/build the base LV feeder model(s) and DER-penetration scenarios
-      for Part 4 (SMART-DS candidates already identified above).
+      for Part 4 threads 2-4 (SMART-DS candidates already identified
+      above; thread 1 no longer needs this, see above).
 - [x] Download and vendor the Maree et al. Mendeley dataset for Part 3
       (gitignored, same pattern as `resources/nilm-code/`, not checked into
       git given its size). Vendored via `scripts/fetch_part3_mendeley_data.py`
