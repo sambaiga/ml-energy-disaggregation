@@ -102,8 +102,8 @@ tests both and reports what the difference costs in practice.
 
 ## Getting the data
 
-This chapter reuses the same real {{< acr LV >}} network and smart-meter
-data Chapters 1 and 2 vendored, no new fetch step required:
+This chapter reuses the same {{< acr LV >}} network and smart-meter data
+Chapters 1 and 2 vendored, no new fetch step required:
 
 ```bash
 uv run python scripts/fetch_part4_ausnet_data.py
@@ -141,7 +141,7 @@ own assumptions.
 
 ## A voltage time series, one per customer
 
-Driving each customer with its own real smart-meter reading, the same
+Driving each customer with its own smart-meter reading, the same
 `LoadShape` mechanics Chapter 2 introduced, and solving across a full day
 produces one voltage time series per customer, the raw material every
 method below draws from.
@@ -209,7 +209,7 @@ customer on this feeder.
 
 ## Would this have found three groups unsupervised?
 
-The number of phases, three, was supplied going in. A real deployment
+The number of phases, three, was supplied going in. A working deployment
 often does not know the right number of groups in advance, so it is worth
 asking whether the data itself would have revealed it. The silhouette
 score, a measure of how well separated a given clustering is, answers
@@ -218,15 +218,15 @@ that directly.
 {{< embed 03-phase-identification-code.ipynb#62b6a69a >}}
 
 Three is the clear peak across the range tested, not an assumption
-smuggled into the method. A real deployment could recover the right
-number of phase groups from this same correlation structure, without
-being told what to look for.
+smuggled into the method. This same correlation structure could have
+surfaced the right number of phase groups without being told what to
+look for.
 
 ## How much data does this actually need?
 
 A perfect result on one full day, from all 31 meters, answers the
 methodological question but not the practical one. Two questions matter
-before recommending this method for a real deployment: how long a voltage
+before recommending this method for actual use: how long a voltage
 history is required, and how many meters actually need to be reporting.
 Both are worth checking directly rather than assumed.
 
@@ -238,6 +238,31 @@ Two hours of readings is unreliable, an adjusted Rand index of 0.53. By
 twelve hours, half a day, recovery is already perfect on this feeder. A
 shorter deployment window is possible, but it trades away margin, not
 just convenience.
+
+Meter density is the second question: how many of the feeder's 31
+customers actually need to be reporting, tested here by sampling smaller
+subsets at random, ten trials per subset size, since which specific
+customers get chosen matters as much as how many.
+
+{{< embed 03-phase-identification-code.ipynb#d095cfeb >}}
+
+{{< embed 03-phase-identification-code.ipynb#b2c42ee5 >}}
+
+::: {.ark-mistake}
+
+**Below about seven meters, results stop being trustworthy, not just
+noisier.** Above seven, roughly two to three per phase on this
+three-phase feeder, recovery is consistently perfect across every random
+subset tried. Below it, results swing widely: sometimes still perfect,
+sometimes failing outright, because a small random draw can miss one
+phase entirely or leave a phase group down to a single member with
+nothing to correlate against. The method does not degrade gracefully as
+data shrinks; it fails unpredictably, which matters more for an actual
+rollout than the average case alone, and matches the meter-density
+sensitivity Hoogsteyn et al. report across other phase-identification
+methods [@hoogsteyn2022phaseid].
+
+:::
 
 ## Does the choice of association measure matter?
 
@@ -276,35 +301,10 @@ numbers on different scales, it is which measures still separate phases
 correctly when the window is barely longer than the noise itself, worth
 checking before trusting a chosen method on a short deployment window.
 
-Meter density is the second question: how many of the feeder's 31
-customers actually need to be reporting, tested here by sampling smaller
-subsets at random, ten trials per subset size, since which specific
-customers get chosen matters as much as how many.
-
-{{< embed 03-phase-identification-code.ipynb#d095cfeb >}}
-
-{{< embed 03-phase-identification-code.ipynb#b2c42ee5 >}}
-
-::: {.ark-mistake}
-
-**Below about seven meters, results stop being trustworthy, not just
-noisier.** Above seven, roughly two to three per phase on this
-three-phase feeder, recovery is consistently perfect across every random
-subset tried. Below it, results swing widely: sometimes still perfect,
-sometimes failing outright, because a small random draw can miss one
-phase entirely or leave a phase group down to a single member with
-nothing to correlate against. The method does not degrade gracefully as
-data shrinks; it fails unpredictably, which matters more for a real
-deployment than the average case alone, and matches the meter-density
-sensitivity Hoogsteyn et al. report across other phase-identification
-methods [@hoogsteyn2022phaseid].
-
-:::
-
 ## Naming the clusters with a handful of known customers
 
 Everything so far assumes the full, real phase list is available to
-check against, but a real deployment does not start with that.
+check against, but an actual rollout does not start with that.
 Clustering on voltage correlation groups customers correctly, an
 adjusted Rand index of 1.0 says so, but a cluster label like "0" or "1"
 carries no information about which real phase it actually is. Naming the
