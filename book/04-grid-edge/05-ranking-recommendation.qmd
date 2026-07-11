@@ -208,16 +208,23 @@ not earned the extra machinery, the same discipline this book applied to
 
 {{< embed 05-ranking-recommendation-code.ipynb#af59a6a4 >}}
 
-Two different results, for a real, physical reason. For thermal risk,
-retrieval beats both baselines: a customer's own five nearest real
-neighbors predict their peak contribution better than their archetype's
-mean, and far better than the population mean. Retrieval earns its
-complexity here. For voltage risk, retrieval does not beat the population
-mean at all. Archetype does not either. Neither is a failure of the code,
-both are an honest report of what the variance decomposition above
-already predicted: voltage risk depends on bus position as much as on
-shape, and no amount of clever retrieval on shape alone can recover
-information the data never carried in the first place.
+::: {.ark-mistake}
+<span class="ark-mistake-title"><i class="bi bi-bug-fill"></i> Common Mistake</span>
+
+**Two different results, for a real, physical reason, not a coin flip.**
+For thermal risk, retrieval beats both baselines: a customer's own five
+nearest real neighbors predict their peak contribution better than their
+archetype's mean, and far better than the population mean. Retrieval
+earns its complexity here. For voltage risk, retrieval does not beat the
+population mean at all. Archetype does not either. Neither is a failure
+of the code, both are an honest report of what the variance decomposition
+above already predicted: voltage risk depends on bus position as much as
+on shape, and no amount of clever retrieval on shape alone can recover
+information the data never carried in the first place. Assuming a
+technique that works for one risk type will work for the other, without
+checking, is the actual mistake to avoid here.
+
+:::
 
 ### How much can a retrieved neighbor actually be trusted?
 
@@ -285,13 +292,19 @@ multi-criteria score on purpose, not a learned ranker. With a labeled set
 this small, a learned model has little complexity to earn back, the same
 lesson already drawn twice in this chapter.
 
+::: {.ark-concept}
+<span class="ark-concept-title"><i class="bi bi-info-circle-fill"></i> Key Concept</span>
+
 The rank interval matters as much as the rank itself. It comes from
 resampling the labeled set 200 times and re-ranking each time, a real,
 bootstrap measure of how much sampling noise alone could move a customer
 up or down the list. The very top of the list is genuinely stable.
 Further down, the interval widens quickly, an honest signal that exact
 ordering in the middle of a triage queue deserves less confidence than
-the top few positions do.
+the top few positions do. A bare rank position hides that difference; the
+interval is what actually tells a {{< acr DSO >}} how much to trust it.
+
+:::
 
 ### Ranking real locations, not just customers
 
@@ -521,9 +534,10 @@ needs to stay real, not fall back on a synthetic benchmark network for
 convenience.
 
 Deakin and colleagues' `HV_UG_full` model is a genuinely real second
-network, real LVNS low-voltage circuits from a UK distribution network
-operator's own low-carbon-networks trial, allocated onto a real UKGDS
-medium-voltage backbone [@deakin2021hybridmvlv]. It is not a small
+network, real Low Voltage Network Solutions (LVNS) circuits from
+Electricity North West's own low-carbon-networks-fund trial, allocated
+onto a real UK Generic Distribution System (UKGDS) medium-voltage
+backbone [@deakin2021hybridmvlv]. It is not a small
 demonstration network: 112,887 buses, 19,072 loads, 414 real feeders,
 already checked directly before this chapter was built, solves cleanly,
 no structural defect. Every load in it is still a static placeholder,
@@ -574,18 +588,20 @@ worst-case voltage well enough to skip a full simulation?
 
 {{< embed 05-ranking-recommendation-code.ipynb#b0b73dc3 >}}
 
-::: {.ark-concept}
-<span class="ark-concept-title"><i class="bi bi-info-circle-fill"></i> Key Concept</span>
+::: {.ark-mistake}
+<span class="ark-mistake-title"><i class="bi bi-bug-fill"></i> Common Mistake</span>
 
-The same honest result customer-level voltage risk already showed, one
-level up. Feeder size and {{< acr PV >}} share both correlate weakly
+**The same honest result customer-level voltage risk already showed, one
+level up.** Feeder size and {{< acr PV >}} share both correlate weakly
 with worst-case voltage, nowhere near enough for a handful of
 similar-looking feeders to predict a new one's own risk better than just
 guessing the population average. The missing signal is almost certainly
 the same one already flagged for individual customers: real electrical
 distance from the substation, not customer count or {{< acr PV >}} share,
 drives voltage rise, and that needs the network's own real topology to
-capture, not a coarse feeder-level summary.
+capture, not a coarse feeder-level summary. Expecting retrieval to earn
+its complexity everywhere just because it earned it once, for thermal
+risk at customer scale, is the mistake this section exists to catch.
 
 :::
 
@@ -678,9 +694,11 @@ chapter was built and validated against the same 294-customer labeled
 pool. The real test of whether any of it is worth deploying is whether it
 holds up past that pool, on customers and networks it never saw during
 construction. Retrieval does, on five genuinely new customers and on 334
-real feeders it was never tuned against. Ranking does, at ten times the
-candidate pool. Recommendation does too, where a real violation exists to
-check it against, and honestly has nothing to say where one does not.
+real feeders it was never tuned against. Ranking does too, still
+producing a real confidence interval on 334 real feeders instead of the
+31 real bus positions it was built on. Recommendation does as well, where
+a real violation exists to check it against, and honestly has nothing to
+say where one does not.
 The one place this chapter's own results stop generalizing, network-wide
 Volt-VAr control, is disclosed as plainly as everywhere it does, the same
 discipline this book has followed since Chapter 1.
