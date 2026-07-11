@@ -127,19 +127,19 @@ backbone dataset.
 ### Part 4: Grid-Edge Value (amber, flagship)
 
 Five threads. The original four are ordered so each builds on the last;
-thread 5 was added later and, by explicit decision, is being built ahead
-of threads 3-4 since it depends on neither. Threads 3-4 are still
-planned around SMART-DS (see the Open Items entry below for the exact
-real, tutorial-sized subfolder identified:
-`AUS/P1U/.../p1uhs0_1247--p1udt12703/`, ~2.4 MB, 8 `.dss` files); thread 1
-was revised after Chapters 1-2 shipped to reuse the real 31-customer
-AusNet feeder those chapters already built and vendored, rather than
-introduce a new dataset for one thread only. Thread 2 was revised the
-same way after checking directly: AusNet's own 342-customer real
-smart-meter pool carries its customer-archetype clustering core, SMART-DS
-`AUS/P1U` is kept only as a secondary source for the thread's
-feeder-level clustering section, where AusNet's single feeder can't
-provide enough feeders to cluster.
+thread 5 was built ahead of threads 3-4 by explicit decision since it
+depends on neither, and is now built and merged. Threads 1, 2, and 5 are
+all built and merged. Thread 3's own data source was revised this session
+after checking directly (an Explore agent confirmed Chapter 4's own
+SMART-DS usage never solves a live circuit, shape-only), the same
+discipline threads 1-2 already applied when they moved off SMART-DS onto
+AusNet's own real 31-customer feeder; thread 3 now reuses AusNet as
+primary and Thread 5's own UK network (`deakinmt/uk-mvlv-models`) as
+secondary, not SMART-DS. Thread 4 is blocked, not just unstarted: it
+depends on Part 3's forecasts, and Part 3 does not exist yet
+(`book/03-forecasting/` is empty, `twiga` is an unused dependency pin),
+confirmed directly rather than assumed, so thread 4 is deliberately not
+planned until Part 3 ships a real forecast to design against.
 
 1. **Phase detection and topology identification** (Chapter 3, branch
    `part4-ch3-phase-identification`): which phase ($A$, $B$, or $C$) each
@@ -236,37 +236,80 @@ provide enough feeders to cluster.
    `dawnranger/IDEC-pytorch`) to adapt rather than build from scratch, and
    `utils/prepare_feature.py`'s `create_seasonal_features` for the
    stability contribution. Notebook first, matching Chapters 1-3's own
-   build discipline; `.qmd` narrative after the notebook is reviewed. Not
-   yet started.
-3. **Voltage violation / power-quality anomaly detection**: catching
-   sustained over/undervoltage events in real time. The single biggest real
-   constraint DSOs actually hit today, since PV back-feed pushing feeder
-   voltage out of statutory limits is what caps hosting capacity in
-   practice, not a hypothetical. Reuses the same SMART-DS feeder and
-   OpenDSS-simulated bus-voltage timeseries as thread 1, this time treated
-   as a live monitoring stream (control limits, isolation forest, or
-   autoencoder reconstruction error) rather than a phase-clustering input.
-   Paired with thread 4 below: this thread catches a violation as it
-   happens, thread 4 forecasts whether one is coming. A short companion
-   section on meter/sensor data-quality anomalies (stuck readings,
-   communication dropouts, calibration drift), using Maree's real data,
-   closes the thread: not a separate chapter, but the cross-cutting practice
-   every earlier forecasting/clustering chapter quietly assumed away.
-   Electricity-theft detection was considered and dropped: real,
-   publicly-labeled theft data essentially does not exist (utilities will
-   not release it), so almost every academic theft-detection paper works by
-   synthetically injecting fake tampering patterns onto real load data, a
-   step away from this book's real-verified-numbers discipline.
-4. **Smart grid analytics and network management**: evaluate grid health
+   build discipline; `.qmd` narrative after the notebook is reviewed.
+   Built and merged.
+3. **Anomaly detection combining smart-meter data and LV network topology**
+   (Chapter 3, branch `part4-ch3-anomaly-detection`), reframed this session
+   after direct research (two codebase-exploration agents plus verified
+   literature search) away from PLAN.md's original "run isolation forest
+   on a voltage timeseries" sketch. Every anomaly-detection paper found,
+   including the most current ones (2025-2026), still frames detection as
+   one meter, one baseline, decide if today's reading deviates from it, an
+   assumption that breaks down as LV networks evolve: DER adoption is a
+   permanent re-baselining, not a one-time event (Chapter 4's own 0.06-0.34
+   cross-quarter archetype-drift finding), and DER adoption clusters and
+   synchronizes, so a real anomaly can live in how several individually
+   normal customers coincide, not in any one customer's own meter, a
+   structural blind spot no per-customer detector in the literature found
+   this session can see by construction. Three chained questions: (1) does
+   today's per-customer detection paradigm even work, tested honestly with
+   a real feature representation (a rolling-window/{{< acr FFT >}}
+   representation plus Chapters 4-5's own shape embedding, not raw
+   per-step readings, echoing Part 2's own feature-engineering lesson for
+   a different signal), a parametric-and-non-parametric detector ensemble
+   (`sklearn`'s `EllipticEnvelope`/`KernelDensity`/`IsolationForest`/
+   `LocalOutlierFactor`, plus a hand-rolled ECOD score, Li et al. 2023, no
+   new dependency), and the threshold set by a fourth application of this
+   book's own split-conformal calibration rather than a heuristic
+   percentile (Hennhöfer, Kirsch & Preisach 2026 is the real precedent for
+   treating anomaly thresholds as a conformal-calibration problem); (2) the
+   chapter's first real contribution, an anomaly no single meter can see,
+   a real coincident-EV-charging scenario every Section-1 detector misses
+   by construction, caught instead by a topology-weighted coincidence
+   check, tested on AusNet (primary) and extended across Thread 5's own
+   414-feeder UK network for statistical weight (a GNN enhancement was
+   checked for feasibility and dropped before being built: AusNet's own
+   feeder is a single-transformer star, not a multi-hop graph, so a GNN's
+   real strength has nothing to work with here, a specific reason, not a
+   generic deferral); (3) the chapter's second real contribution, is the
+   detector itself still trustworthy as the network keeps changing, a
+   simulated multi-stage DER-adoption trajectory tracking what fraction of
+   the population falls outside Chapter 5's own conformal retrieval-
+   confidence threshold over time, a real, checkable, forward-looking
+   early-warning KPI for exactly when a {{< acr DSO >}}'s own archetype
+   and retrieval model needs refreshing, built entirely from machinery
+   Chapters 3-5 already validated, no new algorithm. An energy-balance /
+   non-technical-loss conservation check (sum of every customer's real
+   metered consumption against the feeder head's own real power flow) is
+   folded into Section 1 as a third detection type, answering PLAN.md's
+   own dropped electricity-theft idea honestly: no theft label needed,
+   this is a physics-based conservation check, not a classifier trained on
+   labeled fraud, sidestepping the exact reason theft detection was
+   dropped in the first place. Not yet started; full research, reference
+   list, and section-by-section design in the approved plan this session
+   produced (superseding the paragraph this replaces).
+4. **Smart grid analytics and network management** (blocked, not planned in
+   detail yet, confirmed rather than assumed): evaluate grid health
    (voltage violations, thermal overloading) under *forecasted* DER growth
    scenarios, then test mitigation strategies, the scenario-based
    counterpart to thread 3's real-time detection. This is the chapter where
-   Part 3 stops being standalone: its forecasts (from the Maree dataset)
-   become the DER-penetration scenario driver here, not just a chapter that
-   happens to come before this one. "Mitigation strategies" maps directly to
+   Part 3 stops being standalone: its forecasts become the DER-penetration
+   scenario driver here, not just a chapter that happens to come before
+   this one. Checked directly this session: `book/03-forecasting/` does
+   not exist, `_quarto.yml` has no Part 3 entries, and `twiga` is an unused
+   `pyproject.toml` pin, so there is no forecast artifact to design this
+   thread against yet. The Maree dataset (Lede AS/Porsgrunn, real, already
+   vendored) is net active/reactive power only, no {{< acr PV >}}/
+   {{< acr EV >}} sub-metering, so even once Part 3 exists, this thread's
+   DER-growth driver needs to come from a proxy derived from net-load
+   forecasts, not a direct DER forecast, a real design question to answer
+   once Part 3 actually ships. "Mitigation strategies" still maps to
    Team-Nando's Operating-Envelope/ANM/Volt-Watt-control tutorial code
    (BSD-3, reused as methodology per the `nilm-code-reference`-skill pattern
-   of reusing algorithms, not raw data or figures).
+   of reusing algorithms, not raw data or figures), confirmed to exist
+   (`Team-Nando/OEs-The-Basics`, `Team-Nando/ANM-of-LV-Networks-Rule-Based-
+   Approach`) but not yet vendored locally. Do not plan this thread in
+   detail until Part 3 exists: build Part 3 first.
 5. **Ranking and recommendation for LV management under DER** (new thread,
    Chapter 5, branch `part4-ch5-ranking-recommendation`, built ahead of
    threads 3-4 by explicit decision, it needs neither): applies
@@ -311,8 +354,8 @@ provide enough feeders to cluster.
    utility- and customer-side value backed only by analysis already shown
    earlier in the chapter, the same discipline Chapter 4's own "why
    bother" followed. Notebook first, matching Chapters 1-4's own build
-   discipline; `.qmd` narrative after the notebook is reviewed. Not yet
-   started.
+   discipline; `.qmd` narrative after the notebook is reviewed. Built and
+   merged (PR #11).
 
 Case-study data: real public smart-meter load shapes and a real (or, for
 phase ID, ground-truth-bearing synthetic) network topology replayed through
