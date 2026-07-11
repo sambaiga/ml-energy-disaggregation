@@ -39,4 +39,12 @@ acronyms:
       longname: Adjusted Rand Index
     - shortname: NREL
       longname: National Renewable Energy Laboratory
+    - shortname: CBR
+      longname: Case-Based Reasoning
+    - shortname: LTR
+      longname: Learning to Rank
+    - shortname: kNN
+      longname: k-Nearest Neighbors
+    - shortname: GNN
+      longname: Graph Neural Network
 ...

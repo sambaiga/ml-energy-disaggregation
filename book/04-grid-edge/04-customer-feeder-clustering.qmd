@@ -84,6 +84,8 @@ on shape.
 
 :::
 
+![A small apartment (peak 1.0 kW) and a large house (peak 4.5 kW) share the same evening rhythm. Clustering on raw magnitude (left) separates them by size; clustering on peak-normalized shape (right), the choice this chapter makes, groups them together because their rhythm matches.](../../assets/customer-shape-vs-magnitude.svg){#fig-shape-vs-magnitude}
+
 ## Getting the data
 
 This chapter reuses the same real AusNet smart-meter pool Chapters 1
@@ -114,6 +116,13 @@ checking together, since no single index reliably picks the right k alone
 {{< embed 04-customer-feeder-clustering-code.ipynb#c55f2ee6 >}}
 
 {{< embed 04-customer-feeder-clustering-code.ipynb#c316f933 >}}
+
+The small-multiples view above puts each index on its own scale. Normalizing
+all three to a common 0-1 range and overlaying them makes the same trends
+easier to compare directly: does the elbow in inertia line up with the
+silhouette peak, or point somewhere else entirely.
+
+{{< embed 04-customer-feeder-clustering-code.ipynb#bcee7ce9 >}}
 
 The data show no clear elbow, and the silhouette coefficient peaks at
 k=2 (0.227) then decays smoothly. Real residential behavior does not
@@ -155,6 +164,8 @@ single label: every archetype whose centroid sits within that same
 threshold.
 
 {{< embed 04-customer-feeder-clustering-code.ipynb#69204201 >}}
+
+{{< embed 04-customer-feeder-clustering-code.ipynb#ff2c58e3 >}}
 
 Calibrated on 103 held-back customers, the threshold sits at 1.158. Only
 90 of 342 customers (26%) get an unambiguous, single-archetype set. Most
@@ -255,6 +266,8 @@ diagonal cells. Instead the counts spread across the grid.
 Before treating this as real drift, one thing is worth checking first:
 how much do the labels move around on their own, just from re-running
 k-means on the *same* quarter with a different random seed?
+
+{{< embed 04-customer-feeder-clustering-code.ipynb#e222a411 >}}
 
 {{< embed 04-customer-feeder-clustering-code.ipynb#f230cc27 >}}
 

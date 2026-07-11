@@ -618,3 +618,158 @@ def pv_vs_ev_failure_mode_diagram() -> plt.Figure:
     fig.tight_layout()
     plt.close(fig)
     return fig
+
+
+def _household_curve(peak: float, *, hours: np.ndarray) -> np.ndarray:
+    """A synthetic evening-peaking household load curve, scaled to a given peak (kW)."""
+    shape = 0.15 + 0.85 * np.exp(-0.5 * ((hours - 19) / 2.3) ** 2)
+    return shape * peak
+
+
+def shape_vs_magnitude_diagram() -> plt.Figure:
+    """Draw the "shape, not magnitude" contrast Chapter 4's clustering feature choice rests on.
+
+    Two households share the same evening-peaking rhythm but draw very
+    different absolute power: a small apartment (peak 1.0 kW) and a large
+    house (peak 4.5 kW). Clustering on raw magnitude (left) separates them
+    by size; clustering on peak-normalized shape (right), the choice this
+    chapter actually makes, groups them together because their rhythm
+    matches, the same distinction the surrounding Key Concept box states
+    in words.
+
+    Returns:
+        The matplotlib Figure, ready to display in a notebook cell.
+    """
+    hours = np.linspace(0, 24, 96)
+    small = _household_curve(1.0, hours=hours)
+    large = _household_curve(4.5, hours=hours)
+
+    fig, axes = plt.subplots(1, 2, figsize=(9.0, 4.0))
+
+    ax = axes[0]
+    ax.plot(hours, small, color=WARNING, linewidth=2.2, label="Household A (peak 1.0 kW)")
+    ax.plot(hours, large, color=INFO, linewidth=2.2, label="Household B (peak 4.5 kW)")
+    ax.set_ylabel("Demand (kW)")
+    ax.set_title("Cluster on raw magnitude", fontsize=12, color=PRIMARY, fontweight="bold")
+    ax.text(
+        0.5,
+        -0.24,
+        "Different clusters: far apart in kW",
+        transform=ax.transAxes,
+        ha="center",
+        fontsize=9,
+        color=DANGER,
+        fontweight="bold",
+    )
+
+    ax = axes[1]
+    ax.plot(hours, small / small.max(), color=WARNING, linewidth=2.2, label="Household A")
+    ax.plot(hours, large / large.max(), color=INFO, linewidth=2.2, linestyle="--", label="Household B")
+    ax.set_ylabel("Normalized demand")
+    ax.set_title("Cluster on peak-normalized shape", fontsize=12, color=PRIMARY, fontweight="bold")
+    ax.text(
+        0.5,
+        -0.24,
+        "Same cluster: same evening rhythm",
+        transform=ax.transAxes,
+        ha="center",
+        fontsize=9,
+        color=SUCCESS,
+        fontweight="bold",
+    )
+
+    for ax in axes:
+        ax.set_xlabel("Hour of day")
+        ax.set_xlim(0, 24)
+        ax.set_xticks([0, 6, 12, 18, 24])
+        ax.legend(loc="upper left", fontsize=8, frameon=False)
+        ax.spines[["top", "right"]].set_visible(False)
+
+    fig.tight_layout()
+    plt.close(fig)
+    return fig
+
+
+def _lever_checklist_panel(
+    ax: plt.Axes,
+    title: str,
+    badge_icon: str,
+    badge_color: str,
+    available: dict[str, bool],
+) -> None:
+    """One panel of `lever_applicability_diagram`: a house, a badge, and a checklist of levers."""
+    house_xy = (0.28, 0.5)
+    ax.add_patch(Circle(house_xy, 0.2, facecolor=PRIMARY, edgecolor="white", linewidth=1.6, zorder=2))
+    ax.text(
+        house_xy[0],
+        house_xy[1],
+        ICONS["house-fill"],
+        fontproperties=icon_font(15),
+        color="white",
+        ha="center",
+        va="center",
+        zorder=3,
+    )
+    badge_xy = (house_xy[0] + 0.16, house_xy[1] + 0.15)
+    ax.add_patch(Circle(badge_xy, 0.1, facecolor=badge_color, edgecolor="white", linewidth=1.0, zorder=4))
+    ax.text(
+        badge_xy[0],
+        badge_xy[1],
+        ICONS[badge_icon],
+        fontproperties=icon_font(8),
+        color="white",
+        ha="center",
+        va="center",
+        zorder=5,
+    )
+
+    list_x = 0.58
+    top_y = 0.86
+    row_height = 0.19
+    for row, (lever, is_available) in enumerate(available.items()):
+        y = top_y - row * row_height
+        mark_color = SUCCESS if is_available else DANGER
+        mark = "✓" if is_available else "✕"
+        ax.text(list_x, y, mark, color=mark_color, fontsize=13, fontweight="bold", ha="center", va="center")
+        label_color = PRIMARY if is_available else TEXT_MUTED
+        ax.text(list_x + 0.08, y, lever, color=label_color, fontsize=10, ha="left", va="center")
+
+    ax.set_title(title, fontsize=12, color=PRIMARY, fontweight="bold", pad=10)
+    ax.set_xlim(0, 1.5)
+    ax.set_ylim(0.05, 1.0)
+    ax.axis("off")
+
+
+def lever_applicability_diagram() -> plt.Figure:
+    """Draw which mitigation levers can even act on a voltage violation versus a thermal one.
+
+    Volt-Watt and Volt-VAr are `InvControl` elements: they only govern a
+    `PVSystem` element's own real and reactive power output as local
+    voltage moves. A customer whose violation comes from EV charging
+    pushing the transformer's own thermal loading has no PVSystem for
+    either lever to control at all, not a weaker option, an inapplicable
+    one. Storage is the only lever that reaches both violation types,
+    the same physical constraint the recommendation section's own case-
+    based retrieval is scoped around.
+
+    Returns:
+        The matplotlib Figure, ready to display in a notebook cell.
+    """
+    fig, axes = plt.subplots(1, 2, figsize=(8.6, 3.6))
+    _lever_checklist_panel(
+        axes[0],
+        "Voltage violation (PV export)",
+        badge_icon="sun-fill",
+        badge_color=WARNING,
+        available={"Volt-Watt": True, "Volt-VAr": True, "Storage": True, "No action": True},
+    )
+    _lever_checklist_panel(
+        axes[1],
+        "Thermal violation (EV charging)",
+        badge_icon="ev-front-fill",
+        badge_color=INFO,
+        available={"Volt-Watt": False, "Volt-VAr": False, "Storage": True, "No action": True},
+    )
+    fig.tight_layout()
+    plt.close(fig)
+    return fig

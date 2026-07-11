@@ -62,6 +62,7 @@ book:
         - book/04-grid-edge/02-timeseries-der-modeling.qmd
         - book/04-grid-edge/03-phase-identification.qmd
         - book/04-grid-edge/04-customer-feeder-clustering.qmd
+        - book/04-grid-edge/05-ranking-recommendation.qmd
     - about.qmd
     - acronyms.qmd
 

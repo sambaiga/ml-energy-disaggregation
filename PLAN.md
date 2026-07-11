@@ -126,7 +126,9 @@ backbone dataset.
 
 ### Part 4: Grid-Edge Value (amber, flagship)
 
-Four threads, ordered so each builds on the last. Threads 3-4 are still
+Five threads. The original four are ordered so each builds on the last;
+thread 5 was added later and, by explicit decision, is being built ahead
+of threads 3-4 since it depends on neither. Threads 3-4 are still
 planned around SMART-DS (see the Open Items entry below for the exact
 real, tutorial-sized subfolder identified:
 `AUS/P1U/.../p1uhs0_1247--p1udt12703/`, ~2.4 MB, 8 `.dss` files); thread 1
@@ -265,6 +267,52 @@ provide enough feeders to cluster.
    Team-Nando's Operating-Envelope/ANM/Volt-Watt-control tutorial code
    (BSD-3, reused as methodology per the `nilm-code-reference`-skill pattern
    of reusing algorithms, not raw data or figures).
+5. **Ranking and recommendation for LV management under DER** (new thread,
+   Chapter 5, branch `part4-ch5-ranking-recommendation`, built ahead of
+   threads 3-4 by explicit decision, it needs neither): applies
+   established machine-learning ranking and recommendation techniques,
+   borrowed from other domains, not invented for this book, to real LV
+   problems under DER. Three chained sub-problems, all grounded in what
+   Chapters 1-4 already built: retrieval-based cold-start prediction (a
+   new/unmonitored customer's DER risk, predicted by retrieving similar
+   customers in Chapter 4's own embedding space and using their
+   already-simulated risk, extending Chapter 3/4's split-conformal
+   machinery a third time into a retrieval-confidence set); priority
+   ranking at two granularities (customers, for connection-queue triage;
+   real bus positions, for network-reinforcement priority, grounded in a
+   real transformer-restoration-priority precedent) plus a real-time
+   violation-severity ranking borrowed directly from industrial
+   alarm-flood management (a different established discipline than the
+   other two); and mitigation-lever recommendation (Volt-Watt, Volt-VAr,
+   storage, no action), a case-based recommender checked against real
+   simulated before/after fixes, not a rule of thumb. Thirteen real
+   reference papers, split between general-domain foundations (Aamodt &
+   Plaza 1994 on case-based reasoning, Adomavicius & Tuzhilin 2005 on
+   recommender-system taxonomy, Liu 2009 on learning to rank, Bernardi et
+   al. 2015 on the e-commerce cold-start problem, Parvez et al. 2022 on
+   alarm-flood ranking, Liao et al. 2026 on conformal ranking, He et al.
+   2020's LightGCN considered but not committed) and energy-domain
+   precedent showing where this has and has not started (Luo et al. 2017,
+   Qammar et al. 2024, Andagoya-Alba et al. 2024, Gangwar & Shaik 2023,
+   Duran & Monti 2025, Hardowar et al. 2017). Data: AusNet stays primary
+   (the one network with a genuine real feeder-to-customer pairing); a
+   real UK network, `deakinmt/uk-mvlv-models` (Deakin et al. 2021, real
+   LVNS circuits on a real UKGDS backbone, 112,887 buses, 19,072 loads,
+   414 real feeders), checked directly (downloaded, unzipped, solved) and
+   verified clean, becomes the secondary source, AusNet's real customer
+   shapes borrowed onto its real topology. Two other real candidates
+   (CRE21, a real Australian network already vendored locally; the
+   Koirala et al. 2020 non-synthetic European system) were checked and
+   logged, not used: CRE21 has an unresolved structural voltage-collapse
+   defect that doesn't scale away with load, and the European system
+   ships only raw GIS/MATLAB conversion scripts, no ready OpenDSS model,
+   both real, disclosed reasons rather than silently dropped. "Why
+   bother" ties back to Chapter 1's three DER strain modes explicitly,
+   utility- and customer-side value backed only by analysis already shown
+   earlier in the chapter, the same discipline Chapter 4's own "why
+   bother" followed. Notebook first, matching Chapters 1-4's own build
+   discipline; `.qmd` narrative after the notebook is reviewed. Not yet
+   started.
 
 Case-study data: real public smart-meter load shapes and a real (or, for
 phase ID, ground-truth-bearing synthetic) network topology replayed through
