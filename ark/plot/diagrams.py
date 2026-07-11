@@ -620,6 +620,76 @@ def pv_vs_ev_failure_mode_diagram() -> plt.Figure:
     return fig
 
 
+def _household_curve(peak: float, *, hours: np.ndarray) -> np.ndarray:
+    """A synthetic evening-peaking household load curve, scaled to a given peak (kW)."""
+    shape = 0.15 + 0.85 * np.exp(-0.5 * ((hours - 19) / 2.3) ** 2)
+    return shape * peak
+
+
+def shape_vs_magnitude_diagram() -> plt.Figure:
+    """Draw the "shape, not magnitude" contrast Chapter 4's clustering feature choice rests on.
+
+    Two households share the same evening-peaking rhythm but draw very
+    different absolute power: a small apartment (peak 1.0 kW) and a large
+    house (peak 4.5 kW). Clustering on raw magnitude (left) separates them
+    by size; clustering on peak-normalized shape (right), the choice this
+    chapter actually makes, groups them together because their rhythm
+    matches, the same distinction the surrounding Key Concept box states
+    in words.
+
+    Returns:
+        The matplotlib Figure, ready to display in a notebook cell.
+    """
+    hours = np.linspace(0, 24, 96)
+    small = _household_curve(1.0, hours=hours)
+    large = _household_curve(4.5, hours=hours)
+
+    fig, axes = plt.subplots(1, 2, figsize=(9.0, 4.0))
+
+    ax = axes[0]
+    ax.plot(hours, small, color=WARNING, linewidth=2.2, label="Household A (peak 1.0 kW)")
+    ax.plot(hours, large, color=INFO, linewidth=2.2, label="Household B (peak 4.5 kW)")
+    ax.set_ylabel("Demand (kW)")
+    ax.set_title("Cluster on raw magnitude", fontsize=12, color=PRIMARY, fontweight="bold")
+    ax.text(
+        0.5,
+        -0.24,
+        "Different clusters: far apart in kW",
+        transform=ax.transAxes,
+        ha="center",
+        fontsize=9,
+        color=DANGER,
+        fontweight="bold",
+    )
+
+    ax = axes[1]
+    ax.plot(hours, small / small.max(), color=WARNING, linewidth=2.2, label="Household A")
+    ax.plot(hours, large / large.max(), color=INFO, linewidth=2.2, linestyle="--", label="Household B")
+    ax.set_ylabel("Normalized demand")
+    ax.set_title("Cluster on peak-normalized shape", fontsize=12, color=PRIMARY, fontweight="bold")
+    ax.text(
+        0.5,
+        -0.24,
+        "Same cluster: same evening rhythm",
+        transform=ax.transAxes,
+        ha="center",
+        fontsize=9,
+        color=SUCCESS,
+        fontweight="bold",
+    )
+
+    for ax in axes:
+        ax.set_xlabel("Hour of day")
+        ax.set_xlim(0, 24)
+        ax.set_xticks([0, 6, 12, 18, 24])
+        ax.legend(loc="upper left", fontsize=8, frameon=False)
+        ax.spines[["top", "right"]].set_visible(False)
+
+    fig.tight_layout()
+    plt.close(fig)
+    return fig
+
+
 def _lever_checklist_panel(
     ax: plt.Axes,
     title: str,
