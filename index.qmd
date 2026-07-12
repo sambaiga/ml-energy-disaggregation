@@ -114,6 +114,10 @@ description: "A structured, project-based path through smart meter data: disaggr
 <ul class="act-chapters">
 <li><a href="book/04-grid-edge/01-opendss-lv-modeling.qmd"><span class="ch-num">01</span><span class="ch-name">Modeling the Low-Voltage Network</span><i class="bi bi-check-circle-fill ch-check"></i></a></li>
 <li><a href="book/04-grid-edge/02-timeseries-der-modeling.qmd"><span class="ch-num">02</span><span class="ch-name">Time-Series Simulation and DER Modeling</span><i class="bi bi-check-circle-fill ch-check"></i></a></li>
+<li><a href="book/04-grid-edge/03-phase-identification.qmd"><span class="ch-num">03</span><span class="ch-name">Phase Identification from Smart-Meter Data</span><i class="bi bi-check-circle-fill ch-check"></i></a></li>
+<li><a href="book/04-grid-edge/04-customer-feeder-clustering.qmd"><span class="ch-num">04</span><span class="ch-name">Customer and Feeder Clustering</span><i class="bi bi-check-circle-fill ch-check"></i></a></li>
+<li><a href="book/04-grid-edge/05-ranking-recommendation.qmd"><span class="ch-num">05</span><span class="ch-name">Ranking and Recommendation under DER</span><i class="bi bi-check-circle-fill ch-check"></i></a></li>
+<li><span class="ch-row"><span class="ch-num">06</span><span class="ch-name">Anomaly Detection Combining Smart-Meter Data and LV Topology</span><span class="ch-soon">Soon</span></span></li>
 </ul>
 </div>
 </div>

@@ -620,6 +620,84 @@ def pv_vs_ev_failure_mode_diagram() -> plt.Figure:
     return fig
 
 
+def voltage_correlation_vs_magnitude_diagram() -> plt.Figure:
+    """Draw the "correlation, not magnitude" contrast Chapter 3's phase-identification method rests on.
+
+    Three synthetic customers on a feeder: two share phase A but sit at
+    different distances from the transformer, so their absolute voltage
+    levels differ; the third sits on phase B, but happens to land at an
+    absolute level between the other two. Raw magnitude (left) groups by
+    proximity to the transformer, pairing the wrong two customers.
+    Correlation (right) reveals which voltage traces actually move
+    together, correctly pairing the two customers who share phase A, the
+    same distinction the surrounding Key Concept box states in words.
+
+    Returns:
+        The matplotlib Figure, ready to display in a notebook cell.
+    """
+    hours = np.linspace(0, 24, 96)
+    phase_a_fluctuation = 0.02 * np.sin(2 * np.pi * (hours - 6) / 24) + 0.01 * np.sin(2 * np.pi * hours / 6)
+    phase_b_fluctuation = 0.02 * np.sin(2 * np.pi * (hours - 14) / 24) + 0.008 * np.sin(2 * np.pi * (hours + 2) / 5)
+
+    near_transformer = 1.02 + phase_a_fluctuation
+    far_on_phase_a = 0.97 + 1.3 * phase_a_fluctuation
+    on_phase_b = 1.00 + phase_b_fluctuation
+
+    fig, axes = plt.subplots(1, 2, figsize=(9.0, 4.0))
+
+    ax = axes[0]
+    ax.plot(hours, near_transformer, color=WARNING, linewidth=2.2, label="Customer A1 (phase A, near)")
+    ax.plot(hours, far_on_phase_a, color=INFO, linewidth=2.2, label="Customer A2 (phase A, far)")
+    ax.plot(hours, on_phase_b, color=DANGER, linewidth=2.2, linestyle="--", label="Customer B1 (phase B)")
+    ax.set_ylabel("Voltage (p.u.)")
+    ax.set_title("Cluster on raw magnitude", fontsize=12, color=PRIMARY, fontweight="bold")
+    ax.text(
+        0.5,
+        -0.24,
+        "Wrong pair: A1 and B1 sit closest in level",
+        transform=ax.transAxes,
+        ha="center",
+        fontsize=9,
+        color=DANGER,
+        fontweight="bold",
+    )
+
+    ax = axes[1]
+    ax.plot(hours, near_transformer - near_transformer.mean(), color=WARNING, linewidth=2.2, label="Customer A1")
+    ax.plot(hours, far_on_phase_a - far_on_phase_a.mean(), color=INFO, linewidth=2.2, label="Customer A2")
+    ax.plot(
+        hours,
+        on_phase_b - on_phase_b.mean(),
+        color=DANGER,
+        linewidth=2.2,
+        linestyle="--",
+        label="Customer B1",
+    )
+    ax.set_ylabel("Voltage fluctuation (centered)")
+    ax.set_title("Cluster on correlation", fontsize=12, color=PRIMARY, fontweight="bold")
+    ax.text(
+        0.5,
+        -0.24,
+        "Right pair: A1 and A2 move together",
+        transform=ax.transAxes,
+        ha="center",
+        fontsize=9,
+        color=SUCCESS,
+        fontweight="bold",
+    )
+
+    for ax in axes:
+        ax.set_xlabel("Hour of day")
+        ax.set_xlim(0, 24)
+        ax.set_xticks([0, 6, 12, 18, 24])
+        ax.legend(loc="upper left", fontsize=8, frameon=False)
+        ax.spines[["top", "right"]].set_visible(False)
+
+    fig.tight_layout()
+    plt.close(fig)
+    return fig
+
+
 def _household_curve(peak: float, *, hours: np.ndarray) -> np.ndarray:
     """A synthetic evening-peaking household load curve, scaled to a given peak (kW)."""
     shape = 0.15 + 0.85 * np.exp(-0.5 * ((hours - 19) / 2.3) ** 2)
@@ -684,6 +762,76 @@ def shape_vs_magnitude_diagram() -> plt.Figure:
         ax.set_xticks([0, 6, 12, 18, 24])
         ax.legend(loc="upper left", fontsize=8, frameon=False)
         ax.spines[["top", "right"]].set_visible(False)
+
+    fig.tight_layout()
+    plt.close(fig)
+    return fig
+
+
+def cluster_confidence_set_diagram() -> plt.Figure:
+    """Draw the geometry behind a conformal cluster-membership confidence set.
+
+    Three archetype centroids in embedding space, each surrounded by a
+    circle of radius equal to the calibrated conformal threshold. A
+    customer landing inside exactly one circle gets a confident,
+    single-archetype set (Customer 1). One landing inside two overlapping
+    circles gets an honest two-archetype set instead of a forced single
+    guess (Customer 2). One landing outside every circle gets an empty
+    set, itself a signal that this customer's own behavior does not
+    confidently resemble any archetype (Customer 3). The same geometric
+    idea Chapter 3 uses for phase centroids and Chapter 4 uses for
+    archetype centroids.
+
+    Returns:
+        The matplotlib Figure, ready to display in a notebook cell.
+    """
+    fig, ax = plt.subplots(figsize=(6.4, 5.2))
+
+    centroids = {
+        "Archetype 1": ((-1.4, 0.6), INFO, "left"),
+        "Archetype 2": ((1.4, 0.6), WARNING, "right"),
+        "Archetype 3": ((0.0, -1.7), SUCCESS, "below"),
+    }
+    threshold_radius = 1.05
+
+    for name, (xy, color, side) in centroids.items():
+        ax.add_patch(Circle(xy, threshold_radius, facecolor=color, alpha=0.15, edgecolor=color, linewidth=1.8))
+        ax.scatter(*xy, s=70, color=color, zorder=3)
+        if side == "left":
+            label_xy, ha = (xy[0] - threshold_radius - 0.1, xy[1]), "right"
+        elif side == "right":
+            label_xy, ha = (xy[0] + threshold_radius + 0.1, xy[1]), "left"
+        else:
+            label_xy, ha = (xy[0], xy[1] - threshold_radius - 0.25), "center"
+        ax.text(*label_xy, name, ha=ha, va="center", fontsize=9.5, color=color, fontweight="bold")
+
+    customers = [
+        ("Customer 1", "confident: {1}", (-1.4, 1.35), (0.0, 0.32), "center", TEXT_MUTED),
+        ("Customer 2", "ambiguous: {1, 2}", (0.0, 0.6), (0.0, 0.32), "center", TEXT_MUTED),
+        ("Customer 3", "no match: {}", (2.5, -0.6), (0.0, 0.32), "center", DANGER),
+    ]
+    for name, status, xy, text_offset, ha, color in customers:
+        ax.scatter(*xy, s=90, marker="x", color=color, linewidth=2.4, zorder=4)
+        ax.text(
+            xy[0] + text_offset[0],
+            xy[1] + text_offset[1],
+            f"{name}\n{status}",
+            fontsize=8,
+            color=color,
+            ha=ha,
+            va="bottom",
+        )
+
+    ax.set_xlim(-3.0, 3.2)
+    ax.set_ylim(-3.2, 2.6)
+    ax.set_aspect("equal")
+    ax.axis("off")
+    ax.set_title(
+        "Each circle's radius is the calibrated threshold\ninside one, inside two, or inside none",
+        fontsize=10,
+        color=PRIMARY,
+        fontweight="bold",
+    )
 
     fig.tight_layout()
     plt.close(fig)
@@ -770,6 +918,207 @@ def lever_applicability_diagram() -> plt.Figure:
         badge_color=INFO,
         available={"Volt-Watt": False, "Volt-VAr": False, "Storage": True, "No action": True},
     )
+    fig.tight_layout()
+    plt.close(fig)
+    return fig
+
+
+def _feeder_line_panel(ax: plt.Axes, title: str, subtitle: str) -> tuple[tuple[float, float], tuple[float, float]]:
+    """Draw a transformer and two customers at different distances along one feeder line.
+
+    Returns the (near, far) customer node positions so the caller can add
+    a panel-specific annotation on top of the shared schematic.
+    """
+    transformer_xy = (0.3, 0.5)
+    near_xy = (1.6, 0.5)
+    far_xy = (3.4, 0.5)
+
+    ax.plot([transformer_xy[0], far_xy[0]], [0.5, 0.5], color=TEXT_MUTED, linewidth=2.0, zorder=1)
+
+    ax.add_patch(Circle(transformer_xy, 0.22, facecolor=PRIMARY, edgecolor="white", linewidth=1.2, zorder=3))
+    ax.text(
+        *transformer_xy,
+        ICONS["hdd-network-fill"],
+        fontproperties=icon_font(15),
+        color="white",
+        ha="center",
+        va="center",
+        zorder=4,
+    )
+
+    for xy, label in [(near_xy, "Customer near"), (far_xy, "Customer far")]:
+        ax.add_patch(Circle(xy, 0.19, facecolor=SUCCESS, edgecolor="white", linewidth=1.2, zorder=3))
+        ax.text(
+            *xy, ICONS["house-fill"], fontproperties=icon_font(12), color="white", ha="center", va="center", zorder=4
+        )
+        ax.text(xy[0], xy[1] - 0.42, label, fontsize=8, color=TEXT_MUTED, ha="center")
+        ax.text(xy[0], xy[1] + 0.32, "same real shape", fontsize=7.5, color=TEXT_MUTED, ha="center", style="italic")
+
+    ax.set_title(title, fontsize=11.5, color=PRIMARY, fontweight="bold", pad=14)
+    ax.text(2.0, -0.35, subtitle, fontsize=8.5, color=TEXT_MUTED, ha="center", style="italic", wrap=True)
+    ax.set_xlim(-0.3, 4.0)
+    ax.set_ylim(-0.6, 1.9)
+    ax.set_aspect("equal")
+    ax.axis("off")
+    return near_xy, far_xy
+
+
+def voltage_vs_thermal_position_diagram() -> plt.Figure:
+    """Draw why bus position matters for voltage risk but barely matters for thermal risk.
+
+    Two customers share the exact same real smart-meter shape, only their
+    distance from the transformer differs. Voltage rise depends on how
+    much line impedance sits between a customer and the source, on top of
+    how much they draw or export, something a smart-meter reading alone
+    says nothing about, so the far customer sees a real, different
+    voltage outcome (left). Thermal loading at the transformer depends
+    only on how much power is flowing at its own peak moment, exactly
+    what a smart-meter reading already captures, so position adds nothing
+    once shape is known (right). The physical reason retrieval-from-shape
+    works for one risk and struggles for the other, the same distinction
+    the surrounding Key Concept box states in words.
+
+    Returns:
+        The matplotlib Figure, ready to display in a notebook cell.
+    """
+    fig, axes = plt.subplots(1, 2, figsize=(9.4, 3.6))
+
+    near_xy, far_xy = _feeder_line_panel(
+        axes[0],
+        "Voltage: depends on where you are",
+        "Impedance between customer and source adds up with distance",
+    )
+    ax = axes[0]
+    pu_y = near_xy[1] + 0.95
+    ax.text(near_xy[0], pu_y, "1.01 pu", fontsize=9, color=SUCCESS, fontweight="bold", ha="center")
+    ax.text(far_xy[0], pu_y, "0.96 pu", fontsize=9, color=DANGER, fontweight="bold", ha="center")
+    ax.annotate(
+        "",
+        xy=(far_xy[0], pu_y - 0.14),
+        xytext=(near_xy[0], pu_y - 0.14),
+        arrowprops={"arrowstyle": "-|>", "color": WARNING, "linewidth": 1.6},
+    )
+    ax.text(2.5, pu_y + 0.28, "voltage drifts with distance", fontsize=7.5, color=WARNING, ha="center", style="italic")
+
+    near_xy, far_xy = _feeder_line_panel(
+        axes[1],
+        "Thermal: depends on what you draw",
+        "Transformer loading sums instantaneous power, position is invisible to it",
+    )
+    ax = axes[1]
+    arrow_y = near_xy[1] + 0.85
+    for xy in (near_xy, far_xy):
+        _curved_flow_arrow(ax, (xy[0], arrow_y - 0.1), (0.3, arrow_y), INFO, rad=0.2)
+    ax.text(2.0, arrow_y + 0.28, "same contribution either way", fontsize=7.5, color=INFO, ha="center", style="italic")
+
+    fig.tight_layout()
+    plt.close(fig)
+    return fig
+
+
+def _customer_row(ax: plt.Axes, y: float, n: int = 5) -> list[tuple[float, float]]:
+    """Five evenly-spaced house icons along one row, returns their positions."""
+    xs = np.linspace(0.6, 4.2, n)
+    positions = [(x, y) for x in xs]
+    for xy in positions:
+        ax.add_patch(Circle(xy, 0.22, facecolor=SUCCESS, edgecolor="white", linewidth=1.2, zorder=3))
+        ax.text(
+            *xy, ICONS["house-fill"], fontproperties=icon_font(13), color="white", ha="center", va="center", zorder=4
+        )
+    return positions
+
+
+def per_customer_vs_network_view_diagram() -> plt.Figure:
+    """Draw why per-customer detection cannot see a coincident event that a network view catches immediately.
+
+    Five real customers, the same real moment. Left: each customer's own
+    self-baseline detector only ever sees its own history, and a
+    regionally sunny day already sits inside that history, so nothing
+    looks wrong. Right: the same five customers share one real
+    transformer, and their real exports arrive at the same real moment;
+    summed, they cross a real physical limit no single customer's own
+    meter could ever reveal, the structural blind spot Section 2's own
+    Key Concept box states in words.
+
+    Returns:
+        The matplotlib Figure, ready to display in a notebook cell.
+    """
+    fig, axes = plt.subplots(1, 2, figsize=(10.6, 3.8))
+
+    ax = axes[0]
+    positions = _customer_row(ax, 1.1)
+    for xy in positions:
+        ax.text(xy[0], xy[1] - 0.42, "own history", fontsize=7, color=TEXT_MUTED, ha="center", style="italic")
+        ax.text(xy[0], xy[1] + 0.4, "✓", fontsize=13, color=SUCCESS, fontweight="bold", ha="center")
+    ax.set_title(
+        "Per-customer view: five isolated self-baselines",
+        fontsize=10.8,
+        color=PRIMARY,
+        fontweight="bold",
+        pad=14,
+    )
+    ax.text(
+        2.4,
+        -0.15,
+        "A regionally sunny day already sits inside each customer's own real history",
+        fontsize=8.2,
+        color=TEXT_MUTED,
+        ha="center",
+        style="italic",
+        wrap=True,
+    )
+    ax.set_xlim(-0.2, 5.0)
+    ax.set_ylim(-0.5, 2.0)
+    ax.set_aspect("equal")
+    ax.axis("off")
+
+    ax = axes[1]
+    transformer_xy = (2.4, 0.2)
+    positions = _customer_row(ax, 1.5)
+    ax.add_patch(Circle(transformer_xy, 0.24, facecolor=DANGER, edgecolor="white", linewidth=1.4, zorder=3))
+    ax.text(
+        *transformer_xy,
+        ICONS["hdd-network-fill"],
+        fontproperties=icon_font(16),
+        color="white",
+        ha="center",
+        va="center",
+        zorder=4,
+    )
+    for xy in positions:
+        ax.text(xy[0], xy[1] + 0.4, ICONS["sun-fill"], fontproperties=icon_font(11), color=WARNING, ha="center")
+        _curved_flow_arrow(ax, (xy[0], xy[1] - 0.22), (transformer_xy[0], transformer_xy[1] + 0.24), DANGER, rad=0.12)
+    ax.text(
+        transformer_xy[0],
+        transformer_xy[1] - 0.5,
+        "real overload",
+        fontsize=8.5,
+        color=DANGER,
+        fontweight="bold",
+        ha="center",
+    )
+    ax.set_title(
+        "Network view: the same real moment, summed",
+        fontsize=10.8,
+        color=PRIMARY,
+        fontweight="bold",
+        pad=14,
+    )
+    ax.text(
+        2.4,
+        -0.9,
+        "Five individually unremarkable exports, one real, physical overload",
+        fontsize=8.2,
+        color=TEXT_MUTED,
+        ha="center",
+        style="italic",
+        wrap=True,
+    )
+    ax.set_xlim(-0.2, 5.0)
+    ax.set_ylim(-1.2, 2.2)
+    ax.set_aspect("equal")
+    ax.axis("off")
+
     fig.tight_layout()
     plt.close(fig)
     return fig

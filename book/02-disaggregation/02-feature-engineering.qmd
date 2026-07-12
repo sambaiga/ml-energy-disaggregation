@@ -87,7 +87,6 @@ PLAID, already extracted the way @fig-activation-extraction describes. The
 same event can be read two ways at once: current against time, on the left,
 or current against voltage, on the right.
 
-{{< embed 02-feature-engineering-code.ipynb#3bc2d836 >}}
 {{< embed 02-feature-engineering-code.ipynb#3813ea23 >}}
 
 ## The other route: the V-I trajectory
@@ -321,7 +320,6 @@ heater's once WRG turns it into a graph instead of a loop. That is what the
 numbers below confirm with an actual trained classifier instead of an
 unsupervised projection.
 
-{{< embed 02-feature-engineering-code.ipynb#3bc2d836 >}}
 {{< embed 02-feature-engineering-code.ipynb#027c858f >}}
 
 This notebook's own run is smaller and faster than the published

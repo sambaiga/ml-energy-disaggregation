@@ -63,6 +63,7 @@ book:
         - book/04-grid-edge/03-phase-identification.qmd
         - book/04-grid-edge/04-customer-feeder-clustering.qmd
         - book/04-grid-edge/05-ranking-recommendation.qmd
+        - book/04-grid-edge/06-anomaly-detection.qmd
     - about.qmd
     - acronyms.qmd
 
@@ -108,7 +109,12 @@ format:
     number-sections: false
     fig-cap-location: bottom
     anchor-sections: true
-    smooth-scroll: true
+    # smooth-scroll loads zenscroll AFTER require.js, and zenscroll's own
+    # anonymous UMD define() collides with RequireJS (a documented Quarto
+    # bug, quarto-dev/quarto-cli#10846), which silently breaks every
+    # lets-plot chart's own script tag later in the page. Disabled until
+    # upstream fixes the script ordering.
+    smooth-scroll: false
 
 freeze: auto
 jupyter: python3

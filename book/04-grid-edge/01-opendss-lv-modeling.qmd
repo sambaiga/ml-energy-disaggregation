@@ -231,8 +231,6 @@ fresh at each level, and `plot_voltage_compliance` shades the compliant
 band directly on the chart rather than leaving the comparison to the
 reader:
 
-{{< embed 01-opendss-lv-modeling-code.ipynb#47486a5b >}}
-
 Building the expanded network reuses the exact same `circuit.command(...)`
 calls as above, just continued further:
 

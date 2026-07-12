@@ -38,7 +38,6 @@ Five real UK-DALE house-1 appliances make this concrete: kettle, fridge,
 dishwasher, washing machine, microwave, the same subset and the same
 house the source paper itself uses.
 
-{{< embed 04-multi-task-low-frequency-code.ipynb#c2fc2763 >}}
 {{< embed 04-multi-task-low-frequency-code.ipynb#b9798dde >}}
 
 ## Turning a power curve into a state
