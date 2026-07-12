@@ -2,6 +2,7 @@ import numpy as np
 import pytest
 
 from ark.anomaly.detectors import (
+    copod_score,
     ecod_score,
     ensemble_score,
     ensemble_score_aom,
@@ -28,7 +29,7 @@ def _query_with_one_real_outlier(n_features: int = 4) -> np.ndarray:
 
 @pytest.mark.parametrize(
     "scorer",
-    [mahalanobis_score, kde_score, isolation_forest_score, lof_score, ecod_score],
+    [mahalanobis_score, kde_score, isolation_forest_score, lof_score, ecod_score, copod_score],
 )
 def test_every_detector_scores_the_real_outlier_higher_than_the_inlier(scorer):
     X_train = _normal_training_data()
@@ -48,6 +49,31 @@ def test_ecod_score_matches_a_hand_computed_tail_probability():
     # median sits at roughly the 50th percentile either way, tail ~0.5,
     # so -log(0.5) is the right order of magnitude, not near zero
     assert scores[0] == pytest.approx(-np.log(0.5), abs=0.05)
+
+
+def test_copod_score_matches_pyod_own_ranking_on_a_skewed_distribution():
+    # a real, right-skewed distribution, the case COPOD's own skew-weighting
+    # is built for; ranking cross-checked directly against pyod's own COPOD
+    # (typical < compressed left tail < deep right tail)
+    rng = np.random.default_rng(0)
+    X_train = rng.exponential(scale=1.0, size=(300, 3))
+    X_query = np.array([X_train[0], [0.01, 0.01, 0.01], [8.0, 8.0, 8.0]])
+
+    scores = copod_score(X_train, X_query)
+
+    assert scores[0] < scores[1] < scores[2]
+
+
+def test_copod_score_is_less_aggressive_than_ecod_against_a_dimension_own_skew():
+    # ECOD always takes whichever tail is more extreme; COPOD only favors a
+    # dimension's compressed tail when the skew itself points that way, so
+    # on a right-skewed dimension a deep-left-tail query should score lower
+    # under COPOD than under ECOD
+    rng = np.random.default_rng(0)
+    X_train = rng.exponential(scale=1.0, size=(300, 1))
+    X_query = np.array([[0.01]])
+
+    assert copod_score(X_train, X_query)[0] < ecod_score(X_train, X_query)[0]
 
 
 def test_ensemble_score_averages_rescaled_component_scores():

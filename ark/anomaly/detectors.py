@@ -120,6 +120,60 @@ def ecod_score(X_train: np.ndarray, X_query: np.ndarray) -> np.ndarray:
     return scores
 
 
+def copod_score(X_train: np.ndarray, X_query: np.ndarray) -> np.ndarray:
+    """Non-parametric, parameter-free anomaly score via a skew-weighted empirical copula.
+
+    Implements Li, Zhao, Hu, Botta, Ionescu & Chen (2020), "COPOD: Copula-
+    Based Outlier Detection," *IEEE International Conference on Data
+    Mining* (ICDM), ECOD's own older sibling from the same authors. Per
+    feature dimension, this keeps *both* tail probabilities `ecod_score`
+    collapses into one via `min`, then picks the tail a real, checkable
+    per-dimension skewness sign favors (a right-skewed dimension flags its
+    own right tail more readily, and vice versa), taking the max of that
+    skew-favored term and the plain two-tail average so a dimension with
+    near-zero skew still falls back to catching either tail. Matches
+    `pyod.models.copod`'s own combination logic; reimplemented directly
+    rather than pulled in, the same "simple enough to hand-roll" bar
+    `ecod_score` was held to, using this module's own tail-probability
+    convention rather than `pyod`'s own rank-based empirical CDF.
+
+    Args:
+        X_train: Training feature matrix, shape `(n_train, n_features)`.
+        X_query: Points to score, shape `(n_query, n_features)`.
+
+    Returns:
+        One score per query point, higher meaning more anomalous.
+
+    Examples:
+        >>> rng = np.random.default_rng(0)
+        >>> X_train = rng.normal(size=(200, 1))
+        >>> X_query = np.array([[0.0], [10.0]])
+        >>> scores = copod_score(X_train, X_query)
+        >>> bool(scores[1] > scores[0])
+        True
+    """
+    n_train = X_train.shape[0]
+    eps = 1.0 / (n_train + 1)
+    total = np.zeros(X_query.shape[0])
+    for dim in range(X_train.shape[1]):
+        train_col = X_train[:, dim]
+        query_col = X_query[:, dim]
+        left_tail = np.clip(np.searchsorted(np.sort(train_col), query_col, side="right") / n_train, eps, 1.0)
+        right_tail = np.clip(1.0 - left_tail, eps, 1.0)
+        u_left, u_right = -np.log(left_tail), -np.log(right_tail)
+
+        centered = train_col - train_col.mean()
+        std = train_col.std()
+        skewness = np.mean(centered**3) / std**3 if std > 0 else 0.0
+        skew_sign = np.sign(skewness)
+        # matches pyod's own U_skew construction: skew_sign=+1 selects the
+        # right tail, skew_sign=-1 the left tail, 0 sums both
+        u_skew = u_left * -np.sign(skew_sign - 1) + u_right * np.sign(skew_sign + 1)
+
+        total += np.maximum(u_skew, (u_left + u_right) / 2)
+    return total
+
+
 def fit_ensemble_bounds(reference_scores: list[np.ndarray]) -> list[tuple[float, float]]:
     """Fit fixed min/max rescaling bounds for each detector from one reference score distribution.
 
