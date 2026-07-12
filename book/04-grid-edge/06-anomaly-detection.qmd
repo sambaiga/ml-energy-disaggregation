@@ -171,8 +171,8 @@ for a different signal at a smaller scale here than there: 0.608 mean
 AUC-ROC against 0.589, both real numbers checked on the same 40
 customers, the same injected faults. Part 2's own high-frequency lesson
 does not transfer cleanly to this chapter's low-frequency signal either
-way: a {{< acr WRG >}}-style pairwise distance-matrix embedding,
-reimplemented for a 30-minute {{< acr AMI >}} profile and tested
+way: a WRG-style pairwise distance-matrix embedding,
+reimplemented for a 30-minute AMI profile and tested
 directly rather than assumed to help, trailed the feature-engineered
 representation on recall while taking meaningfully longer to compute, a
 real complexity-versus-benefit question this chapter checked and
