@@ -454,6 +454,89 @@ planned until Part 3 ships a real forecast to design against.
    own AMI-rate data, or whether it is a high-frequency-specific technique
    that does not transfer, before adding it as a fourth Section-1 feature
    option.
+
+   **Root-cause explanation, built this session, a real and honestly mixed
+   finding**: SHAP's `TreeExplainer` on the ensemble's own `isolation_forest`
+   component (the one detector here with a fast, exact Shapley explainer)
+   gives a real, mathematically exact attribution of that detector's own
+   score back to individual input features. Checked directly across several
+   real customer-day pairs, not assumed to work cleanly: the top-attributed
+   features do not reliably line up with the exact clock hours where an
+   injected stuck-reading fault sits, since `IsolationForest`'s own random
+   splits have no built-in preference for temporal locality. What it does
+   deliver honestly is a coarser, still useful signal, which *kind* of
+   feature (a specific hour's shape, the day's own mean/spread, or a
+   frequency-domain component) drove a flagged case, a real first step
+   toward triage, not a guarantee of pinpointing the hour a field crew
+   should check first.
+
+   **Anomaly persistence/recurrence tracking, worth adding as a follow-up,
+   not yet built**: distinguishing a one-off blip from a developing fault
+   by checking whether the same real customer's own detector flags the
+   *same* failure mode across several consecutive real days, not just one
+   isolated injected day the way the current recall test already checks.
+   Reuses the exact same per-customer self-baseline pipeline Section 1
+   already built, no new algorithm, just a different question asked of it:
+   run the ensemble across a real consecutive run of days with a repeated
+   injected fault and report how many of those days it actually catches in
+   a row, a real, checkable "is this getting worse" signal a DSO can act
+   on differently than a single flagged day.
+
+   **DER event/behavior-based anomaly, a genuinely different framing, worth
+   a dedicated build, not a bolt-on**: every detector in this chapter, per-
+   customer and topology-aware alike, asks whether a *signal value*
+   (voltage, current, power magnitude) looks unusual. A real, different
+   question: is a customer's own *DER behavior*, when they export, how
+   often, for how long, unusual, independent of whether any single
+   reading's magnitude crosses a threshold. A PV inverter exporting at an
+   odd hour, or a real export/charging pattern whose own frequency or
+   timing has shifted, can be a real, meaningful signal (a fault, a
+   metering irregularity, a changed household routine) even when every
+   individual reading stays inside a normal magnitude range, the entire
+   point of asking a behavioral question instead of a magnitude one. Real,
+   buildable groundwork already exists in this book's own data: Section
+   2's own net-load construction (`load - PV_KVA * pv_data`) already turns
+   raw readings into real export/import events, so a first version could
+   define a real "export event" as any half-hour a PV-equipped customer's
+   own net load goes negative, then ask whether the count, timing, or
+   duration of those events, not their magnitude, looks unusual against
+   that customer's own real history, split-conformal calibrated the same
+   way as every other threshold in this chapter. AusNet's own real data
+   has no separate {{< acr EV >}} sub-metering (confirmed, matches Part 3's
+   own dataset finding), so an equivalent EV-charging-event version is not
+   directly buildable on this data without a real proxy signal, worth
+   checking directly rather than assumed once this angle is built.
+
+   **COPOD, worth adding as a follow-up detector, not yet built**: Li,
+   Zhao and colleagues' 2020 copula-based outlier detector (IEEE ICDM),
+   ECOD's own older sibling from the same authors. Checked directly
+   against PyOD's own source rather than assumed: like ECOD, it is
+   parameter-free and works from a per-dimension empirical CDF, but
+   weights each dimension's tail by that dimension's own skewness before
+   combining, roughly 40 lines of real logic once class boilerplate is
+   stripped, the same "simple enough to hand-roll" bar ECOD was held to.
+   A real, natural sixth addition to `ark.anomaly.detectors`, no new
+   dependency, worth checking whether it adds real detection signal
+   beyond ECOD on this chapter's own injected-anomaly test before adding
+   it to the ensemble, not assumed to help just because it is newer.
+
+   **Detector selection guidance instead of ensembling by default, a
+   genuinely different pedagogical framing, worth a dedicated future
+   chapter or section, not a bolt-on to this one**: this chapter builds
+   an ensemble first and asks afterward whether the ensemble beats a
+   single family (Section 1's own parametric-vs-non-parametric and
+   combination-rule comparisons). A different, arguably more useful
+   teaching order: start by guiding the reader through *choosing* an
+   appropriate detector for their own data's real characteristics
+   (dimensionality, whether a real covariance structure exists, expected
+   anomaly locality, contamination rate, whether interpretability
+   matters more than recall) before ever reaching for an ensemble, the
+   same diagnose-first instinct this book already applies elsewhere
+   (Chapter 2's raw-current-vs-feature-representation check, Section 1's
+   own feature-representation-vs-raw-reading test above). This is a
+   real, separate initiative, not a Chapter 6 addition: it reframes how
+   the whole chapter teaches detector choice, not just adds a detector,
+   so it belongs in its own future plan, not scoped or built now.
 4. **Smart grid analytics and network management** (blocked, not planned in
    detail yet, confirmed rather than assumed): evaluate grid health
    (voltage violations, thermal overloading) under *forecasted* DER growth
