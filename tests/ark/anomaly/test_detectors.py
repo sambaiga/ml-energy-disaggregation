@@ -4,6 +4,7 @@ import pytest
 from ark.anomaly.detectors import (
     ecod_score,
     ensemble_score,
+    fit_ensemble_bounds,
     isolation_forest_score,
     kde_score,
     lof_score,
@@ -49,8 +50,9 @@ def test_ecod_score_matches_a_hand_computed_tail_probability():
 def test_ensemble_score_averages_rescaled_component_scores():
     a = np.array([0.0, 10.0])
     b = np.array([0.0, 1.0])
+    bounds = fit_ensemble_bounds([a, b])
 
-    combined = ensemble_score([a, b])
+    combined = ensemble_score([a, b], bounds)
 
     # both components already span [0, 1] identically after rescaling
     assert combined == pytest.approx([0.0, 1.0])
@@ -59,8 +61,20 @@ def test_ensemble_score_averages_rescaled_component_scores():
 def test_ensemble_score_handles_a_constant_component_without_dividing_by_zero():
     constant = np.array([5.0, 5.0, 5.0])
     varying = np.array([0.0, 1.0, 2.0])
+    bounds = fit_ensemble_bounds([constant, varying])
 
-    combined = ensemble_score([constant, varying])
+    combined = ensemble_score([constant, varying], bounds)
 
     assert np.all(np.isfinite(combined))
     assert combined[0] < combined[2]
+
+
+def test_fit_ensemble_bounds_then_ensemble_score_stays_consistent_across_batches():
+    reference = np.array([0.0, 5.0, 10.0])
+    bounds = fit_ensemble_bounds([reference])
+
+    # a later batch, entirely within the reference range, on the SAME scale
+    later_batch = np.array([2.5, 10.0])
+    combined = ensemble_score([later_batch], bounds)
+
+    assert combined == pytest.approx([0.25, 1.0])

@@ -120,18 +120,41 @@ def ecod_score(X_train: np.ndarray, X_query: np.ndarray) -> np.ndarray:
     return scores
 
 
-def ensemble_score(scores: list[np.ndarray]) -> np.ndarray:
-    """Combine several anomaly scores into one, each rescaled to `[0, 1]` first so no raw scale dominates.
+def fit_ensemble_bounds(reference_scores: list[np.ndarray]) -> list[tuple[float, float]]:
+    """Fit fixed min/max rescaling bounds for each detector from one reference score distribution.
+
+    Fit this once, on the same reference set the detectors themselves were
+    trained on (or a held-out split of it), and reuse the same bounds for
+    every later call to `ensemble_score`. Rescaling bounds computed fresh
+    per batch would make a calibration-set score and a query-set score not
+    actually comparable, silently breaking conformal calibration, since the
+    "same" rescaled value would mean something different in each batch.
+
+    Args:
+        reference_scores: Same-length score arrays, one per detector,
+            computed on a single reference batch.
+
+    Returns:
+        One `(min, max)` pair per detector, in the same order.
+    """
+    return [(float(s.min()), float(s.max())) for s in reference_scores]
+
+
+def ensemble_score(scores: list[np.ndarray], bounds: list[tuple[float, float]]) -> np.ndarray:
+    """Combine several anomaly scores into one, each rescaled to `[0, 1]` by fixed, pre-fit bounds.
 
     Args:
         scores: Same-length score arrays, one per detector, higher meaning
             more anomalous in each.
+        bounds: `(min, max)` pairs from `fit_ensemble_bounds`, one per
+            detector, in the same order as `scores`. Always the bounds
+            fit once on a reference batch, never refit on `scores` itself,
+            so scores from different calls stay on the same scale.
 
     Returns:
         The mean of the rescaled scores, one per query point.
     """
     rescaled = []
-    for s in scores:
-        lo, hi = s.min(), s.max()
+    for s, (lo, hi) in zip(scores, bounds, strict=True):
         rescaled.append((s - lo) / (hi - lo) if hi > lo else np.zeros_like(s))
     return np.mean(rescaled, axis=0)
