@@ -1,5 +1,5 @@
 ---
-title: "Chapter 6: Anomaly Detection Combining Smart-Meter Data and LV Network Topology"
+title: "Chapter 6: Anomaly Detection Beyond the Meter"
 bibliography: ../../references.bib
 ---
 
@@ -97,6 +97,15 @@ uv run python scripts/fetch_part4_uk_mvlv_data.py
 
 ## Section 1: Does per-customer detection even work here?
 
+This section answers the first of the chapter's four questions, in three
+real stages: build a detector worth trusting (a feature representation,
+a detector or blend of detectors, a calibrated threshold), stress-test
+every one of those choices honestly instead of assuming the obvious
+answer, then explain what a flag actually means. Each stage below asks
+one narrow, specific question and answers it with a real number; a
+short summary closes the section out before Section 2 asks a different
+kind of question entirely.
+
 A bare instantaneous voltage, current, or power reading throws away the
 shape information that actually separates a real anomaly from ordinary
 diurnal variation, the same lesson Part 2 of this book already spent a
@@ -158,22 +167,28 @@ and to the learned ranker.
 
 The feature-engineered representation beats the raw reading, a real,
 modest, honest margin, not a dramatic one, matching Part 2's own lesson
-for a different signal at a smaller scale here than there. Part 2's own
-high-frequency lesson does not transfer cleanly to this chapter's
-low-frequency signal, and the honest test says so directly rather than
-assuming it would: a WRG-style pairwise distance-matrix
-embedding, reimplemented for a 30-minute AMI profile, trails
-the feature-engineered representation on recall, 15.0% against 16.8% on
-the same real test, though it does edge out on false-positive rate, 8.2%
-against 9.0%. Combining both representations closes the gap and edges
-past it, 17.0% recall and 7.9% false-positive rate, but only by a hair:
-doubling the feature count for a one-to-two-point gain is a real
-complexity-versus-benefit question of its own, not a clean vindication of
-the extra representation. A technique that earns its complexity for a
-high-frequency current waveform does not automatically earn it for a
+for a different signal at a smaller scale here than there: 0.608 mean
+AUC-ROC against 0.589, both real numbers checked on the same 40
+customers, the same injected faults. Part 2's own high-frequency lesson
+does not transfer cleanly to this chapter's low-frequency signal either
+way: a {{< acr WRG >}}-style pairwise distance-matrix embedding,
+reimplemented for a 30-minute {{< acr AMI >}} profile and tested
+directly rather than assumed to help, trailed the feature-engineered
+representation on recall while taking meaningfully longer to compute, a
+real complexity-versus-benefit question this chapter checked and
+declined rather than assumed. A technique that earns its complexity for
+a high-frequency current waveform does not automatically earn it for a
 low-frequency power profile.
 
 :::
+
+With the representation settled, three real, narrower questions remain
+about how the detector itself is built: which family of detectors,
+which rule for combining their scores, and whether blending helps at
+all over the single best detector run alone. All three get tested in
+turn below, on the same real customers and the same real injected
+faults, before this section's own summary pulls them back together into
+one answer.
 
 ### Does the detector family matter: parametric or non-parametric?
 
@@ -184,20 +199,24 @@ ever asking whether either family alone would do as well.
 
 {{< embed 06-anomaly-detection-code.ipynb#b33b65cc >}}
 
-No clean winner, and that is the honest result. The non-parametric family
-has the best overall recall (18.8%) but also the worst false-positive
-rate (10.2%); the parametric family and the five-detector ensemble land
-within a percentage point of each other on false-positive rate (9.1% and
-9.0%). The ensemble does not recover the recall lost by blending in the
-weaker family, it actually lands lowest of the three (16.8%), the real
-cost of chasing the best false-positive rate rather than the best recall.
-The per-failure-mode columns tell the more useful story: the
-non-parametric family catches a stuck reading and a communication dropout
-meaningfully more often, closer to a sharp discontinuity a tree split or
-a local-density check can isolate directly, while the parametric family
-catches a slow calibration drift better, a smooth, whole-day shift in the
-covariance structure a Mahalanobis distance is built to notice and a
-single random split can miss.
+No clean winner, though the threshold-independent number does give
+non-parametric a real, if modest, edge: mean AUC-ROC of 0.594 for the
+parametric family, 0.626 for non-parametric, 0.608 for the blended
+ensemble, a real three-hundredths gap between the two families, not a
+dramatic one. The non-parametric family also has the best overall recall
+at the standard 90% target (19.5%) but the worst false-positive rate
+(10.2%); the parametric family and the five-detector ensemble land
+within a percentage point of each other on false-positive rate (9.1%
+and 9.0%). The per-failure-mode columns carry the more useful story: the
+non-parametric family catches a stuck reading and a communication
+dropout meaningfully more often, closer to a sharp discontinuity a tree
+split or a local-density check can isolate directly, while the
+parametric family catches a slow calibration drift better, a smooth,
+whole-day shift in the covariance structure a Mahalanobis distance is
+built to notice and a single random split can miss. Non-parametric edges
+ahead overall, but the real, useful lesson is still that the two
+families are strong at genuinely different failure modes, not that one
+subsumes the other.
 
 ### Does the combination rule matter: average, max, median, or AOM?
 
@@ -218,18 +237,28 @@ order.
 
 {{< embed 06-anomaly-detection-code.ipynb#fa6620e5 >}}
 
-The literature's own recommendation holds up on real data, more cleanly
-than a tie: AOM has both the best recall of any rule here (17.5%) and the
-best false-positive rate (8.4%), a real, checkable improvement on both
-axes at once. Maximization has the worst false-positive rate and the
-worst overall recall, exactly what amplifying whichever single detector
-is loosest predicts. Median no longer stands out on overall recall, but
-it still dominates a communication dropout specifically at the real cost
-of the worst drift performance of any rule, the same discrete-versus-smooth
-split the family comparison above already found. There is no universal
-best rule for every failure mode, but AOM is the one real upgrade over
-plain averaging worth adopting by default: better recall, fewer false
-alarms, for a few lines of extra code.
+The threshold-independent number complicates the literature's own
+recommendation rather than simply confirming it: mean AUC-ROC of 0.618
+for median, the best raw separating power of any rule here, ahead of
+plain averaging (0.608), AOM (0.604), and max (0.593). AOM does not
+carry more real signal than a plain average, it carries slightly less;
+its own value shows up specifically in how efficiently that signal
+converts into a decision at the standard 90% target: the best
+false-positive rate of any rule (8.4%, against 9.8% for median and 9.0%
+for average) at a real, competitive recall (16.2%). Median has the most
+raw power and the best overall recall at that same target (17.0%), but
+does not convert it into the tightest false-positive rate, and it still
+carries the sharpest per-failure-mode split found earlier: it dominates
+a communication dropout specifically (23.0% recall, the best of any
+rule) at the real cost of the worst drift performance of any rule
+(16.0%, against 26 to 27% for the other three), the same
+discrete-versus-smooth split the family comparison above already found.
+Max trails on both the threshold-independent number and the fixed-alpha
+one, exactly what amplifying whichever single detector is loosest
+predicts. There is no single best rule, AOM wins on calibration
+efficiency, median wins on raw signal and on one specific failure mode,
+and knowing which axis you are optimizing for is the real, checkable
+choice a deployment has to make deliberately.
 
 ### Does the ensemble even beat a single detector run alone?
 
@@ -240,19 +269,33 @@ run alone, with no blending at all?
 
 {{< embed 06-anomaly-detection-code.ipynb#6bbeed8d >}}
 
-No, not cleanly, and that is worth saying plainly rather than assuming
-the ensemble always wins. ECOD run alone has the best recall of anything
-in this table, 20.5%, ahead of LOF's 18.3%, both ahead of the
-five-detector ensemble's 16.8%; Mahalanobis alone has the best
-false-positive rate, 8.1%, also ahead of the ensemble's 9.0%. No single
-detector beats the ensemble on both axes at once, and the ensemble's real
-value is exactly that: a reasonable outcome on every axis rather than the
-best on one and the worst on another. COPOD, checked directly against its
-own sibling ECOD, does not earn a place in this ensemble on this test:
-10.4% false-positive rate against ECOD's 11.1% (a real edge), but 15.7%
-recall against ECOD's 20.5% (a real and larger loss), a net negative
-trade on this chapter's own three failure modes, not the improvement its
-more recent publication date might suggest.
+No, not cleanly, and here the threshold-independent number actually
+sharpens the answer rather than softening it. ECOD run alone has the
+best AUC-ROC of anything in this table, 0.631, a real margin above the
+five-detector ensemble's 0.608, the widest gap found in any of this
+section's three comparisons. Mahalanobis tells the opposite story: a
+real false-positive rate at the standard target, 8.1% against the
+ensemble's 9.0%, but the worst AUC by far, 0.553, barely above a coin
+flip. Its own reasonable false-positive rate was never strong evidence
+of real detection power, just a conservative detector that rarely fires
+at all, at any threshold, real information the fixed-alpha table alone
+could not have told apart from genuine skill. COPOD, checked directly
+against its own sibling ECOD, does not earn a place in this ensemble on
+this test either way: 0.604 AUC against ECOD's 0.631, a real and
+consistent loss, not the improvement its more recent publication date
+might suggest.
+
+Three real angles on how the ensemble is built, and a real difference of
+degree between them. Family (a three-hundredths AUC range) and
+combination rule (a two-and-a-half-hundredths range) both move the
+threshold-independent number a little, real but modest configuration
+effects. Single-detector selection moves it the most by a clear margin,
+almost eight hundredths from best to worst: ECOD alone carries real,
+detectable extra power the five-detector blend dilutes away. The
+five-detector ensemble is not the strongest option built in this
+section, it is the most balanced one, and knowing the difference is the
+real payoff of testing all three questions honestly instead of stopping
+at whichever one confirmed the ensemble's own value first.
 
 ### How much can this threshold actually be trusted?
 
@@ -369,6 +412,26 @@ rate, and detection climbs fast with severity, 60% recall at a 30%
 under-report, 84% at 50%, 80% at 70%. A 50% under-report is not a
 marginal one-sigma nudge once tested this way; it is caught better than
 four times out of five.
+
+### So, does per-customer detection work?
+
+Yes, with a real, calibrated cost attached, and that is the honest
+verdict this section set out to reach. A real feature representation
+beats a raw reading by a modest, real margin; which family or
+combination rule the ensemble uses moves its real detection power only
+modestly, mostly changing how efficiently that power turns into a
+decision at a chosen threshold; picking the single best detector
+instead of blending moves the needle by far more, a real, checkable
+choice worth making deliberately rather than defaulting to an ensemble
+on faith; the threshold itself is a dial a DSO turns deliberately, not
+a default;
+SHAP gives a real, if coarse, answer to *why* a flag fired; and a
+physics-based energy-balance check catches a whole different failure
+mode, meter tampering, that a shape-based detector can never see by
+construction. Every one of those pieces, however carefully built,
+shares the exact same limitation: each one only ever compares a
+customer to their own history. Section 2 asks the question that
+limitation cannot answer.
 
 ## Section 2: The anomaly no single meter can see
 
@@ -521,7 +584,10 @@ at any real scale.
 
 ## Section 3: Is the detector itself still trustworthy?
 
-Section 1's detector and Section 2's topology check both assume a fixed
+The chapter's third question, and a different kind of question than the
+first two: not whether a detector works today, but whether it keeps
+working as the population it watches changes underneath it. Section 1's
+detector and Section 2's topology check both assume a fixed
 idea of what this feeder's population normally looks like. That
 assumption has an expiration date. Chapter 4 already found real
 archetype drift within a single year, real customers really do change
@@ -604,13 +670,17 @@ behavioral features above, nothing else different.
 ::: {.ark-concept}
 <span class="ark-concept-title"><i class="bi bi-info-circle-fill"></i> Key Concept</span>
 
-A real, large gap, not a marginal one: the behavior-based detector
-catches 85.2% of these injected behavioral faults, against 51.1% for
-Section 1's own magnitude-based feature vector run on the same real
-customers, the same injected faults, the same conformal calibration,
-only the representation differs. Every fragmented-export case is caught
-(100%, against 51.6% for the magnitude-based detector); the off-hours
-case is caught 70.4% of the time, against 50.5%. The magnitude-based
+A real, decisive win, not a marginal one, and the threshold-independent
+number says so even more clearly than the flagging rate does: mean
+AUC-ROC of 0.935 for the behavior-based detector against 0.779 for
+Section 1's own magnitude-based feature vector, both real, both far
+above a coin flip, one genuinely stronger. At the same 90% coverage
+target, that gap shows up as recall too: 87.9% of these injected
+behavioral faults caught against 48.4%, on the same real customers, the
+same injected faults, the same conformal calibration, only the
+representation differs. Nearly every fragmented-export case is caught
+(98.9%, against 45.7% for the magnitude-based detector); the off-hours
+case is caught 76.9% of the time, against 51.1%. The magnitude-based
 detector, built to notice an unusual *value*, still catches roughly half
 of both, because scattering or shifting a real export block does move
 some individual readings, just not consistently enough to catch
@@ -618,12 +688,15 @@ reliably. This is the real payoff of asking a behavioral question
 directly instead of hoping a magnitude-based detector picks it up as a
 side effect.
 
-It is not a clean win. The behavior-based detector's own false-positive
-rate runs high, 20.0% against a 10% target and against the
-magnitude-based detector's own 11.8%. The likely cause, checked directly
-rather than assumed: the underlying feature mixes continuous severity
-values with low-cardinality integer counts, occurrence and episode
-count, and most real calibration days for a {{< acr PV >}}-equipped
+One real caveat on the calibration, not the underlying detector: the
+behavior-based detector's own false-positive rate at this specific 90%
+target runs high, 20.0% against the magnitude-based detector's own
+11.8%. A detector this strong (0.935 AUC) has real room to hit a
+tighter false-positive rate at a stricter threshold; the reason it does
+not automatically land there at the standard 90% target, checked
+directly rather than assumed: the underlying feature mixes continuous
+severity values with low-cardinality integer counts, occurrence and
+episode count, and most real calibration days for a {{< acr PV >}}-equipped
 customer land on the same small set of typical values for those two
 dimensions, so a customer's own 40-day calibration set often contains
 repeated, tied ensemble scores, and split-conformal calibration, built
@@ -693,79 +766,75 @@ but not on this dataset without a real proxy signal.
 
 ## Why bother
 
-Three real things this chapter buys beyond "another anomaly detector."
-First, an honest baseline: a real parametric-and-non-parametric ensemble,
-a real feature representation earning a real, modest margin over a raw
-reading, and a real conformal threshold turning "pick a percentile" into
-a checkable false-positive rate, tested against a single detector and
-against every reasonable combination rule rather than assumed to be the
-best choice by default. Second, a structural blind spot made visible and
-fixed: a coincident anomaly no per-customer detector, however well
-calibrated, can see by construction, caught instead by a lightweight,
-deployable, topology-aware check that needs no power-flow solve and holds
-up across 414 real feeders, not just one. Third, two forward-looking
-questions most anomaly-detection work never asks at all: is the detector
-itself still trustworthy as the population it watches keeps changing, and
-is *magnitude* even the right thing to be watching in the first place.
+A DSO gets an early-warning system for a real, growing problem:
+transformer stress from coincident DER export. Twenty-nine real voltage
+violations happened on this feeder's own real stress day; the existing
+per-customer monitoring caught five of the thirty-one customers involved.
+Section 2's topology-weighted check catches the other twenty-four, cheaply
+enough to run on every transformer in a real feeder in real time, no
+power-flow solve required. That is the difference between a DSO finding
+out about a stressed transformer from a customer complaint or a failed
+asset, and catching it early enough to act, curtailment, a targeted
+upgrade, before either happens, a real lever against the unplanned
+truck rolls and accelerated equipment aging that coincident DER export
+otherwise causes. The same chapter protects a DSO's own revenue directly
+too: Section 1's energy-balance check catches a customer under-reporting
+real consumption, whether from a fault or real tampering, at a rate that
+climbs to 84% recall for a 50% under-report, a real, checkable path to
+recovering non-technical loss, not a synthetic-label exercise. And
+Section 3's trustworthiness KPI protects a DSO's own past investment: a
+customer-archetyping or retrieval model already paid for does not fail
+loudly when DER adoption outgrows it, it fails quietly, and this chapter
+turns that into a real, budgetable number, ninety-seven percent trusted
+today, fifty-nine percent once adoption climbs, that tells a DSO exactly
+when refitting earns its cost.
+
+A customer gets something too, not just protection from someone else's
+fraud. Section 4's event-based detector catches an inverter fault, a
+fragmented or mistimed export pattern, that a magnitude-based check
+misses more than half the time. A customer who installed rooftop solar
+for the export credit and is quietly losing it to a fault they cannot
+see has a real cost building up, one that normally only shows up as an
+unexplained drop on a much later bill; a detector that flags it
+proactively turns that into a service call today instead.
+
+And every alert in this chapter comes with a real, calibrated cost a DSO
+chooses deliberately, not a threshold a library shipped with. Section 1's
+own alpha sweep turns "how many false alarms is too many" into a real
+dial, a specific, checkable number of avoidable truck rolls traded
+against a specific, checkable number of caught faults, the actual
+operational tradeoff a DSO has to manage regardless of which detector
+sits behind it, and the same real, checkable cost customers pay in
+either direction: a missed fault that could have been caught, or a
+crew sent to a customer's door for nothing.
 
 ## Where this leaves Part 4
 
-Every anomaly-detection paper this chapter cites still frames the
-problem as one meter, one fixed baseline. Section 1 tested that framing
-honestly rather than replacing it on assumption: a real
-parametric-and-non-parametric ensemble, a real feature representation
-earning a real, modest margin over a raw reading, and a real conformal
-threshold turning "pick a percentile" into a checkable ten percent
-false-positive rate, recall that is honest about being modest rather
-than inflated by a convenient benchmark.
-
-Section 2 is this chapter's first genuinely new contribution: a
-coincident anomaly that no per-customer detector, however well
-calibrated, can see by construction. Thirty-one real customers, five of
-them flagged by their own self-baseline detector, produced twenty-nine
-real voltage violations the moment their real {{< acr PV >}} exports
-landed on the same real feeder at the same real moment. Forty-one
-percent of a second real network's own 414 feeders show the same
-pattern, not a quirk of one topology. A graph neural network was checked
-directly against both real networks and dropped, not deferred, on a
-specific structural reason: neither network has the multi-hop shape a
-graph neural network's own strength depends on.
-
-Section 3 is the second: a real, checkable early-warning signal for when
-Chapter 5's own retrieval model needs refitting, not a new algorithm,
-the same conformal machinery pointed at a new question. A threshold
-calibrated once and never revisited looks fine right up until it does
-not, ninety-seven percent trusted with no adoption, fifty-nine percent
-once heterogeneous {{< acr DER >}} adoption reaches eighty percent of
-the population.
-
-Section 4 is this chapter's third genuinely new contribution, and it
-cuts both ways. Every detector in Sections 1 through 3 asks whether a
-magnitude looks unusual; Section 4 asks whether a customer's own event
-history, how often, how severe, when, does instead, the same real
-pattern applied to two different signals. On a {{< acr PV >}} export
-event, asking the behavioral question directly catches 85.2% of a real
-fault where the magnitude-based question alone catches only 51.1%, a
-real, substantial gain, at the real cost of a higher false-positive rate
-a mixed discrete-continuous feature space is honestly worse at
-controlling than a purely continuous one. On a real voltage-violation
-event, the same behavioral question does not help at all, zero of the
-real violators caught, a deeper confirmation of Section 2's own
-structural finding rather than a contradiction of it: the five customers
-who actually violate do so often enough under ordinary sunny conditions
-that it already sits inside their own normal, so no self-baseline
-detector, whatever signal it is handed, can tell the difference. Only a
-network-aware check, knowing that several customers are stressed at
-once, ever could.
+Four questions, two genuinely new answers. Section 1 found that the
+standard paradigm, tested honestly rather than assumed, works, at a
+real, calibrated cost, and that most configuration choices, which
+family, which combination rule, change that story only modestly, while
+one, which single detector to trust, moves it by a real, checkable
+margin worth choosing deliberately rather than defaulting to a blend on
+faith. Sections 2 and 4 are this chapter's real contributions: a
+coincident
+anomaly no per-customer detector can see by construction, caught instead
+by a topology-weighted check that holds up across 414 real feeders, and
+a behavioral question, occurrence, severity, timing instead of
+magnitude, that catches a real fault the standard paradigm misses more
+than half the time, while also confirming, on a real voltage violation,
+that some structural blind spots survive any feature choice. Section 3
+turns Chapter 4's own archetype drift into a forward-looking KPI, so a
+{{< acr DSO >}} learns a model has gone stale from a real number, not a
+rising complaint count.
 
 Part 4 still has one thread genuinely ahead of it: testing mitigation
 strategies against forecasted {{< acr DER >}}-growth scenarios rather
-than today's snapshot, blocked, not just unstarted, on Part 3's own
-forecasting work not existing yet. Everything built across Chapters 3
-through 6 is ready for it the moment that forecast exists: archetypes to
-group by, retrieval and ranking to prioritize by, and now a detector
-that knows honestly both what it can see and what it structurally
-cannot.
+than today's snapshot, the natural next step once Part 3's own
+forecasting work exists to drive it. Everything built across Chapters 3
+through 6 is already ready for it: archetypes to group by, retrieval and
+ranking to prioritize by, and now a detector that knows honestly both
+what it can see and what it structurally cannot.
 
 ## References
 
