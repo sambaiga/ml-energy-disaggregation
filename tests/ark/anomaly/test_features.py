@@ -1,13 +1,7 @@
 import numpy as np
 import pytest
 
-from ark.anomaly.features import (
-    distance_matrix_features,
-    event_features,
-    extract_features,
-    fft_magnitude_features,
-    rolling_statistics,
-)
+from ark.anomaly.features import event_features, extract_features, fft_magnitude_features, rolling_statistics
 
 
 def test_rolling_statistics_matches_hand_computed_values():
@@ -59,34 +53,6 @@ def test_extract_features_handles_an_all_zero_profile_without_dividing_by_zero()
     features = extract_features(profile, n_fft_features=1)
 
     assert np.all(np.isfinite(features))
-
-
-def test_distance_matrix_features_matches_a_hand_computed_matrix():
-    profile = np.array([1.0, 2.0, 3.0, 4.0])
-
-    dist = distance_matrix_features(profile, n_bins=2)
-
-    # bin 0 = mean(1,2) = 1.5, bin 1 = mean(3,4) = 3.5, |1.5-3.5| = 2.0
-    assert dist == pytest.approx([2.0])
-
-
-def test_distance_matrix_features_returns_only_the_upper_triangle():
-    # a symmetric matrix with a zero diagonal has no more real degrees of
-    # freedom than its own upper triangle; the full flattened matrix would
-    # be a redundant, rank-deficient feature vector
-    profile = np.arange(48).astype(float)
-
-    dist = distance_matrix_features(profile, n_bins=12)
-
-    assert dist.shape == (12 * 11 // 2,)
-
-
-def test_distance_matrix_features_is_zero_for_a_flat_profile():
-    profile = np.full(48, 5.0)
-
-    dist = distance_matrix_features(profile, n_bins=8)
-
-    assert dist == pytest.approx(np.zeros(8 * 7 // 2))
 
 
 def test_event_features_matches_a_hand_computed_example():

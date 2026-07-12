@@ -62,52 +62,6 @@ def fft_magnitude_features(profile: np.ndarray, *, n_features: int = 2) -> np.nd
     return top
 
 
-def distance_matrix_features(profile: np.ndarray, *, n_bins: int = 12) -> np.ndarray:
-    """A WRG-style pairwise distance-matrix embedding of one profile's own self-similarity structure.
-
-    Chapter 2's own WRG/AWRG pipeline (`resources/nilm-code/AWRGNILM`'s
-    `get_distance_measure()`) turns a high-frequency current window into a
-    pairwise distance matrix, an "image" carrying far more identifying
-    signal than any single reading. Same idea, reimplemented directly for
-    this chapter's own low-frequency (30-minute AMI) profile rather than
-    depending on the reference repo's own `torch`-based implementation:
-    block-average the profile down to `n_bins` points (a simple PAA,
-    matching the reference repo's own downsampling step), then compute the
-    pairwise absolute-difference matrix between those points. The
-    reference repo feeds this full symmetric matrix to a CNN as an image,
-    where the redundancy is harmless; a classical multivariate detector
-    needs a well-posed covariance matrix, so only the strictly upper
-    triangle is kept here (checked directly: fitting `EllipticEnvelope` on
-    the full flattened matrix warns that the covariance is rank-deficient,
-    since a symmetric matrix with a zero diagonal has no more real degrees
-    of freedom than its own upper triangle).
-
-    Args:
-        profile: A real timeseries, shape `(n_steps,)`.
-        n_bins: How many points to reduce the profile to before computing
-            the distance matrix. The returned vector has
-            `n_bins * (n_bins - 1) / 2` entries.
-
-    Returns:
-        The distance matrix's own upper-triangular entries, flattened.
-
-    Examples:
-        >>> distance_matrix_features(np.array([1.0, 2.0, 3.0, 4.0]), n_bins=2)
-        array([2.])
-    """
-    n_steps = len(profile)
-    bin_edges = np.linspace(0, n_steps, n_bins + 1).astype(int)
-    binned = np.array(
-        [
-            profile[bin_edges[i] : bin_edges[i + 1]].mean() if bin_edges[i + 1] > bin_edges[i] else 0.0
-            for i in range(n_bins)
-        ]
-    )
-    dist = np.abs(binned[:, None] - binned[None, :])
-    rows, cols = np.triu_indices(n_bins, k=1)
-    return dist[rows, cols]
-
-
 def event_features(mask: np.ndarray, severity: np.ndarray, *, step_hours: float = 0.5) -> np.ndarray:
     """Occurrence, severity, and timing of a real event series, the general shape behind any LV network event.
 
