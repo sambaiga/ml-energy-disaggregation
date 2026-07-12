@@ -95,11 +95,25 @@ low-frequency deep learning:
 
 ### Part 3: Forecasting (green)
 
-Household load and PV production forecasting, built on
-[Twiga](https://github.com/sambaiga/twiga) (point + probabilistic: conformal
-prediction, Bayesian NNs, quantile regression) rather than reimplemented from
-scratch. Evaluated with proper probabilistic metrics (CRPS, PICP, Winkler score),
-not just MAE/RMSE.
+Not another single-model forecasting tutorial. The real, hard problem a
+{{< acr DSO >}} or utility actually faces is forecasting household-level
+load demand, and the generation hiding inside it, at the scale of hundreds
+or thousands of individual homes, each with genuinely different
+variability, not one national-grid-style curve assumed to represent every
+customer. Two explicit asks anchor every chapter below: exploit that
+variability directly rather than average it away, and scale to thousands of
+real meters rather than one feeder-level model. Generation enters the way a
+real utility actually sees it, not as its own separately-metered target
+(the vendored dataset has no {{< acr PV >}}/{{< acr EV >}} sub-metering,
+confirmed), but as the invisible confounder that makes net load look the
+way it does. Built on [Twiga](https://github.com/sambaiga/twiga) (point +
+probabilistic: conformal prediction, Bayesian NNs, quantile regression)
+rather than reimplemented from scratch, but every model below is a tool
+inside a real question, never a chapter's own subject, the same discipline
+already applied to Part 4 Chapter 6's own "why bother" section. Evaluated
+with proper probabilistic metrics (CRPS, PICP, Winkler score), computed
+directly via `twiga.core.metrics.evaluate_forecast` (confirmed installed),
+not hand-rolled.
 
 **Data**: the "Medium-Low Voltage Energy Distribution Network and Smart Meter
 Dataset" (Maree et al., Mendeley Data, published March 2025,
@@ -124,157 +138,267 @@ full access is $10k-15k/year). Useful as a small, optional illustrative
 example of what's hiding inside a net-load signal, not as the chapter's
 backbone dataset.
 
-Re-checked directly this session, the vendored copy at
-`resources/mendeley-lede-porsgrunn-ami/` confirms and sharpens the numbers
-above: 6,809 real per-customer AMI parquet files (`data/ami/`), hourly
-`dateTime`/`activePowerIn`/`activePowerOut`/`reactivePowerIn`/
-`reactivePowerOut` columns, real regional weather and price data
-(`data/aux/`), and 185 real LV topology models
+The vendored copy at `resources/mendeley-lede-porsgrunn-ami/` confirms and
+sharpens the numbers above: 6,809 real per-customer AMI parquet files
+(`data/ami/`), hourly `dateTime`/`activePowerIn`/`activePowerOut`/
+`reactivePowerIn`/`reactivePowerOut` columns, real regional weather and
+price data (`data/aux/`), and 185 real LV topology models
 (`data/pandapower/topology/`), not just one region-wide network. The real
 per-customer parquet layout is itself the reason "hundreds of smart
-meters" is achievable directly, no synthetic scaling needed, and the real
-topology folders are a second real asset this book has not yet used:
-smart-meter-driven state estimation on a real LV network, not just
-per-customer forecasting.
+meters" is achievable directly, no synthetic scaling needed.
 
-Six chapters, planned this session after checking Twiga's own installed
-package (`twiga[nn]==1.0.0`, already a `pyproject.toml` dependency for
-Part 3) directly, module by module, rather than assumed from its own
-docs, plus the author's own real, verified publication list and two local
-worked notebooks. Ordered so each chapter's own real finding sets up the
-next one's real question, the same "does complexity earn its keep"
-discipline Parts 2 and 4 already run throughout, not a features list.
+Four chapters, organized around real questions rather than model
+architectures, revised into this shape after the user rejected an earlier,
+architecture-first draft directly: "This plan is focused on ML model
+instead of problem and value it add on smart meters data, customers and
+utility. I would not want to focus much on my model but use them as a tool
+to address the critical challenge and value they add." Checked against
+Twiga's own installed package (`twiga[nn]==1.0.0`, already a
+`pyproject.toml` dependency for Part 3) directly, module by module, the
+author's own private `twiga-forecast` dev repo (not part of this book's
+git tree), the author's own real, verified publication list, two local
+worked notebooks, and real published literature on the same premise, not
+assumed from any of these sources alone. Ordered so each chapter's own real
+finding sets up the next one's real question, the same "does complexity
+earn its keep" discipline Parts 2 and 4 already run throughout, not a
+features list. A fifth angle originally considered for this part, using
+these forecasts for {{< acr LV >}} network state estimation, moved to Part
+4 Thread 4 instead (see that section below): producing forecasts is Part
+3's job, using them for network state estimation is a grid-analytics
+question alongside Thread 4's other already-planned angle.
 
-1. **Is this even forecastable, and at what lag structure?** Twiga's own
-   `twiga.core.stats` module (confirmed installed, function names checked
-   directly, not assumed from docs): `get_permutation_entropy`,
+1. **Characterizing home load and PV, and what that says about which
+   approach to use.** Combines forecastability diagnosis with honest
+   baseline-benchmarking, since both are really the same question: what
+   does this signal's own behavior tell us before reaching for anything
+   complicated? Grounded in real published literature on this exact
+   premise, not just this book's own tooling repeating itself: Peng, Wang,
+   Lu, Li, Shi, Wang & Li, "Short-term Load Forecasting at Different
+   Aggregation Levels with Predictability Analysis" ({{< acr ISGT >}} Asia,
+   2019), using approximate entropy to measure predictability across
+   aggregation levels on a real Irish smart-meter dataset, finding
+   individual loads "typically more volatile and much more challenging to
+   forecast" than substation- or city-level loads, exactly the premise this
+   chapter checks directly on the real Lede/Porsgrunn pool; and Fias,
+   Hashmi & Deconinck, "Uncertainty Quantification in Load Profiles with
+   Rising {{< acr EV >}} and {{< acr PV >}} Adoption" (arXiv, December
+   2025), which finds a genuinely counter-intuitive result worth checking
+   directly rather than assumed: joint {{< acr EV >}}+{{< acr PV >}}
+   adoption can *reduce* net-load uncertainty through a compensatory
+   daytime-charging/daytime-generation effect, not the simple "more
+   {{< acr DER >}} means more volatility" story a reader might otherwise
+   assume. Two more real, current papers ground this chapter's own
+   methodology directly, not just its premise: Wang, Klee & Roos, "Time
+   Series Forecastability Measures" (arXiv, July 2025), proposing two
+   metrics to assess forecastability *before* model development, a
+   Spectral Predictability Score (strength/regularity of frequency
+   components) and the Largest Lyapunov Exponent (chaos/stability of the
+   generating system), reporting strong correlation with actual forecast
+   performance on the M5 competition data and a concrete practical
+   recommendation this chapter directly adopts: focus modeling effort on
+   the customers forecastability already flags as tractable, set different
+   expectations for the rest, rather than running the same intensive
+   pipeline on every customer regardless. Worth checking directly whether
+   these two metrics add real signal beyond twiga's own entropy/Hurst
+   battery below, not assumed redundant. And De Bortoli, Ferrari, Ravazzolo
+   & Rossini, "Model Selection Confidence Sets for Time Series Models with
+   Applications to Electricity Load Data" (arXiv, February 2026), real and
+   current, applying a Model Selection Confidence Set method to real
+   Italian hourly electricity load data: rather than picking one "best"
+   model, it identifies the *set* of models statistically indistinguishable
+   from the true data-generating process at a given confidence level,
+   finding noisier customers produce larger, more contested sets and
+   cleaner ones narrow sharply, and names intraday lags, temperature,
+   calendar effects, and solar generation as the real load drivers behind
+   that uncertainty. Directly shapes this chapter's own closing "decision
+   framework" bullet below: report a real confidence set of viable
+   approaches per forecastability regime, not a single falsely-confident
+   recommendation, the same honesty this book already applies to "does
+   complexity earn its keep" everywhere else. On top of that literature
+   base, Twiga's own `twiga.core.stats`
+   module (confirmed installed): `get_permutation_entropy`,
    `get_sample_entropy`, `get_hurst_exponent`, `get_dfa_exponent`
    (`entropy.py`), `get_acf_values`/`get_pacf_values`
    (`seasonality.py`/`autocorr.py`), `adf_test`/`kpss_test`
    (`stationarity.py`), `compute_xicorr` (`xicorr.py`),
    `compute_crosslag_association`/`recommend_predictive_lags`
-   (`crosslag.py`). Reused directly from
+   (`crosslag.py`), plus two more real diagnostics this session found and
+   the original plan never cited, `ppscore.py` (predictive power score) and
+   `residual.py` (Cook's distance/leverage, for flagging customers whose
+   own forecastability read is distorted by a few outlier readings).
+   Reused directly from
    [`02-forecastability-analysis`](https://sambaiga.github.io/twiga-docs/tutorials/notebooks/02-forecastability-analysis.html),
-   the author's own tutorial, checked directly this session: on the
-   MLVS-PT net-load signal it uses as its own worked example, Hurst
-   exponent 0.737 (real, persistent memory), ACF peaks at lag 48 (daily)
-   and 336 (weekly), an estimated AR order of 8, and a trend-stationary
-   verdict from disagreeing ADF/KPSS tests. This book's own real
-   contribution here: running the same diagnostic across hundreds of real
-   Lede/Porsgrunn customers individually, not one aggregate signal, since
-   "hundreds of smart meters" means hundreds of different forecastability
-   profiles, a real, checkable spread this book can report honestly
-   instead of assuming one national-grid-style signal represents every
-   customer.
-2. **Baselines first, then does classical {{< acr ML >}} actually beat
-   them?** Reused directly from
+   the author's own tutorial (real worked numbers on its own MLVS-PT
+   example: Hurst exponent 0.737, {{< acr ACF >}} peaks at lag 48 and 336,
+   an estimated {{< acr AR >}} order of 8, trend-stationary). This book's
+   own real contribution: running the same diagnostic across hundreds of
+   real Lede/Porsgrunn customers individually, not one aggregate signal,
+   a real, checkable spread reported honestly. Honest baselines next, same
+   signal, reused from
    [`15-baseline-benchmarking`](https://sambaiga.github.io/twiga-docs/tutorials/notebooks/15-baseline-benchmarking.html):
-   naive, seasonal-naive, window-average, drift, and context-parrot (a
-   real 1-nearest-neighbor forecaster in delay-embedded space), checked
-   against LightGBM on the same MLVS-PT signal. The tutorial's own real,
-   already-known finding, verified directly this session: seasonal-naive
-   wins outright (MAE 5.32 kW, RMSE 7.08 kW), every other baseline scores
-   a negative skill against it, and LightGBM does not beat it either, the
-   tutorial's own words, "if LightGBM cannot beat Seasonal Naive on MAE,
-   the problem is in your data or features, not the model architecture."
-   Exactly this book's own recurring discipline, borrowed rather than
-   reinvented: `twiga.models.baseline` (`naive_model.py`,
-   `seasonal_naive_model.py`, `window_average_model.py`, `drift_model.py`,
-   `context_parrot_model.py`) plus `twiga.models.ml`
-   (`lightgbm_model.py`/`xgboost_model.py`/`catboost_model.py`/
-   `randomforest_model.py`, all confirmed installed) checked per-customer
-   across the real Lede pool, not assumed to hold uniformly once chapter 1
-   already found forecastability varies customer to customer.
-3. **Scalable probabilistic forecasting with {{< acr MLPF >}}, at real
-   scale.** The author's own real, published architecture, "Efficiency
-   through Simplicity: {{< acr MLP >}}-based Approach for Net-Load
-   Forecasting with Uncertainty Estimates in Low-Voltage Distribution
-   Networks" (IEEE Transactions on Power Systems, 40(1), 2025), reused via
-   `twiga.models.nn.mlpf_model` and its real distributional variants
-   already installed (`mlpfnormal_model.py`, `mlpfstudentt_model.py`,
-   `mlpflaplace_model.py`, `mlpflognormal_model.py`, `mlpfgamma_model.py`,
-   `mlpfbeta_model.py`, `mlpfqr_model.py`, and `mlpffpqr_model.py`, the
-   real {{< acr FPSeq2Q >}} architecture from a second real, verified
-   paper, "{{< acr FPSeq2Q >}}: Fully Parameterized Sequence to Quantile
-   Regression for Net-Load Forecasting With Uncertainty Estimates" (IEEE
-   Transactions on Smart Grid, 13(3), 2022). Trained across hundreds of
-   real customers, not one aggregate feeder, the user's own explicit ask
-   this session ("exploit the variability challenge in house demand and
-   the larger number of houses"). The real dataset's own
-   `reactivePowerIn`/`reactivePowerOut` columns, confirmed present this
-   session, make a real, checkable version of a third real, published
-   paper possible too: "Enhancing {{< acr LV >}} system resilience through
-   probabilistic forecasting of interdependent variables: voltage,
-   reactive and active power" ({{< acr CIRED >}} Chicago Workshop 2024),
-   jointly forecasting active and reactive power rather than active power
-   alone, worth checking directly rather than assumed once this chapter's
-   own single-target {{< acr MLPF >}} baseline is working.
-4. **Conformal prediction for guaranteed coverage, and a genuinely new
-   cluster-conditional extension.** The author's own real, published
+   naive, seasonal-naive, window-average, drift, and context-parrot
+   (`twiga.models.baseline`), checked against LightGBM
+   (`twiga.models.ml`). The tutorial's own real finding, verified directly:
+   seasonal-naive wins outright (MAE 5.32 kW, RMSE 7.08 kW) and LightGBM
+   does not beat it either, "if LightGBM cannot beat Seasonal Naive on MAE,
+   the problem is in your data or features, not the model architecture,"
+   checked per customer across the real Lede pool, not assumed to hold
+   uniformly. The vendored dataset has no {{< acr PV >}}/{{< acr EV >}}
+   sub-metering, so this chapter cannot characterize {{< acr PV >}}
+   generation as its own signal at full scale; its own
+   `reactivePowerIn`/`reactivePowerOut` columns (a real, if indirect,
+   signature of inverter/{{< acr DER >}} behavior) and Pecan Street's
+   small {{< acr PV >}}-separated sample stand in for it instead, checked
+   directly against the Fias/Hashmi/Deconinck finding above rather than
+   assumed. Closes with a decision framework, not just a diagnostic table,
+   framed as a real confidence set of viable approaches per forecastability
+   regime rather than one falsely-confident recommendation, per De Bortoli
+   et al. above: a mapping from a customer's measured forecastability
+   profile to which later chapter's approach is actually worth reaching
+   for, e.g. a near-constant, low-entropy customer may never need more
+   than seasonal-naive. One more real, checked wrinkle worth flagging here: the
+   author's own `MLGAF_HYPERPARAMETERS.md` ablation found the {{< acr UK >}}
+   and Portuguese datasets need genuinely different architectures (2 vs. 4
+   layers, batch size 64 vs. 8) for the same model family, a sign that
+   "which approach" may need re-asking per real dataset/region too, not
+   assumed to transfer unchanged.
+2. **Scaling to hundreds of meters, does profiling help?** The chapter's
+   real question is scale, not architecture. Workhorse models:
+   `twiga.models.ml` (`lightgbm_model.py`, `xgboost_model.py`,
+   `catboost_model.py`, `randomforest_model.py`, plus the `qrlightgbm`/
+   `qrxgboost`/`qrcatboost`/`qrrandomforest`/`ngboost*` variants as
+   candidates if chapter 1 flags customers where a single point estimate
+   genuinely isn't enough, all confirmed installed). Profiling, the
+   chapter's real new idea: reuses Part 4 Chapter 4's own customer-archetype
+   clustering (`ark.cluster.idec.fit_idec`, the {{< acr IDEC >}} autoencoder
+   already built and validated for this book's Lede-parallel dataset,
+   AusNet), run on the Lede/Porsgrunn pool instead of reimplementing a new
+   clustering approach. Three real options compared honestly: one model per
+   customer (most accurate, least scalable), one shared model per archetype
+   (the profiling answer to this chapter's question), and one global model
+   (most scalable, least tailored). `twiga.forecaster.ensemble`/
+   `twiga.pipeline` (confirmed installed) is the real mechanism for running
+   this comparison at pool scale, not a bespoke script. Real deployment
+   question, not just accuracy: `twiga.mlops`/`twiga.serve`/
+   `twiga.tracking`/`twiga.experiment` (confirmed installed) for what
+   training and serving "hundreds of models" actually costs a utility in
+   practice, reused rather than building bespoke {{< acr MLOps >}} tooling.
+   Sets up chapter 3 directly: whichever scaling tier chapter 2 finds
+   actually earns its cost becomes the backbone chapter 3 wraps in
+   uncertainty.
+3. **What is a probabilistic forecast actually worth, and which kind
+   should you trust?** Four real {{< acr UQ >}} paradigms, compared by the
+   real decision each one supports, not by which architecture backs them.
+   **Parametric distributional heads** (`twiga.models.nn.mlpf_model` and
+   its Normal/Student-t/Laplace/LogNormal/Gamma/Beta variants, from the
+   author's own published "Efficiency through Simplicity: {{< acr MLP >}}-
+   based Approach for Net-Load Forecasting with Uncertainty Estimates in
+   Low-Voltage Distribution Networks," IEEE Transactions on Power Systems,
+   40(1), 2025): a full density, the only family that directly answers
+   "what's the probability my load exceeds X kW," a real risk-of-exceedance
+   question, at the cost of assuming a fixed parametric family.
+   **Quantile regression / {{< acr FPQR >}}** (`mlpfqr_model.py` and
+   `mlpffpqr_model.py`, the {{< acr FPSeq2Q >}} architecture from
+   "{{< acr FPSeq2Q >}}: Fully Parameterized Sequence to Quantile
+   Regression for Net-Load Forecasting With Uncertainty Estimates," IEEE
+   Transactions on Smart Grid, 13(3), 2022, plus chapter 2's own `qr*` tree
+   models as a cheaper backbone): no distributional assumption, a direct
+   answer to a capacity/sizing decision ("what's the {{< acr P95 >}} load a
+   transformer needs to survive"). A newer, in-preparation successor worth
+   checking directly if chapter 1 finds heavy-tailed residuals, not
+   assumed necessary: FPQR_Kuma/FPQR_V2 (two overlapping drafts, a
+   Kumaraswamy tail-adaptive quantile head, reporting 12-18% forecast-skill
+   gains on heavy-tailed distributions in the author's own ablations).
+   **Conformal prediction** (`twiga.distributions.conformal`, two real
+   families: `crc.py`, residual-based, from the author's own published
    "Conformal Multilayer Perceptron-Based Probabilistic Net-Load
    Forecasting for Low-Voltage Distribution Systems with {{< acr PV >}}
-   Generation" ({{< acr IEEE >}} SmartGridComm, Oslo, 2024), detailed
-   directly in the author's own PhD thesis Chapter 7
-   (`resources/PhD_thesis___AF/Chapters/Chapter-7.tex`, read directly this
-   session): {{< acr MLPF >}} wrapped in split-conformal calibration
-   ({{< acr MLPF >}}-{{< acr CP >}}), three real non-conformity scores
-   compared (absolute residual, signed residual, and a symmetric score
-   introduced in the thesis itself), real reported metrics on two real
-   datasets ({{< acr PICP >}} 0.85 vs 0.79, {{< acr NMPI >}} 0.29 vs 0.23
-   for abs-vs-sign score on {{< acr MLVS-PT >}}). `twiga.distributions.conformal`
-   (`crc.py`, `cqr.py`, `base.py`, all confirmed installed) is the direct
-   home for this, a fifth real application of the same split-conformal
-   idea this book has already reused four times (Chapters 3, 4, 5, and 6
-   of Part 4). The genuinely new piece, found this session in a second
-   local worked notebook
-   (`resources/Adaptive-conformal-PV-Forecasting.ipynb`, read directly,
-   not assumed from its filename): cluster-conditional conformal
-   calibration, UMAP-embedding the forecast/feature space, clustering it
-   (GMM), and calibrating a separate conformal threshold per cluster
-   instead of one single global threshold, real working code already
-   present (`cal_UMAPF`, `gmm.predict`, per-cluster `calculate_conformal_value`).
-   This is the "novel concept" the user asked for this session, combining
-   clustering and conformal forecasting directly, worth checking honestly
-   against a single global threshold, the same "does the extra complexity
-   earn its keep" question this chapter's own neighbors keep asking, not
-   assumed better because it is more elaborate.
-5. **Do foundation models earn their keep, and do they solve the
-   thousands-of-meters scaling problem?** `twiga.models.foundational`
-   (`moirai_model.py`, `timesfm_model.py`, `chronos2_model.py`,
-   `lag_llama_model.py`, `tabicl_model.py`, all confirmed installed), real
-   current pretrained time-series foundation models, benchmarked against
-   this book's own chapters 2-3 baselines and trained models on the same
-   real data, per
-   [`15-baseline-benchmarking`](https://sambaiga.github.io/twiga-docs/tutorials/notebooks/15-baseline-benchmarking.html)'s
-   own established pattern. This chapter directly answers the user's own
-   second explicit ask this session, scaling to thousands of real meters
-   at utility scale: a foundation model's own real selling point is
-   zero-shot or few-shot forecasting with no per-customer training run at
-   all, a genuinely different answer to "thousands of models to train and
-   serve" than training one model per customer or one global model, worth
-   checking directly against Part 4 Chapter 4's own five real customer
-   archetypes as a middle option (one shared model per archetype, not per
-   customer, not one global model), reusing `twiga.mlops`/`twiga.serve`/
-   `twiga.tracking`/`twiga.experiment` (all confirmed installed) rather
-   than building bespoke {{< acr MLOps >}} tooling for this book.
-6. **Bayesian forecasting with NumPyro, a genuinely different {{< acr UQ >}}
-   paradigm.** [`numpyro_forecast`](https://github.com/juanitorduz/numpyro_forecast),
-   checked directly this session: a real, mature, {{< acr PyPI >}}-published
-   package (Apache 2.0, typed, linted, tested, semantic-versioned), not a
-   notebook to copy from, offering {{< acr SVI >}} and {{< acr NUTS >}}
-   inference over user-defined generative models, rolling-window
-   backtesting, and real {{< acr CRPS >}} evaluation built in. A new
-   project dependency, the same "borrow a real, maintained package rather
-   than reimplement" precedent Twiga itself already set for this part,
-   compared honestly against {{< acr MLPF >}}-{{< acr CP >}}'s own
-   conformal coverage guarantee on the same real coverage and {{< acr CRPS >}}
-   metrics, not assumed better for being fully Bayesian.
+   Generation," IEEE SmartGridComm, Oslo, 2024, detailed in the author's
+   own PhD thesis Chapter 7 (`resources/PhD_thesis___AF/Chapters/
+   Chapter-7.tex`), real reported {{< acr PICP >}} 0.85 vs 0.79 and
+   {{< acr NMPI >}} 0.29 vs 0.23 for an absolute-vs-signed non-conformity
+   score on {{< acr MLVS-PT >}}; and `cqr.py`, Conformalized Quantile
+   Regression, pairing naturally with chapter 2's own `qr*` tree models). A
+   newer, in-preparation follow-up, MLPF_CRF ("Adaptive Conformal
+   Prediction with an MLPGAM Architecture"), reports a stronger real result
+   on the same problem (CWE 0.815, 9.6% narrower intervals, 22.2%
+   Winkler-score reduction vs standard split-conformal), and the author's
+   own `CRC_ABLATION_ANALYSIS.md` (an already-run, 87,624-eval ablation)
+   both supports and corrects it: found and fixed a metric-artifact bug in
+   the paper's own {{< acr CWE >}} score, corrected result `conf_90_sign`
+   beating standard residual conformal in 8 of 10 folds. Conformal
+   prediction is the only one of the four families with an actual
+   distribution-free coverage *guarantee*, the most defensible answer for a
+   compliance or regulatory risk statement, at the cost that a guarantee on
+   coverage says nothing about sharpness. The chapter's own genuinely new
+   contribution stays here: cluster-conditional conformal calibration
+   (`resources/Adaptive-conformal-PV-Forecasting.ipynb`'s real working
+   code, `cal_UMAPF`, `gmm.predict`, per-cluster
+   `calculate_conformal_value`), reusing chapter 2's own archetypes instead
+   of a fresh {{< acr UMAP >}}/{{< acr GMM >}} clustering pass, one global
+   conformal threshold vs one per archetype, checked honestly, not assumed
+   sharper. Also worth checking directly since it changes what decision the
+   forecast supports: the real dataset's own `reactivePowerIn`/
+   `reactivePowerOut` columns enable a real, checkable version of a third
+   published paper, "Enhancing {{< acr LV >}} system resilience through
+   probabilistic forecasting of interdependent variables: voltage, reactive
+   and active power" ({{< acr CIRED >}} Chicago Workshop 2024), jointly
+   forecasting active and reactive power, a genuinely different decision
+   from any single-target family above (reactive-power intervals feed a
+   voltage-support/{{< acr DER >}}-dispatch decision, not a capacity-sizing
+   or exceedance one). **Bayesian forecasting**
+   ([`numpyro_forecast`](https://github.com/juanitorduz/numpyro_forecast),
+   a real, mature, {{< acr PyPI >}}-published package, {{< acr SVI >}} and
+   {{< acr NUTS >}} inference, rolling-window backtesting, real
+   {{< acr CRPS >}} evaluation built in, a new project dependency): a
+   genuinely different question from the other three, not "what's the
+   range of outcomes" but "how confident is the model itself in this
+   forecast," separating epistemic (model) uncertainty from aleatoric
+   (irreducible) noise, at the cost of heavier compute and no formal
+   coverage guarantee. The chapter's real deliverable: one honest
+   comparison table across all four families on real coverage
+   ({{< acr PICP >}}), sharpness ({{< acr CRPS >}}/Winkler score, via
+   `twiga.core.metrics.evaluate_forecast`), and, matching Chapter 6's own
+   {{< acr AUC-ROC >}} decision, which real decision each family is
+   actually suited to, not a single "winner." Directly reusable for the
+   conformal half of this comparison: twiga's own
+   `10-conformal-prediction.ipynb` tutorial. A model-architecture
+   side-note, checked but not the chapter's focus: whether a group-additive
+   backbone (GANF/MLPGAF, in preparation, `twiga.models.nn.mlpgaf_model`,
+   real ablation numbers: gating alone +0.5% MAE, loss design +3.3%, warmup
+   scheduling avoids a -1.88% degradation without it) changes which
+   {{< acr UQ >}} family wins, or is orthogonal to the question, one
+   paragraph, not a chapter. Twiga's own model zoo has several more real
+   backbone families beyond MLPF and MLPGAF (`mlpgam`, `nhits`, `rnn`, each
+   with 8-10 distributional/quantile variants), available as a stronger
+   backbone if this chapter's own honest comparison calls for one, not
+   surveyed for their own sake.
+4. **Do foundation models actually help, and do they fail like everything
+   else does?** Keeps `twiga.models.foundational` (`moirai_model.py`,
+   `timesfm_model.py`, `chronos2_model.py`, `lag_llama_model.py`,
+   `tabicl_model.py`, confirmed installed, plus the
+   `18-foundational-models.ipynb` tutorial), benchmarked zero-shot against
+   chapter 2's own per-customer/per-archetype/global comparison and chapter
+   1's baselines, per `15-baseline-benchmarking`'s own established pattern.
+   The real question is not "do foundation models scale" (chapter 2's job)
+   but **do foundation models fail the same way other models do, or
+   differently**: cross-referencing every model's real errors against
+   chapter 1's own per-customer forecastability profile, checking directly
+   whether a foundation model's failures cluster on the same hard customers
+   classical/{{< acr NN >}} models already struggle with, or on a
+   genuinely different subset (e.g. {{< acr PV >}}-heavy, volatile
+   customers foundation models were never pretrained to expect). A real,
+   practically useful finding either way: if failure modes overlap, a
+   foundation model is a substitute; if they diverge, it's a real candidate
+   for an ensemble/fallback role instead, a more useful recommendation than
+   a single accuracy leaderboard.
 
 Data source, scope, and sequencing above are the real, checked state as of
 this session; detailed per-chapter notebook design (exact cells, exact
 real numbers) is not started, the same "confirmed rather than assumed"
 discipline the rest of this plan already applies, deferred until Part 3
-work actually begins.
+work actually begins, starting with Chapter 1 since every later chapter
+depends on its forecastability/decision-framework output.
 
 ### Part 4: Grid-Edge Value (amber, flagship)
 
@@ -576,22 +700,41 @@ planned until Part 3 ships a real forecast to design against.
      "scenario-based counterpart to thread 3's real-time detection" framing
      already above, made explicit as a named capability rather than left
      implicit in "evaluate grid health under forecasted DER growth."
-   - **State estimation/forecasting of the LV network itself from
-     smart-meter data**: a different question from forecasting one
-     customer's own future load. Real LV networks are chronically
-     under-monitored below the substation, sparse or no real-time
-     measurement at most buses, so a DSO often does not know its own
-     network's current voltage profile or loading state directly. Smart-meter
-     AMI readings, already this book's own primary data source throughout
-     Parts 2 and 4, are a real, underused input for estimating or
-     forecasting that hidden network state (distribution system state
-     estimation, {{< acr DSSE >}}), not just for estimating individual
-     appliance or customer behavior. Worth checking directly, once Part 3
-     exists, whether this book's own real network models (AusNet, the UK
-     MV/LV network) and real smart-meter data support a genuine, checkable
-     DSSE demonstration, or whether it is better scoped as a forward
-     pointer rather than a full section, the same "confirmed rather than
-     assumed" discipline the rest of this thread already applies.
+   - **State estimation of the LV network itself from smart-meter data**,
+     complementing {{< acr AC >}} power flow: a different question from
+     forecasting one customer's own future load, and the user's own explicit
+     ask this session to fold into this thread rather than Part 3, since
+     producing forecasts is Part 3's job and using them for network state
+     estimation is a grid-analytics question. Real LV networks are
+     chronically under-monitored below the substation, sparse or no
+     real-time measurement at most buses, so a {{< acr DSO >}} often does
+     not know its own network's current voltage profile or loading state
+     directly. Distribution System State Estimation ({{< acr DSSE >}}) is
+     the established real technique for inferring a network's full state
+     from sparse measurements plus a network model; the real, checkable
+     question is whether smart-meter readings, paired with the forecasts
+     and calibrated intervals Part 3 will have already produced by the time
+     this thread starts, can serve as real pseudo-measurements that improve
+     a classical {{< acr AC >}} power-flow-based state estimate at the
+     buses this book's real networks (AusNet, the UK {{< acr MV >}}/
+     {{< acr LV >}} network, Part 4's own) don't directly meter. Open,
+     unverified as of this session, flagged honestly rather than assumed:
+     `pandapower` has a real, established {{< acr WLS >}} state-estimation
+     module (`pandapower.estimation`), not currently a dependency of this
+     project (confirmed: `pandapower` is not installed here). This book's
+     own established power-flow engine is OpenDSSDirect.py instead (used
+     throughout Part 4, confirmed via `ark/dss/circuit.py`'s own imports).
+     Before this thread's notebook design starts, a real, direct decision
+     is needed: adopt `pandapower` as a second power-flow dependency for
+     this one thread (its own state-estimation module is mature and would
+     be reused, not reimplemented, matching this book's "borrow a real
+     package" precedent), or keep everything on OpenDSSDirect and implement
+     a smaller, from-scratch {{< acr WLS >}} estimator against Part 4's own
+     AusNet/UK network models instead, avoiding a second power-flow
+     dependency, at the cost of building the estimator by hand. Not
+     resolved here, a real open question for whoever starts this thread's
+     work, not papered over, the same "confirmed rather than assumed"
+     discipline the rest of this thread already applies.
 5. **Ranking and recommendation for LV management under DER** (new thread,
    Chapter 5, branch `part4-ch5-ranking-recommendation`, built ahead of
    threads 3-4 by explicit decision, it needs neither): applies
