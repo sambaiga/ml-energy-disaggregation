@@ -11,6 +11,8 @@ ECOD, simple enough to implement directly from its own published algorithm.
 
 from __future__ import annotations
 
+import warnings
+
 import numpy as np
 from sklearn.covariance import EllipticEnvelope
 from sklearn.ensemble import IsolationForest
@@ -28,7 +30,15 @@ def mahalanobis_score(X_train: np.ndarray, X_query: np.ndarray, *, random_state:
     Returns:
         One score per query point, higher meaning more anomalous.
     """
-    model = EllipticEnvelope(random_state=random_state).fit(X_train)
+    # FastMCD's own subset search occasionally logs "Determinant has
+    # increased," a known, benign floating-point artifact of its iterative
+    # concentration step (not a sign the fit failed); real enough to
+    # trigger hundreds of times on a higher-dimensional feature space,
+    # checked directly rather than assumed harmless, and not worth
+    # surfacing as chapter-rendered noise.
+    with warnings.catch_warnings():
+        warnings.filterwarnings("ignore", category=RuntimeWarning, module="sklearn.covariance._robust_covariance")
+        model = EllipticEnvelope(random_state=random_state).fit(X_train)
     return -model.score_samples(X_query)
 
 
