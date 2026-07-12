@@ -620,6 +620,84 @@ def pv_vs_ev_failure_mode_diagram() -> plt.Figure:
     return fig
 
 
+def voltage_correlation_vs_magnitude_diagram() -> plt.Figure:
+    """Draw the "correlation, not magnitude" contrast Chapter 3's phase-identification method rests on.
+
+    Three synthetic customers on a feeder: two share phase A but sit at
+    different distances from the transformer, so their absolute voltage
+    levels differ; the third sits on phase B, but happens to land at an
+    absolute level between the other two. Raw magnitude (left) groups by
+    proximity to the transformer, pairing the wrong two customers.
+    Correlation (right) reveals which voltage traces actually move
+    together, correctly pairing the two customers who share phase A, the
+    same distinction the surrounding Key Concept box states in words.
+
+    Returns:
+        The matplotlib Figure, ready to display in a notebook cell.
+    """
+    hours = np.linspace(0, 24, 96)
+    phase_a_fluctuation = 0.02 * np.sin(2 * np.pi * (hours - 6) / 24) + 0.01 * np.sin(2 * np.pi * hours / 6)
+    phase_b_fluctuation = 0.02 * np.sin(2 * np.pi * (hours - 14) / 24) + 0.008 * np.sin(2 * np.pi * (hours + 2) / 5)
+
+    near_transformer = 1.02 + phase_a_fluctuation
+    far_on_phase_a = 0.97 + 1.3 * phase_a_fluctuation
+    on_phase_b = 1.00 + phase_b_fluctuation
+
+    fig, axes = plt.subplots(1, 2, figsize=(9.0, 4.0))
+
+    ax = axes[0]
+    ax.plot(hours, near_transformer, color=WARNING, linewidth=2.2, label="Customer A1 (phase A, near)")
+    ax.plot(hours, far_on_phase_a, color=INFO, linewidth=2.2, label="Customer A2 (phase A, far)")
+    ax.plot(hours, on_phase_b, color=DANGER, linewidth=2.2, linestyle="--", label="Customer B1 (phase B)")
+    ax.set_ylabel("Voltage (p.u.)")
+    ax.set_title("Cluster on raw magnitude", fontsize=12, color=PRIMARY, fontweight="bold")
+    ax.text(
+        0.5,
+        -0.24,
+        "Wrong pair: A1 and B1 sit closest in level",
+        transform=ax.transAxes,
+        ha="center",
+        fontsize=9,
+        color=DANGER,
+        fontweight="bold",
+    )
+
+    ax = axes[1]
+    ax.plot(hours, near_transformer - near_transformer.mean(), color=WARNING, linewidth=2.2, label="Customer A1")
+    ax.plot(hours, far_on_phase_a - far_on_phase_a.mean(), color=INFO, linewidth=2.2, label="Customer A2")
+    ax.plot(
+        hours,
+        on_phase_b - on_phase_b.mean(),
+        color=DANGER,
+        linewidth=2.2,
+        linestyle="--",
+        label="Customer B1",
+    )
+    ax.set_ylabel("Voltage fluctuation (centered)")
+    ax.set_title("Cluster on correlation", fontsize=12, color=PRIMARY, fontweight="bold")
+    ax.text(
+        0.5,
+        -0.24,
+        "Right pair: A1 and A2 move together",
+        transform=ax.transAxes,
+        ha="center",
+        fontsize=9,
+        color=SUCCESS,
+        fontweight="bold",
+    )
+
+    for ax in axes:
+        ax.set_xlabel("Hour of day")
+        ax.set_xlim(0, 24)
+        ax.set_xticks([0, 6, 12, 18, 24])
+        ax.legend(loc="upper left", fontsize=8, frameon=False)
+        ax.spines[["top", "right"]].set_visible(False)
+
+    fig.tight_layout()
+    plt.close(fig)
+    return fig
+
+
 def _household_curve(peak: float, *, hours: np.ndarray) -> np.ndarray:
     """A synthetic evening-peaking household load curve, scaled to a given peak (kW)."""
     shape = 0.15 + 0.85 * np.exp(-0.5 * ((hours - 19) / 2.3) ** 2)

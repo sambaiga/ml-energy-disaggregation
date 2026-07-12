@@ -100,6 +100,8 @@ tests both and reports what the difference costs in practice.
 
 :::
 
+![Three synthetic customers on a feeder: A1 and A2 share phase A but sit at different distances from the transformer, B1 sits on phase B but happens to land at a similar absolute level to A1. Clustering on raw magnitude (left) pairs A1 with B1, the wrong answer. Clustering on correlation (right) correctly pairs A1 with A2, the two customers who actually share a phase.](../../assets/voltage-correlation-vs-magnitude.svg){#fig-voltage-correlation-vs-magnitude}
+
 ## Getting the data
 
 This chapter reuses the same {{< acr LV >}} network and smart-meter data
