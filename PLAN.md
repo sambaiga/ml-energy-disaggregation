@@ -124,6 +124,158 @@ full access is $10k-15k/year). Useful as a small, optional illustrative
 example of what's hiding inside a net-load signal, not as the chapter's
 backbone dataset.
 
+Re-checked directly this session, the vendored copy at
+`resources/mendeley-lede-porsgrunn-ami/` confirms and sharpens the numbers
+above: 6,809 real per-customer AMI parquet files (`data/ami/`), hourly
+`dateTime`/`activePowerIn`/`activePowerOut`/`reactivePowerIn`/
+`reactivePowerOut` columns, real regional weather and price data
+(`data/aux/`), and 185 real LV topology models
+(`data/pandapower/topology/`), not just one region-wide network. The real
+per-customer parquet layout is itself the reason "hundreds of smart
+meters" is achievable directly, no synthetic scaling needed, and the real
+topology folders are a second real asset this book has not yet used:
+smart-meter-driven state estimation on a real LV network, not just
+per-customer forecasting.
+
+Six chapters, planned this session after checking Twiga's own installed
+package (`twiga[nn]==1.0.0`, already a `pyproject.toml` dependency for
+Part 3) directly, module by module, rather than assumed from its own
+docs, plus the author's own real, verified publication list and two local
+worked notebooks. Ordered so each chapter's own real finding sets up the
+next one's real question, the same "does complexity earn its keep"
+discipline Parts 2 and 4 already run throughout, not a features list.
+
+1. **Is this even forecastable, and at what lag structure?** Twiga's own
+   `twiga.core.stats` module (confirmed installed, function names checked
+   directly, not assumed from docs): `get_permutation_entropy`,
+   `get_sample_entropy`, `get_hurst_exponent`, `get_dfa_exponent`
+   (`entropy.py`), `get_acf_values`/`get_pacf_values`
+   (`seasonality.py`/`autocorr.py`), `adf_test`/`kpss_test`
+   (`stationarity.py`), `compute_xicorr` (`xicorr.py`),
+   `compute_crosslag_association`/`recommend_predictive_lags`
+   (`crosslag.py`). Reused directly from
+   [`02-forecastability-analysis`](https://sambaiga.github.io/twiga-docs/tutorials/notebooks/02-forecastability-analysis.html),
+   the author's own tutorial, checked directly this session: on the
+   MLVS-PT net-load signal it uses as its own worked example, Hurst
+   exponent 0.737 (real, persistent memory), ACF peaks at lag 48 (daily)
+   and 336 (weekly), an estimated AR order of 8, and a trend-stationary
+   verdict from disagreeing ADF/KPSS tests. This book's own real
+   contribution here: running the same diagnostic across hundreds of real
+   Lede/Porsgrunn customers individually, not one aggregate signal, since
+   "hundreds of smart meters" means hundreds of different forecastability
+   profiles, a real, checkable spread this book can report honestly
+   instead of assuming one national-grid-style signal represents every
+   customer.
+2. **Baselines first, then does classical {{< acr ML >}} actually beat
+   them?** Reused directly from
+   [`15-baseline-benchmarking`](https://sambaiga.github.io/twiga-docs/tutorials/notebooks/15-baseline-benchmarking.html):
+   naive, seasonal-naive, window-average, drift, and context-parrot (a
+   real 1-nearest-neighbor forecaster in delay-embedded space), checked
+   against LightGBM on the same MLVS-PT signal. The tutorial's own real,
+   already-known finding, verified directly this session: seasonal-naive
+   wins outright (MAE 5.32 kW, RMSE 7.08 kW), every other baseline scores
+   a negative skill against it, and LightGBM does not beat it either, the
+   tutorial's own words, "if LightGBM cannot beat Seasonal Naive on MAE,
+   the problem is in your data or features, not the model architecture."
+   Exactly this book's own recurring discipline, borrowed rather than
+   reinvented: `twiga.models.baseline` (`naive_model.py`,
+   `seasonal_naive_model.py`, `window_average_model.py`, `drift_model.py`,
+   `context_parrot_model.py`) plus `twiga.models.ml`
+   (`lightgbm_model.py`/`xgboost_model.py`/`catboost_model.py`/
+   `randomforest_model.py`, all confirmed installed) checked per-customer
+   across the real Lede pool, not assumed to hold uniformly once chapter 1
+   already found forecastability varies customer to customer.
+3. **Scalable probabilistic forecasting with {{< acr MLPF >}}, at real
+   scale.** The author's own real, published architecture, "Efficiency
+   through Simplicity: {{< acr MLP >}}-based Approach for Net-Load
+   Forecasting with Uncertainty Estimates in Low-Voltage Distribution
+   Networks" (IEEE Transactions on Power Systems, 40(1), 2025), reused via
+   `twiga.models.nn.mlpf_model` and its real distributional variants
+   already installed (`mlpfnormal_model.py`, `mlpfstudentt_model.py`,
+   `mlpflaplace_model.py`, `mlpflognormal_model.py`, `mlpfgamma_model.py`,
+   `mlpfbeta_model.py`, `mlpfqr_model.py`, and `mlpffpqr_model.py`, the
+   real {{< acr FPSeq2Q >}} architecture from a second real, verified
+   paper, "{{< acr FPSeq2Q >}}: Fully Parameterized Sequence to Quantile
+   Regression for Net-Load Forecasting With Uncertainty Estimates" (IEEE
+   Transactions on Smart Grid, 13(3), 2022). Trained across hundreds of
+   real customers, not one aggregate feeder, the user's own explicit ask
+   this session ("exploit the variability challenge in house demand and
+   the larger number of houses"). The real dataset's own
+   `reactivePowerIn`/`reactivePowerOut` columns, confirmed present this
+   session, make a real, checkable version of a third real, published
+   paper possible too: "Enhancing {{< acr LV >}} system resilience through
+   probabilistic forecasting of interdependent variables: voltage,
+   reactive and active power" ({{< acr CIRED >}} Chicago Workshop 2024),
+   jointly forecasting active and reactive power rather than active power
+   alone, worth checking directly rather than assumed once this chapter's
+   own single-target {{< acr MLPF >}} baseline is working.
+4. **Conformal prediction for guaranteed coverage, and a genuinely new
+   cluster-conditional extension.** The author's own real, published
+   "Conformal Multilayer Perceptron-Based Probabilistic Net-Load
+   Forecasting for Low-Voltage Distribution Systems with {{< acr PV >}}
+   Generation" ({{< acr IEEE >}} SmartGridComm, Oslo, 2024), detailed
+   directly in the author's own PhD thesis Chapter 7
+   (`resources/PhD_thesis___AF/Chapters/Chapter-7.tex`, read directly this
+   session): {{< acr MLPF >}} wrapped in split-conformal calibration
+   ({{< acr MLPF >}}-{{< acr CP >}}), three real non-conformity scores
+   compared (absolute residual, signed residual, and a symmetric score
+   introduced in the thesis itself), real reported metrics on two real
+   datasets ({{< acr PICP >}} 0.85 vs 0.79, {{< acr NMPI >}} 0.29 vs 0.23
+   for abs-vs-sign score on {{< acr MLVS-PT >}}). `twiga.distributions.conformal`
+   (`crc.py`, `cqr.py`, `base.py`, all confirmed installed) is the direct
+   home for this, a fifth real application of the same split-conformal
+   idea this book has already reused four times (Chapters 3, 4, 5, and 6
+   of Part 4). The genuinely new piece, found this session in a second
+   local worked notebook
+   (`resources/Adaptive-conformal-PV-Forecasting.ipynb`, read directly,
+   not assumed from its filename): cluster-conditional conformal
+   calibration, UMAP-embedding the forecast/feature space, clustering it
+   (GMM), and calibrating a separate conformal threshold per cluster
+   instead of one single global threshold, real working code already
+   present (`cal_UMAPF`, `gmm.predict`, per-cluster `calculate_conformal_value`).
+   This is the "novel concept" the user asked for this session, combining
+   clustering and conformal forecasting directly, worth checking honestly
+   against a single global threshold, the same "does the extra complexity
+   earn its keep" question this chapter's own neighbors keep asking, not
+   assumed better because it is more elaborate.
+5. **Do foundation models earn their keep, and do they solve the
+   thousands-of-meters scaling problem?** `twiga.models.foundational`
+   (`moirai_model.py`, `timesfm_model.py`, `chronos2_model.py`,
+   `lag_llama_model.py`, `tabicl_model.py`, all confirmed installed), real
+   current pretrained time-series foundation models, benchmarked against
+   this book's own chapters 2-3 baselines and trained models on the same
+   real data, per
+   [`15-baseline-benchmarking`](https://sambaiga.github.io/twiga-docs/tutorials/notebooks/15-baseline-benchmarking.html)'s
+   own established pattern. This chapter directly answers the user's own
+   second explicit ask this session, scaling to thousands of real meters
+   at utility scale: a foundation model's own real selling point is
+   zero-shot or few-shot forecasting with no per-customer training run at
+   all, a genuinely different answer to "thousands of models to train and
+   serve" than training one model per customer or one global model, worth
+   checking directly against Part 4 Chapter 4's own five real customer
+   archetypes as a middle option (one shared model per archetype, not per
+   customer, not one global model), reusing `twiga.mlops`/`twiga.serve`/
+   `twiga.tracking`/`twiga.experiment` (all confirmed installed) rather
+   than building bespoke {{< acr MLOps >}} tooling for this book.
+6. **Bayesian forecasting with NumPyro, a genuinely different {{< acr UQ >}}
+   paradigm.** [`numpyro_forecast`](https://github.com/juanitorduz/numpyro_forecast),
+   checked directly this session: a real, mature, {{< acr PyPI >}}-published
+   package (Apache 2.0, typed, linted, tested, semantic-versioned), not a
+   notebook to copy from, offering {{< acr SVI >}} and {{< acr NUTS >}}
+   inference over user-defined generative models, rolling-window
+   backtesting, and real {{< acr CRPS >}} evaluation built in. A new
+   project dependency, the same "borrow a real, maintained package rather
+   than reimplement" precedent Twiga itself already set for this part,
+   compared honestly against {{< acr MLPF >}}-{{< acr CP >}}'s own
+   conformal coverage guarantee on the same real coverage and {{< acr CRPS >}}
+   metrics, not assumed better for being fully Bayesian.
+
+Data source, scope, and sequencing above are the real, checked state as of
+this session; detailed per-chapter notebook design (exact cells, exact
+real numbers) is not started, the same "confirmed rather than assumed"
+discipline the rest of this plan already applies, deferred until Part 3
+work actually begins.
+
 ### Part 4: Grid-Edge Value (amber, flagship)
 
 Five threads. The original four are ordered so each builds on the last;
@@ -288,6 +440,20 @@ planned until Part 3 ships a real forecast to design against.
    dropped in the first place. Not yet started; full research, reference
    list, and section-by-section design in the approved plan this session
    produced (superseding the paragraph this replaces).
+
+   **Feature representation, worth testing as a follow-up, not yet
+   built**: Section 1's own shape/rolling-stat/{{< acr FFT >}} features are
+   a low-frequency (30-minute AMI) representation, chosen for a low-
+   frequency signal, the same discipline that made Part 2's own high-
+   frequency WRG/AWRG distance-matrix representation (Chapter 2, real
+   PLAID/LILAC current/voltage data, `resources/nilm-code/AWRGNILM`'s
+   `get_distance_measure()`/`get_img_from_VI()`) the right choice there.
+   Worth checking directly, not assumed either way, whether a WRG-style
+   distance-matrix embedding of a customer's own rolling window adds real
+   detection signal beyond the current shape/FFT features on this book's
+   own AMI-rate data, or whether it is a high-frequency-specific technique
+   that does not transfer, before adding it as a fourth Section-1 feature
+   option.
 4. **Smart grid analytics and network management** (blocked, not planned in
    detail yet, confirmed rather than assumed): evaluate grid health
    (voltage violations, thermal overloading) under *forecasted* DER growth
@@ -310,6 +476,35 @@ planned until Part 3 ships a real forecast to design against.
    (`Team-Nando/OEs-The-Basics`, `Team-Nando/ANM-of-LV-Networks-Rule-Based-
    Approach`) but not yet vendored locally. Do not plan this thread in
    detail until Part 3 exists: build Part 3 first.
+
+   Two angles to fold in once Part 3 ships a real forecast to design
+   against, recorded here so they are not lost before detailed planning
+   starts:
+   - **What-if scenario analysis**, combining Part 3's own net-load
+     forecast with the LV network model Part 4 already built (Chapters 1-2's
+     `ark/dss/` power-flow machinery): run a forecasted future load/DER
+     trajectory through the real network model to see which real
+     constraints (voltage, thermal) a DSO would face under that scenario,
+     before it happens, not just under today's snapshot. This is the same
+     "scenario-based counterpart to thread 3's real-time detection" framing
+     already above, made explicit as a named capability rather than left
+     implicit in "evaluate grid health under forecasted DER growth."
+   - **State estimation/forecasting of the LV network itself from
+     smart-meter data**: a different question from forecasting one
+     customer's own future load. Real LV networks are chronically
+     under-monitored below the substation, sparse or no real-time
+     measurement at most buses, so a DSO often does not know its own
+     network's current voltage profile or loading state directly. Smart-meter
+     AMI readings, already this book's own primary data source throughout
+     Parts 2 and 4, are a real, underused input for estimating or
+     forecasting that hidden network state (distribution system state
+     estimation, {{< acr DSSE >}}), not just for estimating individual
+     appliance or customer behavior. Worth checking directly, once Part 3
+     exists, whether this book's own real network models (AusNet, the UK
+     MV/LV network) and real smart-meter data support a genuine, checkable
+     DSSE demonstration, or whether it is better scoped as a forward
+     pointer rather than a full section, the same "confirmed rather than
+     assumed" discipline the rest of this thread already applies.
 5. **Ranking and recommendation for LV management under DER** (new thread,
    Chapter 5, branch `part4-ch5-ranking-recommendation`, built ahead of
    threads 3-4 by explicit decision, it needs neither): applies
