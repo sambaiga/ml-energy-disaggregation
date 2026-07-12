@@ -190,6 +190,8 @@ or tariff decision now has a real number to weigh that decision against.
 
 :::
 
+![Three archetype centroids, each surrounded by a circle of radius equal to the calibrated conformal threshold. A customer inside exactly one circle gets a confident single-archetype set; inside two overlapping circles, an honest two-archetype set; outside every circle, an empty set flagging behavior that does not confidently resemble any archetype.](../../assets/cluster-confidence-set.svg){#fig-cluster-confidence-set}
+
 ## Does a more advanced method earn its complexity?
 
 IDEC, Improved Deep Embedded Clustering, pretrains an autoencoder, then

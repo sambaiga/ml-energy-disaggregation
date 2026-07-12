@@ -768,6 +768,76 @@ def shape_vs_magnitude_diagram() -> plt.Figure:
     return fig
 
 
+def cluster_confidence_set_diagram() -> plt.Figure:
+    """Draw the geometry behind a conformal cluster-membership confidence set.
+
+    Three archetype centroids in embedding space, each surrounded by a
+    circle of radius equal to the calibrated conformal threshold. A
+    customer landing inside exactly one circle gets a confident,
+    single-archetype set (Customer 1). One landing inside two overlapping
+    circles gets an honest two-archetype set instead of a forced single
+    guess (Customer 2). One landing outside every circle gets an empty
+    set, itself a signal that this customer's own behavior does not
+    confidently resemble any archetype (Customer 3). The same geometric
+    idea Chapter 3 uses for phase centroids and Chapter 4 uses for
+    archetype centroids.
+
+    Returns:
+        The matplotlib Figure, ready to display in a notebook cell.
+    """
+    fig, ax = plt.subplots(figsize=(6.4, 5.2))
+
+    centroids = {
+        "Archetype 1": ((-1.4, 0.6), INFO, "left"),
+        "Archetype 2": ((1.4, 0.6), WARNING, "right"),
+        "Archetype 3": ((0.0, -1.7), SUCCESS, "below"),
+    }
+    threshold_radius = 1.05
+
+    for name, (xy, color, side) in centroids.items():
+        ax.add_patch(Circle(xy, threshold_radius, facecolor=color, alpha=0.15, edgecolor=color, linewidth=1.8))
+        ax.scatter(*xy, s=70, color=color, zorder=3)
+        if side == "left":
+            label_xy, ha = (xy[0] - threshold_radius - 0.1, xy[1]), "right"
+        elif side == "right":
+            label_xy, ha = (xy[0] + threshold_radius + 0.1, xy[1]), "left"
+        else:
+            label_xy, ha = (xy[0], xy[1] - threshold_radius - 0.25), "center"
+        ax.text(*label_xy, name, ha=ha, va="center", fontsize=9.5, color=color, fontweight="bold")
+
+    customers = [
+        ("Customer 1", "confident: {1}", (-1.4, 1.35), (0.0, 0.32), "center", TEXT_MUTED),
+        ("Customer 2", "ambiguous: {1, 2}", (0.0, 0.6), (0.0, 0.32), "center", TEXT_MUTED),
+        ("Customer 3", "no match: {}", (2.5, -0.6), (0.0, 0.32), "center", DANGER),
+    ]
+    for name, status, xy, text_offset, ha, color in customers:
+        ax.scatter(*xy, s=90, marker="x", color=color, linewidth=2.4, zorder=4)
+        ax.text(
+            xy[0] + text_offset[0],
+            xy[1] + text_offset[1],
+            f"{name}\n{status}",
+            fontsize=8,
+            color=color,
+            ha=ha,
+            va="bottom",
+        )
+
+    ax.set_xlim(-3.0, 3.2)
+    ax.set_ylim(-3.2, 2.6)
+    ax.set_aspect("equal")
+    ax.axis("off")
+    ax.set_title(
+        "Each circle's radius is the calibrated threshold\ninside one, inside two, or inside none",
+        fontsize=10,
+        color=PRIMARY,
+        fontweight="bold",
+    )
+
+    fig.tight_layout()
+    plt.close(fig)
+    return fig
+
+
 def _lever_checklist_panel(
     ax: plt.Axes,
     title: str,
