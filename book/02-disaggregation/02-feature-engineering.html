@@ -98,7 +98,6 @@ div.csl-indent {
     "search-label": "Search"
   }
 }</script>
-<style>html{ scroll-behavior: smooth; }</style>
 <script src="https://cdn.jsdelivr.net/npm/requirejs@2.3.6/require.min.js" integrity="sha384-c9c+LnTbwQ3aujuU7ULEPVvgLs+Fn6fJUvIGTsuu1ZcCf11fiEubah0ttpca4ntM sha384-6V1/AdqZRWk1KAlWbKBlGhN7VG4iE/yAZcO6NZPMF8od0vukrvr0tg4qY6NSrItx" crossorigin="anonymous"></script>
 
 <script type="application/javascript">define('jquery', [],function() {return window.jQuery;})</script>
@@ -442,6 +441,11 @@ window.Quarto = {
   <a href="../../book/04-grid-edge/05-ranking-recommendation.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">Chapter 5: Ranking and Recommendation under DER</span></a>
   </div>
 </li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../book/04-grid-edge/06-anomaly-detection.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">Chapter 6: Anomaly Detection Beyond the Meter</span></a>
+  </div>
+</li>
       </ul>
   </li>
         <li class="sidebar-item">
@@ -546,48 +550,17 @@ d_{k,j} = |x_k - x_j|
 <p><span class="math inline">\(D\)</span> says nothing about appliances by itself. It is a structural fingerprint of the waveform’s own shape: a smooth periodic signal produces one pattern, a spiky transient produces another. The rest of this chapter is about what to do with <span class="math inline">\(D\)</span> once it exists <span class="citation" data-cites="faustine2020wrg">[1]</span>.</p>
 </div>
 <p>The notebook below builds <span class="math inline">\(D\)</span> for a single, real activation current from PLAID, already extracted the way <a href="#fig-activation-extraction" class="quarto-xref">Figure&nbsp;<span>5.1</span></a> describes. The same event can be read two ways at once: current against time, on the left, or current against voltage, on the right.</p>
-<div class="quarto-embed-nb-cell" data-notebook="/home/runner/work/ml-energy-disaggregation/ml-energy-disaggregation/book/02-disaggregation/02-feature-engineering-code.ipynb" data-notebook-title="Feature Engineering for Appliance Recognition" data-notebook-cellid="3bc2d836">
-<div id="3bc2d836" class="cell">
-<div class="cell-output cell-output-display">
-
-        <div id="hmBF0z"></div>
-        <script type="text/javascript" data-lets-plot-script="library">
-            if(!window.letsPlotCallQueue) {
-                window.letsPlotCallQueue = [];
-            };
-            window.letsPlotCall = function(f) {
-                window.letsPlotCallQueue.push(f);
-            };
-            (function() {
-                var script = document.createElement("script");
-                script.type = "text/javascript";
-                script.src = "https://cdn.jsdelivr.net/gh/JetBrains/lets-plot@v4.11.0/js-package/distr/lets-plot.min.js";
-                script.onload = function() {
-                    window.letsPlotCall = function(f) {f();};
-                    window.letsPlotCallQueue.forEach(function(f) {f();});
-                    window.letsPlotCallQueue = [];
-                    
-                };
-                script.onerror = function(event) {
-                    window.letsPlotCall = function(f) {};    // noop
-                    window.letsPlotCallQueue = [];
-                    var div = document.createElement("div");
-                    div.style.color = 'darkred';
-                    div.textContent = 'Error loading Lets-Plot JS';
-                    document.getElementById("hmBF0z").appendChild(div);
-                };
-                var e = document.getElementById("hmBF0z");
-                e.appendChild(script);
-            })()
-        </script>
-        
-</div>
-</div>
-</div>
 <div class="quarto-embed-nb-cell" data-notebook="/home/runner/work/ml-energy-disaggregation/ml-energy-disaggregation/book/02-disaggregation/02-feature-engineering-code.ipynb" data-notebook-title="Feature Engineering for Appliance Recognition" data-notebook-cellid="3813ea23">
 <div id="3813ea23" class="cell">
 <div class="cell-output cell-output-display">
-   <div id="AJqryo"></div>
+
+   
+       <meta charset="UTF-8">
+       <style> html, body { margin: 0; padding: 0; } </style>
+       <script type="text/javascript" data-lets-plot-script="library" src="https://cdn.jsdelivr.net/gh/JetBrains/lets-plot@v4.11.0/js-package/distr/lets-plot.min.js"></script>
+   
+   
+          <div id="cKtVqb"></div>
    <script type="text/javascript" data-lets-plot-script="plot">
    
    (function() {
@@ -612,7 +585,7 @@ d_{k,j} = |x_k - x_j|
        };
    }
    
-   const containerDiv = document.getElementById("AJqryo");
+   const containerDiv = document.getElementById("cKtVqb");
    let fig = null;
    
    function renderPlot() {
@@ -946,7 +919,7 @@ d_{k,j} = |x_k - x_j|
 "spec_id":"2"
 }]
 };
-           window.letsPlotCall(function() { fig = LetsPlot.buildPlotFromProcessedSpecs(plotSpec, containerDiv, sizing); });
+           fig = LetsPlot.buildPlotFromProcessedSpecs(plotSpec, containerDiv, sizing);
        } else {
            fig.updateView({});
        }
@@ -987,6 +960,8 @@ d_{k,j} = |x_k - x_j|
    })();
    
    </script>
+   
+
 </div>
 </div>
 </div>
@@ -1017,7 +992,14 @@ w}\)</span> image, together with the V-I image introduced above, is what a small
 <div class="quarto-embed-nb-cell" data-notebook="/home/runner/work/ml-energy-disaggregation/ml-energy-disaggregation/book/02-disaggregation/02-feature-engineering-code.ipynb" data-notebook-title="Feature Engineering for Appliance Recognition" data-notebook-cellid="b2a8a8db">
 <div id="b2a8a8db" class="cell">
 <div class="cell-output cell-output-display">
-   <div id="PU7G9T"></div>
+
+   
+       <meta charset="UTF-8">
+       <style> html, body { margin: 0; padding: 0; } </style>
+       <script type="text/javascript" data-lets-plot-script="library" src="https://cdn.jsdelivr.net/gh/JetBrains/lets-plot@v4.11.0/js-package/distr/lets-plot.min.js"></script>
+   
+   
+          <div id="7sCNvZ"></div>
    <script type="text/javascript" data-lets-plot-script="plot">
    
    (function() {
@@ -1042,7 +1024,7 @@ w}\)</span> image, together with the V-I image introduced above, is what a small
        };
    }
    
-   const containerDiv = document.getElementById("PU7G9T");
+   const containerDiv = document.getElementById("7sCNvZ");
    let fig = null;
    
    function renderPlot() {
@@ -1228,7 +1210,7 @@ w}\)</span> image, together with the V-I image introduced above, is what a small
 "metainfo_list":[],
 "spec_id":"3"
 };
-           window.letsPlotCall(function() { fig = LetsPlot.buildPlotFromProcessedSpecs(plotSpec, containerDiv, sizing); });
+           fig = LetsPlot.buildPlotFromProcessedSpecs(plotSpec, containerDiv, sizing);
        } else {
            fig.updateView({});
        }
@@ -1269,6 +1251,8 @@ w}\)</span> image, together with the V-I image introduced above, is what a small
    })();
    
    </script>
+   
+
 </div>
 </div>
 </div>
@@ -1276,7 +1260,14 @@ w}\)</span> image, together with the V-I image introduced above, is what a small
 <div class="quarto-embed-nb-cell" data-notebook="/home/runner/work/ml-energy-disaggregation/ml-energy-disaggregation/book/02-disaggregation/02-feature-engineering-code.ipynb" data-notebook-title="Feature Engineering for Appliance Recognition" data-notebook-cellid="b5120beb">
 <div id="b5120beb" class="cell">
 <div class="cell-output cell-output-display">
-   <div id="CsAxeq"></div>
+
+   
+       <meta charset="UTF-8">
+       <style> html, body { margin: 0; padding: 0; } </style>
+       <script type="text/javascript" data-lets-plot-script="library" src="https://cdn.jsdelivr.net/gh/JetBrains/lets-plot@v4.11.0/js-package/distr/lets-plot.min.js"></script>
+   
+   
+          <div id="lZrqmG"></div>
    <script type="text/javascript" data-lets-plot-script="plot">
    
    (function() {
@@ -1301,7 +1292,7 @@ w}\)</span> image, together with the V-I image introduced above, is what a small
        };
    }
    
-   const containerDiv = document.getElementById("CsAxeq");
+   const containerDiv = document.getElementById("lZrqmG");
    let fig = null;
    
    function renderPlot() {
@@ -1488,7 +1479,7 @@ w}\)</span> image, together with the V-I image introduced above, is what a small
 "metainfo_list":[],
 "spec_id":"4"
 };
-           window.letsPlotCall(function() { fig = LetsPlot.buildPlotFromProcessedSpecs(plotSpec, containerDiv, sizing); });
+           fig = LetsPlot.buildPlotFromProcessedSpecs(plotSpec, containerDiv, sizing);
        } else {
            fig.updateView({});
        }
@@ -1529,6 +1520,8 @@ w}\)</span> image, together with the V-I image introduced above, is what a small
    })();
    
    </script>
+   
+
 </div>
 </div>
 </div>
@@ -1544,7 +1537,14 @@ w}\)</span> image, together with the V-I image introduced above, is what a small
 <div class="quarto-embed-nb-cell" data-notebook="/home/runner/work/ml-energy-disaggregation/ml-energy-disaggregation/book/02-disaggregation/02-feature-engineering-code.ipynb" data-notebook-title="Feature Engineering for Appliance Recognition" data-notebook-cellid="d6e6907d">
 <div id="d6e6907d" class="cell">
 <div class="cell-output cell-output-display">
-   <div id="EvXPeM"></div>
+
+   
+       <meta charset="UTF-8">
+       <style> html, body { margin: 0; padding: 0; } </style>
+       <script type="text/javascript" data-lets-plot-script="library" src="https://cdn.jsdelivr.net/gh/JetBrains/lets-plot@v4.11.0/js-package/distr/lets-plot.min.js"></script>
+   
+   
+          <div id="XasmhN"></div>
    <script type="text/javascript" data-lets-plot-script="plot">
    
    (function() {
@@ -1569,7 +1569,7 @@ w}\)</span> image, together with the V-I image introduced above, is what a small
        };
    }
    
-   const containerDiv = document.getElementById("EvXPeM");
+   const containerDiv = document.getElementById("XasmhN");
    let fig = null;
    
    function renderPlot() {
@@ -1768,7 +1768,7 @@ w}\)</span> image, together with the V-I image introduced above, is what a small
 "metainfo_list":[],
 "spec_id":"6"
 };
-           window.letsPlotCall(function() { fig = LetsPlot.buildPlotFromProcessedSpecs(plotSpec, containerDiv, sizing); });
+           fig = LetsPlot.buildPlotFromProcessedSpecs(plotSpec, containerDiv, sizing);
        } else {
            fig.updateView({});
        }
@@ -1809,6 +1809,8 @@ w}\)</span> image, together with the V-I image introduced above, is what a small
    })();
    
    </script>
+   
+
 </div>
 </div>
 </div>
@@ -1816,7 +1818,14 @@ w}\)</span> image, together with the V-I image introduced above, is what a small
 <div class="quarto-embed-nb-cell" data-notebook="/home/runner/work/ml-energy-disaggregation/ml-energy-disaggregation/book/02-disaggregation/02-feature-engineering-code.ipynb" data-notebook-title="Feature Engineering for Appliance Recognition" data-notebook-cellid="f7b8b897">
 <div id="f7b8b897" class="cell">
 <div class="cell-output cell-output-display">
-   <div id="HYhW7u"></div>
+
+   
+       <meta charset="UTF-8">
+       <style> html, body { margin: 0; padding: 0; } </style>
+       <script type="text/javascript" data-lets-plot-script="library" src="https://cdn.jsdelivr.net/gh/JetBrains/lets-plot@v4.11.0/js-package/distr/lets-plot.min.js"></script>
+   
+   
+          <div id="fv2bop"></div>
    <script type="text/javascript" data-lets-plot-script="plot">
    
    (function() {
@@ -1841,7 +1850,7 @@ w}\)</span> image, together with the V-I image introduced above, is what a small
        };
    }
    
-   const containerDiv = document.getElementById("HYhW7u");
+   const containerDiv = document.getElementById("fv2bop");
    let fig = null;
    
    function renderPlot() {
@@ -2024,7 +2033,7 @@ w}\)</span> image, together with the V-I image introduced above, is what a small
 "metainfo_list":[],
 "spec_id":"5"
 };
-           window.letsPlotCall(function() { fig = LetsPlot.buildPlotFromProcessedSpecs(plotSpec, containerDiv, sizing); });
+           fig = LetsPlot.buildPlotFromProcessedSpecs(plotSpec, containerDiv, sizing);
        } else {
            fig.updateView({});
        }
@@ -2065,6 +2074,8 @@ w}\)</span> image, together with the V-I image introduced above, is what a small
    })();
    
    </script>
+   
+
 </div>
 </div>
 </div>
@@ -2072,7 +2083,14 @@ w}\)</span> image, together with the V-I image introduced above, is what a small
 <div class="quarto-embed-nb-cell" data-notebook="/home/runner/work/ml-energy-disaggregation/ml-energy-disaggregation/book/02-disaggregation/02-feature-engineering-code.ipynb" data-notebook-title="Feature Engineering for Appliance Recognition" data-notebook-cellid="e82013f9">
 <div id="e82013f9" class="cell">
 <div class="cell-output cell-output-display">
-   <div id="GYw7Fo"></div>
+
+   
+       <meta charset="UTF-8">
+       <style> html, body { margin: 0; padding: 0; } </style>
+       <script type="text/javascript" data-lets-plot-script="library" src="https://cdn.jsdelivr.net/gh/JetBrains/lets-plot@v4.11.0/js-package/distr/lets-plot.min.js"></script>
+   
+   
+          <div id="JWtkN8"></div>
    <script type="text/javascript" data-lets-plot-script="plot">
    
    (function() {
@@ -2097,7 +2115,7 @@ w}\)</span> image, together with the V-I image introduced above, is what a small
        };
    }
    
-   const containerDiv = document.getElementById("GYw7Fo");
+   const containerDiv = document.getElementById("JWtkN8");
    let fig = null;
    
    function renderPlot() {
@@ -2280,7 +2298,7 @@ w}\)</span> image, together with the V-I image introduced above, is what a small
 "metainfo_list":[],
 "spec_id":"7"
 };
-           window.letsPlotCall(function() { fig = LetsPlot.buildPlotFromProcessedSpecs(plotSpec, containerDiv, sizing); });
+           fig = LetsPlot.buildPlotFromProcessedSpecs(plotSpec, containerDiv, sizing);
        } else {
            fig.updateView({});
        }
@@ -2321,6 +2339,8 @@ w}\)</span> image, together with the V-I image introduced above, is what a small
    })();
    
    </script>
+   
+
 </div>
 </div>
 </div>
@@ -2328,7 +2348,14 @@ w}\)</span> image, together with the V-I image introduced above, is what a small
 <div class="quarto-embed-nb-cell" data-notebook="/home/runner/work/ml-energy-disaggregation/ml-energy-disaggregation/book/02-disaggregation/02-feature-engineering-code.ipynb" data-notebook-title="Feature Engineering for Appliance Recognition" data-notebook-cellid="72202d4e">
 <div id="72202d4e" class="cell">
 <div class="cell-output cell-output-display">
-   <div id="EV6EDA"></div>
+
+   
+       <meta charset="UTF-8">
+       <style> html, body { margin: 0; padding: 0; } </style>
+       <script type="text/javascript" data-lets-plot-script="library" src="https://cdn.jsdelivr.net/gh/JetBrains/lets-plot@v4.11.0/js-package/distr/lets-plot.min.js"></script>
+   
+   
+          <div id="C12TnP"></div>
    <script type="text/javascript" data-lets-plot-script="plot">
    
    (function() {
@@ -2353,7 +2380,7 @@ w}\)</span> image, together with the V-I image introduced above, is what a small
        };
    }
    
-   const containerDiv = document.getElementById("EV6EDA");
+   const containerDiv = document.getElementById("C12TnP");
    let fig = null;
    
    function renderPlot() {
@@ -2555,7 +2582,7 @@ w}\)</span> image, together with the V-I image introduced above, is what a small
 "metainfo_list":[],
 "spec_id":"8"
 };
-           window.letsPlotCall(function() { fig = LetsPlot.buildPlotFromProcessedSpecs(plotSpec, containerDiv, sizing); });
+           fig = LetsPlot.buildPlotFromProcessedSpecs(plotSpec, containerDiv, sizing);
        } else {
            fig.updateView({});
        }
@@ -2596,6 +2623,8 @@ w}\)</span> image, together with the V-I image introduced above, is what a small
    })();
    
    </script>
+   
+
 </div>
 </div>
 </div>
@@ -2603,7 +2632,14 @@ w}\)</span> image, together with the V-I image introduced above, is what a small
 <div class="quarto-embed-nb-cell" data-notebook="/home/runner/work/ml-energy-disaggregation/ml-energy-disaggregation/book/02-disaggregation/02-feature-engineering-code.ipynb" data-notebook-title="Feature Engineering for Appliance Recognition" data-notebook-cellid="fbeb9df2">
 <div id="fbeb9df2" class="cell">
 <div class="cell-output cell-output-display">
-   <div id="97msfH"></div>
+
+   
+       <meta charset="UTF-8">
+       <style> html, body { margin: 0; padding: 0; } </style>
+       <script type="text/javascript" data-lets-plot-script="library" src="https://cdn.jsdelivr.net/gh/JetBrains/lets-plot@v4.11.0/js-package/distr/lets-plot.min.js"></script>
+   
+   
+          <div id="uhROj3"></div>
    <script type="text/javascript" data-lets-plot-script="plot">
    
    (function() {
@@ -2628,7 +2664,7 @@ w}\)</span> image, together with the V-I image introduced above, is what a small
        };
    }
    
-   const containerDiv = document.getElementById("97msfH");
+   const containerDiv = document.getElementById("uhROj3");
    let fig = null;
    
    function renderPlot() {
@@ -2815,7 +2851,7 @@ w}\)</span> image, together with the V-I image introduced above, is what a small
 "metainfo_list":[],
 "spec_id":"9"
 };
-           window.letsPlotCall(function() { fig = LetsPlot.buildPlotFromProcessedSpecs(plotSpec, containerDiv, sizing); });
+           fig = LetsPlot.buildPlotFromProcessedSpecs(plotSpec, containerDiv, sizing);
        } else {
            fig.updateView({});
        }
@@ -2856,6 +2892,8 @@ w}\)</span> image, together with the V-I image introduced above, is what a small
    })();
    
    </script>
+   
+
 </div>
 </div>
 </div>
@@ -2867,7 +2905,14 @@ w}\)</span> image, together with the V-I image introduced above, is what a small
 <div class="quarto-embed-nb-cell" data-notebook="/home/runner/work/ml-energy-disaggregation/ml-energy-disaggregation/book/02-disaggregation/02-feature-engineering-code.ipynb" data-notebook-title="Feature Engineering for Appliance Recognition" data-notebook-cellid="219e8b13">
 <div id="219e8b13" class="cell">
 <div class="cell-output cell-output-display">
-   <div id="kKjBcd"></div>
+
+   
+       <meta charset="UTF-8">
+       <style> html, body { margin: 0; padding: 0; } </style>
+       <script type="text/javascript" data-lets-plot-script="library" src="https://cdn.jsdelivr.net/gh/JetBrains/lets-plot@v4.11.0/js-package/distr/lets-plot.min.js"></script>
+   
+   
+          <div id="b1SpFm"></div>
    <script type="text/javascript" data-lets-plot-script="plot">
    
    (function() {
@@ -2892,7 +2937,7 @@ w}\)</span> image, together with the V-I image introduced above, is what a small
        };
    }
    
-   const containerDiv = document.getElementById("kKjBcd");
+   const containerDiv = document.getElementById("b1SpFm");
    let fig = null;
    
    function renderPlot() {
@@ -3078,7 +3123,7 @@ w}\)</span> image, together with the V-I image introduced above, is what a small
 "metainfo_list":[],
 "spec_id":"10"
 };
-           window.letsPlotCall(function() { fig = LetsPlot.buildPlotFromProcessedSpecs(plotSpec, containerDiv, sizing); });
+           fig = LetsPlot.buildPlotFromProcessedSpecs(plotSpec, containerDiv, sizing);
        } else {
            fig.updateView({});
        }
@@ -3119,6 +3164,8 @@ w}\)</span> image, together with the V-I image introduced above, is what a small
    })();
    
    </script>
+   
+
 </div>
 </div>
 </div>
@@ -3127,7 +3174,14 @@ w}\)</span> image, together with the V-I image introduced above, is what a small
 <div class="quarto-embed-nb-cell" data-notebook="/home/runner/work/ml-energy-disaggregation/ml-energy-disaggregation/book/02-disaggregation/02-feature-engineering-code.ipynb" data-notebook-title="Feature Engineering for Appliance Recognition" data-notebook-cellid="514fa86c">
 <div id="514fa86c" class="cell">
 <div class="cell-output cell-output-display">
-   <div id="WDIi0J"></div>
+
+   
+       <meta charset="UTF-8">
+       <style> html, body { margin: 0; padding: 0; } </style>
+       <script type="text/javascript" data-lets-plot-script="library" src="https://cdn.jsdelivr.net/gh/JetBrains/lets-plot@v4.11.0/js-package/distr/lets-plot.min.js"></script>
+   
+   
+          <div id="dmZvp8"></div>
    <script type="text/javascript" data-lets-plot-script="plot">
    
    (function() {
@@ -3152,7 +3206,7 @@ w}\)</span> image, together with the V-I image introduced above, is what a small
        };
    }
    
-   const containerDiv = document.getElementById("WDIi0J");
+   const containerDiv = document.getElementById("dmZvp8");
    let fig = null;
    
    function renderPlot() {
@@ -3340,7 +3394,7 @@ w}\)</span> image, together with the V-I image introduced above, is what a small
 },{
 "data":{
 "w":[30.0,50.0,80.0],
-"time":[175.75910687446594,22.682878017425537,1177.5920677185059]
+"time":[14.539658069610596,22.68395495414734,46.48428201675415]
 },
 "mapping":{
 "x":"w",
@@ -3512,7 +3566,7 @@ w}\)</span> image, together with the V-I image introduced above, is what a small
 "spec_id":"12"
 }]
 };
-           window.letsPlotCall(function() { fig = LetsPlot.buildPlotFromProcessedSpecs(plotSpec, containerDiv, sizing); });
+           fig = LetsPlot.buildPlotFromProcessedSpecs(plotSpec, containerDiv, sizing);
        } else {
            fig.updateView({});
        }
@@ -3553,6 +3607,8 @@ w}\)</span> image, together with the V-I image introduced above, is what a small
    })();
    
    </script>
+   
+
 </div>
 </div>
 </div>
@@ -3565,7 +3621,14 @@ w}\)</span> image, together with the V-I image introduced above, is what a small
 <div class="quarto-embed-nb-cell" data-notebook="/home/runner/work/ml-energy-disaggregation/ml-energy-disaggregation/book/02-disaggregation/02-feature-engineering-code.ipynb" data-notebook-title="Feature Engineering for Appliance Recognition" data-notebook-cellid="77515a5e">
 <div id="77515a5e" class="cell">
 <div class="cell-output cell-output-display">
-   <div id="vEgK3x"></div>
+
+   
+       <meta charset="UTF-8">
+       <style> html, body { margin: 0; padding: 0; } </style>
+       <script type="text/javascript" data-lets-plot-script="library" src="https://cdn.jsdelivr.net/gh/JetBrains/lets-plot@v4.11.0/js-package/distr/lets-plot.min.js"></script>
+   
+   
+          <div id="9eNvTd"></div>
    <script type="text/javascript" data-lets-plot-script="plot">
    
    (function() {
@@ -3590,7 +3653,7 @@ w}\)</span> image, together with the V-I image introduced above, is what a small
        };
    }
    
-   const containerDiv = document.getElementById("vEgK3x");
+   const containerDiv = document.getElementById("9eNvTd");
    let fig = null;
    
    function renderPlot() {
@@ -3940,7 +4003,7 @@ w}\)</span> image, together with the V-I image introduced above, is what a small
 "spec_id":"14"
 }]
 };
-           window.letsPlotCall(function() { fig = LetsPlot.buildPlotFromProcessedSpecs(plotSpec, containerDiv, sizing); });
+           fig = LetsPlot.buildPlotFromProcessedSpecs(plotSpec, containerDiv, sizing);
        } else {
            fig.updateView({});
        }
@@ -3981,6 +4044,8 @@ w}\)</span> image, together with the V-I image introduced above, is what a small
    })();
    
    </script>
+   
+
 </div>
 </div>
 </div>
@@ -3993,7 +4058,14 @@ w}\)</span> image, together with the V-I image introduced above, is what a small
 <div class="quarto-embed-nb-cell" data-notebook="/home/runner/work/ml-energy-disaggregation/ml-energy-disaggregation/book/02-disaggregation/02-feature-engineering-code.ipynb" data-notebook-title="Feature Engineering for Appliance Recognition" data-notebook-cellid="c635c7ad">
 <div id="c635c7ad" class="cell">
 <div class="cell-output cell-output-display">
-   <div id="0NQJwD"></div>
+
+   
+       <meta charset="UTF-8">
+       <style> html, body { margin: 0; padding: 0; } </style>
+       <script type="text/javascript" data-lets-plot-script="library" src="https://cdn.jsdelivr.net/gh/JetBrains/lets-plot@v4.11.0/js-package/distr/lets-plot.min.js"></script>
+   
+   
+          <div id="8rucVV"></div>
    <script type="text/javascript" data-lets-plot-script="plot">
    
    (function() {
@@ -4018,7 +4090,7 @@ w}\)</span> image, together with the V-I image introduced above, is what a small
        };
    }
    
-   const containerDiv = document.getElementById("0NQJwD");
+   const containerDiv = document.getElementById("8rucVV");
    let fig = null;
    
    function renderPlot() {
@@ -4217,7 +4289,7 @@ w}\)</span> image, together with the V-I image introduced above, is what a small
 "metainfo_list":[],
 "spec_id":"15"
 };
-           window.letsPlotCall(function() { fig = LetsPlot.buildPlotFromProcessedSpecs(plotSpec, containerDiv, sizing); });
+           fig = LetsPlot.buildPlotFromProcessedSpecs(plotSpec, containerDiv, sizing);
        } else {
            fig.updateView({});
        }
@@ -4258,52 +4330,23 @@ w}\)</span> image, together with the V-I image introduced above, is what a small
    })();
    
    </script>
+   
+
 </div>
 </div>
 </div>
 <p>Under V-I, the six appliances’ clusters overlap heavily; under WRG, most of them pull apart, the two three-phase machines especially, since a large motor’s activation current has almost nothing in common with a bulb’s or a heater’s once WRG turns it into a graph instead of a loop. That is what the numbers below confirm with an actual trained classifier instead of an unsupervised projection.</p>
-<div class="quarto-embed-nb-cell" data-notebook="/home/runner/work/ml-energy-disaggregation/ml-energy-disaggregation/book/02-disaggregation/02-feature-engineering-code.ipynb" data-notebook-title="Feature Engineering for Appliance Recognition" data-notebook-cellid="3bc2d836">
-<div id="3bc2d836" class="cell">
-<div class="cell-output cell-output-display">
-
-        <div id="hmBF0z"></div>
-        <script type="text/javascript" data-lets-plot-script="library">
-            if(!window.letsPlotCallQueue) {
-                window.letsPlotCallQueue = [];
-            };
-            window.letsPlotCall = function(f) {
-                window.letsPlotCallQueue.push(f);
-            };
-            (function() {
-                var script = document.createElement("script");
-                script.type = "text/javascript";
-                script.src = "https://cdn.jsdelivr.net/gh/JetBrains/lets-plot@v4.11.0/js-package/distr/lets-plot.min.js";
-                script.onload = function() {
-                    window.letsPlotCall = function(f) {f();};
-                    window.letsPlotCallQueue.forEach(function(f) {f();});
-                    window.letsPlotCallQueue = [];
-                    
-                };
-                script.onerror = function(event) {
-                    window.letsPlotCall = function(f) {};    // noop
-                    window.letsPlotCallQueue = [];
-                    var div = document.createElement("div");
-                    div.style.color = 'darkred';
-                    div.textContent = 'Error loading Lets-Plot JS';
-                    document.getElementById("hmBF0z").appendChild(div);
-                };
-                var e = document.getElementById("hmBF0z");
-                e.appendChild(script);
-            })()
-        </script>
-        
-</div>
-</div>
-</div>
 <div class="quarto-embed-nb-cell" data-notebook="/home/runner/work/ml-energy-disaggregation/ml-energy-disaggregation/book/02-disaggregation/02-feature-engineering-code.ipynb" data-notebook-title="Feature Engineering for Appliance Recognition" data-notebook-cellid="027c858f">
 <div id="027c858f" class="cell">
 <div class="cell-output cell-output-display">
-   <div id="H2aMYu"></div>
+
+   
+       <meta charset="UTF-8">
+       <style> html, body { margin: 0; padding: 0; } </style>
+       <script type="text/javascript" data-lets-plot-script="library" src="https://cdn.jsdelivr.net/gh/JetBrains/lets-plot@v4.11.0/js-package/distr/lets-plot.min.js"></script>
+   
+   
+          <div id="ABVBfa"></div>
    <script type="text/javascript" data-lets-plot-script="plot">
    
    (function() {
@@ -4328,7 +4371,7 @@ w}\)</span> image, together with the V-I image introduced above, is what a small
        };
    }
    
-   const containerDiv = document.getElementById("H2aMYu");
+   const containerDiv = document.getElementById("ABVBfa");
    let fig = null;
    
    function renderPlot() {
@@ -4511,7 +4554,7 @@ w}\)</span> image, together with the V-I image introduced above, is what a small
 "metainfo_list":[],
 "spec_id":"16"
 };
-           window.letsPlotCall(function() { fig = LetsPlot.buildPlotFromProcessedSpecs(plotSpec, containerDiv, sizing); });
+           fig = LetsPlot.buildPlotFromProcessedSpecs(plotSpec, containerDiv, sizing);
        } else {
            fig.updateView({});
        }
@@ -4552,6 +4595,8 @@ w}\)</span> image, together with the V-I image introduced above, is what a small
    })();
    
    </script>
+   
+
 </div>
 </div>
 </div>
@@ -4559,7 +4604,14 @@ w}\)</span> image, together with the V-I image introduced above, is what a small
 <div class="quarto-embed-nb-cell" data-notebook="/home/runner/work/ml-energy-disaggregation/ml-energy-disaggregation/book/02-disaggregation/02-feature-engineering-code.ipynb" data-notebook-title="Feature Engineering for Appliance Recognition" data-notebook-cellid="869c89de">
 <div id="869c89de" class="cell">
 <div class="cell-output cell-output-display">
-   <div id="nKotHr"></div>
+
+   
+       <meta charset="UTF-8">
+       <style> html, body { margin: 0; padding: 0; } </style>
+       <script type="text/javascript" data-lets-plot-script="library" src="https://cdn.jsdelivr.net/gh/JetBrains/lets-plot@v4.11.0/js-package/distr/lets-plot.min.js"></script>
+   
+   
+          <div id="qnECIa"></div>
    <script type="text/javascript" data-lets-plot-script="plot">
    
    (function() {
@@ -4584,7 +4636,7 @@ w}\)</span> image, together with the V-I image introduced above, is what a small
        };
    }
    
-   const containerDiv = document.getElementById("nKotHr");
+   const containerDiv = document.getElementById("qnECIa");
    let fig = null;
    
    function renderPlot() {
@@ -4767,7 +4819,7 @@ w}\)</span> image, together with the V-I image introduced above, is what a small
 "metainfo_list":[],
 "spec_id":"17"
 };
-           window.letsPlotCall(function() { fig = LetsPlot.buildPlotFromProcessedSpecs(plotSpec, containerDiv, sizing); });
+           fig = LetsPlot.buildPlotFromProcessedSpecs(plotSpec, containerDiv, sizing);
        } else {
            fig.updateView({});
        }
@@ -4808,6 +4860,8 @@ w}\)</span> image, together with the V-I image introduced above, is what a small
    })();
    
    </script>
+   
+
 </div>
 </div>
 </div>
@@ -4815,7 +4869,14 @@ w}\)</span> image, together with the V-I image introduced above, is what a small
 <div class="quarto-embed-nb-cell" data-notebook="/home/runner/work/ml-energy-disaggregation/ml-energy-disaggregation/book/02-disaggregation/02-feature-engineering-code.ipynb" data-notebook-title="Feature Engineering for Appliance Recognition" data-notebook-cellid="82b5b481">
 <div id="82b5b481" class="cell">
 <div class="cell-output cell-output-display">
-   <div id="Mxl33H"></div>
+
+   
+       <meta charset="UTF-8">
+       <style> html, body { margin: 0; padding: 0; } </style>
+       <script type="text/javascript" data-lets-plot-script="library" src="https://cdn.jsdelivr.net/gh/JetBrains/lets-plot@v4.11.0/js-package/distr/lets-plot.min.js"></script>
+   
+   
+          <div id="ld9I6t"></div>
    <script type="text/javascript" data-lets-plot-script="plot">
    
    (function() {
@@ -4840,7 +4901,7 @@ w}\)</span> image, together with the V-I image introduced above, is what a small
        };
    }
    
-   const containerDiv = document.getElementById("Mxl33H");
+   const containerDiv = document.getElementById("ld9I6t");
    let fig = null;
    
    function renderPlot() {
@@ -5042,7 +5103,7 @@ w}\)</span> image, together with the V-I image introduced above, is what a small
 "metainfo_list":[],
 "spec_id":"18"
 };
-           window.letsPlotCall(function() { fig = LetsPlot.buildPlotFromProcessedSpecs(plotSpec, containerDiv, sizing); });
+           fig = LetsPlot.buildPlotFromProcessedSpecs(plotSpec, containerDiv, sizing);
        } else {
            fig.updateView({});
        }
@@ -5083,6 +5144,8 @@ w}\)</span> image, together with the V-I image introduced above, is what a small
    })();
    
    </script>
+   
+
 </div>
 </div>
 </div>
@@ -5090,7 +5153,14 @@ w}\)</span> image, together with the V-I image introduced above, is what a small
 <div class="quarto-embed-nb-cell" data-notebook="/home/runner/work/ml-energy-disaggregation/ml-energy-disaggregation/book/02-disaggregation/02-feature-engineering-code.ipynb" data-notebook-title="Feature Engineering for Appliance Recognition" data-notebook-cellid="a477dcc8">
 <div id="a477dcc8" class="cell">
 <div class="cell-output cell-output-display">
-   <div id="v7hGbp"></div>
+
+   
+       <meta charset="UTF-8">
+       <style> html, body { margin: 0; padding: 0; } </style>
+       <script type="text/javascript" data-lets-plot-script="library" src="https://cdn.jsdelivr.net/gh/JetBrains/lets-plot@v4.11.0/js-package/distr/lets-plot.min.js"></script>
+   
+   
+          <div id="ht56nF"></div>
    <script type="text/javascript" data-lets-plot-script="plot">
    
    (function() {
@@ -5115,7 +5185,7 @@ w}\)</span> image, together with the V-I image introduced above, is what a small
        };
    }
    
-   const containerDiv = document.getElementById("v7hGbp");
+   const containerDiv = document.getElementById("ht56nF");
    let fig = null;
    
    function renderPlot() {
@@ -5302,7 +5372,7 @@ w}\)</span> image, together with the V-I image introduced above, is what a small
 "metainfo_list":[],
 "spec_id":"19"
 };
-           window.letsPlotCall(function() { fig = LetsPlot.buildPlotFromProcessedSpecs(plotSpec, containerDiv, sizing); });
+           fig = LetsPlot.buildPlotFromProcessedSpecs(plotSpec, containerDiv, sizing);
        } else {
            fig.updateView({});
        }
@@ -5343,6 +5413,8 @@ w}\)</span> image, together with the V-I image introduced above, is what a small
    })();
    
    </script>
+   
+
 </div>
 </div>
 </div>
@@ -5859,5 +5931,4 @@ w}\)</span> image, together with the V-I image introduced above, is what a small
 
 
 
-<script src="../../site_libs/quarto-html/zenscroll-min.js"></script>
 </body></html>

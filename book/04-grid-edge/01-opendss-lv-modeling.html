@@ -133,7 +133,6 @@ div.csl-indent {
     "search-label": "Search"
   }
 }</script>
-<style>html{ scroll-behavior: smooth; }</style>
 <script src="https://cdn.jsdelivr.net/npm/requirejs@2.3.6/require.min.js" integrity="sha384-c9c+LnTbwQ3aujuU7ULEPVvgLs+Fn6fJUvIGTsuu1ZcCf11fiEubah0ttpca4ntM sha384-6V1/AdqZRWk1KAlWbKBlGhN7VG4iE/yAZcO6NZPMF8od0vukrvr0tg4qY6NSrItx" crossorigin="anonymous"></script>
 
 <script type="application/javascript">define('jquery', [],function() {return window.jQuery;})</script>
@@ -446,6 +445,11 @@ div.csl-indent {
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../../book/04-grid-edge/05-ranking-recommendation.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">Chapter 5: Ranking and Recommendation under DER</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../book/04-grid-edge/06-anomaly-detection.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">Chapter 6: Anomaly Detection Beyond the Meter</span></a>
   </div>
 </li>
       </ul>
@@ -805,44 +809,6 @@ phase 3 current = 1.278 A</code></pre>
 <section id="checking-a-feeder-over-time" class="level2">
 <h2 class="anchored" data-anchor-id="checking-a-feeder-over-time">Checking a feeder over time</h2>
 <p>Here is what checking several conditions actually looks like, using the same network expanded to six houses and a real annual load-duration curve: peak demand for 1650 hours a year, 67% of peak for 4280 hours, 33% of peak for the remaining 2830. <code>evaluate_loading_levels</code> rebuilds the circuit fresh at each level, and <code>plot_voltage_compliance</code> shades the compliant band directly on the chart rather than leaving the comparison to the reader:</p>
-<div class="quarto-embed-nb-cell" data-notebook="/home/runner/work/ml-energy-disaggregation/ml-energy-disaggregation/book/04-grid-edge/01-opendss-lv-modeling-code.ipynb" data-notebook-title="Mastering the Fundamentals: A Guide to OpenDSS-LV Modeling" data-notebook-cellid="47486a5b">
-<div id="47486a5b" class="cell">
-<div class="cell-output cell-output-display">
-
-        <div id="QYyEMt"></div>
-        <script type="text/javascript" data-lets-plot-script="library">
-            if(!window.letsPlotCallQueue) {
-                window.letsPlotCallQueue = [];
-            };
-            window.letsPlotCall = function(f) {
-                window.letsPlotCallQueue.push(f);
-            };
-            (function() {
-                var script = document.createElement("script");
-                script.type = "text/javascript";
-                script.src = "https://cdn.jsdelivr.net/gh/JetBrains/lets-plot@v4.11.0/js-package/distr/lets-plot.min.js";
-                script.onload = function() {
-                    window.letsPlotCall = function(f) {f();};
-                    window.letsPlotCallQueue.forEach(function(f) {f();});
-                    window.letsPlotCallQueue = [];
-                    
-                };
-                script.onerror = function(event) {
-                    window.letsPlotCall = function(f) {};    // noop
-                    window.letsPlotCallQueue = [];
-                    var div = document.createElement("div");
-                    div.style.color = 'darkred';
-                    div.textContent = 'Error loading Lets-Plot JS';
-                    document.getElementById("QYyEMt").appendChild(div);
-                };
-                var e = document.getElementById("QYyEMt");
-                e.appendChild(script);
-            })()
-        </script>
-        
-</div>
-</div>
-</div>
 <p>Building the expanded network reuses the exact same <code>circuit.command(...)</code> calls as above, just continued further:</p>
 <div class="quarto-embed-nb-cell" data-notebook="/home/runner/work/ml-energy-disaggregation/ml-energy-disaggregation/book/04-grid-edge/01-opendss-lv-modeling-code.ipynb" data-notebook-title="Mastering the Fundamentals: A Guide to OpenDSS-LV Modeling" data-notebook-cellid="c23dd734">
 <div id="c23dd734" class="cell">
@@ -876,7 +842,14 @@ Higher: the new branch through bus F carries 24 kW of additional peak demand, an
 <div class="quarto-embed-nb-cell" data-notebook="/home/runner/work/ml-energy-disaggregation/ml-energy-disaggregation/book/04-grid-edge/01-opendss-lv-modeling-code.ipynb" data-notebook-title="Mastering the Fundamentals: A Guide to OpenDSS-LV Modeling" data-notebook-cellid="5498f72a">
 <div id="5498f72a" class="cell">
 <div class="cell-output cell-output-display">
-   <div id="ThBdJZ"></div>
+
+   
+       <meta charset="UTF-8">
+       <style> html, body { margin: 0; padding: 0; } </style>
+       <script type="text/javascript" data-lets-plot-script="library" src="https://cdn.jsdelivr.net/gh/JetBrains/lets-plot@v4.11.0/js-package/distr/lets-plot.min.js"></script>
+   
+   
+          <div id="O2rsRl"></div>
    <script type="text/javascript" data-lets-plot-script="plot">
    
    (function() {
@@ -901,7 +874,7 @@ Higher: the new branch through bus F carries 24 kW of additional peak demand, an
        };
    }
    
-   const containerDiv = document.getElementById("ThBdJZ");
+   const containerDiv = document.getElementById("O2rsRl");
    let fig = null;
    
    function renderPlot() {
@@ -1166,7 +1139,7 @@ Higher: the new branch through bus F carries 24 kW of additional peak demand, an
 "metainfo_list":[],
 "spec_id":"1"
 };
-           window.letsPlotCall(function() { fig = LetsPlot.buildPlotFromProcessedSpecs(plotSpec, containerDiv, sizing); });
+           fig = LetsPlot.buildPlotFromProcessedSpecs(plotSpec, containerDiv, sizing);
        } else {
            fig.updateView({});
        }
@@ -1207,6 +1180,8 @@ Higher: the new branch through bus F carries 24 kW of additional peak demand, an
    })();
    
    </script>
+   
+
 </div>
 </div>
 </div>
@@ -1688,5 +1663,4 @@ Higher: the new branch through bus F carries 24 kW of additional peak demand, an
 
 
 
-<script src="../../site_libs/quarto-html/zenscroll-min.js"></script>
 </body></html>

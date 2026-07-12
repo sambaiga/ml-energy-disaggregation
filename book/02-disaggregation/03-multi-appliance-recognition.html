@@ -98,7 +98,6 @@ div.csl-indent {
     "search-label": "Search"
   }
 }</script>
-<style>html{ scroll-behavior: smooth; }</style>
 <script src="https://cdn.jsdelivr.net/npm/requirejs@2.3.6/require.min.js" integrity="sha384-c9c+LnTbwQ3aujuU7ULEPVvgLs+Fn6fJUvIGTsuu1ZcCf11fiEubah0ttpca4ntM sha384-6V1/AdqZRWk1KAlWbKBlGhN7VG4iE/yAZcO6NZPMF8od0vukrvr0tg4qY6NSrItx" crossorigin="anonymous"></script>
 
 <script type="application/javascript">define('jquery', [],function() {return window.jQuery;})</script>
@@ -442,6 +441,11 @@ window.Quarto = {
   <a href="../../book/04-grid-edge/05-ranking-recommendation.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">Chapter 5: Ranking and Recommendation under DER</span></a>
   </div>
 </li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../book/04-grid-edge/06-anomaly-detection.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">Chapter 6: Anomaly Detection Beyond the Meter</span></a>
+  </div>
+</li>
       </ul>
   </li>
         <li class="sidebar-item">
@@ -518,48 +522,17 @@ x_t = \sum_{m=1}^{M} y_t^{(m)} \cdot s_t^{(m)} + \epsilon_t
 <section id="does-the-same-feature-carry-over-as-is" class="level2">
 <h2 class="anchored" data-anchor-id="does-the-same-feature-carry-over-as-is">Does the same feature carry over as-is?</h2>
 <p>The obvious first move is to reuse Chapter 2’s own two representations, the binary V-I image and the raw activation current, and just see what happens once “the current” might be more than one appliance’s signature added together. The plot below is a real PLAID event with two appliances already active in the same window.</p>
-<div class="quarto-embed-nb-cell" data-notebook="/home/runner/work/ml-energy-disaggregation/ml-energy-disaggregation/book/02-disaggregation/03-multi-appliance-recognition-code.ipynb" data-notebook-title="Multi-Appliance Recognition from High-Frequency Signals" data-notebook-cellid="adaae1bd">
-<div id="adaae1bd" class="cell">
-<div class="cell-output cell-output-display">
-
-        <div id="A5tpyq"></div>
-        <script type="text/javascript" data-lets-plot-script="library">
-            if(!window.letsPlotCallQueue) {
-                window.letsPlotCallQueue = [];
-            };
-            window.letsPlotCall = function(f) {
-                window.letsPlotCallQueue.push(f);
-            };
-            (function() {
-                var script = document.createElement("script");
-                script.type = "text/javascript";
-                script.src = "https://cdn.jsdelivr.net/gh/JetBrains/lets-plot@v4.11.0/js-package/distr/lets-plot.min.js";
-                script.onload = function() {
-                    window.letsPlotCall = function(f) {f();};
-                    window.letsPlotCallQueue.forEach(function(f) {f();});
-                    window.letsPlotCallQueue = [];
-                    
-                };
-                script.onerror = function(event) {
-                    window.letsPlotCall = function(f) {};    // noop
-                    window.letsPlotCallQueue = [];
-                    var div = document.createElement("div");
-                    div.style.color = 'darkred';
-                    div.textContent = 'Error loading Lets-Plot JS';
-                    document.getElementById("A5tpyq").appendChild(div);
-                };
-                var e = document.getElementById("A5tpyq");
-                e.appendChild(script);
-            })()
-        </script>
-        
-</div>
-</div>
-</div>
 <div class="quarto-embed-nb-cell" data-notebook="/home/runner/work/ml-energy-disaggregation/ml-energy-disaggregation/book/02-disaggregation/03-multi-appliance-recognition-code.ipynb" data-notebook-title="Multi-Appliance Recognition from High-Frequency Signals" data-notebook-cellid="de62bc1a">
 <div id="de62bc1a" class="cell">
 <div class="cell-output cell-output-display">
-   <div id="ltDnPt"></div>
+
+   
+       <meta charset="UTF-8">
+       <style> html, body { margin: 0; padding: 0; } </style>
+       <script type="text/javascript" data-lets-plot-script="library" src="https://cdn.jsdelivr.net/gh/JetBrains/lets-plot@v4.11.0/js-package/distr/lets-plot.min.js"></script>
+   
+   
+          <div id="d3eepV"></div>
    <script type="text/javascript" data-lets-plot-script="plot">
    
    (function() {
@@ -584,7 +557,7 @@ x_t = \sum_{m=1}^{M} y_t^{(m)} \cdot s_t^{(m)} + \epsilon_t
        };
    }
    
-   const containerDiv = document.getElementById("ltDnPt");
+   const containerDiv = document.getElementById("d3eepV");
    let fig = null;
    
    function renderPlot() {
@@ -750,7 +723,7 @@ x_t = \sum_{m=1}^{M} y_t^{(m)} \cdot s_t^{(m)} + \epsilon_t
 "metainfo_list":[],
 "spec_id":"1"
 };
-           window.letsPlotCall(function() { fig = LetsPlot.buildPlotFromProcessedSpecs(plotSpec, containerDiv, sizing); });
+           fig = LetsPlot.buildPlotFromProcessedSpecs(plotSpec, containerDiv, sizing);
        } else {
            fig.updateView({});
        }
@@ -791,6 +764,8 @@ x_t = \sum_{m=1}^{M} y_t^{(m)} \cdot s_t^{(m)} + \epsilon_t
    })();
    
    </script>
+   
+
 </div>
 </div>
 </div>
@@ -798,7 +773,14 @@ x_t = \sum_{m=1}^{M} y_t^{(m)} \cdot s_t^{(m)} + \epsilon_t
 <div class="quarto-embed-nb-cell" data-notebook="/home/runner/work/ml-energy-disaggregation/ml-energy-disaggregation/book/02-disaggregation/03-multi-appliance-recognition-code.ipynb" data-notebook-title="Multi-Appliance Recognition from High-Frequency Signals" data-notebook-cellid="7f28b4d7">
 <div id="7f28b4d7" class="cell">
 <div class="cell-output cell-output-display">
-   <div id="Os3cdL"></div>
+
+   
+       <meta charset="UTF-8">
+       <style> html, body { margin: 0; padding: 0; } </style>
+       <script type="text/javascript" data-lets-plot-script="library" src="https://cdn.jsdelivr.net/gh/JetBrains/lets-plot@v4.11.0/js-package/distr/lets-plot.min.js"></script>
+   
+   
+          <div id="ISrHmR"></div>
    <script type="text/javascript" data-lets-plot-script="plot">
    
    (function() {
@@ -823,7 +805,7 @@ x_t = \sum_{m=1}^{M} y_t^{(m)} \cdot s_t^{(m)} + \epsilon_t
        };
    }
    
-   const containerDiv = document.getElementById("Os3cdL");
+   const containerDiv = document.getElementById("ISrHmR");
    let fig = null;
    
    function renderPlot() {
@@ -831,7 +813,7 @@ x_t = \sum_{m=1}^{M} y_t^{(m)} \cdot s_t^{(m)} + \epsilon_t
            const plotSpec = {
 "data":{
 "representation":["V-I image","Activation current"],
-"f1_macro":[65.7,62.7]
+"f1_macro":[51.3,62.7]
 },
 "mapping":{
 "x":"representation",
@@ -1006,7 +988,7 @@ x_t = \sum_{m=1}^{M} y_t^{(m)} \cdot s_t^{(m)} + \epsilon_t
 "metainfo_list":[],
 "spec_id":"2"
 };
-           window.letsPlotCall(function() { fig = LetsPlot.buildPlotFromProcessedSpecs(plotSpec, containerDiv, sizing); });
+           fig = LetsPlot.buildPlotFromProcessedSpecs(plotSpec, containerDiv, sizing);
        } else {
            fig.updateView({});
        }
@@ -1047,6 +1029,8 @@ x_t = \sum_{m=1}^{M} y_t^{(m)} \cdot s_t^{(m)} + \epsilon_t
    })();
    
    </script>
+   
+
 </div>
 </div>
 </div>
@@ -1068,7 +1052,14 @@ i_a(t)\)</span>. Two appliances sharing a window rarely agree on both of these a
 <div class="quarto-embed-nb-cell" data-notebook="/home/runner/work/ml-energy-disaggregation/ml-energy-disaggregation/book/02-disaggregation/03-multi-appliance-recognition-code.ipynb" data-notebook-title="Multi-Appliance Recognition from High-Frequency Signals" data-notebook-cellid="b104d87e">
 <div id="b104d87e" class="cell">
 <div class="cell-output cell-output-display">
-   <div id="XNyxbE"></div>
+
+   
+       <meta charset="UTF-8">
+       <style> html, body { margin: 0; padding: 0; } </style>
+       <script type="text/javascript" data-lets-plot-script="library" src="https://cdn.jsdelivr.net/gh/JetBrains/lets-plot@v4.11.0/js-package/distr/lets-plot.min.js"></script>
+   
+   
+          <div id="3eWb7y"></div>
    <script type="text/javascript" data-lets-plot-script="plot">
    
    (function() {
@@ -1093,7 +1084,7 @@ i_a(t)\)</span>. Two appliances sharing a window rarely agree on both of these a
        };
    }
    
-   const containerDiv = document.getElementById("XNyxbE");
+   const containerDiv = document.getElementById("3eWb7y");
    let fig = null;
    
    function renderPlot() {
@@ -1279,7 +1270,7 @@ i_a(t)\)</span>. Two appliances sharing a window rarely agree on both of these a
 "metainfo_list":[],
 "spec_id":"3"
 };
-           window.letsPlotCall(function() { fig = LetsPlot.buildPlotFromProcessedSpecs(plotSpec, containerDiv, sizing); });
+           fig = LetsPlot.buildPlotFromProcessedSpecs(plotSpec, containerDiv, sizing);
        } else {
            fig.updateView({});
        }
@@ -1320,6 +1311,8 @@ i_a(t)\)</span>. Two appliances sharing a window rarely agree on both of these a
    })();
    
    </script>
+   
+
 </div>
 </div>
 </div>
@@ -1330,7 +1323,14 @@ i_a(t)\)</span>. Two appliances sharing a window rarely agree on both of these a
 <div class="quarto-embed-nb-cell" data-notebook="/home/runner/work/ml-energy-disaggregation/ml-energy-disaggregation/book/02-disaggregation/03-multi-appliance-recognition-code.ipynb" data-notebook-title="Multi-Appliance Recognition from High-Frequency Signals" data-notebook-cellid="9b041a3f">
 <div id="9b041a3f" class="cell">
 <div class="cell-output cell-output-display">
-   <div id="yml0Kb"></div>
+
+   
+       <meta charset="UTF-8">
+       <style> html, body { margin: 0; padding: 0; } </style>
+       <script type="text/javascript" data-lets-plot-script="library" src="https://cdn.jsdelivr.net/gh/JetBrains/lets-plot@v4.11.0/js-package/distr/lets-plot.min.js"></script>
+   
+   
+          <div id="8IVRYs"></div>
    <script type="text/javascript" data-lets-plot-script="plot">
    
    (function() {
@@ -1355,7 +1355,7 @@ i_a(t)\)</span>. Two appliances sharing a window rarely agree on both of these a
        };
    }
    
-   const containerDiv = document.getElementById("yml0Kb");
+   const containerDiv = document.getElementById("8IVRYs");
    let fig = null;
    
    function renderPlot() {
@@ -1363,7 +1363,7 @@ i_a(t)\)</span>. Two appliances sharing a window rarely agree on both of these a
            const plotSpec = {
 "data":{
 "representation":["V-I image","Activation current","Decomposed current","Decomposed distance"],
-"f1_macro":[65.7,62.7,79.7,77.9]
+"f1_macro":[51.3,62.7,79.7,77.9]
 },
 "mapping":{
 "x":"representation",
@@ -1547,7 +1547,7 @@ i_a(t)\)</span>. Two appliances sharing a window rarely agree on both of these a
 "metainfo_list":[],
 "spec_id":"4"
 };
-           window.letsPlotCall(function() { fig = LetsPlot.buildPlotFromProcessedSpecs(plotSpec, containerDiv, sizing); });
+           fig = LetsPlot.buildPlotFromProcessedSpecs(plotSpec, containerDiv, sizing);
        } else {
            fig.updateView({});
        }
@@ -1588,6 +1588,8 @@ i_a(t)\)</span>. Two appliances sharing a window rarely agree on both of these a
    })();
    
    </script>
+   
+
 </div>
 </div>
 </div>
@@ -1622,7 +1624,14 @@ b_m)\)</span>, off and on. The softmax probability of “on” is</p>
 <div class="quarto-embed-nb-cell" data-notebook="/home/runner/work/ml-energy-disaggregation/ml-energy-disaggregation/book/02-disaggregation/03-multi-appliance-recognition-code.ipynb" data-notebook-title="Multi-Appliance Recognition from High-Frequency Signals" data-notebook-cellid="3026a340">
 <div id="3026a340" class="cell">
 <div class="cell-output cell-output-display">
-   <div id="TvAd3v"></div>
+
+   
+       <meta charset="UTF-8">
+       <style> html, body { margin: 0; padding: 0; } </style>
+       <script type="text/javascript" data-lets-plot-script="library" src="https://cdn.jsdelivr.net/gh/JetBrains/lets-plot@v4.11.0/js-package/distr/lets-plot.min.js"></script>
+   
+   
+          <div id="aM0igi"></div>
    <script type="text/javascript" data-lets-plot-script="plot">
    
    (function() {
@@ -1647,7 +1656,7 @@ b_m)\)</span>, off and on. The softmax probability of “on” is</p>
        };
    }
    
-   const containerDiv = document.getElementById("TvAd3v");
+   const containerDiv = document.getElementById("aM0igi");
    let fig = null;
    
    function renderPlot() {
@@ -1655,7 +1664,7 @@ b_m)\)</span>, off and on. The softmax probability of “on” is</p>
            const plotSpec = {
 "data":{
 "appliance":["AC","CFL","CoffeeMaker","Fan","Fridge","FridgeDefroster","HairIron","ILB","LaptopCharger","SolderingIron","Vacuum","Waterkettle","AC","CFL","CoffeeMaker","Fan","Fridge","FridgeDefroster","HairIron","ILB","LaptopCharger","SolderingIron","Vacuum","Waterkettle"],
-"f1":[56.52173913043478,64.0,0.0,51.85185185185185,85.71428571428571,89.79591836734694,96.0,64.7887323943662,69.6969696969697,56.666666666666664,100.0,53.48837209302325,71.42857142857143,91.80327868852459,19.51219512195122,87.87878787878788,88.88888888888889,98.0392156862745,94.44444444444444,71.7948717948718,76.47058823529412,65.625,100.0,69.44444444444444],
+"f1":[0.0,58.333333333333336,0.0,51.85185185185185,88.88888888888889,93.61702127659575,88.23529411764706,0.0,68.75,28.000000000000004,98.7012987012987,39.34426229508197,71.42857142857143,91.80327868852459,19.51219512195122,87.87878787878788,88.88888888888889,98.0392156862745,94.44444444444444,71.7948717948718,76.47058823529412,65.625,100.0,69.44444444444444],
 "representation":["V-I image","V-I image","V-I image","V-I image","V-I image","V-I image","V-I image","V-I image","V-I image","V-I image","V-I image","V-I image","Decomposed distance","Decomposed distance","Decomposed distance","Decomposed distance","Decomposed distance","Decomposed distance","Decomposed distance","Decomposed distance","Decomposed distance","Decomposed distance","Decomposed distance","Decomposed distance"]
 },
 "mapping":{
@@ -1666,7 +1675,7 @@ b_m)\)</span>, off and on. The softmax probability of “on” is</p>
 "data_meta":{
 "series_annotations":[{
 "type":"str",
-"factor_levels":["CoffeeMaker","Fan","Waterkettle","AC","SolderingIron","CFL","ILB","LaptopCharger","Fridge","FridgeDefroster","HairIron","Vacuum"],
+"factor_levels":["AC","CoffeeMaker","ILB","SolderingIron","Waterkettle","Fan","CFL","LaptopCharger","HairIron","Fridge","FridgeDefroster","Vacuum"],
 "column":"appliance"
 },{
 "type":"float",
@@ -1821,7 +1830,7 @@ b_m)\)</span>, off and on. The softmax probability of “on” is</p>
 "data_meta":{
 "series_annotations":[{
 "column":"appliance",
-"factor_levels":["CoffeeMaker","Fan","Waterkettle","AC","SolderingIron","CFL","ILB","LaptopCharger","Fridge","FridgeDefroster","HairIron","Vacuum"]
+"factor_levels":["AC","CoffeeMaker","ILB","SolderingIron","Waterkettle","Fan","CFL","LaptopCharger","HairIron","Fridge","FridgeDefroster","Vacuum"]
 }]
 },
 "data":{
@@ -1830,7 +1839,7 @@ b_m)\)</span>, off and on. The softmax probability of “on” is</p>
 "metainfo_list":[],
 "spec_id":"5"
 };
-           window.letsPlotCall(function() { fig = LetsPlot.buildPlotFromProcessedSpecs(plotSpec, containerDiv, sizing); });
+           fig = LetsPlot.buildPlotFromProcessedSpecs(plotSpec, containerDiv, sizing);
        } else {
            fig.updateView({});
        }
@@ -1871,6 +1880,8 @@ b_m)\)</span>, off and on. The softmax probability of “on” is</p>
    })();
    
    </script>
+   
+
 </div>
 </div>
 </div>
@@ -1882,7 +1893,14 @@ b_m)\)</span>, off and on. The softmax probability of “on” is</p>
 <div class="quarto-embed-nb-cell" data-notebook="/home/runner/work/ml-energy-disaggregation/ml-energy-disaggregation/book/02-disaggregation/03-multi-appliance-recognition-code.ipynb" data-notebook-title="Multi-Appliance Recognition from High-Frequency Signals" data-notebook-cellid="4ce06fa9">
 <div id="4ce06fa9" class="cell">
 <div class="cell-output cell-output-display">
-   <div id="1lq3tZ"></div>
+
+   
+       <meta charset="UTF-8">
+       <style> html, body { margin: 0; padding: 0; } </style>
+       <script type="text/javascript" data-lets-plot-script="library" src="https://cdn.jsdelivr.net/gh/JetBrains/lets-plot@v4.11.0/js-package/distr/lets-plot.min.js"></script>
+   
+   
+          <div id="5SJ3ck"></div>
    <script type="text/javascript" data-lets-plot-script="plot">
    
    (function() {
@@ -1907,7 +1925,7 @@ b_m)\)</span>, off and on. The softmax probability of “on” is</p>
        };
    }
    
-   const containerDiv = document.getElementById("1lq3tZ");
+   const containerDiv = document.getElementById("5SJ3ck");
    let fig = null;
    
    function renderPlot() {
@@ -2066,7 +2084,7 @@ b_m)\)</span>, off and on. The softmax probability of “on” is</p>
 "column":"non_active_share"
 },{
 "type":"str",
-"factor_levels":["CoffeeMaker","Fan","Waterkettle","AC","SolderingIron","CFL","ILB","LaptopCharger","Fridge","FridgeDefroster","HairIron","Vacuum"],
+"factor_levels":["AC","CoffeeMaker","ILB","SolderingIron","Waterkettle","Fan","CFL","LaptopCharger","HairIron","Fridge","FridgeDefroster","Vacuum"],
 "column":"appliance"
 }]
 },
@@ -2077,8 +2095,8 @@ b_m)\)</span>, off and on. The softmax probability of “on” is</p>
 },{
 "geom":"point",
 "data":{
-"appliance":["CoffeeMaker","Fan","Waterkettle","AC","SolderingIron","CFL","ILB","LaptopCharger","Fridge","FridgeDefroster","HairIron","Vacuum"],
-"non_active_share":[9.02419796083073,21.792353584880892,8.821406156972584,10.758001625394716,7.971268645549098,86.13718638333233,14.129827193027685,92.52593082861202,33.24622258858117,46.40114380358922,42.16405331928546,15.455633902315407]
+"appliance":["AC","CoffeeMaker","ILB","SolderingIron","Waterkettle","Fan","CFL","LaptopCharger","HairIron","Fridge","FridgeDefroster","Vacuum"],
+"non_active_share":[10.758001625394716,9.02419796083073,14.129827193027685,7.971268645549098,8.821406156972584,21.792353584880892,86.13718638333233,92.52593082861202,42.16405331928546,33.24622258858117,46.40114380358922,15.455633902315407]
 },
 "mapping":{
 "x":"appliance",
@@ -2090,7 +2108,7 @@ b_m)\)</span>, off and on. The softmax probability of “on” is</p>
 "column":"non_active_share"
 },{
 "type":"str",
-"factor_levels":["CoffeeMaker","Fan","Waterkettle","AC","SolderingIron","CFL","ILB","LaptopCharger","Fridge","FridgeDefroster","HairIron","Vacuum"],
+"factor_levels":["AC","CoffeeMaker","ILB","SolderingIron","Waterkettle","Fan","CFL","LaptopCharger","HairIron","Fridge","FridgeDefroster","Vacuum"],
 "column":"appliance"
 }]
 },
@@ -2101,7 +2119,7 @@ b_m)\)</span>, off and on. The softmax probability of “on” is</p>
 "metainfo_list":[],
 "spec_id":"6"
 };
-           window.letsPlotCall(function() { fig = LetsPlot.buildPlotFromProcessedSpecs(plotSpec, containerDiv, sizing); });
+           fig = LetsPlot.buildPlotFromProcessedSpecs(plotSpec, containerDiv, sizing);
        } else {
            fig.updateView({});
        }
@@ -2142,6 +2160,8 @@ b_m)\)</span>, off and on. The softmax probability of “on” is</p>
    })();
    
    </script>
+   
+
 </div>
 </div>
 </div>
@@ -2153,7 +2173,14 @@ b_m)\)</span>, off and on. The softmax probability of “on” is</p>
 <div class="quarto-embed-nb-cell" data-notebook="/home/runner/work/ml-energy-disaggregation/ml-energy-disaggregation/book/02-disaggregation/03-multi-appliance-recognition-code.ipynb" data-notebook-title="Multi-Appliance Recognition from High-Frequency Signals" data-notebook-cellid="c469b850">
 <div id="c469b850" class="cell">
 <div class="cell-output cell-output-display">
-   <div id="7bEosm"></div>
+
+   
+       <meta charset="UTF-8">
+       <style> html, body { margin: 0; padding: 0; } </style>
+       <script type="text/javascript" data-lets-plot-script="library" src="https://cdn.jsdelivr.net/gh/JetBrains/lets-plot@v4.11.0/js-package/distr/lets-plot.min.js"></script>
+   
+   
+          <div id="H1iC1L"></div>
    <script type="text/javascript" data-lets-plot-script="plot">
    
    (function() {
@@ -2178,7 +2205,7 @@ b_m)\)</span>, off and on. The softmax probability of “on” is</p>
        };
    }
    
-   const containerDiv = document.getElementById("7bEosm");
+   const containerDiv = document.getElementById("H1iC1L");
    let fig = null;
    
    function renderPlot() {
@@ -2366,7 +2393,7 @@ b_m)\)</span>, off and on. The softmax probability of “on” is</p>
 "metainfo_list":[],
 "spec_id":"7"
 };
-           window.letsPlotCall(function() { fig = LetsPlot.buildPlotFromProcessedSpecs(plotSpec, containerDiv, sizing); });
+           fig = LetsPlot.buildPlotFromProcessedSpecs(plotSpec, containerDiv, sizing);
        } else {
            fig.updateView({});
        }
@@ -2407,6 +2434,8 @@ b_m)\)</span>, off and on. The softmax probability of “on” is</p>
    })();
    
    </script>
+   
+
 </div>
 </div>
 </div>
@@ -2885,5 +2914,4 @@ b_m)\)</span>, off and on. The softmax probability of “on” is</p>
 
 
 
-<script src="../../site_libs/quarto-html/zenscroll-min.js"></script>
 </body></html>

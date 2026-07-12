@@ -133,7 +133,6 @@ div.csl-indent {
     "search-label": "Search"
   }
 }</script>
-<style>html{ scroll-behavior: smooth; }</style>
 <script src="https://cdn.jsdelivr.net/npm/requirejs@2.3.6/require.min.js" integrity="sha384-c9c+LnTbwQ3aujuU7ULEPVvgLs+Fn6fJUvIGTsuu1ZcCf11fiEubah0ttpca4ntM sha384-6V1/AdqZRWk1KAlWbKBlGhN7VG4iE/yAZcO6NZPMF8od0vukrvr0tg4qY6NSrItx" crossorigin="anonymous"></script>
 
 <script type="application/javascript">define('jquery', [],function() {return window.jQuery;})</script>
@@ -448,6 +447,11 @@ div.csl-indent {
   <a href="../../book/04-grid-edge/05-ranking-recommendation.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">Chapter 5: Ranking and Recommendation under DER</span></a>
   </div>
 </li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../book/04-grid-edge/06-anomaly-detection.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">Chapter 6: Anomaly Detection Beyond the Meter</span></a>
+  </div>
+</li>
       </ul>
   </li>
         <li class="sidebar-item">
@@ -553,40 +557,13 @@ pv_data:   (365, 48) (days, half-hours), one normalised profile per day</code></
 <div id="275ebe42" class="cell">
 <div class="cell-output cell-output-display">
 
-        <div id="bjVsNY"></div>
-        <script type="text/javascript" data-lets-plot-script="library">
-            if(!window.letsPlotCallQueue) {
-                window.letsPlotCallQueue = [];
-            };
-            window.letsPlotCall = function(f) {
-                window.letsPlotCallQueue.push(f);
-            };
-            (function() {
-                var script = document.createElement("script");
-                script.type = "text/javascript";
-                script.src = "https://cdn.jsdelivr.net/gh/JetBrains/lets-plot@v4.11.0/js-package/distr/lets-plot.min.js";
-                script.onload = function() {
-                    window.letsPlotCall = function(f) {f();};
-                    window.letsPlotCallQueue.forEach(function(f) {f();});
-                    window.letsPlotCallQueue = [];
-                    
-                };
-                script.onerror = function(event) {
-                    window.letsPlotCall = function(f) {};    // noop
-                    window.letsPlotCallQueue = [];
-                    var div = document.createElement("div");
-                    div.style.color = 'darkred';
-                    div.textContent = 'Error loading Lets-Plot JS';
-                    document.getElementById("bjVsNY").appendChild(div);
-                };
-                var e = document.getElementById("bjVsNY");
-                e.appendChild(script);
-            })()
-        </script>
-        
-</div>
-<div class="cell-output cell-output-display">
-   <div id="MWTGKt"></div>
+   
+       <meta charset="UTF-8">
+       <style> html, body { margin: 0; padding: 0; } </style>
+       <script type="text/javascript" data-lets-plot-script="library" src="https://cdn.jsdelivr.net/gh/JetBrains/lets-plot@v4.11.0/js-package/distr/lets-plot.min.js"></script>
+   
+   
+          <div id="Pu7JHk"></div>
    <script type="text/javascript" data-lets-plot-script="plot">
    
    (function() {
@@ -611,7 +588,7 @@ pv_data:   (365, 48) (days, half-hours), one normalised profile per day</code></
        };
    }
    
-   const containerDiv = document.getElementById("MWTGKt");
+   const containerDiv = document.getElementById("Pu7JHk");
    let fig = null;
    
    function renderPlot() {
@@ -782,7 +759,7 @@ pv_data:   (365, 48) (days, half-hours), one normalised profile per day</code></
 "metainfo_list":[],
 "spec_id":"1"
 };
-           window.letsPlotCall(function() { fig = LetsPlot.buildPlotFromProcessedSpecs(plotSpec, containerDiv, sizing); });
+           fig = LetsPlot.buildPlotFromProcessedSpecs(plotSpec, containerDiv, sizing);
        } else {
            fig.updateView({});
        }
@@ -823,6 +800,8 @@ pv_data:   (365, 48) (days, half-hours), one normalised profile per day</code></
    })();
    
    </script>
+   
+
 </div>
 </div>
 </div>
@@ -830,7 +809,14 @@ pv_data:   (365, 48) (days, half-hours), one normalised profile per day</code></
 <div class="quarto-embed-nb-cell" data-notebook="/home/runner/work/ml-energy-disaggregation/ml-energy-disaggregation/book/04-grid-edge/02-timeseries-der-modeling-code.ipynb" data-notebook-title="Time-Series Simulation and DER Modeling" data-notebook-cellid="819de22b">
 <div id="819de22b" class="cell">
 <div class="cell-output cell-output-display">
-   <div id="MnS1mL"></div>
+
+   
+       <meta charset="UTF-8">
+       <style> html, body { margin: 0; padding: 0; } </style>
+       <script type="text/javascript" data-lets-plot-script="library" src="https://cdn.jsdelivr.net/gh/JetBrains/lets-plot@v4.11.0/js-package/distr/lets-plot.min.js"></script>
+   
+   
+          <div id="kzKPPX"></div>
    <script type="text/javascript" data-lets-plot-script="plot">
    
    (function() {
@@ -855,7 +841,7 @@ pv_data:   (365, 48) (days, half-hours), one normalised profile per day</code></
        };
    }
    
-   const containerDiv = document.getElementById("MnS1mL");
+   const containerDiv = document.getElementById("kzKPPX");
    let fig = null;
    
    function renderPlot() {
@@ -1026,7 +1012,7 @@ pv_data:   (365, 48) (days, half-hours), one normalised profile per day</code></
 "metainfo_list":[],
 "spec_id":"2"
 };
-           window.letsPlotCall(function() { fig = LetsPlot.buildPlotFromProcessedSpecs(plotSpec, containerDiv, sizing); });
+           fig = LetsPlot.buildPlotFromProcessedSpecs(plotSpec, containerDiv, sizing);
        } else {
            fig.updateView({});
        }
@@ -1067,6 +1053,8 @@ pv_data:   (365, 48) (days, half-hours), one normalised profile per day</code></
    })();
    
    </script>
+   
+
 </div>
 </div>
 </div>
@@ -1109,40 +1097,13 @@ Largest gap, real data vs. the LoadShape's own pmult:   0.000000 kW</code></pre>
 <div id="62cef641" class="cell">
 <div class="cell-output cell-output-display">
 
-        <div id="eBqw3E"></div>
-        <script type="text/javascript" data-lets-plot-script="library">
-            if(!window.letsPlotCallQueue) {
-                window.letsPlotCallQueue = [];
-            };
-            window.letsPlotCall = function(f) {
-                window.letsPlotCallQueue.push(f);
-            };
-            (function() {
-                var script = document.createElement("script");
-                script.type = "text/javascript";
-                script.src = "https://cdn.jsdelivr.net/gh/JetBrains/lets-plot@v4.11.0/js-package/distr/lets-plot.min.js";
-                script.onload = function() {
-                    window.letsPlotCall = function(f) {f();};
-                    window.letsPlotCallQueue.forEach(function(f) {f();});
-                    window.letsPlotCallQueue = [];
-                    
-                };
-                script.onerror = function(event) {
-                    window.letsPlotCall = function(f) {};    // noop
-                    window.letsPlotCallQueue = [];
-                    var div = document.createElement("div");
-                    div.style.color = 'darkred';
-                    div.textContent = 'Error loading Lets-Plot JS';
-                    document.getElementById("eBqw3E").appendChild(div);
-                };
-                var e = document.getElementById("eBqw3E");
-                e.appendChild(script);
-            })()
-        </script>
-        
-</div>
-<div class="cell-output cell-output-display">
-   <div id="iGn48p"></div>
+   
+       <meta charset="UTF-8">
+       <style> html, body { margin: 0; padding: 0; } </style>
+       <script type="text/javascript" data-lets-plot-script="library" src="https://cdn.jsdelivr.net/gh/JetBrains/lets-plot@v4.11.0/js-package/distr/lets-plot.min.js"></script>
+   
+   
+          <div id="L91MKV"></div>
    <script type="text/javascript" data-lets-plot-script="plot">
    
    (function() {
@@ -1167,7 +1128,7 @@ Largest gap, real data vs. the LoadShape's own pmult:   0.000000 kW</code></pre>
        };
    }
    
-   const containerDiv = document.getElementById("iGn48p");
+   const containerDiv = document.getElementById("L91MKV");
    let fig = null;
    
    function renderPlot() {
@@ -1339,7 +1300,7 @@ Largest gap, real data vs. the LoadShape's own pmult:   0.000000 kW</code></pre>
 "metainfo_list":[],
 "spec_id":"3"
 };
-           window.letsPlotCall(function() { fig = LetsPlot.buildPlotFromProcessedSpecs(plotSpec, containerDiv, sizing); });
+           fig = LetsPlot.buildPlotFromProcessedSpecs(plotSpec, containerDiv, sizing);
        } else {
            fig.updateView({});
        }
@@ -1380,6 +1341,8 @@ Largest gap, real data vs. the LoadShape's own pmult:   0.000000 kW</code></pre>
    })();
    
    </script>
+   
+
 </div>
 </div>
 </div>
@@ -1387,7 +1350,14 @@ Largest gap, real data vs. the LoadShape's own pmult:   0.000000 kW</code></pre>
 <div class="quarto-embed-nb-cell" data-notebook="/home/runner/work/ml-energy-disaggregation/ml-energy-disaggregation/book/04-grid-edge/02-timeseries-der-modeling-code.ipynb" data-notebook-title="Time-Series Simulation and DER Modeling" data-notebook-cellid="433f63b5">
 <div id="433f63b5" class="cell">
 <div class="cell-output cell-output-display">
-   <div id="pKwT2j"></div>
+
+   
+       <meta charset="UTF-8">
+       <style> html, body { margin: 0; padding: 0; } </style>
+       <script type="text/javascript" data-lets-plot-script="library" src="https://cdn.jsdelivr.net/gh/JetBrains/lets-plot@v4.11.0/js-package/distr/lets-plot.min.js"></script>
+   
+   
+          <div id="UbEJzL"></div>
    <script type="text/javascript" data-lets-plot-script="plot">
    
    (function() {
@@ -1412,7 +1382,7 @@ Largest gap, real data vs. the LoadShape's own pmult:   0.000000 kW</code></pre>
        };
    }
    
-   const containerDiv = document.getElementById("pKwT2j");
+   const containerDiv = document.getElementById("UbEJzL");
    let fig = null;
    
    function renderPlot() {
@@ -1608,7 +1578,7 @@ Largest gap, real data vs. the LoadShape's own pmult:   0.000000 kW</code></pre>
 "metainfo_list":[],
 "spec_id":"4"
 };
-           window.letsPlotCall(function() { fig = LetsPlot.buildPlotFromProcessedSpecs(plotSpec, containerDiv, sizing); });
+           fig = LetsPlot.buildPlotFromProcessedSpecs(plotSpec, containerDiv, sizing);
        } else {
            fig.updateView({});
        }
@@ -1649,6 +1619,8 @@ Largest gap, real data vs. the LoadShape's own pmult:   0.000000 kW</code></pre>
    })();
    
    </script>
+   
+
 </div>
 </div>
 </div>
@@ -1670,7 +1642,14 @@ Largest gap, real data vs. the LoadShape's own pmult:   0.000000 kW</code></pre>
 <div class="quarto-embed-nb-cell" data-notebook="/home/runner/work/ml-energy-disaggregation/ml-energy-disaggregation/book/04-grid-edge/02-timeseries-der-modeling-code.ipynb" data-notebook-title="Time-Series Simulation and DER Modeling" data-notebook-cellid="03f0facc">
 <div id="03f0facc" class="cell">
 <div class="cell-output cell-output-display">
-   <div id="KUTKQy"></div>
+
+   
+       <meta charset="UTF-8">
+       <style> html, body { margin: 0; padding: 0; } </style>
+       <script type="text/javascript" data-lets-plot-script="library" src="https://cdn.jsdelivr.net/gh/JetBrains/lets-plot@v4.11.0/js-package/distr/lets-plot.min.js"></script>
+   
+   
+          <div id="6JEzHE"></div>
    <script type="text/javascript" data-lets-plot-script="plot">
    
    (function() {
@@ -1695,7 +1674,7 @@ Largest gap, real data vs. the LoadShape's own pmult:   0.000000 kW</code></pre>
        };
    }
    
-   const containerDiv = document.getElementById("KUTKQy");
+   const containerDiv = document.getElementById("6JEzHE");
    let fig = null;
    
    function renderPlot() {
@@ -1867,7 +1846,7 @@ Largest gap, real data vs. the LoadShape's own pmult:   0.000000 kW</code></pre>
 "metainfo_list":[],
 "spec_id":"5"
 };
-           window.letsPlotCall(function() { fig = LetsPlot.buildPlotFromProcessedSpecs(plotSpec, containerDiv, sizing); });
+           fig = LetsPlot.buildPlotFromProcessedSpecs(plotSpec, containerDiv, sizing);
        } else {
            fig.updateView({});
        }
@@ -1908,6 +1887,8 @@ Largest gap, real data vs. the LoadShape's own pmult:   0.000000 kW</code></pre>
    })();
    
    </script>
+   
+
 </div>
 </div>
 </div>
@@ -1936,7 +1917,14 @@ Name: vmax_pu, dtype: float64</code></pre>
 <div class="quarto-embed-nb-cell" data-notebook="/home/runner/work/ml-energy-disaggregation/ml-energy-disaggregation/book/04-grid-edge/02-timeseries-der-modeling-code.ipynb" data-notebook-title="Time-Series Simulation and DER Modeling" data-notebook-cellid="41594543">
 <div id="41594543" class="cell">
 <div class="cell-output cell-output-display">
-   <div id="MhIgKN"></div>
+
+   
+       <meta charset="UTF-8">
+       <style> html, body { margin: 0; padding: 0; } </style>
+       <script type="text/javascript" data-lets-plot-script="library" src="https://cdn.jsdelivr.net/gh/JetBrains/lets-plot@v4.11.0/js-package/distr/lets-plot.min.js"></script>
+   
+   
+          <div id="DQ1kmb"></div>
    <script type="text/javascript" data-lets-plot-script="plot">
    
    (function() {
@@ -1961,7 +1949,7 @@ Name: vmax_pu, dtype: float64</code></pre>
        };
    }
    
-   const containerDiv = document.getElementById("MhIgKN");
+   const containerDiv = document.getElementById("DQ1kmb");
    let fig = null;
    
    function renderPlot() {
@@ -2246,7 +2234,7 @@ Name: vmax_pu, dtype: float64</code></pre>
 "metainfo_list":[],
 "spec_id":"6"
 };
-           window.letsPlotCall(function() { fig = LetsPlot.buildPlotFromProcessedSpecs(plotSpec, containerDiv, sizing); });
+           fig = LetsPlot.buildPlotFromProcessedSpecs(plotSpec, containerDiv, sizing);
        } else {
            fig.updateView({});
        }
@@ -2287,6 +2275,8 @@ Name: vmax_pu, dtype: float64</code></pre>
    })();
    
    </script>
+   
+
 </div>
 </div>
 </div>
@@ -2295,7 +2285,14 @@ Name: vmax_pu, dtype: float64</code></pre>
 <div class="quarto-embed-nb-cell" data-notebook="/home/runner/work/ml-energy-disaggregation/ml-energy-disaggregation/book/04-grid-edge/02-timeseries-der-modeling-code.ipynb" data-notebook-title="Time-Series Simulation and DER Modeling" data-notebook-cellid="a969e4c3">
 <div id="a969e4c3" class="cell">
 <div class="cell-output cell-output-display">
-   <div id="or8EcR"></div>
+
+   
+       <meta charset="UTF-8">
+       <style> html, body { margin: 0; padding: 0; } </style>
+       <script type="text/javascript" data-lets-plot-script="library" src="https://cdn.jsdelivr.net/gh/JetBrains/lets-plot@v4.11.0/js-package/distr/lets-plot.min.js"></script>
+   
+   
+          <div id="uEyDlF"></div>
    <script type="text/javascript" data-lets-plot-script="plot">
    
    (function() {
@@ -2320,7 +2317,7 @@ Name: vmax_pu, dtype: float64</code></pre>
        };
    }
    
-   const containerDiv = document.getElementById("or8EcR");
+   const containerDiv = document.getElementById("uEyDlF");
    let fig = null;
    
    function renderPlot() {
@@ -2507,7 +2504,7 @@ Name: vmax_pu, dtype: float64</code></pre>
 "metainfo_list":[],
 "spec_id":"7"
 };
-           window.letsPlotCall(function() { fig = LetsPlot.buildPlotFromProcessedSpecs(plotSpec, containerDiv, sizing); });
+           fig = LetsPlot.buildPlotFromProcessedSpecs(plotSpec, containerDiv, sizing);
        } else {
            fig.updateView({});
        }
@@ -2548,6 +2545,8 @@ Name: vmax_pu, dtype: float64</code></pre>
    })();
    
    </script>
+   
+
 </div>
 </div>
 </div>
@@ -2597,7 +2596,14 @@ Name: vmax_pu, dtype: float64</code></pre>
 <div class="quarto-embed-nb-cell" data-notebook="/home/runner/work/ml-energy-disaggregation/ml-energy-disaggregation/book/04-grid-edge/02-timeseries-der-modeling-code.ipynb" data-notebook-title="Time-Series Simulation and DER Modeling" data-notebook-cellid="1974e966">
 <div id="1974e966" class="cell">
 <div class="cell-output cell-output-display">
-   <div id="yyIQQq"></div>
+
+   
+       <meta charset="UTF-8">
+       <style> html, body { margin: 0; padding: 0; } </style>
+       <script type="text/javascript" data-lets-plot-script="library" src="https://cdn.jsdelivr.net/gh/JetBrains/lets-plot@v4.11.0/js-package/distr/lets-plot.min.js"></script>
+   
+   
+          <div id="gIHYqf"></div>
    <script type="text/javascript" data-lets-plot-script="plot">
    
    (function() {
@@ -2622,7 +2628,7 @@ Name: vmax_pu, dtype: float64</code></pre>
        };
    }
    
-   const containerDiv = document.getElementById("yyIQQq");
+   const containerDiv = document.getElementById("gIHYqf");
    let fig = null;
    
    function renderPlot() {
@@ -2808,7 +2814,7 @@ Name: vmax_pu, dtype: float64</code></pre>
 "metainfo_list":[],
 "spec_id":"8"
 };
-           window.letsPlotCall(function() { fig = LetsPlot.buildPlotFromProcessedSpecs(plotSpec, containerDiv, sizing); });
+           fig = LetsPlot.buildPlotFromProcessedSpecs(plotSpec, containerDiv, sizing);
        } else {
            fig.updateView({});
        }
@@ -2849,6 +2855,8 @@ Name: vmax_pu, dtype: float64</code></pre>
    })();
    
    </script>
+   
+
 </div>
 </div>
 </div>
@@ -2857,7 +2865,14 @@ Name: vmax_pu, dtype: float64</code></pre>
 <div class="quarto-embed-nb-cell" data-notebook="/home/runner/work/ml-energy-disaggregation/ml-energy-disaggregation/book/04-grid-edge/02-timeseries-der-modeling-code.ipynb" data-notebook-title="Time-Series Simulation and DER Modeling" data-notebook-cellid="db07dd81">
 <div id="db07dd81" class="cell">
 <div class="cell-output cell-output-display">
-   <div id="ajjVbY"></div>
+
+   
+       <meta charset="UTF-8">
+       <style> html, body { margin: 0; padding: 0; } </style>
+       <script type="text/javascript" data-lets-plot-script="library" src="https://cdn.jsdelivr.net/gh/JetBrains/lets-plot@v4.11.0/js-package/distr/lets-plot.min.js"></script>
+   
+   
+          <div id="eZJtuP"></div>
    <script type="text/javascript" data-lets-plot-script="plot">
    
    (function() {
@@ -2882,7 +2897,7 @@ Name: vmax_pu, dtype: float64</code></pre>
        };
    }
    
-   const containerDiv = document.getElementById("ajjVbY");
+   const containerDiv = document.getElementById("eZJtuP");
    let fig = null;
    
    function renderPlot() {
@@ -3115,7 +3130,7 @@ Name: vmax_pu, dtype: float64</code></pre>
 "metainfo_list":[],
 "spec_id":"9"
 };
-           window.letsPlotCall(function() { fig = LetsPlot.buildPlotFromProcessedSpecs(plotSpec, containerDiv, sizing); });
+           fig = LetsPlot.buildPlotFromProcessedSpecs(plotSpec, containerDiv, sizing);
        } else {
            fig.updateView({});
        }
@@ -3156,6 +3171,8 @@ Name: vmax_pu, dtype: float64</code></pre>
    })();
    
    </script>
+   
+
 </div>
 </div>
 </div>
@@ -3199,7 +3216,14 @@ Downsampled to 48 half-hour points; peak 1.49 kW/EV at hour 21:00</code></pre>
 <div class="quarto-embed-nb-cell" data-notebook="/home/runner/work/ml-energy-disaggregation/ml-energy-disaggregation/book/04-grid-edge/02-timeseries-der-modeling-code.ipynb" data-notebook-title="Time-Series Simulation and DER Modeling" data-notebook-cellid="43ca733d">
 <div id="43ca733d" class="cell">
 <div class="cell-output cell-output-display">
-   <div id="oFY4zE"></div>
+
+   
+       <meta charset="UTF-8">
+       <style> html, body { margin: 0; padding: 0; } </style>
+       <script type="text/javascript" data-lets-plot-script="library" src="https://cdn.jsdelivr.net/gh/JetBrains/lets-plot@v4.11.0/js-package/distr/lets-plot.min.js"></script>
+   
+   
+          <div id="6B9W9c"></div>
    <script type="text/javascript" data-lets-plot-script="plot">
    
    (function() {
@@ -3224,7 +3248,7 @@ Downsampled to 48 half-hour points; peak 1.49 kW/EV at hour 21:00</code></pre>
        };
    }
    
-   const containerDiv = document.getElementById("oFY4zE");
+   const containerDiv = document.getElementById("6B9W9c");
    let fig = null;
    
    function renderPlot() {
@@ -3389,7 +3413,7 @@ Downsampled to 48 half-hour points; peak 1.49 kW/EV at hour 21:00</code></pre>
 "metainfo_list":[],
 "spec_id":"10"
 };
-           window.letsPlotCall(function() { fig = LetsPlot.buildPlotFromProcessedSpecs(plotSpec, containerDiv, sizing); });
+           fig = LetsPlot.buildPlotFromProcessedSpecs(plotSpec, containerDiv, sizing);
        } else {
            fig.updateView({});
        }
@@ -3430,6 +3454,8 @@ Downsampled to 48 half-hour points; peak 1.49 kW/EV at hour 21:00</code></pre>
    })();
    
    </script>
+   
+
 </div>
 </div>
 </div>
@@ -3519,7 +3545,14 @@ Downsampled to 48 half-hour points; peak 1.49 kW/EV at hour 21:00</code></pre>
 <div class="quarto-embed-nb-cell" data-notebook="/home/runner/work/ml-energy-disaggregation/ml-energy-disaggregation/book/04-grid-edge/02-timeseries-der-modeling-code.ipynb" data-notebook-title="Time-Series Simulation and DER Modeling" data-notebook-cellid="58f85f4a">
 <div id="58f85f4a" class="cell">
 <div class="cell-output cell-output-display">
-   <div id="MJma5p"></div>
+
+   
+       <meta charset="UTF-8">
+       <style> html, body { margin: 0; padding: 0; } </style>
+       <script type="text/javascript" data-lets-plot-script="library" src="https://cdn.jsdelivr.net/gh/JetBrains/lets-plot@v4.11.0/js-package/distr/lets-plot.min.js"></script>
+   
+   
+          <div id="aE0j2O"></div>
    <script type="text/javascript" data-lets-plot-script="plot">
    
    (function() {
@@ -3544,7 +3577,7 @@ Downsampled to 48 half-hour points; peak 1.49 kW/EV at hour 21:00</code></pre>
        };
    }
    
-   const containerDiv = document.getElementById("MJma5p");
+   const containerDiv = document.getElementById("aE0j2O");
    let fig = null;
    
    function renderPlot() {
@@ -3734,7 +3767,7 @@ Downsampled to 48 half-hour points; peak 1.49 kW/EV at hour 21:00</code></pre>
 "metainfo_list":[],
 "spec_id":"11"
 };
-           window.letsPlotCall(function() { fig = LetsPlot.buildPlotFromProcessedSpecs(plotSpec, containerDiv, sizing); });
+           fig = LetsPlot.buildPlotFromProcessedSpecs(plotSpec, containerDiv, sizing);
        } else {
            fig.updateView({});
        }
@@ -3775,13 +3808,22 @@ Downsampled to 48 half-hour points; peak 1.49 kW/EV at hour 21:00</code></pre>
    })();
    
    </script>
+   
+
 </div>
 </div>
 </div>
 <div class="quarto-embed-nb-cell" data-notebook="/home/runner/work/ml-energy-disaggregation/ml-energy-disaggregation/book/04-grid-edge/02-timeseries-der-modeling-code.ipynb" data-notebook-title="Time-Series Simulation and DER Modeling" data-notebook-cellid="351248ed">
 <div id="351248ed" class="cell">
 <div class="cell-output cell-output-display">
-   <div id="93rjZ7"></div>
+
+   
+       <meta charset="UTF-8">
+       <style> html, body { margin: 0; padding: 0; } </style>
+       <script type="text/javascript" data-lets-plot-script="library" src="https://cdn.jsdelivr.net/gh/JetBrains/lets-plot@v4.11.0/js-package/distr/lets-plot.min.js"></script>
+   
+   
+          <div id="5D4HuK"></div>
    <script type="text/javascript" data-lets-plot-script="plot">
    
    (function() {
@@ -3806,7 +3848,7 @@ Downsampled to 48 half-hour points; peak 1.49 kW/EV at hour 21:00</code></pre>
        };
    }
    
-   const containerDiv = document.getElementById("93rjZ7");
+   const containerDiv = document.getElementById("5D4HuK");
    let fig = null;
    
    function renderPlot() {
@@ -3996,7 +4038,7 @@ Downsampled to 48 half-hour points; peak 1.49 kW/EV at hour 21:00</code></pre>
 "metainfo_list":[],
 "spec_id":"12"
 };
-           window.letsPlotCall(function() { fig = LetsPlot.buildPlotFromProcessedSpecs(plotSpec, containerDiv, sizing); });
+           fig = LetsPlot.buildPlotFromProcessedSpecs(plotSpec, containerDiv, sizing);
        } else {
            fig.updateView({});
        }
@@ -4037,6 +4079,8 @@ Downsampled to 48 half-hour points; peak 1.49 kW/EV at hour 21:00</code></pre>
    })();
    
    </script>
+   
+
 </div>
 </div>
 </div>
@@ -4045,7 +4089,14 @@ Downsampled to 48 half-hour points; peak 1.49 kW/EV at hour 21:00</code></pre>
 <div class="quarto-embed-nb-cell" data-notebook="/home/runner/work/ml-energy-disaggregation/ml-energy-disaggregation/book/04-grid-edge/02-timeseries-der-modeling-code.ipynb" data-notebook-title="Time-Series Simulation and DER Modeling" data-notebook-cellid="2bee3243">
 <div id="2bee3243" class="cell">
 <div class="cell-output cell-output-display">
-   <div id="WztWML"></div>
+
+   
+       <meta charset="UTF-8">
+       <style> html, body { margin: 0; padding: 0; } </style>
+       <script type="text/javascript" data-lets-plot-script="library" src="https://cdn.jsdelivr.net/gh/JetBrains/lets-plot@v4.11.0/js-package/distr/lets-plot.min.js"></script>
+   
+   
+          <div id="5dzHig"></div>
    <script type="text/javascript" data-lets-plot-script="plot">
    
    (function() {
@@ -4070,7 +4121,7 @@ Downsampled to 48 half-hour points; peak 1.49 kW/EV at hour 21:00</code></pre>
        };
    }
    
-   const containerDiv = document.getElementById("WztWML");
+   const containerDiv = document.getElementById("5dzHig");
    let fig = null;
    
    function renderPlot() {
@@ -4260,7 +4311,7 @@ Downsampled to 48 half-hour points; peak 1.49 kW/EV at hour 21:00</code></pre>
 "metainfo_list":[],
 "spec_id":"13"
 };
-           window.letsPlotCall(function() { fig = LetsPlot.buildPlotFromProcessedSpecs(plotSpec, containerDiv, sizing); });
+           fig = LetsPlot.buildPlotFromProcessedSpecs(plotSpec, containerDiv, sizing);
        } else {
            fig.updateView({});
        }
@@ -4301,13 +4352,22 @@ Downsampled to 48 half-hour points; peak 1.49 kW/EV at hour 21:00</code></pre>
    })();
    
    </script>
+   
+
 </div>
 </div>
 </div>
 <div class="quarto-embed-nb-cell" data-notebook="/home/runner/work/ml-energy-disaggregation/ml-energy-disaggregation/book/04-grid-edge/02-timeseries-der-modeling-code.ipynb" data-notebook-title="Time-Series Simulation and DER Modeling" data-notebook-cellid="48c02a7b">
 <div id="48c02a7b" class="cell">
 <div class="cell-output cell-output-display">
-   <div id="Hna7Ua"></div>
+
+   
+       <meta charset="UTF-8">
+       <style> html, body { margin: 0; padding: 0; } </style>
+       <script type="text/javascript" data-lets-plot-script="library" src="https://cdn.jsdelivr.net/gh/JetBrains/lets-plot@v4.11.0/js-package/distr/lets-plot.min.js"></script>
+   
+   
+          <div id="ArjdLM"></div>
    <script type="text/javascript" data-lets-plot-script="plot">
    
    (function() {
@@ -4332,7 +4392,7 @@ Downsampled to 48 half-hour points; peak 1.49 kW/EV at hour 21:00</code></pre>
        };
    }
    
-   const containerDiv = document.getElementById("Hna7Ua");
+   const containerDiv = document.getElementById("ArjdLM");
    let fig = null;
    
    function renderPlot() {
@@ -4522,7 +4582,7 @@ Downsampled to 48 half-hour points; peak 1.49 kW/EV at hour 21:00</code></pre>
 "metainfo_list":[],
 "spec_id":"14"
 };
-           window.letsPlotCall(function() { fig = LetsPlot.buildPlotFromProcessedSpecs(plotSpec, containerDiv, sizing); });
+           fig = LetsPlot.buildPlotFromProcessedSpecs(plotSpec, containerDiv, sizing);
        } else {
            fig.updateView({});
        }
@@ -4563,6 +4623,8 @@ Downsampled to 48 half-hour points; peak 1.49 kW/EV at hour 21:00</code></pre>
    })();
    
    </script>
+   
+
 </div>
 </div>
 </div>
@@ -4710,7 +4772,14 @@ Name: utilization_pct, dtype: float64</code></pre>
 <div class="quarto-embed-nb-cell" data-notebook="/home/runner/work/ml-energy-disaggregation/ml-energy-disaggregation/book/04-grid-edge/02-timeseries-der-modeling-code.ipynb" data-notebook-title="Time-Series Simulation and DER Modeling" data-notebook-cellid="1d326184">
 <div id="1d326184" class="cell">
 <div class="cell-output cell-output-display">
-   <div id="PVCH1s"></div>
+
+   
+       <meta charset="UTF-8">
+       <style> html, body { margin: 0; padding: 0; } </style>
+       <script type="text/javascript" data-lets-plot-script="library" src="https://cdn.jsdelivr.net/gh/JetBrains/lets-plot@v4.11.0/js-package/distr/lets-plot.min.js"></script>
+   
+   
+          <div id="NotCJ0"></div>
    <script type="text/javascript" data-lets-plot-script="plot">
    
    (function() {
@@ -4735,7 +4804,7 @@ Name: utilization_pct, dtype: float64</code></pre>
        };
    }
    
-   const containerDiv = document.getElementById("PVCH1s");
+   const containerDiv = document.getElementById("NotCJ0");
    let fig = null;
    
    function renderPlot() {
@@ -4968,7 +5037,7 @@ Name: utilization_pct, dtype: float64</code></pre>
 "metainfo_list":[],
 "spec_id":"15"
 };
-           window.letsPlotCall(function() { fig = LetsPlot.buildPlotFromProcessedSpecs(plotSpec, containerDiv, sizing); });
+           fig = LetsPlot.buildPlotFromProcessedSpecs(plotSpec, containerDiv, sizing);
        } else {
            fig.updateView({});
        }
@@ -5009,6 +5078,8 @@ Name: utilization_pct, dtype: float64</code></pre>
    })();
    
    </script>
+   
+
 </div>
 </div>
 </div>
@@ -5485,5 +5556,4 @@ Name: utilization_pct, dtype: float64</code></pre>
 
 
 
-<script src="../../site_libs/quarto-html/zenscroll-min.js"></script>
 </body></html>

@@ -98,7 +98,6 @@ div.csl-indent {
     "search-label": "Search"
   }
 }</script>
-<style>html{ scroll-behavior: smooth; }</style>
 <script src="https://cdn.jsdelivr.net/npm/requirejs@2.3.6/require.min.js" integrity="sha384-c9c+LnTbwQ3aujuU7ULEPVvgLs+Fn6fJUvIGTsuu1ZcCf11fiEubah0ttpca4ntM sha384-6V1/AdqZRWk1KAlWbKBlGhN7VG4iE/yAZcO6NZPMF8od0vukrvr0tg4qY6NSrItx" crossorigin="anonymous"></script>
 
 <script type="application/javascript">define('jquery', [],function() {return window.jQuery;})</script>
@@ -442,6 +441,11 @@ window.Quarto = {
   <a href="../../book/04-grid-edge/05-ranking-recommendation.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">Chapter 5: Ranking and Recommendation under DER</span></a>
   </div>
 </li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../book/04-grid-edge/06-anomaly-detection.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">Chapter 6: Anomaly Detection Beyond the Meter</span></a>
+  </div>
+</li>
       </ul>
   </li>
         <li class="sidebar-item">
@@ -508,48 +512,17 @@ x_t = \sum_{k=1}^{M} y^{(k)}_t \cdot s^{(k)}_t + \sigma_t
 <p>where <span class="math inline">\(\sigma_t\)</span> absorbs measurement noise and anything not accounted for. Nobody observes <span class="math inline">\(y^{(k)}_t\)</span> or <span class="math inline">\(s^{(k)}_t\)</span> directly. Recovering them from <span class="math inline">\(x_t\)</span> alone is the entire problem <span class="citation" data-cites="hart1992nonintrusive">[2]</span>.</p>
 </div>
 <p>Run the cell below and the problem stops being abstract. It builds one day of a synthetic household: a roughly constant baseline load from lights and standby devices, a fridge cycling on and off every half hour or so, and a kettle spiking twice a day. The aggregate line at the top is all a real smart meter would ever report. The other three are exactly what disaggregation has to recover, and they are already invisible once summed.</p>
-<div class="quarto-embed-nb-cell" data-notebook="/home/runner/work/ml-energy-disaggregation/ml-energy-disaggregation/book/02-disaggregation/01-what-is-nilm-code.ipynb" data-notebook-cellid="9f310435">
-<div id="9f310435" class="cell">
-<div class="cell-output cell-output-display">
-
-        <div id="WkqSSq"></div>
-        <script type="text/javascript" data-lets-plot-script="library">
-            if(!window.letsPlotCallQueue) {
-                window.letsPlotCallQueue = [];
-            };
-            window.letsPlotCall = function(f) {
-                window.letsPlotCallQueue.push(f);
-            };
-            (function() {
-                var script = document.createElement("script");
-                script.type = "text/javascript";
-                script.src = "https://cdn.jsdelivr.net/gh/JetBrains/lets-plot@v4.11.0/js-package/distr/lets-plot.min.js";
-                script.onload = function() {
-                    window.letsPlotCall = function(f) {f();};
-                    window.letsPlotCallQueue.forEach(function(f) {f();});
-                    window.letsPlotCallQueue = [];
-                    
-                };
-                script.onerror = function(event) {
-                    window.letsPlotCall = function(f) {};    // noop
-                    window.letsPlotCallQueue = [];
-                    var div = document.createElement("div");
-                    div.style.color = 'darkred';
-                    div.textContent = 'Error loading Lets-Plot JS';
-                    document.getElementById("WkqSSq").appendChild(div);
-                };
-                var e = document.getElementById("WkqSSq");
-                e.appendChild(script);
-            })()
-        </script>
-        
-</div>
-</div>
-</div>
 <div class="quarto-embed-nb-cell" data-notebook="/home/runner/work/ml-energy-disaggregation/ml-energy-disaggregation/book/02-disaggregation/01-what-is-nilm-code.ipynb" data-notebook-cellid="75244935">
 <div id="75244935" class="cell">
 <div class="cell-output cell-output-display">
-   <div id="gMAbHj"></div>
+
+   
+       <meta charset="UTF-8">
+       <style> html, body { margin: 0; padding: 0; } </style>
+       <script type="text/javascript" data-lets-plot-script="library" src="https://cdn.jsdelivr.net/gh/JetBrains/lets-plot@v4.11.0/js-package/distr/lets-plot.min.js"></script>
+   
+   
+          <div id="ejELL9"></div>
    <script type="text/javascript" data-lets-plot-script="plot">
    
    (function() {
@@ -574,7 +547,7 @@ x_t = \sum_{k=1}^{M} y^{(k)}_t \cdot s^{(k)}_t + \sigma_t
        };
    }
    
-   const containerDiv = document.getElementById("gMAbHj");
+   const containerDiv = document.getElementById("ejELL9");
    let fig = null;
    
    function renderPlot() {
@@ -744,7 +717,7 @@ x_t = \sum_{k=1}^{M} y^{(k)}_t \cdot s^{(k)}_t + \sigma_t
 "metainfo_list":[],
 "spec_id":"1"
 };
-           window.letsPlotCall(function() { fig = LetsPlot.buildPlotFromProcessedSpecs(plotSpec, containerDiv, sizing); });
+           fig = LetsPlot.buildPlotFromProcessedSpecs(plotSpec, containerDiv, sizing);
        } else {
            fig.updateView({});
        }
@@ -785,6 +758,8 @@ x_t = \sum_{k=1}^{M} y^{(k)}_t \cdot s^{(k)}_t + \sigma_t
    })();
    
    </script>
+   
+
 </div>
 </div>
 </div>
@@ -1414,5 +1389,4 @@ Figure&nbsp;4.3: The same aggregate signal, two different learning setups. Singl
 
 
 
-<script src="../../site_libs/quarto-html/zenscroll-min.js"></script>
 </body></html>
