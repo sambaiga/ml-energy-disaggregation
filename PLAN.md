@@ -441,19 +441,21 @@ planned until Part 3 ships a real forecast to design against.
    list, and section-by-section design in the approved plan this session
    produced (superseding the paragraph this replaces).
 
-   **Feature representation, worth testing as a follow-up, not yet
-   built**: Section 1's own shape/rolling-stat/{{< acr FFT >}} features are
-   a low-frequency (30-minute AMI) representation, chosen for a low-
-   frequency signal, the same discipline that made Part 2's own high-
-   frequency WRG/AWRG distance-matrix representation (Chapter 2, real
-   PLAID/LILAC current/voltage data, `resources/nilm-code/AWRGNILM`'s
+   **Feature representation, tried and dropped, a real, checked
+   answer**: Section 1's own shape/rolling-stat/{{< acr FFT >}} features
+   are a low-frequency (30-minute AMI) representation, chosen for a
+   low-frequency signal, the same discipline that made Part 2's own
+   high-frequency WRG/AWRG distance-matrix representation (Chapter 2,
+   real PLAID/LILAC current/voltage data, `resources/nilm-code/AWRGNILM`'s
    `get_distance_measure()`/`get_img_from_VI()`) the right choice there.
-   Worth checking directly, not assumed either way, whether a WRG-style
-   distance-matrix embedding of a customer's own rolling window adds real
-   detection signal beyond the current shape/FFT features on this book's
-   own AMI-rate data, or whether it is a high-frequency-specific technique
-   that does not transfer, before adding it as a fourth Section-1 feature
-   option.
+   Built and checked directly rather than assumed: a WRG-style
+   distance-matrix embedding of a customer's own rolling window trailed
+   the existing shape/FFT features on this book's own AMI-rate data, both
+   on recall and on threshold-independent AUC-ROC, while taking
+   meaningfully longer to compute, a real complexity-versus-benefit
+   question answered rather than deferred. Confirms the same lesson Part
+   2 taught for a different signal does not transfer automatically to a
+   different frequency; not added to the shipped chapter.
 
    **Root-cause explanation, built this session, a real and honestly mixed
    finding**: SHAP's `TreeExplainer` on the ensemble's own `isolation_forest`
