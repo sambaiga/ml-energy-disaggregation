@@ -42,7 +42,6 @@ kettle spiking twice a day. The aggregate line at the top is all a real smart
 meter would ever report. The other three are exactly what disaggregation has
 to recover, and they are already invisible once summed.
 
-{{< embed 01-what-is-nilm-code.ipynb#9f310435 >}}
 {{< embed 01-what-is-nilm-code.ipynb#75244935 >}}
 
 Notice how the fridge and the baseline load barely show up once the kettle's

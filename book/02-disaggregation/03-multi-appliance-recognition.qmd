@@ -61,7 +61,6 @@ happens once "the current" might be more than one appliance's signature
 added together. The plot below is a real PLAID event with two appliances
 already active in the same window.
 
-{{< embed 03-multi-appliance-recognition-code.ipynb#adaae1bd >}}
 {{< embed 03-multi-appliance-recognition-code.ipynb#de62bc1a >}}
 
 Training the same small CNN on both representations, on a real, multi-label
