@@ -37,6 +37,7 @@ dependencies = [
 modelling = [
     "xgboost>=3.1.1",
     "lightgbm>=4.6.0",
+    "shap>=0.46.0",
     "optuna>=4.5.0",
     "optuna-integration>=4.5.0",
     "torch>=2.0.0",
