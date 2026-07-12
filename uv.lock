@@ -334,6 +334,7 @@ grid = [
 ]
 modelling = [
     { name = "iterative-stratification" },
+    { name = "lightgbm" },
     { name = "optuna" },
     { name = "optuna-integration" },
     { name = "pytorch-lightning" },
@@ -356,6 +357,7 @@ requires-dist = [
     { name = "joblib", specifier = ">=1.3.0" },
     { name = "jupyter", marker = "extra == 'dev'" },
     { name = "lets-plot", specifier = ">=4.11.0" },
+    { name = "lightgbm", marker = "extra == 'modelling'", specifier = ">=4.6.0" },
     { name = "loguru", specifier = ">=0.7.0" },
     { name = "matplotlib", specifier = ">=3.0.0" },
     { name = "mypy", marker = "extra == 'dev'", specifier = ">=1.13.0" },
