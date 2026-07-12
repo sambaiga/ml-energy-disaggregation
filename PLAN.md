@@ -482,8 +482,10 @@ planned until Part 3 ships a real forecast to design against.
    a row, a real, checkable "is this getting worse" signal a DSO can act
    on differently than a single flagged day.
 
-   **DER event/behavior-based anomaly, a genuinely different framing, worth
-   a dedicated build, not a bolt-on**: every detector in this chapter, per-
+   **DER event/behavior-based anomaly, a genuinely different framing,
+   worth its own follow-up notebook, planned and executed with the same
+   care as this chapter rather than bolted onto it**: every detector in
+   this chapter, per-
    customer and topology-aware alike, asks whether a *signal value*
    (voltage, current, power magnitude) looks unusual. A real, different
    question: is a customer's own *DER behavior*, when they export, how
