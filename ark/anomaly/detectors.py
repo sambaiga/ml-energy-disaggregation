@@ -140,8 +140,26 @@ def fit_ensemble_bounds(reference_scores: list[np.ndarray]) -> list[tuple[float,
     return [(float(s.min()), float(s.max())) for s in reference_scores]
 
 
+def _rescale(scores: list[np.ndarray], bounds: list[tuple[float, float]]) -> np.ndarray:
+    """Stack several score arrays into one `(n_query, n_detectors)` matrix, each column rescaled to `[0, 1]`."""
+    rescaled = []
+    for s, (lo, hi) in zip(scores, bounds, strict=True):
+        rescaled.append((s - lo) / (hi - lo) if hi > lo else np.zeros_like(s))
+    return np.column_stack(rescaled)
+
+
 def ensemble_score(scores: list[np.ndarray], bounds: list[tuple[float, float]]) -> np.ndarray:
     """Combine several anomaly scores into one, each rescaled to `[0, 1]` by fixed, pre-fit bounds.
+
+    The "average" combination strategy (Aggarwal & Sathe, 2015, "Theoretical
+    Foundations and Algorithms for Outlier Ensembles"), the same one
+    `combo.models.score_comb.average` implements. Reimplemented directly
+    here rather than pulling in `combo`/`pyod`: both packages declare each
+    other as a hard dependency (`combo` requires `pyod`, confirmed directly
+    against `combo`'s own package metadata), dragging in `numba`,
+    `llvmlite`, and `matplotlib` for what the source of each combination
+    function turns out to be a single-line `numpy` reduction, the same
+    "earn its complexity" bar ECOD was held to above.
 
     Args:
         scores: Same-length score arrays, one per detector, higher meaning
@@ -154,7 +172,73 @@ def ensemble_score(scores: list[np.ndarray], bounds: list[tuple[float, float]]) 
     Returns:
         The mean of the rescaled scores, one per query point.
     """
-    rescaled = []
-    for s, (lo, hi) in zip(scores, bounds, strict=True):
-        rescaled.append((s - lo) / (hi - lo) if hi > lo else np.zeros_like(s))
-    return np.mean(rescaled, axis=0)
+    return _rescale(scores, bounds).mean(axis=1)
+
+
+def ensemble_score_max(scores: list[np.ndarray], bounds: list[tuple[float, float]]) -> np.ndarray:
+    """Combine several anomaly scores by taking the maximum rescaled score, not the mean.
+
+    The "maximization" strategy: flags a point the moment any single
+    detector is confident, at the cost of amplifying whichever detector is
+    the noisiest. See `ensemble_score` for the rescaling convention.
+
+    Args:
+        scores: Same-length score arrays, one per detector.
+        bounds: `(min, max)` pairs from `fit_ensemble_bounds`, matching `scores`.
+
+    Returns:
+        The max of the rescaled scores, one per query point.
+    """
+    return _rescale(scores, bounds).max(axis=1)
+
+
+def ensemble_score_median(scores: list[np.ndarray], bounds: list[tuple[float, float]]) -> np.ndarray:
+    """Combine several anomaly scores by taking the median rescaled score.
+
+    More robust than the mean to one detector's own miscalibration pulling
+    the combined score off, at the cost of ignoring how extreme the other
+    detectors' scores are. See `ensemble_score` for the rescaling convention.
+
+    Args:
+        scores: Same-length score arrays, one per detector.
+        bounds: `(min, max)` pairs from `fit_ensemble_bounds`, matching `scores`.
+
+    Returns:
+        The median of the rescaled scores, one per query point.
+    """
+    return np.median(_rescale(scores, bounds), axis=1)
+
+
+def ensemble_score_aom(
+    scores: list[np.ndarray], bounds: list[tuple[float, float]], *, n_buckets: int = 2, random_state: int = 0
+) -> np.ndarray:
+    """Combine several anomaly scores via Average of Maximum (Aggarwal & Sathe, 2015).
+
+    Splits detectors into `n_buckets` random subgroups, takes the max
+    rescaled score within each subgroup, then averages across subgroups.
+    Matches `combo.models.score_comb.aom`'s own static-bucketing algorithm
+    exactly (shuffle detectors, split into equal-sized groups, max within,
+    mean across), reimplemented rather than imported for the same reason
+    given in `ensemble_score`'s own docstring. Intended to dampen the noise
+    of any one weak detector while still letting a confidently-anomalous
+    subgroup dominate, the combination Aggarwal & Sathe found most
+    consistently effective across their own benchmarks.
+
+    Args:
+        scores: Same-length score arrays, one per detector. `len(scores)`
+            must be evenly divisible by `n_buckets`.
+        bounds: `(min, max)` pairs from `fit_ensemble_bounds`, matching `scores`.
+        n_buckets: Number of subgroups to split detectors into.
+        random_state: Seed for the detector shuffle.
+
+    Returns:
+        The average-of-subgroup-maxima, one per query point.
+    """
+    rescaled = _rescale(scores, bounds)
+    n_detectors = rescaled.shape[1]
+    per_bucket = n_detectors // n_buckets
+    order = np.random.default_rng(random_state).permutation(n_detectors)
+    bucket_maxima = np.column_stack(
+        [rescaled[:, order[i : i + per_bucket]].max(axis=1) for i in range(0, n_detectors, per_bucket)]
+    )
+    return bucket_maxima.mean(axis=1)

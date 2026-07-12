@@ -4,6 +4,9 @@ import pytest
 from ark.anomaly.detectors import (
     ecod_score,
     ensemble_score,
+    ensemble_score_aom,
+    ensemble_score_max,
+    ensemble_score_median,
     fit_ensemble_bounds,
     isolation_forest_score,
     kde_score,
@@ -78,3 +81,50 @@ def test_fit_ensemble_bounds_then_ensemble_score_stays_consistent_across_batches
     combined = ensemble_score([later_batch], bounds)
 
     assert combined == pytest.approx([0.25, 1.0])
+
+
+def test_ensemble_score_max_takes_the_largest_rescaled_component():
+    a = np.array([0.0, 1.0])  # rescaled: [0.0, 1.0]
+    b = np.array([0.0, 0.5])  # rescaled: [0.0, 0.5]
+    bounds = fit_ensemble_bounds([a, b])
+
+    combined = ensemble_score_max([a, b], bounds)
+
+    assert combined == pytest.approx([0.0, 1.0])
+
+
+def test_ensemble_score_median_takes_the_middle_rescaled_component():
+    a = np.array([1.0])  # rescaled bounds fit on itself: 1.0
+    b = np.array([0.0])
+    c = np.array([0.5])
+    bounds = fit_ensemble_bounds([np.array([0.0, 1.0]), np.array([0.0, 1.0]), np.array([0.0, 1.0])])
+
+    combined = ensemble_score_median([a, b, c], bounds)
+
+    assert combined == pytest.approx([0.5])
+
+
+def test_ensemble_score_aom_sits_between_average_and_max():
+    rng = np.random.default_rng(0)
+    scores = [rng.normal(size=20) for _ in range(4)]
+    bounds = fit_ensemble_bounds(scores)
+
+    avg = ensemble_score(scores, bounds)
+    mx = ensemble_score_max(scores, bounds)
+    aom = ensemble_score_aom(scores, bounds, n_buckets=2, random_state=0)
+
+    assert np.all(aom >= avg - 1e-9)
+    assert np.all(aom <= mx + 1e-9)
+
+
+def test_ensemble_score_aom_matches_a_hand_computed_bucket_average():
+    # 4 detectors, 2 buckets: with a known shuffle order, AOM is just
+    # (max of bucket 1's rescaled scores + max of bucket 2's) / 2
+    scores = [np.array([0.0, v]) for v in [1.0, 2.0, 3.0, 4.0]]
+    bounds = fit_ensemble_bounds(scores)  # each component already spans its own [0, v] -> rescaled [0, 1]
+
+    aom = ensemble_score_aom(scores, bounds, n_buckets=2, random_state=0)
+
+    # every component rescales to [0.0, 1.0] identically, so regardless of
+    # which detectors land in which bucket, both bucket maxima are 1.0
+    assert aom == pytest.approx([0.0, 1.0])
