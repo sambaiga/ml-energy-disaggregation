@@ -1014,3 +1014,111 @@ def voltage_vs_thermal_position_diagram() -> plt.Figure:
     fig.tight_layout()
     plt.close(fig)
     return fig
+
+
+def _customer_row(ax: plt.Axes, y: float, n: int = 5) -> list[tuple[float, float]]:
+    """Five evenly-spaced house icons along one row, returns their positions."""
+    xs = np.linspace(0.6, 4.2, n)
+    positions = [(x, y) for x in xs]
+    for xy in positions:
+        ax.add_patch(Circle(xy, 0.22, facecolor=SUCCESS, edgecolor="white", linewidth=1.2, zorder=3))
+        ax.text(
+            *xy, ICONS["house-fill"], fontproperties=icon_font(13), color="white", ha="center", va="center", zorder=4
+        )
+    return positions
+
+
+def per_customer_vs_network_view_diagram() -> plt.Figure:
+    """Draw why per-customer detection cannot see a coincident event that a network view catches immediately.
+
+    Five real customers, the same real moment. Left: each customer's own
+    self-baseline detector only ever sees its own history, and a
+    regionally sunny day already sits inside that history, so nothing
+    looks wrong. Right: the same five customers share one real
+    transformer, and their real exports arrive at the same real moment;
+    summed, they cross a real physical limit no single customer's own
+    meter could ever reveal, the structural blind spot Section 2's own
+    Key Concept box states in words.
+
+    Returns:
+        The matplotlib Figure, ready to display in a notebook cell.
+    """
+    fig, axes = plt.subplots(1, 2, figsize=(10.6, 3.8))
+
+    ax = axes[0]
+    positions = _customer_row(ax, 1.1)
+    for xy in positions:
+        ax.text(xy[0], xy[1] - 0.42, "own history", fontsize=7, color=TEXT_MUTED, ha="center", style="italic")
+        ax.text(xy[0], xy[1] + 0.4, "✓", fontsize=13, color=SUCCESS, fontweight="bold", ha="center")
+    ax.set_title(
+        "Per-customer view: five isolated self-baselines",
+        fontsize=10.8,
+        color=PRIMARY,
+        fontweight="bold",
+        pad=14,
+    )
+    ax.text(
+        2.4,
+        -0.15,
+        "A regionally sunny day already sits inside each customer's own real history",
+        fontsize=8.2,
+        color=TEXT_MUTED,
+        ha="center",
+        style="italic",
+        wrap=True,
+    )
+    ax.set_xlim(-0.2, 5.0)
+    ax.set_ylim(-0.5, 2.0)
+    ax.set_aspect("equal")
+    ax.axis("off")
+
+    ax = axes[1]
+    transformer_xy = (2.4, 0.2)
+    positions = _customer_row(ax, 1.5)
+    ax.add_patch(Circle(transformer_xy, 0.24, facecolor=DANGER, edgecolor="white", linewidth=1.4, zorder=3))
+    ax.text(
+        *transformer_xy,
+        ICONS["hdd-network-fill"],
+        fontproperties=icon_font(16),
+        color="white",
+        ha="center",
+        va="center",
+        zorder=4,
+    )
+    for xy in positions:
+        ax.text(xy[0], xy[1] + 0.4, ICONS["sun-fill"], fontproperties=icon_font(11), color=WARNING, ha="center")
+        _curved_flow_arrow(ax, (xy[0], xy[1] - 0.22), (transformer_xy[0], transformer_xy[1] + 0.24), DANGER, rad=0.12)
+    ax.text(
+        transformer_xy[0],
+        transformer_xy[1] - 0.5,
+        "real overload",
+        fontsize=8.5,
+        color=DANGER,
+        fontweight="bold",
+        ha="center",
+    )
+    ax.set_title(
+        "Network view: the same real moment, summed",
+        fontsize=10.8,
+        color=PRIMARY,
+        fontweight="bold",
+        pad=14,
+    )
+    ax.text(
+        2.4,
+        -0.9,
+        "Five individually unremarkable exports, one real, physical overload",
+        fontsize=8.2,
+        color=TEXT_MUTED,
+        ha="center",
+        style="italic",
+        wrap=True,
+    )
+    ax.set_xlim(-0.2, 5.0)
+    ax.set_ylim(-1.2, 2.2)
+    ax.set_aspect("equal")
+    ax.axis("off")
+
+    fig.tight_layout()
+    plt.close(fig)
+    return fig
