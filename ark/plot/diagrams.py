@@ -921,3 +921,96 @@ def lever_applicability_diagram() -> plt.Figure:
     fig.tight_layout()
     plt.close(fig)
     return fig
+
+
+def _feeder_line_panel(ax: plt.Axes, title: str, subtitle: str) -> tuple[tuple[float, float], tuple[float, float]]:
+    """Draw a transformer and two customers at different distances along one feeder line.
+
+    Returns the (near, far) customer node positions so the caller can add
+    a panel-specific annotation on top of the shared schematic.
+    """
+    transformer_xy = (0.3, 0.5)
+    near_xy = (1.6, 0.5)
+    far_xy = (3.4, 0.5)
+
+    ax.plot([transformer_xy[0], far_xy[0]], [0.5, 0.5], color=TEXT_MUTED, linewidth=2.0, zorder=1)
+
+    ax.add_patch(Circle(transformer_xy, 0.22, facecolor=PRIMARY, edgecolor="white", linewidth=1.2, zorder=3))
+    ax.text(
+        *transformer_xy,
+        ICONS["hdd-network-fill"],
+        fontproperties=icon_font(15),
+        color="white",
+        ha="center",
+        va="center",
+        zorder=4,
+    )
+
+    for xy, label in [(near_xy, "Customer near"), (far_xy, "Customer far")]:
+        ax.add_patch(Circle(xy, 0.19, facecolor=SUCCESS, edgecolor="white", linewidth=1.2, zorder=3))
+        ax.text(
+            *xy, ICONS["house-fill"], fontproperties=icon_font(12), color="white", ha="center", va="center", zorder=4
+        )
+        ax.text(xy[0], xy[1] - 0.42, label, fontsize=8, color=TEXT_MUTED, ha="center")
+        ax.text(xy[0], xy[1] + 0.32, "same real shape", fontsize=7.5, color=TEXT_MUTED, ha="center", style="italic")
+
+    ax.set_title(title, fontsize=11.5, color=PRIMARY, fontweight="bold", pad=14)
+    ax.text(2.0, -0.35, subtitle, fontsize=8.5, color=TEXT_MUTED, ha="center", style="italic", wrap=True)
+    ax.set_xlim(-0.3, 4.0)
+    ax.set_ylim(-0.6, 1.9)
+    ax.set_aspect("equal")
+    ax.axis("off")
+    return near_xy, far_xy
+
+
+def voltage_vs_thermal_position_diagram() -> plt.Figure:
+    """Draw why bus position matters for voltage risk but barely matters for thermal risk.
+
+    Two customers share the exact same real smart-meter shape, only their
+    distance from the transformer differs. Voltage rise depends on how
+    much line impedance sits between a customer and the source, on top of
+    how much they draw or export, something a smart-meter reading alone
+    says nothing about, so the far customer sees a real, different
+    voltage outcome (left). Thermal loading at the transformer depends
+    only on how much power is flowing at its own peak moment, exactly
+    what a smart-meter reading already captures, so position adds nothing
+    once shape is known (right). The physical reason retrieval-from-shape
+    works for one risk and struggles for the other, the same distinction
+    the surrounding Key Concept box states in words.
+
+    Returns:
+        The matplotlib Figure, ready to display in a notebook cell.
+    """
+    fig, axes = plt.subplots(1, 2, figsize=(9.4, 3.6))
+
+    near_xy, far_xy = _feeder_line_panel(
+        axes[0],
+        "Voltage: depends on where you are",
+        "Impedance between customer and source adds up with distance",
+    )
+    ax = axes[0]
+    pu_y = near_xy[1] + 0.95
+    ax.text(near_xy[0], pu_y, "1.01 pu", fontsize=9, color=SUCCESS, fontweight="bold", ha="center")
+    ax.text(far_xy[0], pu_y, "0.96 pu", fontsize=9, color=DANGER, fontweight="bold", ha="center")
+    ax.annotate(
+        "",
+        xy=(far_xy[0], pu_y - 0.14),
+        xytext=(near_xy[0], pu_y - 0.14),
+        arrowprops={"arrowstyle": "-|>", "color": WARNING, "linewidth": 1.6},
+    )
+    ax.text(2.5, pu_y + 0.28, "voltage drifts with distance", fontsize=7.5, color=WARNING, ha="center", style="italic")
+
+    near_xy, far_xy = _feeder_line_panel(
+        axes[1],
+        "Thermal: depends on what you draw",
+        "Transformer loading sums instantaneous power, position is invisible to it",
+    )
+    ax = axes[1]
+    arrow_y = near_xy[1] + 0.85
+    for xy in (near_xy, far_xy):
+        _curved_flow_arrow(ax, (xy[0], arrow_y - 0.1), (0.3, arrow_y), INFO, rad=0.2)
+    ax.text(2.0, arrow_y + 0.28, "same contribution either way", fontsize=7.5, color=INFO, ha="center", style="italic")
+
+    fig.tight_layout()
+    plt.close(fig)
+    return fig

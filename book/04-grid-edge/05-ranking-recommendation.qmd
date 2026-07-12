@@ -190,6 +190,8 @@ assumed.
 
 :::
 
+![Two customers share the exact same real smart-meter shape, only their distance from the transformer differs. Voltage rise depends on line impedance between customer and source, so the far customer sees a real, different outcome. Thermal loading at the transformer only sums instantaneous power, so position adds nothing once shape is known.](../../assets/voltage-vs-thermal-position.svg){#fig-voltage-vs-thermal-position}
+
 ## Retrieval: predicting risk for a customer with no simulation of their own
 
 A new customer applying for a solar or {{< acr EV >}} connection has a
