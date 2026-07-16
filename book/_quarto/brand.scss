@@ -348,13 +348,29 @@ body:has(.cover-hero) #title-block-header {
   flex: 1 1 300px;
   max-width: 360px;
   display: flex;
+  flex-direction: column;
   align-items: center;
-  justify-content: center;
-  gap: 14px;
+  gap: 10px;
 
   @media (max-width: 640px) {
     display: none;
   }
+}
+
+.hero-visual-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+}
+
+.hero-visual-caption {
+  font-size: 0.68rem;
+  font-weight: 600;
+  font-style: italic;
+  color: #64748B;
+  text-align: center;
+  margin: 0 !important;
 }
 
 .signal-node {
@@ -403,7 +419,21 @@ body:has(.cover-hero) #title-block-header {
   margin-top: 6px;
 }
 
-// ── Cover pipeline strip: the book's 4 parts, shown not described ───────────
+// ── Cover pipeline strip: the book's 5 parts, shown not described ───────────
+
+.pipeline-flow-label {
+  text-align: center;
+  font-size: 0.68rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: #64748B;
+  margin: 22px 0 12px !important;
+  padding-top: 22px;
+  border-top: 1px solid rgba(255,255,255,0.08);
+  position: relative;
+  z-index: 1;
+}
 
 .pipeline-flow {
   display: flex;
@@ -411,8 +441,6 @@ body:has(.cover-hero) #title-block-header {
   justify-content: center;
   flex-wrap: wrap;
   gap: 10px 6px;
-  padding-top: 22px;
-  border-top: 1px solid rgba(255,255,255,0.08);
   position: relative;
   z-index: 1;
 }
@@ -422,6 +450,21 @@ body:has(.cover-hero) #title-block-header {
   flex-direction: row;
   align-items: center;
   gap: 10px;
+}
+
+// Parts 3-5 wrap their pipeline-step in a link. Pandoc's HTML-block parser
+// only recognizes block-level tags (div, p, ...) at the top of a raw HTML
+// line, not `a`, so a bare top-level `<a class="pipeline-step">` gets
+// swallowed into a stray paragraph instead of staying a flex sibling. The
+// outer div keeps this a block; the anchor just repeats the same flex row.
+.pipeline-step-link {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  text-decoration: none;
+  color: inherit;
+
+  &:hover .pipeline-label { color: #38BDF8; text-decoration: none; }
 }
 
 .pipeline-dot {
@@ -439,6 +482,7 @@ body:has(.cover-hero) #title-block-header {
   &.pipeline-dot-2 { background: #A78BFA; }
   &.pipeline-dot-3 { background: #34D399; }
   &.pipeline-dot-4 { background: #FBBF24; }
+  &.pipeline-dot-5 { background: #FB7185; }
 }
 
 .pipeline-label {
@@ -596,6 +640,7 @@ body:has(.cover-hero) #title-block-header {
   &.act-2 { background: #7C3AED; }
   &.act-3 { background: #059669; }
   &.act-4 { background: #D97706; }
+  &.act-5 { background: #E11D48; }
 }
 
 .act-inner {
@@ -615,6 +660,7 @@ body:has(.cover-hero) #title-block-header {
   &.act-icon-2 { color: #7C3AED; }
   &.act-icon-3 { color: #059669; }
   &.act-icon-4 { color: #D97706; }
+  &.act-icon-5 { color: #E11D48; }
 }
 
 .act-eyebrow {
@@ -695,6 +741,15 @@ body:has(.cover-hero) #title-block-header {
   padding: 1px 6px;
   border-radius: 99px;
   flex-shrink: 0;
+}
+
+.act-note {
+  font-size: 0.72rem;
+  font-style: italic;
+  color: #9CA3AF;
+  margin: 10px 0 0 !important;
+  text-align: left;
+  hyphens: none;
 }
 
 // ── About the Author page ────────────────────────────────────────────────────

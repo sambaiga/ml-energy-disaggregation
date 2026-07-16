@@ -2,7 +2,7 @@
 title: "Welcome"
 title-block-banner: false
 page-layout: article
-description: "A structured, project-based path through smart meter data: disaggregation, forecasting, anomaly detection, and grid-edge value, from raw signal to business insight."
+description: "A structured, project-based path through smart meter data: ML foundations, disaggregation, grid-edge value, and forecasting, from raw signal to business insight."
 ---
 
 <div class="cover-hero column-page">
@@ -10,7 +10,14 @@ description: "A structured, project-based path through smart meter data: disaggr
 <div class="cover-hero-text">
 <p class="cover-eyebrow">A practical book for energy analytics and ML practitioners</p>
 <h1>Machine Learning for Smart Meter Data</h1>
-<p>From raw meter signal to business decision: disaggregation, forecasting, and grid-edge value, built to be run, not just read.</p>
+<p>From raw meter signal to business decision, through the ML foundations, disaggregation, and grid-edge value that make the closing forecast worth trusting, built to be run, not just read.</p>
+
+<div class="cover-stat-row">
+<div class="cover-stat"><span class="stat-value">342</span><span class="stat-label">Real households</span></div>
+<div class="cover-stat"><span class="stat-value">16</span><span class="stat-label">Appliance types</span></div>
+<div class="cover-stat"><span class="stat-value">11</span><span class="stat-label">Chapters live</span></div>
+</div>
+
 <p class="cover-author">By <a href="https://sambaiga.github.io/" style="color:#38BDF8;font-weight:600">Anthony Faustine</a>&nbsp;&nbsp;<a href="https://github.com/sambaiga" title="GitHub" style="color:#94A3B8"><i class="bi bi-github"></i></a>&nbsp;<a href="https://www.linkedin.com/in/sambaiga" title="LinkedIn" style="color:#94A3B8"><i class="bi bi-linkedin"></i></a>&nbsp;<a href="mailto:sambaiga@gmail.com" title="Email" style="color:#94A3B8"><i class="bi bi-envelope-at"></i></a></p>
 
 <div class="cover-cta-row">
@@ -20,6 +27,7 @@ description: "A structured, project-based path through smart meter data: disaggr
 </div>
 
 <div class="cover-hero-visual" role="img" aria-label="A meter signal flows through data analytics and ML into business value">
+<div class="hero-visual-row">
 <div class="signal-node signal-node-meter">
 <span class="signal-icon"><i class="bi bi-speedometer2"></i></span>
 <span class="signal-node-label">Meter Signal</span>
@@ -35,28 +43,27 @@ description: "A structured, project-based path through smart meter data: disaggr
 <span class="signal-node-label">Business Value</span>
 </div>
 </div>
+<p class="hero-visual-caption">The arc every chapter follows</p>
+</div>
 </div>
 
+<p class="pipeline-flow-label">The book, in five parts</p>
 <div class="pipeline-flow">
 <div class="pipeline-step">
 <span class="pipeline-dot pipeline-dot-1"><i class="bi bi-activity"></i></span>
-<span class="pipeline-label">Meter Signal</span>
+<span class="pipeline-label">Signal Foundations</span>
 </div>
-<span class="pipeline-arrow">&#8594;</span>
-<a class="pipeline-step" href="book/02-disaggregation/01-what-is-nilm.qmd">
-<span class="pipeline-dot pipeline-dot-2"><i class="bi bi-plug-fill"></i></span>
-<span class="pipeline-label">Disaggregation</span>
-</a>
 <span class="pipeline-arrow">&#8594;</span>
 <div class="pipeline-step">
-<span class="pipeline-dot pipeline-dot-3"><i class="bi bi-graph-up-arrow"></i></span>
-<span class="pipeline-label">Forecasting</span>
+<span class="pipeline-dot pipeline-dot-2"><i class="bi bi-cpu-fill"></i></span>
+<span class="pipeline-label">ML Foundations</span>
 </div>
 <span class="pipeline-arrow">&#8594;</span>
-<a class="pipeline-step" href="book/04-grid-edge/01-opendss-lv-modeling.qmd">
-<span class="pipeline-dot pipeline-dot-4"><i class="bi bi-diagram-3-fill"></i></span>
-<span class="pipeline-label">Grid-Edge Value</span>
-</a>
+<div class="pipeline-step"><a class="pipeline-step-link" href="book/03-disaggregation/01-what-is-nilm.qmd"><span class="pipeline-dot pipeline-dot-3"><i class="bi bi-plug-fill"></i></span><span class="pipeline-label">Disaggregation</span></a></div>
+<span class="pipeline-arrow">&#8594;</span>
+<div class="pipeline-step"><a class="pipeline-step-link" href="book/04-grid-edge/01-opendss-lv-modeling.qmd"><span class="pipeline-dot pipeline-dot-4"><i class="bi bi-diagram-3-fill"></i></span><span class="pipeline-label">Grid-Edge Value</span></a></div>
+<span class="pipeline-arrow">&#8594;</span>
+<div class="pipeline-step"><a class="pipeline-step-link" href="book/05-forecasting/01-forecastability.qmd"><span class="pipeline-dot pipeline-dot-5"><i class="bi bi-graph-up-arrow"></i></span><span class="pipeline-label">Forecasting</span></a></div>
 </div>
 </div>
 
@@ -70,37 +77,39 @@ description: "A structured, project-based path through smart meter data: disaggr
 <div class="act-stripe act-1"></div>
 <div class="act-inner">
 <i class="bi bi-activity act-icon act-icon-1"></i>
-<span class="act-eyebrow">Part 1 · Foundations</span>
-<p class="act-desc">Smart meter data fundamentals, signal processing, and the data pipelines every later chapter builds on.</p>
+<span class="act-eyebrow">Part 1 · Signal Foundations</span>
+<p class="act-desc">Reading a meter signal, general event and change detection, and feature-engineering concepts every later part reuses.</p>
 <ul class="act-chapters">
 <li><span class="ch-row"><span class="ch-num">01</span><span class="ch-name">Reading a meter signal</span><span class="ch-soon">Soon</span></span></li>
 </ul>
+<p class="act-note">Chapters land after Part 5 ships.</p>
 </div>
 </div>
 
 <div class="act-card">
 <div class="act-stripe act-2"></div>
 <div class="act-inner">
-<i class="bi bi-plug-fill act-icon act-icon-2"></i>
-<span class="act-eyebrow">Part 2 · Disaggregation</span>
-<p class="act-desc">Non-intrusive load monitoring: from the aggregate signal to appliance-level insight.</p>
+<i class="bi bi-cpu-fill act-icon act-icon-2"></i>
+<span class="act-eyebrow">Part 2 · ML Foundations</span>
+<p class="act-desc">The mathematical and statistical theory behind every model this book uses as a tool: learning theory, optimization, tree ensembles, deep architectures, and the uncertainty-quantification foundations Part 5's own forecasts depend on.</p>
 <ul class="act-chapters">
-<li><a href="book/02-disaggregation/01-what-is-nilm.qmd"><span class="ch-num">01</span><span class="ch-name">Non-Intrusive Load Monitoring</span><i class="bi bi-check-circle-fill ch-check"></i></a></li>
-<li><a href="book/02-disaggregation/02-feature-engineering.qmd"><span class="ch-num">02</span><span class="ch-name">Appliance Recognition</span><i class="bi bi-check-circle-fill ch-check"></i></a></li>
-<li><a href="book/02-disaggregation/03-multi-appliance-recognition.qmd"><span class="ch-num">03</span><span class="ch-name">Multi-Appliance Recognition</span><i class="bi bi-check-circle-fill ch-check"></i></a></li>
-<li><a href="book/02-disaggregation/04-multi-task-low-frequency.qmd"><span class="ch-num">04</span><span class="ch-name">Multi-Task Deep Learning</span><i class="bi bi-check-circle-fill ch-check"></i></a></li>
+<li><span class="ch-row"><span class="ch-num">01</span><span class="ch-name">What is machine learning, precisely</span><span class="ch-soon">Soon</span></span></li>
 </ul>
+<p class="act-note">Chapters land after Part 5 ships.</p>
 </div>
 </div>
 
 <div class="act-card">
 <div class="act-stripe act-3"></div>
 <div class="act-inner">
-<i class="bi bi-graph-up-arrow act-icon act-icon-3"></i>
-<span class="act-eyebrow">Part 3 · Forecasting</span>
-<p class="act-desc">Probabilistic load and PV forecasting, built on Twiga: point forecasts and calibrated uncertainty.</p>
+<i class="bi bi-plug-fill act-icon act-icon-3"></i>
+<span class="act-eyebrow">Part 3 · Disaggregation</span>
+<p class="act-desc">Non-intrusive load monitoring: from the aggregate signal to appliance-level insight.</p>
 <ul class="act-chapters">
-<li><span class="ch-row"><span class="ch-num">03</span><span class="ch-name">Forecasting with uncertainty</span><span class="ch-soon">Soon</span></span></li>
+<li><a href="book/03-disaggregation/01-what-is-nilm.qmd"><span class="ch-num">01</span><span class="ch-name">Non-Intrusive Load Monitoring</span><i class="bi bi-check-circle-fill ch-check"></i></a></li>
+<li><a href="book/03-disaggregation/02-feature-engineering.qmd"><span class="ch-num">02</span><span class="ch-name">Appliance Recognition</span><i class="bi bi-check-circle-fill ch-check"></i></a></li>
+<li><a href="book/03-disaggregation/03-multi-appliance-recognition.qmd"><span class="ch-num">03</span><span class="ch-name">Multi-Appliance Recognition</span><i class="bi bi-check-circle-fill ch-check"></i></a></li>
+<li><a href="book/03-disaggregation/04-multi-task-low-frequency.qmd"><span class="ch-num">04</span><span class="ch-name">Multi-Task Deep Learning</span><i class="bi bi-check-circle-fill ch-check"></i></a></li>
 </ul>
 </div>
 </div>
@@ -110,20 +119,33 @@ description: "A structured, project-based path through smart meter data: disaggr
 <div class="act-inner">
 <i class="bi bi-diagram-3-fill act-icon act-icon-4"></i>
 <span class="act-eyebrow">Part 4 · Grid-Edge Value</span>
-<p class="act-desc">Phase detection, customer/feeder clustering, voltage-violation and power-quality anomaly detection, and grid health under forecasted DER growth, modeled with open-source power-flow simulation.</p>
+<p class="act-desc">Phase detection, customer/feeder clustering, voltage-violation and power-quality anomaly detection, and ranking and recommendation for LV management under DER, modeled with open-source power-flow simulation.</p>
 <ul class="act-chapters">
 <li><a href="book/04-grid-edge/01-opendss-lv-modeling.qmd"><span class="ch-num">01</span><span class="ch-name">Modeling the Low-Voltage Network</span><i class="bi bi-check-circle-fill ch-check"></i></a></li>
 <li><a href="book/04-grid-edge/02-timeseries-der-modeling.qmd"><span class="ch-num">02</span><span class="ch-name">Time-Series Simulation and DER Modeling</span><i class="bi bi-check-circle-fill ch-check"></i></a></li>
 <li><a href="book/04-grid-edge/03-phase-identification.qmd"><span class="ch-num">03</span><span class="ch-name">Phase Identification from Smart-Meter Data</span><i class="bi bi-check-circle-fill ch-check"></i></a></li>
 <li><a href="book/04-grid-edge/04-customer-feeder-clustering.qmd"><span class="ch-num">04</span><span class="ch-name">Customer and Feeder Clustering</span><i class="bi bi-check-circle-fill ch-check"></i></a></li>
 <li><a href="book/04-grid-edge/05-ranking-recommendation.qmd"><span class="ch-num">05</span><span class="ch-name">Ranking and Recommendation under DER</span><i class="bi bi-check-circle-fill ch-check"></i></a></li>
-<li><span class="ch-row"><span class="ch-num">06</span><span class="ch-name">Anomaly Detection Combining Smart-Meter Data and LV Topology</span><span class="ch-soon">Soon</span></span></li>
+<li><a href="book/04-grid-edge/06-anomaly-detection.qmd"><span class="ch-num">06</span><span class="ch-name">Anomaly Detection Combining Smart-Meter Data and LV Topology</span><i class="bi bi-check-circle-fill ch-check"></i></a></li>
+</ul>
+</div>
+</div>
+
+<div class="act-card">
+<div class="act-stripe act-5"></div>
+<div class="act-inner">
+<i class="bi bi-graph-up-arrow act-icon act-icon-5"></i>
+<span class="act-eyebrow">Part 5 · Forecasting</span>
+<p class="act-desc">Household-scale load, PV, and EV forecastability and uncertainty, built on Twiga. The book's closing part, feeding its own forecasts back into Part 4's LV network model.</p>
+<ul class="act-chapters">
+<li><a href="book/05-forecasting/01-forecastability.qmd"><span class="ch-num">01</span><span class="ch-name">Household Smart-Meter Forecastability</span><i class="bi bi-check-circle-fill ch-check"></i></a></li>
+<li><span class="ch-row"><span class="ch-num">02</span><span class="ch-name">Scaling with customer archetypes</span><span class="ch-soon">Soon</span></span></li>
 </ul>
 </div>
 </div>
 
 </div>
 
-<p style="color:#94A3B8;font-size:0.85rem;">Chapters are being written part by part. <a href="https://github.com/sambaiga/ml-energy-disaggregation" style="color:#64748B">Follow progress on GitHub</a>.</p>
+<p style="color:#94A3B8;font-size:0.85rem;">11 chapters shipped so far, each with a runnable notebook. <a href="https://github.com/sambaiga/ml-energy-disaggregation" style="color:#64748B">Follow progress on GitHub</a>.</p>
 
 </div>
