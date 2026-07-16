@@ -35,13 +35,13 @@ jobs:
         run: |
           # Notebooks skipped from CI execution (not ready, too slow, or
           # dependent on gitignored local data).
-          # book/02-disaggregation/02-feature-engineering-code.ipynb loads
+          # book/03-disaggregation/02-feature-engineering-code.ipynb loads
           # real PLAID/LILACD data from resources/nilm-code/AWRGNILM, the
           # author's own research code, gitignored and not available in CI.
-          # book/02-disaggregation/03-multi-appliance-recognition-code.ipynb
+          # book/03-disaggregation/03-multi-appliance-recognition-code.ipynb
           # loads real multi-label PLAID data from resources/nilm-code/MLCFCD,
           # same reason.
-          # book/02-disaggregation/04-multi-task-low-frequency-code.ipynb
+          # book/03-disaggregation/04-multi-task-low-frequency-code.ipynb
           # loads real UK-DALE data from resources/nilm-code/UNETNiLM, same
           # reason.
           # book/04-grid-edge/04-customer-feeder-clustering-code.ipynb's
@@ -58,7 +58,7 @@ jobs:
           # reads them directly without re-executing the notebook, so the
           # rendered book is unaffected; only this from-scratch CI
           # re-execution can't run them.
-          SKIP_LIST="book/02-disaggregation/02-feature-engineering-code.ipynb book/02-disaggregation/03-multi-appliance-recognition-code.ipynb book/02-disaggregation/04-multi-task-low-frequency-code.ipynb book/04-grid-edge/04-customer-feeder-clustering-code.ipynb book/04-grid-edge/05-ranking-recommendation-code.ipynb book/04-grid-edge/06-anomaly-detection-code.ipynb"
+          SKIP_LIST="book/03-disaggregation/02-feature-engineering-code.ipynb book/03-disaggregation/03-multi-appliance-recognition-code.ipynb book/03-disaggregation/04-multi-task-low-frequency-code.ipynb book/04-grid-edge/04-customer-feeder-clustering-code.ipynb book/04-grid-edge/05-ranking-recommendation-code.ipynb book/04-grid-edge/06-anomaly-detection-code.ipynb"
 
           # Helper: find all notebooks, excluding archived ones
           find_notebooks() {

@@ -1122,3 +1122,79 @@ def per_customer_vs_network_view_diagram() -> plt.Figure:
     fig.tight_layout()
     plt.close(fig)
     return fig
+
+
+def _persistent_signal(hours: np.ndarray, *, rng: np.random.Generator) -> np.ndarray:
+    """A clean, strongly repeating daily cycle plus a little real noise."""
+    daily = 0.5 + 0.45 * np.sin((hours - 6) / 24 * 2 * np.pi)
+    return daily + rng.normal(0, 0.03, size=hours.shape)
+
+
+def _volatile_signal(hours: np.ndarray, *, rng: np.random.Generator) -> np.ndarray:
+    """The same average level and daily cycle, buried under much larger real noise."""
+    daily = 0.5 + 0.15 * np.sin((hours - 6) / 24 * 2 * np.pi)
+    return daily + rng.normal(0, 0.22, size=hours.shape)
+
+
+def forecastability_diagram() -> plt.Figure:
+    """Draw the "some signals are just harder to forecast" contrast this chapter opens with.
+
+    Two signals share the same average level and the same underlying daily
+    cycle. The left one repeats cleanly, day after day, real noise but not
+    enough to hide the pattern: low entropy, a Hurst exponent above 0.5, the
+    persistent case a model can learn from directly. The right one carries
+    the same cycle under noise large enough to swamp it: high entropy, a
+    Hurst exponent near the random-walk boundary, the volatile case no
+    amount of modelling sophistication fixes on its own. This is the real
+    distinction every metric in this chapter measures from a different
+    angle, not a specific customer's own reading.
+
+    Returns:
+        The matplotlib Figure, ready to display in a notebook cell.
+    """
+    rng = np.random.default_rng(7)
+    hours = np.linspace(0, 24 * 3, 300)  # three real days
+
+    persistent = _persistent_signal(hours, rng=rng)
+    volatile = _volatile_signal(hours, rng=rng)
+
+    fig, axes = plt.subplots(1, 2, figsize=(9.0, 4.0), sharey=True)
+
+    ax = axes[0]
+    ax.plot(hours, persistent, color=SUCCESS, linewidth=1.6)
+    ax.set_title("Persistent: forecastable", fontsize=12, color=PRIMARY, fontweight="bold")
+    ax.text(
+        0.5,
+        -0.26,
+        "Low entropy, Hurst > 0.5\nyesterday predicts today",
+        transform=ax.transAxes,
+        ha="center",
+        fontsize=9,
+        color=SUCCESS,
+        fontweight="bold",
+    )
+
+    ax = axes[1]
+    ax.plot(hours, volatile, color=DANGER, linewidth=1.6)
+    ax.set_title("Volatile: hard to forecast", fontsize=12, color=PRIMARY, fontweight="bold")
+    ax.text(
+        0.5,
+        -0.26,
+        "High entropy, Hurst near 0.5\nthe same cycle, buried in noise",
+        transform=ax.transAxes,
+        ha="center",
+        fontsize=9,
+        color=DANGER,
+        fontweight="bold",
+    )
+
+    for ax in axes:
+        ax.set_xlabel("Hour (three real days)")
+        ax.set_xlim(hours.min(), hours.max())
+        ax.set_xticks([0, 24, 48, 72])
+        ax.spines[["top", "right"]].set_visible(False)
+    axes[0].set_ylabel("Load (normalized)")
+
+    fig.tight_layout()
+    plt.close(fig)
+    return fig

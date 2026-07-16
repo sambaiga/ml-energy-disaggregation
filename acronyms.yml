@@ -3,6 +3,20 @@ acronyms:
   keys:
     - shortname: NILM
       longname: Non-Intrusive Load Monitoring
+    - shortname: ANOVA
+      longname: Analysis of Variance
+    - shortname: ACF
+      longname: Autocorrelation Function
+    - shortname: PACF
+      longname: Partial Autocorrelation Function
+    - shortname: ADF
+      longname: Augmented Dickey-Fuller
+    - shortname: KPSS
+      longname: Kwiatkowski-Phillips-Schmidt-Shin
+    - shortname: DFA
+      longname: Detrended Fluctuation Analysis
+    - shortname: AR
+      longname: Autoregressive
     - shortname: LV
       longname: Low Voltage
     - shortname: MV

@@ -50,12 +50,12 @@ book:
     - index.qmd
     - preface.qmd
     - how-to-use.qmd
-    - part: "Part 2: Disaggregation"
+    - part: "Part 3: Disaggregation"
       chapters:
-        - book/02-disaggregation/01-what-is-nilm.qmd
-        - book/02-disaggregation/02-feature-engineering.qmd
-        - book/02-disaggregation/03-multi-appliance-recognition.qmd
-        - book/02-disaggregation/04-multi-task-low-frequency.qmd
+        - book/03-disaggregation/01-what-is-nilm.qmd
+        - book/03-disaggregation/02-feature-engineering.qmd
+        - book/03-disaggregation/03-multi-appliance-recognition.qmd
+        - book/03-disaggregation/04-multi-task-low-frequency.qmd
     - part: "Part 4: Grid-Edge Value"
       chapters:
         - book/04-grid-edge/01-opendss-lv-modeling.qmd
@@ -64,13 +64,19 @@ book:
         - book/04-grid-edge/04-customer-feeder-clustering.qmd
         - book/04-grid-edge/05-ranking-recommendation.qmd
         - book/04-grid-edge/06-anomaly-detection.qmd
+    - part: "Part 5: Forecasting"
+      chapters:
+        - book/05-forecasting/01-forecastability.qmd
     - about.qmd
     - acronyms.qmd
 
   # Parts are added chapter by chapter as each is written.
-  #  - part: "Part 1: Foundations"
+  #  - part: "Part 1: Signal Foundations"
   #    chapters:
   #      - book/01-foundations/01-intro.ipynb
+  #  - part: "Part 2: ML Foundations"
+  #    chapters:
+  #      - book/02-ml-foundations/01-what-is-ml.ipynb
 
 
 csl: book/_quarto/ieee.csl
