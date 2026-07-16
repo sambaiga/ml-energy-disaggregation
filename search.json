@@ -4,7 +4,7 @@
     "href": "index.html",
     "title": "Machine Learning for Smart Meter Data",
     "section": "",
-    "text": "A practical book for energy analytics and ML practitioners\n\n\nMachine Learning for Smart Meter Data\n\n\nFrom raw meter signal to business decision: disaggregation, forecasting, and grid-edge value, built to be run, not just read.\n\n\nBy Anthony Faustine    \n\n\n Read the preface  View on GitHub\n\n\n\n\n Meter Signal\n\n\n\n Data & ML\n\n\n\n Business Value\n\n\n\n\n\n Meter Signal\n\n→   Disaggregation  →\n\n Forecasting\n\n→   Grid-Edge Value \n\n\n\n\nYour learning path\n\n\n\n\n\n\n\n Part 1 · Foundations\n\nSmart meter data fundamentals, signal processing, and the data pipelines every later chapter builds on.\n\n\n\n01Reading a meter signalSoon\n\n\n\n\n\n\n\n\n\n Part 2 · Disaggregation\n\nNon-intrusive load monitoring: from the aggregate signal to appliance-level insight.\n\n\n\n01Non-Intrusive Load Monitoring\n\n\n02Appliance Recognition\n\n\n03Multi-Appliance Recognition\n\n\n04Multi-Task Deep Learning\n\n\n\n\n\n\n\n\n\n Part 3 · Forecasting\n\nProbabilistic load and PV forecasting, built on Twiga: point forecasts and calibrated uncertainty.\n\n\n\n03Forecasting with uncertaintySoon\n\n\n\n\n\n\n\n\n\n Part 4 · Grid-Edge Value\n\nPhase detection, customer/feeder clustering, voltage-violation and power-quality anomaly detection, and grid health under forecasted DER growth, modeled with open-source power-flow simulation.\n\n\n\n01Modeling the Low-Voltage Network\n\n\n02Time-Series Simulation and DER Modeling\n\n\n03Phase Identification from Smart-Meter Data\n\n\n04Customer and Feeder Clustering\n\n\n05Ranking and Recommendation under DER\n\n\n06Anomaly Detection Combining Smart-Meter Data and LV TopologySoon\n\n\n\n\n\n\nChapters are being written part by part. Follow progress on GitHub.",
+    "text": "A practical book for energy analytics and ML practitioners\n\n\nMachine Learning for Smart Meter Data\n\n\nFrom raw meter signal to business decision, through the ML foundations, disaggregation, and grid-edge value that make the closing forecast worth trusting, built to be run, not just read.\n\n\n\n342Real households\n\n\n16Appliance types\n\n\n11Chapters live\n\n\n\nBy Anthony Faustine    \n\n\n Read the preface  View on GitHub\n\n\n\n\n\n Meter Signal\n\n\n\n Data & ML\n\n\n\n Business Value\n\n\n\nThe arc every chapter follows\n\n\n\n\nThe book, in five parts\n\n\n\n Signal Foundations\n\n→\n\n ML Foundations\n\n→\n\nDisaggregation\n\n→\n\nGrid-Edge Value\n\n→\n\nForecasting\n\n\n\n\n\nYour learning path\n\n\n\n\n\n\n\n Part 1 · Signal Foundations\n\nReading a meter signal, general event and change detection, and feature-engineering concepts every later part reuses.\n\n\n\n01Reading a meter signalSoon\n\n\n\nChapters land after Part 5 ships.\n\n\n\n\n\n\n\n\n Part 2 · ML Foundations\n\nThe mathematical and statistical theory behind every model this book uses as a tool: learning theory, optimization, tree ensembles, deep architectures, and the uncertainty-quantification foundations Part 5’s own forecasts depend on.\n\n\n\n01What is machine learning, preciselySoon\n\n\n\nChapters land after Part 5 ships.\n\n\n\n\n\n\n\n\n Part 3 · Disaggregation\n\nNon-intrusive load monitoring: from the aggregate signal to appliance-level insight.\n\n\n\n01Non-Intrusive Load Monitoring\n\n\n02Appliance Recognition\n\n\n03Multi-Appliance Recognition\n\n\n04Multi-Task Deep Learning\n\n\n\n\n\n\n\n\n\n Part 4 · Grid-Edge Value\n\nPhase detection, customer/feeder clustering, voltage-violation and power-quality anomaly detection, and ranking and recommendation for LV management under DER, modeled with open-source power-flow simulation.\n\n\n\n01Modeling the Low-Voltage Network\n\n\n02Time-Series Simulation and DER Modeling\n\n\n03Phase Identification from Smart-Meter Data\n\n\n04Customer and Feeder Clustering\n\n\n05Ranking and Recommendation under DER\n\n\n06Anomaly Detection Combining Smart-Meter Data and LV Topology\n\n\n\n\n\n\n\n\n\n Part 5 · Forecasting\n\nHousehold-scale load, PV, and EV forecastability and uncertainty, built on Twiga. The book’s closing part, feeding its own forecasts back into Part 4’s LV network model.\n\n\n\n01Household Smart-Meter Forecastability\n\n\n02Scaling with customer archetypesSoon\n\n\n\n\n\n\n11 chapters shipped so far, each with a runnable notebook. Follow progress on GitHub.",
     "crumbs": [
       "<span class='chapter-number'>1</span>  <span class='chapter-title'>Welcome</span>"
     ]
@@ -30,486 +30,486 @@
     ]
   },
   {
-    "objectID": "book/02-disaggregation/01-what-is-nilm.html",
-    "href": "book/02-disaggregation/01-what-is-nilm.html",
+    "objectID": "book/03-disaggregation/01-what-is-nilm.html",
+    "href": "book/03-disaggregation/01-what-is-nilm.html",
     "title": "Chapter 1: Non-Intrusive Load Monitoring",
     "section": "",
     "text": "High frequency or low frequency: two different jobs\nIn 2016, a team at the University of Virginia asked a strange question: could you guess which appliances a household owns from nothing but its monthly electricity bill? One number, thirty days apart. No smart meter, no sub-metering, just the figure already printed on every utility invoice. Their system, Gemello, could still flag a house as likely owning a space heater or an old refrigerator, just from the shape of that one number over time [1].\nThat is Non-Intrusive Load Monitoring (NILM) taken to its extreme: almost no signal, and still something real to say about what is running behind the meter. Most of this book works with a much richer signal than a monthly bill, readings every few seconds or minutes, but the underlying problem is the same one Gemello solves in miniature. Given only the aggregate power drawn at a single point, can you recover what individual appliances are doing?\nRun the cell below and the problem stops being abstract. It builds one day of a synthetic household: a roughly constant baseline load from lights and standby devices, a fridge cycling on and off every half hour or so, and a kettle spiking twice a day. The aggregate line at the top is all a real smart meter would ever report. The other three are exactly what disaggregation has to recover, and they are already invisible once summed.\nNotice how the fridge and the baseline load barely show up once the kettle’s spike is on the same axis. That is not a plotting choice, it is the actual shape of the problem: a smart meter’s one number is dominated by whatever draws the most power at that instant, and the rest has to be inferred, not read off.\nBefore any of the four steps run, one choice already shapes everything that follows: how fast is the meter actually sampling? The literature splits roughly into two regimes, and each one is suited to a different question [3].\nHigh-frequency acquisition, kilohertz and up, captures the transient noise an appliance’s switch-mode power supply puts back onto the line: shape, harmonics, the brief spike before a device settles into steady state. That detail is what makes it possible to tell a kettle from a hair dryer even when both draw similar average power. Patel and colleagues built custom hardware to capture exactly this, sampling the range to fingerprint individual switching events on the residential power line [4]. The cost is real: that hardware does not exist in a standard smart meter, so high-frequency NILM is fundamentally a load identification problem, telling appliances apart, answered with equipment most households do not have.\nLow-frequency acquisition, on the order of one reading every few seconds to a few minutes, is what an actual deployed smart meter reports. There is no transient detail to lean on here, so the question changes: not “which exact appliance is this” but “how much energy is being used, and by roughly which category of load.”\nBoth regimes matter to this part of the book, and for a specific reason: high-frequency, event-level measurement is where the author’s own published research sits (Chapters 2 and 3), while low-frequency, smart-meter-rate data is where the field’s modern deep-learning tooling operates at scale (Chapter 4). Figure 4.1 lays out that fork.",
     "crumbs": [
-      "Part 2: Disaggregation",
+      "Part 3: Disaggregation",
       "<span class='chapter-number'>4</span>  <span class='chapter-title'>Chapter 1: Non-Intrusive Load Monitoring</span>"
     ]
   },
   {
-    "objectID": "book/02-disaggregation/01-what-is-nilm.html#high-frequency-or-low-frequency-two-different-jobs",
-    "href": "book/02-disaggregation/01-what-is-nilm.html#high-frequency-or-low-frequency-two-different-jobs",
+    "objectID": "book/03-disaggregation/01-what-is-nilm.html#high-frequency-or-low-frequency-two-different-jobs",
+    "href": "book/03-disaggregation/01-what-is-nilm.html#high-frequency-or-low-frequency-two-different-jobs",
     "title": "Chapter 1: Non-Intrusive Load Monitoring",
     "section": "",
     "text": "Figure 4.1: Two acquisition regimes, two different jobs. High-frequency measurement (kHz and up) supports load identification: telling appliances apart. Low-frequency measurement (the rate a real smart meter reports) supports energy estimation: how much, by roughly which category of load.",
     "crumbs": [
-      "Part 2: Disaggregation",
+      "Part 3: Disaggregation",
       "<span class='chapter-number'>4</span>  <span class='chapter-title'>Chapter 1: Non-Intrusive Load Monitoring</span>"
     ]
   },
   {
-    "objectID": "book/02-disaggregation/01-what-is-nilm.html#detecting-when-something-changed",
-    "href": "book/02-disaggregation/01-what-is-nilm.html#detecting-when-something-changed",
+    "objectID": "book/03-disaggregation/01-what-is-nilm.html#detecting-when-something-changed",
+    "href": "book/03-disaggregation/01-what-is-nilm.html#detecting-when-something-changed",
     "title": "Chapter 1: Non-Intrusive Load Monitoring",
     "section": "Detecting when something changed",
     "text": "Detecting when something changed\nA NILM system has to detect an appliance’s operating status, ON or OFF, or a finite state somewhere between the two, from the power measurements alone. This is harder than it sounds: appliances differ widely in the statuses they can be in, from simple ON/OFF, to a finite set of states, to always-ON, to continuously variable [2]. Based on how they approach this, NILM methods split into two families: event-based and state-based (also called non-event-based).\nEvent-based approaches focus on the state-transition edges an appliance generates and use a change-detection algorithm to identify where an event starts and ends [5], [6]. The job of the change-detection algorithm is to spot changes in the aggregate load time series caused by one or more appliances switching ON/OFF or changing state. This relies on the fact that power monitored in a home is continuously rising, falling, and stepping. When a change is significant enough, it is taken as evidence that an event occurred. Appliance signatures, such as active power or the size of the rising or falling edge, are then analyzed to classify which event it was. A review of event-detection algorithms used in the NILM literature is given in [7]. The performance of event-based approaches is limited by the fixed or adaptive threshold of the change-detection algorithm, by measurement noise, and by similarities among steady-state signatures; missed detections and false detections of edges are both common failure modes.\nState-based approaches do not rely on an event detector at all. Instead they rely on pattern recognition: an appliance turning ON/OFF or changing running state creates a distinct pattern with a probability distribution that matches that appliance. At low sampling rates, the classic example is the Hidden Markov Model [8], [9], though it is not a method this book spends much time on: modern deep-learning approaches have largely taken its place for low-frequency energy estimation, and Chapter 4 picks up that thread directly.\nEvent-based methods tend to pair naturally with the high-frequency, load-identification problem above; state-based methods are the more common choice once the signal is low-frequency and the goal shifts toward energy estimation.",
     "crumbs": [
-      "Part 2: Disaggregation",
+      "Part 3: Disaggregation",
       "<span class='chapter-number'>4</span>  <span class='chapter-title'>Chapter 1: Non-Intrusive Load Monitoring</span>"
     ]
   },
   {
-    "objectID": "book/02-disaggregation/01-what-is-nilm.html#telling-appliances-apart",
-    "href": "book/02-disaggregation/01-what-is-nilm.html#telling-appliances-apart",
+    "objectID": "book/03-disaggregation/01-what-is-nilm.html#telling-appliances-apart",
+    "href": "book/03-disaggregation/01-what-is-nilm.html#telling-appliances-apart",
     "title": "Chapter 1: Non-Intrusive Load Monitoring",
     "section": "Telling appliances apart",
     "text": "Telling appliances apart\nAn effective NILM algorithm needs signatures unique enough to characterize appliance behavior: a distinctive energy-consumption pattern, often called its appliance signature, that identifies and recognizes that appliance’s operation from the aggregate load. Hart frames it the same way: a measured parameter of the total load that carries information about one appliance’s nature or operating state, a consumption pattern intrinsic to that device [2], [3], [10]. NILM research uses two main classes of signature: transient and steady-state.\nTransient signatures are short-term fluctuations in power or current before the appliance settles into a steady-state value. They uniquely define appliance-state transitions through features like shape, size, duration, and harmonic content of the transient [3]. Capturing them requires high sampling rates, to get a high degree of signal uniqueness, and longer monitoring time, to capture a full operating cycle, which in turn demands hardware more costly than the low-frequency power a smart meter reports. Patel and colleagues, for example, built custom hardware to detect transient noise across , exploiting the fact that an appliance’s in-state operation transmits noise back onto the power line [4].\n\n\n\n\n\n\nFigure 4.2: A switch-on event in the current waveform. The first fraction of a second is transient: a fast, decaying oscillation whose shape, duration, and harmonic content are what make one appliance’s fingerprint different from another’s. Once that dies out, the signal settles into the smooth, repeating cycle of steady state.\n\n\n\nSteady-state signatures relate to the more sustained change in power characteristics once an appliance settles into a running state. At the low-frequency end, these include active power [10], [11], reactive power [12], and current [13], the signatures a smart meter can actually supply, which is why they dominate the practical low-frequency NILM literature. Where most prior work uses real power for NILM [9], [11], [14], Makonin and colleagues argue that current, rather than real power, is the more effective steady-state feature for energy disaggregation [13], a useful reminder that the obvious choice of feature is not always the best one.\nThe Voltage-Current (V-I) trajectory, the closed loop traced by plotting instantaneous voltage against instantaneous current over one cycle, is also technically a steady-state signature, but it belongs to the high-frequency side of the split above: tracing a stable, recognizable loop shape needs sampling in the tens of kilohertz, not the sub-hertz rate a smart meter reports [15]. This distinction matters more than it might seem. Chapters 2 and 3 of this part both build on the high-frequency, event-based, load-identification side of NILM: turning that V-I loop, or the raw activation current itself, into an image-like or graph-like representation a classifier can learn from [15], [16].",
     "crumbs": [
-      "Part 2: Disaggregation",
+      "Part 3: Disaggregation",
       "<span class='chapter-number'>4</span>  <span class='chapter-title'>Chapter 1: Non-Intrusive Load Monitoring</span>"
     ]
   },
   {
-    "objectID": "book/02-disaggregation/01-what-is-nilm.html#from-features-to-an-answer",
-    "href": "book/02-disaggregation/01-what-is-nilm.html#from-features-to-an-answer",
+    "objectID": "book/03-disaggregation/01-what-is-nilm.html#from-features-to-an-answer",
+    "href": "book/03-disaggregation/01-what-is-nilm.html#from-features-to-an-answer",
     "title": "Chapter 1: Non-Intrusive Load Monitoring",
     "section": "From features to an answer",
     "text": "From features to an answer\nOnce a signature has been extracted, it can be used to identify the appliance category, its status, and its power consumption. Machine learning models do this in two stages: a learning stage that fits model parameters, and an inference stage that infers appliance states from observed aggregate power and estimates their power consumption.\nSingle-appliance or multi-appliance. NILM learning strategies further split into single-appliance learning, which assumes only one appliance is active at a time and disaggregates one appliance at a time, and multi-appliance learning, which links several appliances to one observed aggregate signal at once [17]. Single-appliance learning ignores the fact that appliances can be active simultaneously and that their usage is not independent, yet it is the strategy behind most deep-learning NILM models, each trained on one particular appliance. Multi-appliance, multi-label learning is the more realistic setting and the one Chapter 3 of this part deals with directly.\n\n\n\n\n\n\nFigure 4.3: The same aggregate signal, two different learning setups. Single-appliance learning trains and runs one model per appliance, each blind to what the others are doing. Multi-appliance, multi-label learning trains one shared model that reads every appliance’s state off the same signal in a single pass.\n\n\n\nPower estimation. Historically, low-frequency energy estimation leaned heavily on HMM variants, including the factorial HMM, an extension that tracks several appliances’ hidden states jointly rather than one at a time [18]. This book does not spend much time there either: Chapter 4 covers how modern deep learning handles power estimation at low frequency instead.",
     "crumbs": [
-      "Part 2: Disaggregation",
+      "Part 3: Disaggregation",
       "<span class='chapter-number'>4</span>  <span class='chapter-title'>Chapter 1: Non-Intrusive Load Monitoring</span>"
     ]
   },
   {
-    "objectID": "book/02-disaggregation/01-what-is-nilm.html#why-bother",
-    "href": "book/02-disaggregation/01-what-is-nilm.html#why-bother",
+    "objectID": "book/03-disaggregation/01-what-is-nilm.html#why-bother",
+    "href": "book/03-disaggregation/01-what-is-nilm.html#why-bother",
     "title": "Chapter 1: Non-Intrusive Load Monitoring",
     "section": "Why bother",
     "text": "Why bother\nThe case for disaggregation is not really about the appliance breakdown itself. It is about what that breakdown lets someone do next. A household that can see its fridge is drawing twice what a healthy fridge should, before the fridge fails outright, gets to fix it on their own schedule instead of throwing out a freezer full of food [19], [20]. A retailer that can separate heating load from everything else can price and forecast far more precisely than one working from a single aggregate curve. None of that requires solving NILM perfectly, it requires solving it well enough to be useful, which is a lower and more interesting bar, and one Barker and colleagues argue the field should judge itself by explicitly, instead of chasing accuracy numbers on a benchmark no household ever sees [21], [22].\nThat bar shows up in a handful of recurring, real use cases, well beyond splitting a single bill into a per-appliance breakdown:\n\nActionable feedback. A number is not the same thing as a decision. Batra and colleagues found that showing a household its heating, its fridge, and its lighting as separate lines, not one combined total, is what actually changes behavior, because a person can only act on a category they can see [23].\nFault detection. The fridge example above is not hypothetical. A fridge’s compressor draws a distinctive, repeating cycle; once NILM can isolate that cycle, a lengthening cycle time or a rising baseline draw is an early warning sign a technician can act on before the unit fails [19], [20], [24].\nContinuous energy audits. A manual walk-through audit is a snapshot: an auditor visits once and inspects what is running that day. Berges and colleagues showed NILM output can stand in for, or extend, that audit continuously, catching an oversized or aging piece of equipment without scheduling a site visit [25].\nDemand response. A utility that already knows how much of a home’s load is heating, cooling, or one specific flexible appliance can target a demand-response signal at exactly that slice of load, instead of asking a household to guess what to turn off during a peak event [26], [27].\nOccupancy and household characteristics. Because NILM output already reflects which appliances are running and when, the same signal can be read backward: an empty house looks different from an occupied one, and an unsupervised model built entirely from unlabeled smart-meter data, with no household ever filling out a survey, can pick that up directly [28].\n\nNone of this is speculative. Sense and Bidgely are two commercial products built on exactly this idea, disaggregating a home’s smart-meter or panel-level signal into appliance-level insight and selling the result back to the household or the utility.\nDatasets exist precisely so this problem can be studied properly: real households or industrial sites, metered at the aggregate level and, critically, with ground-truth sub-meters on individual appliances to check any disaggregation algorithm’s answers against. Low-frequency datasets like UK-DALE support the energy-estimation side of NILM [29]; high-frequency, event-level datasets support the load-identification side. Later chapters in this part use both, depending on which problem is on the table.",
     "crumbs": [
-      "Part 2: Disaggregation",
+      "Part 3: Disaggregation",
       "<span class='chapter-number'>4</span>  <span class='chapter-title'>Chapter 1: Non-Intrusive Load Monitoring</span>"
     ]
   },
   {
-    "objectID": "book/02-disaggregation/01-what-is-nilm.html#where-this-part-of-the-book-goes",
-    "href": "book/02-disaggregation/01-what-is-nilm.html#where-this-part-of-the-book-goes",
+    "objectID": "book/03-disaggregation/01-what-is-nilm.html#where-this-part-of-the-book-goes",
+    "href": "book/03-disaggregation/01-what-is-nilm.html#where-this-part-of-the-book-goes",
     "title": "Chapter 1: Non-Intrusive Load Monitoring",
     "section": "Where this part of the book goes",
     "text": "Where this part of the book goes\nThis chapter only frames the problem. The rest of Part 2 builds the actual methods, following the high-frequency/low-frequency split this chapter introduced:\n\nChapter 2, feature engineering for appliance recognition, moving into the high-frequency, event-based side of NILM: turning the V-I trajectory or activation current into a graph-based representation that makes appliances easier to tell apart, then extending that same representation to three-phase industrial settings, where phase imbalance becomes a challenge, and an opportunity, of its own.\nChapter 3, multi-appliance recognition, extending that same high-frequency representation to the more realistic case where several appliances change state at once, not one at a time.\nChapter 4, deep learning at low frequency, back on the energy-estimation side: modern neural architectures benchmarked reproducibly on UK-DALE, where a model learns its own features directly from the aggregate signal.\n\n\n Common Mistake\nAssuming NILM always needs labeled, sub-metered training data. Some methods do. Others, including several covered later in this part, work from the aggregate signal alone. Which one is appropriate depends entirely on what data is actually available at deployment time, not on which method has the best published accuracy.",
     "crumbs": [
-      "Part 2: Disaggregation",
+      "Part 3: Disaggregation",
       "<span class='chapter-number'>4</span>  <span class='chapter-title'>Chapter 1: Non-Intrusive Load Monitoring</span>"
     ]
   },
   {
-    "objectID": "book/02-disaggregation/01-what-is-nilm.html#references",
-    "href": "book/02-disaggregation/01-what-is-nilm.html#references",
+    "objectID": "book/03-disaggregation/01-what-is-nilm.html#references",
+    "href": "book/03-disaggregation/01-what-is-nilm.html#references",
     "title": "Chapter 1: Non-Intrusive Load Monitoring",
     "section": "References",
     "text": "References\n\n\n[1] N. Batra, A. Singh, and K. Whitehouse, “Gemello: Creating a detailed energy breakdown from just the monthly electricity bill,” in Proceedings of the 22nd ACM SIGKDD international conference on knowledge discovery and data mining, 2016.\n\n\n[2] G. W. Hart, “Nonintrusive appliance load monitoring,” Proceedings of the IEEE, vol. 80, no. 12, pp. 1870–1891, 1992, doi: 10.1109/5.192069.\n\n\n[3] A. Zoha, A. Gluhak, M. A. Imran, and S. Rajasegarar, “Non-intrusive load monitoring approaches for disaggregated energy sensing: A survey,” Sensors, vol. 12, no. 12, pp. 16838–16866, 2012, doi: 10.3390/s121216838.\n\n\n[4] S. N. Patel, T. Robertson, J. A. Kientz, M. S. Reynolds, and G. D. Abowd, “At the flick of a switch: Detecting and classifying unique electrical events on the residential power line,” in Proceedings of UbiComp, 2007, pp. 271–288.\n\n\n[5] K. S. Barsim, R. Streubel, and B. Yang, “An approach for unsupervised non-intrusive load monitoring of residential appliances,” in Proceedings of the 48th international universities’ power engineering conference (UPEC), 2013, pp. 1–5.\n\n\n[6] Y. F. Wong, Y. Ahmet Sekercioglu, T. Drummond, and V. S. Wong, “Recent approaches to non-intrusive load monitoring techniques in residential settings,” IEEE Symposium on Computational Intelligence Applications in Smart Grid (CIASG), pp. 73–79, 2013, doi: 10.1109/CIASG.2013.6611501.\n\n\n[7] K. D. Anderson, M. E. Bergés, A. Ocneanu, D. Benitez, and J. M. F. Moura, “Event detection for non intrusive load monitoring,” in IECON 2012, 38th annual conference on IEEE industrial electronics society, 2012. doi: 10.1109/IECON.2012.6389367.\n\n\n[8] H. Kim, M. Marwah, M. F. Arlitt, G. Lyon, and J. Han, “Unsupervised disaggregation of low frequency power measurements,” Proceedings of the 11th SIAM International Conference on Data Mining, pp. 747–758, 2011.\n\n\n[9] J. Z. Kolter and T. Jaakkola, “Approximate inference in additive factorial HMMs with application to energy disaggregation,” in Proceedings of the international conference on artificial intelligence and statistics, 2012, pp. 1472–1482.\n\n\n[10] J. Liang, S. K. K. Ng, G. Kendall, and J. W. M. Cheng, “Load signature study, part I: Basic concept, structure, and methodology,” IEEE Transactions on Power Delivery, vol. 25, no. 2, pp. 551–560, 2010.\n\n\n[11] O. Parson, S. Ghosh, M. Weal, and A. Rogers, “Non-intrusive load monitoring using prior models of general appliance types,” in Proceedings of the 26th AAAI conference on artificial intelligence, 2012.\n\n\n[12] M. Zeifman and K. Roth, “Nonintrusive appliance load monitoring: Review and outlook,” IEEE Transactions on Consumer Electronics, vol. 57, no. 1, pp. 76–84, 2011.\n\n\n[13] S. Makonin, F. Popowich, L. Bartram, B. Gill, and I. V. Bajić, “AMPds: A public dataset for load disaggregation and eco-feedback research,” in Proceedings of the IEEE electrical power and energy conference (EPEC), 2013. doi: 10.1109/EPEC.2013.6802949.\n\n\n[14] B. Zhao, L. Stankovic, and V. Stankovic, “Blind non-intrusive appliance load monitoring using graph-based signal processing,” in IEEE global conference on signal and information processing (GlobalSIP), 2015, pp. 68–72.\n\n\n[15] N. Sadeghianpourhamami, J. Ruyssinck, D. Deschrijver, T. Dhaene, and C. Develder, “Comprehensive feature selection for appliance classification in NILM,” Energy and Buildings, vol. 151, pp. 98–106, 2017, doi: 10.1016/j.enbuild.2017.06.042.\n\n\n[16] K. S. Barsim, L. Mauch, and B. Yang, “Neural network ensembles to real-time identification of plug-level appliance measurements,” in Proceedings of the NILM workshop, 2016.\n\n\n[17] C.-K. Yeh, W.-C. Wu, W.-J. Ko, and Y.-C. F. Wang, “Learning deep latent spaces for multi-label classification,” in Proceedings of the AAAI conference on artificial intelligence, 2017.\n\n\n[18] Z. Ghahramani and M. I. Jordan, “Factorial hidden Markov models,” Machine Learning, vol. 29, no. 2, pp. 245–273, 1997.\n\n\n[19] O. Parson, M. Weal, and A. Rogers, “A scalable non-intrusive load monitoring system for fridge-freezer energy efficiency estimation,” in Proceedings of the NILM workshop, 2014, pp. 1–4.\n\n\n[20] D. Christensen, L. Earle, and B. Sparn, “NILM applications for the energy-efficient home,” National Renewable Energy Laboratory (NREL), 2012.\n\n\n[21] S. Barker, S. Kalra, D. Irwin, and P. Shenoy, “NILM redux: The case for emphasizing applications over accuracy,” in Proceedings of the NILM workshop, 2014.\n\n\n[22] N. Batra, R. Baijal, A. Singh, and K. Whitehouse, “How good is good enough? Re-evaluating the bar for energy disaggregation,” arXiv preprint arXiv:1510.08713, 2015.\n\n\n[23] N. Batra, A. Singh, and K. Whitehouse, “If you measure it, can you improve it? Exploring the value of energy disaggregation,” in Proceedings of the 2nd ACM international conference on embedded systems for energy-efficient built environments, 2015, pp. 191–200. doi: 10.1145/2821650.2821660.\n\n\n[24] N. Batra, A. Singh, P. Singh, H. Dutta, V. Sarangan, and M. Srivastava, “Data driven energy efficiency in buildings,” arXiv preprint arXiv:1404.7227, 2014.\n\n\n[25] M. E. Berges, E. Goldman, H. S. Matthews, and L. Soibelman, “Enhancing electricity audits in residential buildings with nonintrusive load monitoring,” Journal of Industrial Ecology, vol. 14, no. 5, pp. 844–858, 2010, doi: 10.1111/j.1530-9290.2010.00280.x.\n\n\n[26] D. Huang, M. Thottan, and F. Feather, “Designing customized energy services based on disaggregation of heating usage,” in Proceedings of the IEEE PES innovative smart grid technologies conference (ISGT), 2013, pp. 1–6.\n\n\n[27] D. He, W. Lin, N. Liu, R. G. Harley, and T. G. Habetler, “Incorporating non-intrusive load monitoring into building level demand response,” IEEE Transactions on Smart Grid, vol. 4, no. 4, pp. 1870–1877, 2013, doi: 10.1109/TSG.2013.2258180.\n\n\n[28] O. Parson, “Unsupervised training methods for non-intrusive appliance load monitoring from smart meter data,” PhD thesis, University of Southampton, 2014.\n\n\n[29] J. Kelly and W. Knottenbelt, “The UK-DALE dataset, domestic appliance-level electricity demand and whole-house demand from five UK homes,” Scientific Data, vol. 2, p. 150007, 2015, doi: 10.1038/sdata.2015.7.",
     "crumbs": [
-      "Part 2: Disaggregation",
+      "Part 3: Disaggregation",
       "<span class='chapter-number'>4</span>  <span class='chapter-title'>Chapter 1: Non-Intrusive Load Monitoring</span>"
     ]
   },
   {
-    "objectID": "book/02-disaggregation/02-feature-engineering.html",
-    "href": "book/02-disaggregation/02-feature-engineering.html",
+    "objectID": "book/03-disaggregation/02-feature-engineering.html",
+    "href": "book/03-disaggregation/02-feature-engineering.html",
     "title": "Chapter 2: Appliance Recognition",
     "section": "",
     "text": "Getting one activation window\nA 60-watt bulb switches on next to a warehouse’s compressor motor. On its own, a bulb’s current is about the simplest signature in NILM: a smooth, resistive sine wave, barely worth building a classifier for. Wired to one leg of the same three-phase line as that motor, the bulb’s voltage-current trajectory comes out looking almost unrecognizable, twisted by the current the motor’s other two phases pull just to keep turning. Same bulb, same physics, but the feature a classifier sees depends entirely on what else is running on the line.\nChapter 1 left one question open: how do you turn a raw switch-on event, whether it’s a bulb’s current spike or a motor’s distorted three-phase draw, into a feature specific enough to tell one appliance from another? This chapter builds that feature once, then shows it survives both the clean residential case and the messy industrial one.\nEvery feature in this chapter starts from the same raw material: a short window of current and voltage, centered on the moment an appliance changed state. Getting that window right matters as much as anything downstream of it. The recipe, unchanged across the WRG, AWRG, and phase-imbalance work, is to measure \\(N_s\\) complete mains cycles immediately before the transition, \\(\\{\\mathbf{i}^{(b)}, \\mathbf{v}^{(b)}\\}\\), and \\(N_s\\) cycles immediately after, \\(\\{\\mathbf{i}^{(a)}, \\mathbf{v}^{(a)}\\}\\) [1]. For three-phase industrial data each phase gets its own before-and-after pair; for single-phase residential data there is only one [2].\nBoth windows are aligned at the voltage’s zero-crossing before anything else happens to them, and that alignment is not a formality. An AC waveform’s instantaneous value depends on exactly where in the cycle it is sampled, so comparing a before-window and an after-window that start at different phase angles would pick up a difference caused by phase misalignment, not by the appliance. Zero-crossing alignment pins both windows to the same starting phase, so a point-by-point subtraction reflects only what actually changed. Because current also adds linearly, that subtraction is enough on its own to cancel out everything that did not change and leave only the appliance that just switched: \\(\\mathbf{i} = \\mathbf{i}^{(a)} - \\mathbf{i}^{(b)}\\) for a switch-on event, or the reverse for a switch-off [1], [2]. \\(N_s\\) itself is not universal: 20 cycles for the sub-metered single-appliance data the original WRG paper used, 2 cycles for aggregated PLAID (following the convention in [3]), and 10 to 25 cycles for the three-phase LILACD data, chosen empirically once the industrial signal turned out to need a longer window to settle [1], [2], [4].\nThe resulting window is still \\(T_s = f_s / f\\) samples long, tens of thousands of samples at PLAID’s 30 kHz. Piecewise Aggregate Approximation (PAA) reduces it to a fixed, much smaller size \\(w\\) by averaging each of \\(w\\) equal segments down to one value, which is what actually feeds the distance matrix below. Figure 5.1 walks through the extraction step; Figure 5.2 picks up immediately after, once that fixed-size window exists.\nThe notebook below builds \\(D\\) for a single, real activation current from PLAID, already extracted the way Figure 5.1 describes. The same event can be read two ways at once: current against time, on the left, or current against voltage, on the right.",
     "crumbs": [
-      "Part 2: Disaggregation",
+      "Part 3: Disaggregation",
       "<span class='chapter-number'>5</span>  <span class='chapter-title'>Chapter 2: Appliance Recognition</span>"
     ]
   },
   {
-    "objectID": "book/02-disaggregation/02-feature-engineering.html#getting-one-activation-window",
-    "href": "book/02-disaggregation/02-feature-engineering.html#getting-one-activation-window",
+    "objectID": "book/03-disaggregation/02-feature-engineering.html#getting-one-activation-window",
+    "href": "book/03-disaggregation/02-feature-engineering.html#getting-one-activation-window",
     "title": "Chapter 2: Appliance Recognition",
     "section": "",
     "text": "Figure 5.1: One state transition splits the signal into a before-window and an after-window; subtracting them isolates the appliance that changed.\n\n\n\n\n\n\n\n\n\n\n\nFigure 5.2: The activation window, reduced by PAA, becomes a distance matrix, then a graph-like image, then a label.\n\n\n\n\n\n\n\n Key Concept\nTake that activation current, reduced to \\(w\\) points \\(\\mathbf{x} = \\{x_1, \\ldots, x_w\\}\\). The distance similarity matrix \\(D_{w \\times w} = [d_{k,j}]\\) records how far apart every pair of points in that window is:\n\\[\nd_{k,j} = |x_k - x_j|\n\\]\n\\(D\\) says nothing about appliances by itself. It is a structural fingerprint of the waveform’s own shape: a smooth periodic signal produces one pattern, a spiky transient produces another. The rest of this chapter is about what to do with \\(D\\) once it exists [1].",
     "crumbs": [
-      "Part 2: Disaggregation",
+      "Part 3: Disaggregation",
       "<span class='chapter-number'>5</span>  <span class='chapter-title'>Chapter 2: Appliance Recognition</span>"
     ]
   },
   {
-    "objectID": "book/02-disaggregation/02-feature-engineering.html#the-other-route-the-v-i-trajectory",
-    "href": "book/02-disaggregation/02-feature-engineering.html#the-other-route-the-v-i-trajectory",
+    "objectID": "book/03-disaggregation/02-feature-engineering.html#the-other-route-the-v-i-trajectory",
+    "href": "book/03-disaggregation/02-feature-engineering.html#the-other-route-the-v-i-trajectory",
     "title": "Chapter 2: Appliance Recognition",
     "section": "The other route: the V-I trajectory",
     "text": "The other route: the V-I trajectory\nChapter 1 named the voltage-current (V-I) trajectory as a high-frequency signature: the closed loop traced by plotting instantaneous voltage against instantaneous current over one cycle. The right-hand panel above, the same activation current plotted against its own voltage instead of against time, is that loop.\nA resistive appliance traces something close to a straight line; a motor or a switch-mode power supply bends that line into a loop with a distinctive shape. That shape is a real, usable feature on its own, and it is the one most of the appliance-classification literature reached for first [3], [5]. To make it a fixed-size input a classifier can consume, the loop is meshed onto a \\(w \\times w\\) grid and rasterized into a binary V-I image, the same way a raw current window gets reduced to \\(D\\) above. That V-I image is the baseline this chapter measures WRG against for the rest of the way.",
     "crumbs": [
-      "Part 2: Disaggregation",
+      "Part 3: Disaggregation",
       "<span class='chapter-number'>5</span>  <span class='chapter-title'>Chapter 2: Appliance Recognition</span>"
     ]
   },
   {
-    "objectID": "book/02-disaggregation/02-feature-engineering.html#from-a-distance-matrix-to-a-recurrence-graph",
-    "href": "book/02-disaggregation/02-feature-engineering.html#from-a-distance-matrix-to-a-recurrence-graph",
+    "objectID": "book/03-disaggregation/02-feature-engineering.html#from-a-distance-matrix-to-a-recurrence-graph",
+    "href": "book/03-disaggregation/02-feature-engineering.html#from-a-distance-matrix-to-a-recurrence-graph",
     "title": "Chapter 2: Appliance Recognition",
     "section": "From a distance matrix to a recurrence graph",
     "text": "From a distance matrix to a recurrence graph\nThe standard way to turn \\(D\\) into an image, borrowed from nonlinear time-series analysis, is the recurrence plot: pick a threshold \\(\\epsilon\\) and mark two points as “recurring” whenever they are closer than that threshold [6]. Formally, the recurrence graph \\(RG_{w \\times w} =\n[r_{k,j}]\\) is the binary matrix\n\\[\nr_{k,j} = \\begin{cases} 1 & \\text{if } d_{k,j} \\geq \\epsilon \\\\ 0 & \\text{otherwise} \\end{cases}\n\\]\n\\(RG\\) can be read as an unweighted graph: \\(r_{k,j}\\) is the adjacency matrix between points in time, and the resulting image gives a classifier something to learn from beyond the raw waveform [1]. But binarizing \\(D\\) at a single threshold throws away everything except a yes/no answer at every pixel. Two activations that are close but not identical, and two that are worlds apart, can end up looking the same once thresholded.",
     "crumbs": [
-      "Part 2: Disaggregation",
+      "Part 3: Disaggregation",
       "<span class='chapter-number'>5</span>  <span class='chapter-title'>Chapter 2: Appliance Recognition</span>"
     ]
   },
   {
-    "objectID": "book/02-disaggregation/02-feature-engineering.html#weighted-recurrence-graphs",
-    "href": "book/02-disaggregation/02-feature-engineering.html#weighted-recurrence-graphs",
+    "objectID": "book/03-disaggregation/02-feature-engineering.html#weighted-recurrence-graphs",
+    "href": "book/03-disaggregation/02-feature-engineering.html#weighted-recurrence-graphs",
     "title": "Chapter 2: Appliance Recognition",
     "section": "Weighted recurrence graphs",
     "text": "Weighted recurrence graphs\nThe fix is to stop throwing that detail away. Instead of collapsing \\(D\\) to 0 or 1, the weighted recurrence graph (WRG) keeps a graded value, capped at a maximum \\(\\delta\\):\n\\[\nr_{k,j} = \\min\\left(\\left\\lfloor \\frac{d_{k,j}}{\\epsilon} \\right\\rfloor, \\delta\\right)\n\\]\nReparametrizing \\(\\lambda = 1/\\epsilon\\) for numerical stability, \\(r_{k,j} =\n\\min(\\lfloor d_{k,j} \\cdot \\lambda \\rfloor, \\delta)\\). Setting \\(\\delta = 1\\) recovers the binary \\(RG\\) above; \\(\\lambda\\) and \\(\\delta\\) are hyperparameters, tuned once and then fixed [1]. The resulting \\(WRG_{w \\times\nw}\\) image, together with the V-I image introduced above, is what a small three-layer CNN classifies.\n\n\n\n\n   \n       \n       \n       \n   \n   \n          \n   \n   \n\n\n\n\nThe panels above make the earlier claim concrete: the weighted version keeps gradations the binary version collapses to a single color. On real datasets, that difference is not cosmetic. Moving from binary \\(RG\\) to \\(WRG\\) raises macro \\(F_1\\) from 98.96% to 99.86% on the COOLL dataset and from 88.18% to 94.35% on PLAID [1], [7], [8]. Against the V-I image baseline, evaluated with leave-one-house-out cross-validation so the comparison reflects generalization to a house the model never trained on, \\(WRG\\) wins by 0.92, 8.5, and 4.5 percentage points of macro \\(F_1\\) on COOLL, WHITED, and PLAID respectively [1], [3], [9], [10].",
     "crumbs": [
-      "Part 2: Disaggregation",
+      "Part 3: Disaggregation",
       "<span class='chapter-number'>5</span>  <span class='chapter-title'>Chapter 2: Appliance Recognition</span>"
     ]
   },
   {
-    "objectID": "book/02-disaggregation/02-feature-engineering.html#making-the-hyperparameters-learnable-awrg",
-    "href": "book/02-disaggregation/02-feature-engineering.html#making-the-hyperparameters-learnable-awrg",
+    "objectID": "book/03-disaggregation/02-feature-engineering.html#making-the-hyperparameters-learnable-awrg",
+    "href": "book/03-disaggregation/02-feature-engineering.html#making-the-hyperparameters-learnable-awrg",
     "title": "Chapter 2: Appliance Recognition",
     "section": "Making the hyperparameters learnable: AWRG",
     "text": "Making the hyperparameters learnable: AWRG\n\\(\\lambda\\) and \\(\\delta\\) still have to be chosen somehow, and hand-tuning two hyperparameters per dataset does not scale. The adaptive weighted recurrence graph (AWRG) treats them the same way a neural network treats its own weights: as parameters learned by gradient descent, initialized once and then updated during training rather than fixed in advance [2]. The block that does this is only two lines: floor the scaled distance, then clip it to the learned ceiling. On aggregated, multi-appliance PLAID and on the three-phase LILACD dataset, initializing both parameters near 10 gives the fastest, most stable convergence; initializing at zero stalls training outright, because the gradient has nothing to push against. AWRG lifts PLAID from 0.91 to 0.98 on the Matthews correlation coefficient (MCC, a single balanced accuracy score that tops out at 1.0), cutting misclassifications from 8.32% to 2.23%, and lifts LILACD from 0.85 to 0.98 MCC (13.82% down to 1.66%), both against the same V-I baseline [2], [11].",
     "crumbs": [
-      "Part 2: Disaggregation",
+      "Part 3: Disaggregation",
       "<span class='chapter-number'>5</span>  <span class='chapter-title'>Chapter 2: Appliance Recognition</span>"
     ]
   },
   {
-    "objectID": "book/02-disaggregation/02-feature-engineering.html#reproducing-the-residential-result",
-    "href": "book/02-disaggregation/02-feature-engineering.html#reproducing-the-residential-result",
+    "objectID": "book/03-disaggregation/02-feature-engineering.html#reproducing-the-residential-result",
+    "href": "book/03-disaggregation/02-feature-engineering.html#reproducing-the-residential-result",
     "title": "Chapter 2: Appliance Recognition",
     "section": "Reproducing the residential result",
     "text": "Reproducing the residential result\nEvery number in that last paragraph is cited from the AWRG paper’s own experiments. Before trusting them, it is worth training a fresh classifier on data neither those experiments nor this book has touched yet: PLAID 2020, a newer release of the same residential dataset with 2,092 real aggregated activation events across 12 household appliances [12]. Same recipe as the WRG-vs-V-I comparison above, applied to a full dataset instead of one activation, evaluated on a held-out 25%.\nBefore training that classifier, the same separability check from the LILACD section is worth running here too: a deliberately mixed set of six residential appliances, three of V-I’s worst performers (blender, coffee maker, fridge) and three of its best (hair iron, CFL, water kettle).\n\n\n\n\n   \n       \n       \n       \n   \n   \n          \n   \n   \n\n\n\n\nSame pattern as LILACD: V-I’s six clusters overlap heavily, WRG’s mostly pull apart. That is what the trained classifier confirms next.\n\n\n\n\n   \n       \n       \n       \n   \n   \n          \n   \n   \n\n\n\n\nThe residential story holds on fresh data: V-I tops out at 60.4% macro \\(F_1\\); WRG reaches 81.2%, a 21-point jump from swapping one feature representation for another with nothing else changed. Which appliances carry that gap?\n\n\n\n\n   \n       \n       \n       \n   \n   \n          \n   \n   \n\n\n\n\nV-I’s worst scores land on appliances whose current barely varies from one sample to the next: a blender (26%), a coffee maker (30%), a fridge (34%). WRG recovers most of them outright, the coffee maker jumps to 98%, but not all of them. The fridge barely moves, 34% to 38%, a reminder that WRG fixes the specific confusion caused by a flat current shape, not every source of appliance ambiguity. The confusion matrix shows exactly where that specific failure lands.\n\n\n\n\n   \n       \n       \n       \n   \n   \n          \n   \n   \n\n\n\n\nThe single biggest confusion is a fridge called an air conditioner (15 of this test split’s mistakes), followed by an air conditioner called an incandescent bulb (12) and a fridge called a fridge defroster (8). The first and third make sense, a fridge, an air conditioner, and a fridge defroster are all compressor-driven appliances with a similarly gradual current draw, not the sharp, resistive signature WRG is best at telling apart. The second is a genuine open question this run doesn’t resolve.\n\n\n\n\n   \n       \n       \n       \n   \n   \n          \n   \n   \n\n\n\n\nThe panels above are the literal WRG image behind that top confusion: a real held-out fridge activation the model called an air conditioner, next to a real, correctly classified air conditioner. Two compressor motors, photographed by the same feature, look almost the same.",
     "crumbs": [
-      "Part 2: Disaggregation",
+      "Part 3: Disaggregation",
       "<span class='chapter-number'>5</span>  <span class='chapter-title'>Chapter 2: Appliance Recognition</span>"
     ]
   },
   {
-    "objectID": "book/02-disaggregation/02-feature-engineering.html#how-much-do-the-hyperparameters-actually-matter",
-    "href": "book/02-disaggregation/02-feature-engineering.html#how-much-do-the-hyperparameters-actually-matter",
+    "objectID": "book/03-disaggregation/02-feature-engineering.html#how-much-do-the-hyperparameters-actually-matter",
+    "href": "book/03-disaggregation/02-feature-engineering.html#how-much-do-the-hyperparameters-actually-matter",
     "title": "Chapter 2: Appliance Recognition",
     "section": "How much do the hyperparameters actually matter?",
     "text": "How much do the hyperparameters actually matter?\n\\(\\lambda\\) and \\(\\delta\\) still have to be chosen somehow, and the AWRG paper’s own grid search found performance swinging widely across both, with zero initialization stalling training outright. Running that same sweep on PLAID 2020 turns that claim into a picture.\n\n\n\n\n   \n       \n       \n       \n   \n   \n          \n   \n   \n\n\n\n\nBoth curves peak in the middle and fall off at either extreme. \\(\\lambda\\) climbs from 50.3% macro \\(F_1\\) at \\(\\lambda=1\\) to 81.6% at \\(\\lambda=10\\), then slides back to 76.8% by \\(\\lambda=50\\): too small and the distance matrix barely gets thresholded at all, too large and every cell saturates to the ceiling. \\(\\delta=1\\), the binary recurrence graph, tops out at 52.4%; letting \\(\\delta\\) grow to 20 recovers WRG’s full 81.6%, then overshooting to \\(\\delta=50\\) gives back some of that gain. Neither curve has an obvious “just set it high” or “just set it low” answer, which is exactly the situation AWRG’s learned parameters exist to avoid.\nThe embedding size \\(w\\) has a different shape entirely.\n\n\n\n\n   \n       \n       \n       \n   \n   \n          \n   \n   \n\n\n\n\nTripling \\(w\\) from 30 to 80 buys 6.9 points of macro \\(F_1\\) (77.5% to 84.4%) while nearly quadrupling training time (14 seconds to 51). Past a point, spending more \\(w\\) buys far less accuracy than it costs in training time, precisely the tradeoff the Common Mistake box near the end of this chapter warns about.",
     "crumbs": [
-      "Part 2: Disaggregation",
+      "Part 3: Disaggregation",
       "<span class='chapter-number'>5</span>  <span class='chapter-title'>Chapter 2: Appliance Recognition</span>"
     ]
   },
   {
-    "objectID": "book/02-disaggregation/02-feature-engineering.html#extending-to-industrial-three-phase-settings",
-    "href": "book/02-disaggregation/02-feature-engineering.html#extending-to-industrial-three-phase-settings",
+    "objectID": "book/03-disaggregation/02-feature-engineering.html#extending-to-industrial-three-phase-settings",
+    "href": "book/03-disaggregation/02-feature-engineering.html#extending-to-industrial-three-phase-settings",
     "title": "Chapter 2: Appliance Recognition",
     "section": "Extending to industrial, three-phase settings",
     "text": "Extending to industrial, three-phase settings\nWhich brings the chapter back to the bulb. Industrial sites mix large three-phase machinery with ordinary single-phase appliances, and real three-phase power is rarely perfectly balanced across all three lines [13]. When a small appliance shares a line with a large, unbalanced load, its activation current comes out distorted, and WRG built directly on that raw current inherits the distortion.\nThe tool for pulling the small signal back out is the Fortescue transform, a long-standing technique for decomposing an unbalanced three-phase system into three components: positive-sequence, negative-sequence, and zero-sequence. For a perfectly balanced three-phase system, the zero-sequence component is exactly zero. So whatever zero-sequence current does show up is, by construction, a direct measure of the imbalance itself, which is exactly where a single-phase appliance’s own signature tends to concentrate once it is sharing a line with something much larger [4]. The panels below put both sides of that fix side by side: a real LILACD bulb’s raw three-phase current, one phase carrying the load and the other two carrying almost nothing, next to the same event after the transform, where the zero-sequence component alone carries the bulb’s signature.\n\n\n\n\n   \n       \n       \n       \n   \n   \n          \n   \n   \n\n\n\n\nApplying the Fortescue transform before building the recurrence graph, then classifying with the same architecture as before, raises the combined-phase \\(F_1\\) score on LILACD from 94.21% without the transform to 96.43% with it. The V-I baseline fares far worse under imbalance: below 60% \\(F_1\\) for resistive single-phase appliances like the coffee machine, kettle, and raclette, precisely the appliances most likely to sit on a line with a large motor [4], [11].",
     "crumbs": [
-      "Part 2: Disaggregation",
+      "Part 3: Disaggregation",
       "<span class='chapter-number'>5</span>  <span class='chapter-title'>Chapter 2: Appliance Recognition</span>"
     ]
   },
   {
-    "objectID": "book/02-disaggregation/02-feature-engineering.html#training-and-evaluating-the-classifier",
-    "href": "book/02-disaggregation/02-feature-engineering.html#training-and-evaluating-the-classifier",
+    "objectID": "book/03-disaggregation/02-feature-engineering.html#training-and-evaluating-the-classifier",
+    "href": "book/03-disaggregation/02-feature-engineering.html#training-and-evaluating-the-classifier",
     "title": "Chapter 2: Appliance Recognition",
     "section": "Training and evaluating the classifier",
     "text": "Training and evaluating the classifier\nEvery number so far has been cited from the papers. This section trains a real classifier instead, on the full LILACD dataset: all 16 appliance types at once, three phases stacked as three input channels. The architecture is the same small three-layer CNN described earlier. The only thing that changes between runs is which image representation feeds it: V-I, WRG, or WRG with the Fortescue transform applied first. Following the same protocol as the AWRG paper, the model trains on a stratified 75% of the data and is evaluated on the untouched remaining 25% [2].\nBefore training that classifier, it is worth checking whether the features feeding it even separate appliances in the first place, with no model in the loop yet. The plot below runs t-SNE on the raw V-I and WRG feature vectors for six LILACD appliances chosen to mix single-phase and three-phase loads: a bulb, two resistive heaters this section later shows the classifier confusing, a single-phase motor, and two three-phase industrial machines.\n\n\n\n\n   \n       \n       \n       \n   \n   \n          \n   \n   \n\n\n\n\nUnder V-I, the six appliances’ clusters overlap heavily; under WRG, most of them pull apart, the two three-phase machines especially, since a large motor’s activation current has almost nothing in common with a bulb’s or a heater’s once WRG turns it into a graph instead of a loop. That is what the numbers below confirm with an actual trained classifier instead of an unsupervised projection.\n\n\n\n\n   \n       \n       \n       \n   \n   \n          \n   \n   \n\n\n\n\nThis notebook’s own run is smaller and faster than the published experiments: 40 training iterations on a single split, not 600 iterations across a 4-fold cross-validation. Treat the exact numbers as a live sanity check, not a reproduction of the paper’s headline scores. The ranking still comes out the same way: V-I trails badly (macro \\(F_1\\) 48.2%), WRG is a large step up (88.2%), and adding the Fortescue transform improves it further still (92.6%), the same ordering reported at full scale above. Which appliances specifically?\n\n\n\n\n   \n       \n       \n       \n   \n   \n          \n   \n   \n\n\n\n\nV-I’s worst scores are near-total failures on single-phase resistive loads: 0% on both Kettle and Hair-dryer, 14% on Coffee-machine, 18% on Raclette, all four are simple heating elements whose current shape carries almost no distinguishing detail as a V-I loop. WRG recovers Kettle and Coffee-machine completely (both reach 100%) and lifts Raclette to 73%, but Hair-dryer stays stuck at 0% until the Fortescue transform is added, at which point it jumps to 77%. WRG+FT is not a uniform upgrade over WRG alone, though: Coffee-machine actually drops from 100% to 84%, and Raclette from 73% to 68%. The net effect across all 16 appliances is still a gain (88.2% to 92.6% macro \\(F_1\\)), but it is not every appliance winning; it is Hair-dryer’s large gain outweighing two smaller losses elsewhere.\n\n\n\n\n   \n       \n       \n       \n   \n   \n          \n   \n   \n\n\n\n\nThe confusion matrix shows where the WRG+FT model still struggles, and it is not random. In this run, Raclette gets mistaken for Coffee-machine more than any other pair, both are simple resistive heating elements with similar current shapes, and a smaller Hair-dryer/Raclette confusion survives too. That second pair is the same one the FT paper itself calls out: without the transform, RG confuses Hair-dryer and Raclette repeatedly; FT does not erase that confusion, it only shrinks it [4]. Fixing what is left would need a feature that distinguishes resistive loads by something other than current magnitude, not a bigger version of the same image.\n\n\n\n\n   \n       \n       \n       \n   \n   \n          \n   \n   \n\n\n\n\nThat top confusion is not an abstraction. The panels above are the literal WRG+FT image behind one real held-out mistake: an actual Raclette activation the model called a Coffee-machine, next to an actual, correctly classified Coffee-machine. Placed side by side, the reason for the mix-up stops being a sentence about “similar resistive heating elements” and becomes a fact about two pictures that look almost the same.",
     "crumbs": [
-      "Part 2: Disaggregation",
+      "Part 3: Disaggregation",
       "<span class='chapter-number'>5</span>  <span class='chapter-title'>Chapter 2: Appliance Recognition</span>"
     ]
   },
   {
-    "objectID": "book/02-disaggregation/02-feature-engineering.html#why-bother",
-    "href": "book/02-disaggregation/02-feature-engineering.html#why-bother",
+    "objectID": "book/03-disaggregation/02-feature-engineering.html#why-bother",
+    "href": "book/03-disaggregation/02-feature-engineering.html#why-bother",
     "title": "Chapter 2: Appliance Recognition",
     "section": "Why bother",
     "text": "Why bother\nNone of this is only a classification exercise. Recognizing that an activation came from “Motor #3” is a means, not the point. What actually pays for the sensor is what that signature reveals about the shape of the current a machine draws, cycle after cycle, and whether that shape is drifting.\nA bearing wearing down, a rotor bar cracking, a winding starting to degrade: all of these distort a motor’s own current draw first, well before the vibration, heat, or noise a technician would notice on a walk through. That is the same physical fact this whole chapter has been built on: current carries an appliance’s identity in its shape, not just its magnitude. Nothing about that fact stops being true once an appliance is correctly classified. The WRG image built to answer “which machine is this” is the same object that can answer “does this machine still look like itself.” Comparing a motor’s own recurrence graph against its healthy baseline, month over month, is the identical distance-similarity computation this chapter opened with, run against the machine’s own past instead of against other appliance classes.\nThat reframing is what makes this worth building beyond a labeling exercise. An industrial site that already runs this feature pipeline for appliance recognition gets equipment health monitoring for free: no vibration sensor, no thermal camera, no extra hardware per machine, just the same aggregate current measurement, phase imbalance and all, read a second way. Catching a large motor’s changing signature while it is still running, instead of after it stops, is the same value proposition Chapter 1 introduced for a household fridge, now scaled to equipment where an unplanned outage is measured in downtime and lost production, not spoiled food [4].",
     "crumbs": [
-      "Part 2: Disaggregation",
+      "Part 3: Disaggregation",
       "<span class='chapter-number'>5</span>  <span class='chapter-title'>Chapter 2: Appliance Recognition</span>"
     ]
   },
   {
-    "objectID": "book/02-disaggregation/02-feature-engineering.html#where-this-part-of-the-book-goes",
-    "href": "book/02-disaggregation/02-feature-engineering.html#where-this-part-of-the-book-goes",
+    "objectID": "book/03-disaggregation/02-feature-engineering.html#where-this-part-of-the-book-goes",
+    "href": "book/03-disaggregation/02-feature-engineering.html#where-this-part-of-the-book-goes",
     "title": "Chapter 2: Appliance Recognition",
     "section": "Where this part of the book goes",
     "text": "Where this part of the book goes\nThis chapter treated every event as caused by exactly one appliance changing state. Real aggregate signals rarely cooperate:\n\nChapter 3, multi-appliance recognition, extends this same graph-based representation to the more realistic case where several appliances change state at once, all captured in the same activation window.\nChapter 4, deep learning at low frequency, moves off event-based, high-frequency features entirely, onto the energy-estimation side of NILM introduced in Chapter 1.\n\n\n Common Mistake\nAssuming a larger embedding size \\(w\\) always helps. Past a certain resolution, a bigger \\(WRG\\) image stops paying for itself: this chapter’s own sweep found tripling \\(w\\) from 30 to 80 worth only 6.9 points of macro \\(F_1\\) for nearly quadruple the training time. Too small a \\(w\\), on the other hand, genuinely loses information. The right size is found empirically, once, not maximized by default.",
     "crumbs": [
-      "Part 2: Disaggregation",
+      "Part 3: Disaggregation",
       "<span class='chapter-number'>5</span>  <span class='chapter-title'>Chapter 2: Appliance Recognition</span>"
     ]
   },
   {
-    "objectID": "book/02-disaggregation/02-feature-engineering.html#references",
-    "href": "book/02-disaggregation/02-feature-engineering.html#references",
+    "objectID": "book/03-disaggregation/02-feature-engineering.html#references",
+    "href": "book/03-disaggregation/02-feature-engineering.html#references",
     "title": "Chapter 2: Appliance Recognition",
     "section": "References",
     "text": "References\n\n\n[1] A. Faustine and L. Pereira, “Improved appliance classification in non-intrusive load monitoring using weighted recurrence graph and convolutional neural networks,” Energies, vol. 13, no. 13, p. 3374, 2020, doi: 10.3390/en13133374.\n\n\n[2] A. Faustine, L. Pereira, and C. Klemenjak, “Adaptive weighted recurrence graphs for appliance recognition in non-intrusive load monitoring,” IEEE Transactions on Smart Grid, vol. 12, no. 1, pp. 398–406, 2021, doi: 10.1109/TSG.2020.3010621.\n\n\n[3] L. De Baets, J. Ruyssinck, C. Develder, T. Dhaene, and D. Deschrijver, “Appliance classification using VI trajectories and convolutional neural networks,” Energy and Buildings, vol. 158, pp. 32–36, 2018, doi: 10.1016/j.enbuild.2017.09.087.\n\n\n[4] A. Faustine and L. Pereira, “Applying symmetrical component transform for industrial appliance classification in non-intrusive load monitoring,” in ICASSP 2023 - IEEE international conference on acoustics, speech and signal processing (ICASSP), IEEE, 2023, pp. 1–5. doi: 10.1109/ICASSP49357.2023.10096324.\n\n\n[5] L. De Baets, T. Dhaene, D. Deschrijver, C. Develder, and M. Bergés, “VI-based appliance classification using aggregated power consumption data,” in 2018 IEEE international conference on smart computing (SMARTCOMP), 2018, pp. 179–186. doi: 10.1109/SMARTCOMP.2018.00089.\n\n\n[6] N. Marwan, M. C. Romano, M. Thiel, and J. Kurths, “Recurrence plots for the analysis of complex systems,” Physics Reports, vol. 438, no. 5, pp. 237–329, 2007, doi: 10.1016/j.physrep.2006.11.001.\n\n\n[7] T. Picon et al., “COOLL: Controlled on/off loads library, a public dataset of high-sampled electrical signals for appliance identification,” arXiv preprint arXiv:1611.05803, 2016.\n\n\n[8] J. Gao, S. Giri, E. C. Kara, and M. Bergés, “PLAID: A public dataset of high-resolution electrical appliance measurements for load identification research: Demo abstract,” in Proceedings of the 1st ACM conference on embedded systems for energy-efficient buildings, 2014, pp. 198–199. doi: 10.1145/2674061.2675032.\n\n\n[9] M. Kahl, A. Ul Haq, T. Kriechbaumer, and H.-A. Jacobsen, “WHITED: A worldwide household and industry transient energy data set,” in 3rd international workshop on non-intrusive load monitoring (NILM), 2016.\n\n\n[10] J. Gao, E. C. Kara, S. Giri, and M. Bergés, “A feasibility study of automated plug-load identification from high-frequency measurements,” in 2015 IEEE global conference on signal and information processing (GlobalSIP), 2015, pp. 220–224. doi: 10.1109/GlobalSIP.2015.7418189.\n\n\n[11] M. Kahl et al., “Measurement system and dataset for in-depth analysis of appliance energy consumption in industrial environment,” tm - Technisches Messen, vol. 86, no. 1, pp. 1–13, 2019, doi: 10.1515/teme-2018-0038.\n\n\n[12] R. Medico et al., “A voltage and current measurement dataset for plug load appliance identification in households,” Scientific Data, vol. 7, no. 1, p. 49, 2020, doi: 10.1038/s41597-020-0389-7.\n\n\n[13] S. Henriet, U. Şimşekli, B. Fuentes, and G. Richard, “A generative model for non-intrusive load monitoring in commercial buildings,” Energy and Buildings, vol. 177, pp. 268–278, 2018, doi: 10.1016/j.enbuild.2018.07.060.",
     "crumbs": [
-      "Part 2: Disaggregation",
+      "Part 3: Disaggregation",
       "<span class='chapter-number'>5</span>  <span class='chapter-title'>Chapter 2: Appliance Recognition</span>"
     ]
   },
   {
-    "objectID": "book/02-disaggregation/03-multi-appliance-recognition.html",
-    "href": "book/02-disaggregation/03-multi-appliance-recognition.html",
+    "objectID": "book/03-disaggregation/03-multi-appliance-recognition.html",
+    "href": "book/03-disaggregation/03-multi-appliance-recognition.html",
     "title": "Chapter 3: Multi-Appliance Recognition",
     "section": "",
     "text": "From one label to a set of labels\nA coffee maker clicks on. Before its heating element has even settled into a steady draw, the kettle across the counter finishes boiling and clicks off, and the fan in the next room is still running from twenty minutes ago. One current window, three appliances, two of them mid-cycle already. Chapter 2’s whole pipeline, the before-window, the after-window, the subtraction that isolates exactly one appliance’s signature, quietly assumed this never happens: that whatever changes in a window is caused by exactly one appliance switching state. Real homes do not clear that assumption. They rarely change one thing at a time.\nThis chapter keeps the tools Chapter 2 built, activation windows, PAA, distance-similarity matrices, a small CNN, but asks a different question of them. Not “which one appliance is this,” but “which appliances, plural, are active right now.” That is a genuinely different problem, not a harder version of the same one, and it needs a different label, a different metric, and one new piece of signal processing to answer well.\nChapter 2’s classifier picked exactly one class per activation. That stops making sense the moment more than one appliance can be active in the same window: the aggregate current a classifier sees is the sum of whatever is running, not a clean sample of one appliance. The right target is a state vector, one entry per appliance, each either on or off, not a single class index. Given aggregate measurements \\(x_t\\) built from \\(M\\) appliances, each with its own power draw \\(y_t^{(m)}\\) and state \\(s_t^{(m)} \\in \\{0,1\\}\\),\n\\[\nx_t = \\sum_{m=1}^{M} y_t^{(m)} \\cdot s_t^{(m)} + \\epsilon_t\n\\]\nthe job is to recover the whole state vector \\(\\mathbf{s}_t\\), not one label, from one aggregate feature vector [1].",
     "crumbs": [
-      "Part 2: Disaggregation",
+      "Part 3: Disaggregation",
       "<span class='chapter-number'>6</span>  <span class='chapter-title'>Chapter 3: Multi-Appliance Recognition</span>"
     ]
   },
   {
-    "objectID": "book/02-disaggregation/03-multi-appliance-recognition.html#from-one-label-to-a-set-of-labels",
-    "href": "book/02-disaggregation/03-multi-appliance-recognition.html#from-one-label-to-a-set-of-labels",
+    "objectID": "book/03-disaggregation/03-multi-appliance-recognition.html#from-one-label-to-a-set-of-labels",
+    "href": "book/03-disaggregation/03-multi-appliance-recognition.html#from-one-label-to-a-set-of-labels",
     "title": "Chapter 3: Multi-Appliance Recognition",
     "section": "",
     "text": "Key Concept\nMacro \\(F_1\\), the metric Chapter 2 used throughout, still works here: it scores each appliance separately and averages, so an appliance that is almost always off does not get to hide behind one that is almost always on. But multi-label prediction has a second, equally real question macro \\(F_1\\) cannot answer on its own: for this one activation, did the model get the whole set right, not just each appliance’s own average? Example-based \\(F_1\\) (\\(F_1\\)-eb) answers that instead, scoring each sample’s predicted set against its true set and averaging over samples. A model can score well on one and poorly on the other: high macro \\(F_1\\) with a few appliances it never gets right in combination, or high \\(F_1\\)-eb with one rare appliance it silently ignores. Both numbers matter; neither replaces the other.",
     "crumbs": [
-      "Part 2: Disaggregation",
+      "Part 3: Disaggregation",
       "<span class='chapter-number'>6</span>  <span class='chapter-title'>Chapter 3: Multi-Appliance Recognition</span>"
     ]
   },
   {
-    "objectID": "book/02-disaggregation/03-multi-appliance-recognition.html#does-the-same-feature-carry-over-as-is",
-    "href": "book/02-disaggregation/03-multi-appliance-recognition.html#does-the-same-feature-carry-over-as-is",
+    "objectID": "book/03-disaggregation/03-multi-appliance-recognition.html#does-the-same-feature-carry-over-as-is",
+    "href": "book/03-disaggregation/03-multi-appliance-recognition.html#does-the-same-feature-carry-over-as-is",
     "title": "Chapter 3: Multi-Appliance Recognition",
     "section": "Does the same feature carry over as-is?",
     "text": "Does the same feature carry over as-is?\nThe obvious first move is to reuse Chapter 2’s own two representations, the binary V-I image and the raw activation current, and just see what happens once “the current” might be more than one appliance’s signature added together. The plot below is a real PLAID event with two appliances already active in the same window.\n\n\n\n\n   \n       \n       \n       \n   \n   \n          \n   \n   \n\n\n\n\nTraining the same small CNN on both representations, on a real, multi-label subset of PLAID (1154 aggregated activations, each labeled with every appliance active in the background, not just whichever one changed state [1]), gives a real answer rather than an assumed one.\n\n\n\n\n   \n       \n       \n       \n   \n   \n          \n   \n   \n\n\n\n\nV-I image reaches 65.7% macro \\(F_1\\); raw activation current reaches 62.7%. That is not the order the published result found, current a few points ahead of V-I there too [1], but the published gap between them is itself small (0.826 to 0.849), and this run’s own gap is just as small in the other direction. Read it as what it is: two representations that are genuinely close, not one cleanly beating the other. Neither is good enough to call this problem solved.",
     "crumbs": [
-      "Part 2: Disaggregation",
+      "Part 3: Disaggregation",
       "<span class='chapter-number'>6</span>  <span class='chapter-title'>Chapter 3: Multi-Appliance Recognition</span>"
     ]
   },
   {
-    "objectID": "book/02-disaggregation/03-multi-appliance-recognition.html#fryze-power-decomposition",
-    "href": "book/02-disaggregation/03-multi-appliance-recognition.html#fryze-power-decomposition",
+    "objectID": "book/03-disaggregation/03-multi-appliance-recognition.html#fryze-power-decomposition",
+    "href": "book/03-disaggregation/03-multi-appliance-recognition.html#fryze-power-decomposition",
     "title": "Chapter 3: Multi-Appliance Recognition",
     "section": "Fryze power decomposition",
     "text": "Fryze power decomposition\nThe fix is not a bigger network. It is a real piece of signal processing Chapter 2 never needed: splitting the current itself into two physically different parts before any image gets built. The Fryze power theory decomposes an activation current \\(i(t)\\) into an active component, purely resistive, in phase with the voltage, and a non-active component, whatever is left over [1]:\n\\[\ni(t) = i_a(t) + i_f(t)\n\\]\nThe active component carries the same active power as the real signal, at the same voltage:\n\\[\ni_a(t) = \\frac{p_a}{v_\\text{rms}^2} \\, v(t), \\qquad\np_a = \\frac{1}{T_s}\\sum_{t=1}^{T_s} i(t) \\, v(t)\n\\]\nand the non-active component is simply what remains, \\(i_f(t) = i(t) -\ni_a(t)\\). Two appliances sharing a window rarely agree on both of these at once, even when their raw sum looks similar. The plot below applies this split to the same two-appliance event shown above.",
     "crumbs": [
-      "Part 2: Disaggregation",
+      "Part 3: Disaggregation",
       "<span class='chapter-number'>6</span>  <span class='chapter-title'>Chapter 3: Multi-Appliance Recognition</span>"
     ]
   },
   {
-    "objectID": "book/02-disaggregation/03-multi-appliance-recognition.html#from-decomposed-current-to-a-distance-matrix",
-    "href": "book/02-disaggregation/03-multi-appliance-recognition.html#from-decomposed-current-to-a-distance-matrix",
+    "objectID": "book/03-disaggregation/03-multi-appliance-recognition.html#from-decomposed-current-to-a-distance-matrix",
+    "href": "book/03-disaggregation/03-multi-appliance-recognition.html#from-decomposed-current-to-a-distance-matrix",
     "title": "Chapter 3: Multi-Appliance Recognition",
     "section": "From decomposed current to a distance matrix",
     "text": "From decomposed current to a distance matrix\nChapter 2’s distance_matrix() step reappears unchanged. It is applied separately to the active and non-active components, each PAA-reduced to the same fixed size \\(w\\), and stacked as two channels the same way Chapter 2 stacked three phases for LILACD. Four representations are compared in total: the V-I image and raw current from above, the decomposed current itself fed directly to a small 1D CNN, and the decomposed current’s own distance-similarity matrix fed to a 2D CNN.\n\n\n\n\n   \n       \n       \n       \n   \n   \n          \n   \n   \n\n\n\n\nDecomposing the current is what actually moves the number: 79.7% macro \\(F_1\\) for the decomposed current itself, 77.9% for its distance matrix, both roughly 15 points above either representation that skipped the decomposition. The published result finds the same shape (0.931 and 0.940 macro \\(F_1\\) against 0.826 to 0.849 without decomposition) and calls the two decomposed features “comparable,” which is exactly what this run finds too: decomposed current and decomposed distance land within two points of each other, in either order [1]. The signal processing step is doing the real work here, not the choice of image on top of it.",
     "crumbs": [
-      "Part 2: Disaggregation",
+      "Part 3: Disaggregation",
       "<span class='chapter-number'>6</span>  <span class='chapter-title'>Chapter 3: Multi-Appliance Recognition</span>"
     ]
   },
   {
-    "objectID": "book/02-disaggregation/03-multi-appliance-recognition.html#the-multi-label-head-and-what-its-softmax-trick-actually-buys",
-    "href": "book/02-disaggregation/03-multi-appliance-recognition.html#the-multi-label-head-and-what-its-softmax-trick-actually-buys",
+    "objectID": "book/03-disaggregation/03-multi-appliance-recognition.html#the-multi-label-head-and-what-its-softmax-trick-actually-buys",
+    "href": "book/03-disaggregation/03-multi-appliance-recognition.html#the-multi-label-head-and-what-its-softmax-trick-actually-buys",
     "title": "Chapter 3: Multi-Appliance Recognition",
     "section": "The multi-label head, and what its softmax trick actually buys",
     "text": "The multi-label head, and what its softmax trick actually buys\nThe usual way to bolt multi-label output onto a CNN is a sigmoid per appliance and a threshold, typically 0.5, that turns a probability into a yes-or-no. That threshold is picked after training, not learned as part of it, and building a better one is its own open problem [1]. The classifier trained above does something more specific instead: it produces two logits per appliance, one for off and one for on, and applies a softmax over just those two before a cross-entropy loss, verified directly against the author’s own training code, not just the paper’s prose.\n\n\n\n\n\n\nFigure 6.1: Two ways to turn a logit into a yes-or-no. Sigmoid needs an external cutoff, fixed after training and hard to improve on. The two-logit softmax folds that decision into the network itself: whichever logit is larger wins.\n\n\n\nWorth being precise about what that buys, because the honest answer is narrower than it first sounds. Write appliance \\(m\\)’s two logits as \\((a_m,\nb_m)\\), off and on. The softmax probability of “on” is\n\\[\n\\hat{p}_m = \\frac{\\exp(b_m)}{\\exp(a_m) + \\exp(b_m)}\n          = \\frac{1}{1 + \\exp(a_m - b_m)}\n          = \\mathrm{sigmoid}(b_m - a_m),\n\\]\ndividing numerator and denominator by \\(\\exp(b_m)\\). So this is a reparametrized sigmoid, not a fundamentally different mechanism. What is genuinely different is where the decision boundary lives: with two competing logits, “on” wins whenever \\(b_m &gt; a_m\\), a rule trained end to end as part of the network, rather than an external 0.5 cutoff applied to a probability after the fact. Small difference, but a real one, and it is the one this chapter can defend without overselling it.\nOne more honest note. The original paper describes this loss as one that “implicitly captures the relations between labels” [1]. Structurally, that is not quite what is happening: each appliance’s two-logit softmax above is computed independently of every other appliance’s, with no term in the loss that couples them directly. Whatever relation the model learns between, say, a kettle and a fan being on together comes entirely from the shared CNN encoder underneath, the same 128 features feeding every appliance’s own logit pair, not from the softmax or the loss itself. Worth knowing before reading more into the mechanism than it delivers.",
     "crumbs": [
-      "Part 2: Disaggregation",
+      "Part 3: Disaggregation",
       "<span class='chapter-number'>6</span>  <span class='chapter-title'>Chapter 3: Multi-Appliance Recognition</span>"
     ]
   },
   {
-    "objectID": "book/02-disaggregation/03-multi-appliance-recognition.html#which-appliances-specifically",
-    "href": "book/02-disaggregation/03-multi-appliance-recognition.html#which-appliances-specifically",
+    "objectID": "book/03-disaggregation/03-multi-appliance-recognition.html#which-appliances-specifically",
+    "href": "book/03-disaggregation/03-multi-appliance-recognition.html#which-appliances-specifically",
     "title": "Chapter 3: Multi-Appliance Recognition",
     "section": "Which appliances specifically?",
     "text": "Which appliances specifically?\nMacro \\(F_1\\) hides which appliances the winning feature still struggles with. Per-appliance \\(F_1\\), V-I image against the decomposed distance matrix, on the same held-out split.\n\n\n\n\n   \n       \n       \n       \n   \n   \n          \n   \n   \n\n\n\n\nMost appliances improve substantially: AC, CFL, Fan, ILB, and LaptopCharger all sit under 70% on V-I, some far under it (CFL at 64%, Fan at 52%), and all five clear 70% on the decomposed distance matrix, CFL by nearly 30 points. Appliances already strong on V-I stay strong: HairIron, FridgeDefroster, Fridge, and Vacuum (100% on both). SolderingIron and Waterkettle improve substantially without quite crossing the 70% line, and CoffeeMaker barely moves at all, the one exception the next section explains directly. The published result reports the same broad pattern, over 90% example-based \\(F_1\\) for every appliance except AC, ILB, and LaptopCharger, once the decomposed distance feature is used [1]. This run’s own weak point is sharper and different in its specifics: CoffeeMaker stays at 19.5% even after decomposition, its worst score by a wide margin. Coffee makers are simple resistive heating elements, the same category of appliance Chapter 2 found genuinely hard to tell apart in LILACD (Raclette and Coffee-machine confused each other more than any other pair there). The same physical reason plausibly applies here, and unlike in Chapter 2, it is checkable directly rather than left as a plausible story.",
     "crumbs": [
-      "Part 2: Disaggregation",
+      "Part 3: Disaggregation",
       "<span class='chapter-number'>6</span>  <span class='chapter-title'>Chapter 3: Multi-Appliance Recognition</span>"
     ]
   },
   {
-    "objectID": "book/02-disaggregation/03-multi-appliance-recognition.html#why-the-coffee-maker-specifically",
-    "href": "book/02-disaggregation/03-multi-appliance-recognition.html#why-the-coffee-maker-specifically",
+    "objectID": "book/03-disaggregation/03-multi-appliance-recognition.html#why-the-coffee-maker-specifically",
+    "href": "book/03-disaggregation/03-multi-appliance-recognition.html#why-the-coffee-maker-specifically",
     "title": "Chapter 3: Multi-Appliance Recognition",
     "section": "Why the coffee maker specifically?",
     "text": "Why the coffee maker specifically?\nRestricting to the 648 single-appliance activations (so each point is one appliance’s own current, not several summed together), the Fryze split gives a direct per-sample measurement: how much of an appliance’s own current is non-active, as a share of its total RMS current. A purely resistive load carries almost no non-active current by definition; a motor or a switching power supply carries much more.\n\n\n\n\n   \n       \n       \n       \n   \n   \n          \n   \n   \n\n\n\n\nThe three lowest scorers on the decomposed distance matrix, SolderingIron, Waterkettle, and CoffeeMaker, are exactly the three appliances with the lowest median non-active share here (8.0%, 8.8%, and 9.0%), clustered on top of each other near zero. AC and ILB, also plain resistive loads, sit close behind at 10.8% and 14.1%. Motors and electronics separate cleanly from all of them: Fridge and HairIron sit in the 30-40% range, and CFL and LaptopCharger, both switching electronics, average above 85%. CoffeeMaker’s weak score is not a modelling failure; it is measuring an appliance whose own current genuinely looks like its resistive neighbours, decomposition or not.",
     "crumbs": [
-      "Part 2: Disaggregation",
+      "Part 3: Disaggregation",
       "<span class='chapter-number'>6</span>  <span class='chapter-title'>Chapter 3: Multi-Appliance Recognition</span>"
     ]
   },
   {
-    "objectID": "book/02-disaggregation/03-multi-appliance-recognition.html#what-kind-of-mistake-is-it",
-    "href": "book/02-disaggregation/03-multi-appliance-recognition.html#what-kind-of-mistake-is-it",
+    "objectID": "book/03-disaggregation/03-multi-appliance-recognition.html#what-kind-of-mistake-is-it",
+    "href": "book/03-disaggregation/03-multi-appliance-recognition.html#what-kind-of-mistake-is-it",
     "title": "Chapter 3: Multi-Appliance Recognition",
     "section": "What kind of mistake is it?",
     "text": "What kind of mistake is it?\nA multi-label miss is not one thing. Missing every active appliance is a different failure than mislabeling one of three, and lumping them into a single error rate hides which failure mode actually needs fixing. Following the same taxonomy the original paper used: zero-error (predicts nothing active when something is), one-to-one (gets the single active appliance wrong when only one is running), and many-to-many (confuses at least one appliance when several are active, split further by how many of them it got wrong) [1].\n\n\n\n\n   \n       \n       \n       \n   \n   \n          \n   \n   \n\n\n\n\nOf 111 incorrect predictions on this held-out split, single-appliance confusions dominate: 68 samples where the model got every active appliance right except one. Zero-errors are rare (16), complete misses rarer still (8), and one-to-one errors, the case where only one appliance is running at all, are the least common failure of any type (9), the same result the published paper found: with over 50% of activations being single-appliance events, the model sees plenty of them and gets almost all of them right. Where this run’s own finding actually diverges from the published one is the many-to-many split itself. The paper reports double-errors as its most common failure; here, single-errors dominate instead. That is plausibly a consequence of the data itself: two-appliance activations outnumber three-appliance ones by roughly four to one, so when the model does slip on a multi-appliance window, the more likely window to slip on is a two-appliance one, where getting one of two wrong is, by construction, a single-error.",
     "crumbs": [
-      "Part 2: Disaggregation",
+      "Part 3: Disaggregation",
       "<span class='chapter-number'>6</span>  <span class='chapter-title'>Chapter 3: Multi-Appliance Recognition</span>"
     ]
   },
   {
-    "objectID": "book/02-disaggregation/03-multi-appliance-recognition.html#why-bother",
-    "href": "book/02-disaggregation/03-multi-appliance-recognition.html#why-bother",
+    "objectID": "book/03-disaggregation/03-multi-appliance-recognition.html#why-bother",
+    "href": "book/03-disaggregation/03-multi-appliance-recognition.html#why-bother",
     "title": "Chapter 3: Multi-Appliance Recognition",
     "section": "Why bother",
     "text": "Why bother\nTwo concrete things this buys beyond “now it handles more than one appliance.” First, deployability: single-label recognition has a hidden dependency on a near-perfect event detector, one that guarantees clean, isolated activations. That holds in a curated dataset and fails constantly in a real home, a fridge compressor cycling in the background while a kettle switches on. Multi-label recognition removes that dependency entirely; it does not need the aggregate signal to cooperate.\nSecond, co-occurrence is itself the information, not just a nuisance to model around. Knowing that a kettle, a hair dryer, and an air conditioner are all drawing power at the same instant is exactly what a time-of-use tariff, a demand-response program, or a circuit-capacity check needs, and it is something a sequence of clean, single-appliance events can never directly answer. Chapter 2’s own “why bother” was one machine’s signature drifting over months, an industrial, predictive-maintenance value. This chapter’s is the residential-facing counterpart: which appliances are drawing power together, right now.",
     "crumbs": [
-      "Part 2: Disaggregation",
+      "Part 3: Disaggregation",
       "<span class='chapter-number'>6</span>  <span class='chapter-title'>Chapter 3: Multi-Appliance Recognition</span>"
     ]
   },
   {
-    "objectID": "book/02-disaggregation/03-multi-appliance-recognition.html#where-this-part-of-the-book-goes",
-    "href": "book/02-disaggregation/03-multi-appliance-recognition.html#where-this-part-of-the-book-goes",
+    "objectID": "book/03-disaggregation/03-multi-appliance-recognition.html#where-this-part-of-the-book-goes",
+    "href": "book/03-disaggregation/03-multi-appliance-recognition.html#where-this-part-of-the-book-goes",
     "title": "Chapter 3: Multi-Appliance Recognition",
     "section": "Where this part of the book goes",
     "text": "Where this part of the book goes\nThis chapter and the last both stayed inside the same high-frequency, event-based world: a short activation window, a graph-like or distance-based image, a CNN. Real smart meters mostly do not offer that world at all.\n\nChapter 4, deep learning at low frequency, moves off event-based, high-frequency features entirely, onto the energy-estimation side of NILM introduced in Chapter 1, the kind of problem a meter reporting once every few seconds can actually be asked to solve.\n\n\n Common Mistake\nTreating a low per-appliance macro \\(F_1\\) as one failure with one cause. CoffeeMaker’s 19.5% here and the published paper’s own AC/ILB/LaptopCharger weak points are not evidence that decomposition “doesn’t work”; they are evidence that current-shape features cap out on appliances whose current shape is not very distinctive to begin with, mostly plain resistive loads. Fixing that needs a feature sensitive to something other than current shape, not a longer training run on the same one.",
     "crumbs": [
-      "Part 2: Disaggregation",
+      "Part 3: Disaggregation",
       "<span class='chapter-number'>6</span>  <span class='chapter-title'>Chapter 3: Multi-Appliance Recognition</span>"
     ]
   },
   {
-    "objectID": "book/02-disaggregation/03-multi-appliance-recognition.html#references",
-    "href": "book/02-disaggregation/03-multi-appliance-recognition.html#references",
+    "objectID": "book/03-disaggregation/03-multi-appliance-recognition.html#references",
+    "href": "book/03-disaggregation/03-multi-appliance-recognition.html#references",
     "title": "Chapter 3: Multi-Appliance Recognition",
     "section": "References",
     "text": "References\n\n\n[1] A. Faustine and L. Pereira, “Multi-label learning for appliance recognition in NILM using Fryze-current decomposition and convolutional neural network,” Energies, vol. 13, no. 16, p. 4154, 2020, doi: 10.3390/en13164154.",
     "crumbs": [
-      "Part 2: Disaggregation",
+      "Part 3: Disaggregation",
       "<span class='chapter-number'>6</span>  <span class='chapter-title'>Chapter 3: Multi-Appliance Recognition</span>"
     ]
   },
   {
-    "objectID": "book/02-disaggregation/04-multi-task-low-frequency.html",
-    "href": "book/02-disaggregation/04-multi-task-low-frequency.html",
+    "objectID": "book/03-disaggregation/04-multi-task-low-frequency.html",
+    "href": "book/03-disaggregation/04-multi-task-low-frequency.html",
     "title": "Chapter 4: Multi-Task Deep Learning at Low Frequency",
     "section": "",
     "text": "From one state to a state and a power\nA kettle switches on. Not as a crisp current transient at 30kHz, the kind Chapters 2 and 3 built their whole pipeline around, but as a slow rise in a number a real smart meter reports once every few seconds. There is no before-window and after-window to subtract, no single clean event to isolate: a fridge is already cycling, a dishwasher is running, and the kettle’s own contribution is just one more wrinkle in a continuously wandering aggregate curve. This is the low-frequency world Chapter 1 named and Chapter 3 handed off to: energy estimation, not load identification, at the rate every real smart meter actually reports.\nThe question changes with it. Not “which appliance is this event,” not even “which appliances are active in this window” (Chapter 3): now, how much power is each one drawing, continuously, moment to moment, alongside whether it is on at all.\nAn aggregate reading is still the same sum Chapters 3 and 4’s own source papers both start from,\n\\[\nx_t = \\sum_{m=1}^{M} y_m(t) \\cdot s_m(t) + \\epsilon_t,\n\\]\nbut now each appliance \\(m\\) carries two targets instead of one: a binary state \\(s_m(t) \\in \\{0, 1\\}\\) and a continuous power \\(y_m(t)\\), one derived directly from the other by a fixed threshold. That coupling is the actual argument for a multi-task model: one shared representation feeding two heads, rather than a classifier and a regressor trained as if they had nothing to do with each other [1].\nFive real UK-DALE house-1 appliances make this concrete: kettle, fridge, dishwasher, washing machine, microwave, the same subset and the same house the source paper itself uses.",
     "crumbs": [
-      "Part 2: Disaggregation",
+      "Part 3: Disaggregation",
       "<span class='chapter-number'>7</span>  <span class='chapter-title'>Chapter 4: Multi-Task Deep Learning at Low Frequency</span>"
     ]
   },
   {
-    "objectID": "book/02-disaggregation/04-multi-task-low-frequency.html#turning-a-power-curve-into-a-state",
-    "href": "book/02-disaggregation/04-multi-task-low-frequency.html#turning-a-power-curve-into-a-state",
+    "objectID": "book/03-disaggregation/04-multi-task-low-frequency.html#turning-a-power-curve-into-a-state",
+    "href": "book/03-disaggregation/04-multi-task-low-frequency.html#turning-a-power-curve-into-a-state",
     "title": "Chapter 4: Multi-Task Deep Learning at Low Frequency",
     "section": "Turning a power curve into a state",
     "text": "Turning a power curve into a state\nAbove a fixed on-power threshold (2000W for the kettle, the real constant this data was built from), a continuous curve becomes a binary label. That threshold is not something the model has to discover; it is how the ground truth itself was built.",
     "crumbs": [
-      "Part 2: Disaggregation",
+      "Part 3: Disaggregation",
       "<span class='chapter-number'>7</span>  <span class='chapter-title'>Chapter 4: Multi-Task Deep Learning at Low Frequency</span>"
     ]
   },
   {
-    "objectID": "book/02-disaggregation/04-multi-task-low-frequency.html#from-an-activation-window-to-a-sliding-window",
-    "href": "book/02-disaggregation/04-multi-task-low-frequency.html#from-an-activation-window-to-a-sliding-window",
+    "objectID": "book/03-disaggregation/04-multi-task-low-frequency.html#from-an-activation-window-to-a-sliding-window",
+    "href": "book/03-disaggregation/04-multi-task-low-frequency.html#from-an-activation-window-to-a-sliding-window",
     "title": "Chapter 4: Multi-Task Deep Learning at Low Frequency",
     "section": "From an activation window to a sliding window",
     "text": "From an activation window to a sliding window\nChapters 2 and 3 isolated one detected event: a before-window and an after-window around a single state change. There is no event to detect at low frequency, so a fixed window of 100 consecutive aggregate readings slides across the whole signal instead, and the target is the state and power at the window’s last point, a seq2point framing, matching the Dataset class in the author’s own UNETNiLM repository. That repository builds windows one at a time in Python; at this chapter’s scale, hundreds of thousands of candidate windows rather than Chapters 2-3’s few thousand activations, that loop is a real bottleneck, so this notebook gathers every window with one vectorized NumPy operation instead.",
     "crumbs": [
-      "Part 2: Disaggregation",
+      "Part 3: Disaggregation",
       "<span class='chapter-number'>7</span>  <span class='chapter-title'>Chapter 4: Multi-Task Deep Learning at Low Frequency</span>"
     ]
   },
   {
-    "objectID": "book/02-disaggregation/04-multi-task-low-frequency.html#two-backbones-one-set-of-heads",
-    "href": "book/02-disaggregation/04-multi-task-low-frequency.html#two-backbones-one-set-of-heads",
+    "objectID": "book/03-disaggregation/04-multi-task-low-frequency.html#two-backbones-one-set-of-heads",
+    "href": "book/03-disaggregation/04-multi-task-low-frequency.html#two-backbones-one-set-of-heads",
     "title": "Chapter 4: Multi-Task Deep Learning at Low Frequency",
     "section": "Two backbones, one set of heads",
     "text": "Two backbones, one set of heads\n\n Key Concept\nMulti-target quantile regression is not five separate regressions bolted together. A single shared network predicts a handful of quantiles per appliance at once (here, the paper’s own choice: 2.5%, 10%, 50%, 90%, 97.5%), trained with the pinball loss, which penalizes over- and under-prediction asymmetrically depending on which quantile is being fit. The payoff: a real uncertainty band around every prediction, not just a point estimate, at essentially no extra modeling cost over a plain regression head [1].\n\nBoth backbones compared here end in the identical pair of heads: a per-appliance 2-way softmax for state, the same mechanism Chapter 3 used for multi-label appliance state, and a per-appliance multi-quantile linear head for power. CNN1DModel is a plain stacked-Conv1D encoder. UNETNiLM is a true U-Net: the same downsampling stack, followed by an upsampling stack with skip-connection concatenation back to the matching downsampling stage. Ported directly from the author’s own UNETNiLM repository, with two small fixes applied along the way: the checked-out unet.py imports Conv1D/Deconv1D from a .block module that does not exist (they live in layers.py), and its U-Net class referred to an undefined num_classes that needed to be a constructor argument. Both are one-line fixes, not a redesign; everything else is the original architecture, verified directly against the code, not just the paper’s prose.",
     "crumbs": [
-      "Part 2: Disaggregation",
+      "Part 3: Disaggregation",
       "<span class='chapter-number'>7</span>  <span class='chapter-title'>Chapter 4: Multi-Task Deep Learning at Low Frequency</span>"
     ]
   },
   {
-    "objectID": "book/02-disaggregation/04-multi-task-low-frequency.html#live-results-does-the-u-net-actually-help-here",
-    "href": "book/02-disaggregation/04-multi-task-low-frequency.html#live-results-does-the-u-net-actually-help-here",
+    "objectID": "book/03-disaggregation/04-multi-task-low-frequency.html#live-results-does-the-u-net-actually-help-here",
+    "href": "book/03-disaggregation/04-multi-task-low-frequency.html#live-results-does-the-u-net-actually-help-here",
     "title": "Chapter 4: Multi-Task Deep Learning at Low Frequency",
     "section": "Live results: does the U-Net actually help here?",
     "text": "Live results: does the U-Net actually help here?\nBoth models trained on a real subsample of the UK-DALE training split (100,000 windows, far short of the full 1.5 million-plus readings available, but enough to train on real data throughout) and evaluated on a held-out 20,000-window test subsample. MAE below is in the same per-appliance normalized units both models were trained on, not raw watts; NDE is a ratio and unaffected either way.\n\n\n\nCNN1DModel: F1-macro=0.667  F1-eb=0.354\nUNETNiLM: F1-macro=0.642  F1-eb=0.223\nLightGBM: F1-macro=0.709  F1-eb=0.359\n\n\n\n\n\n\n\n\nmodel\nappliance\nmae\nnde\n\n\n\n\nCNN1DModel\nkettle\n0.0609\n0.4388\n\n\nCNN1DModel\nfridge\n0.4711\n0.6515\n\n\nCNN1DModel\ndishwasher\n0.0666\n0.3462\n\n\nCNN1DModel\nwashingmachine\n0.0686\n0.3078\n\n\nCNN1DModel\nmicrowave\n0.0566\n0.9524\n\n\nUNETNiLM\nkettle\n0.0435\n0.3313\n\n\nUNETNiLM\nfridge\n0.5065\n0.7059\n\n\nUNETNiLM\ndishwasher\n0.0644\n0.3645\n\n\nUNETNiLM\nwashingmachine\n0.0626\n0.2143\n\n\nUNETNiLM\nmicrowave\n0.0465\n0.982\n\n\nLightGBM\nkettle\n0.0259\n0.329\n\n\nLightGBM\nfridge\n0.4349\n0.803\n\n\nLightGBM\ndishwasher\n0.0429\n0.282\n\n\nLightGBM\nwashingmachine\n0.0615\n0.338\n\n\nLightGBM\nmicrowave\n0.0482\n0.7784\n\n\n\n\n\n\n\n\n\n\n\n\n\n   \n       \n       \n       \n   \n   \n          \n   \n   \n\n\n\n\n\n\n\n\n   \n       \n       \n       \n   \n   \n          \n   \n   \n\n\n\n\nInconclusive, at this training budget, and that is itself the honest result. In this run, CNN1DModel has the lower (better) MAE on four of five appliances, kettle, fridge, dishwasher, and washing machine, UNETNiLM only winning on microwave, and the lower NDE on all five. State detection is close to a tie: macro F1 65.9% for CNN1DModel against 65.7% for UNETNiLM, example-based F1 33.1% against 30.9%. Re-executing this exact code, same seed, same data, produced four different rankings across four runs while this chapter was being written: macro F1 ranged 64.5-68.7% for CNN1DModel and 65.7-68.9% for UNETNiLM, overlapping ranges with no consistent winner, sometimes UNETNiLM ahead by three points, sometimes CNN1DModel ahead, purely from ordinary CPU floating-point non-determinism in convolution and batch-norm reduction order. The published result finds a clear, repeatable U-Net advantage, average MAE reduced 26.35% and F1-macro 0.941 against 0.930 for the plain CNN baseline, on a training budget far larger than this chapter’s 100,000 random windows across 6 epochs afford [1]. At book scale, that gap is too small relative to run-to-run noise to call reliably in either direction; the architecture question needs either more training or a less noisy evaluation to answer here, not a bigger claim than the data supports.",
     "crumbs": [
-      "Part 2: Disaggregation",
+      "Part 3: Disaggregation",
       "<span class='chapter-number'>7</span>  <span class='chapter-title'>Chapter 4: Multi-Task Deep Learning at Low Frequency</span>"
     ]
   },
   {
-    "objectID": "book/02-disaggregation/04-multi-task-low-frequency.html#a-close-look-at-uncertainty",
-    "href": "book/02-disaggregation/04-multi-task-low-frequency.html#a-close-look-at-uncertainty",
+    "objectID": "book/03-disaggregation/04-multi-task-low-frequency.html#a-close-look-at-uncertainty",
+    "href": "book/03-disaggregation/04-multi-task-low-frequency.html#a-close-look-at-uncertainty",
     "title": "Chapter 4: Multi-Task Deep Learning at Low Frequency",
     "section": "A close look at uncertainty",
     "text": "A close look at uncertainty\nOne real kettle activation from the held-out test split, predicted by UNETNiLM as a full set of quantiles, not just a single number. The 80% and 95% bands come directly from the same multi-quantile head trained above, nothing extra fit on top.",
     "crumbs": [
-      "Part 2: Disaggregation",
+      "Part 3: Disaggregation",
       "<span class='chapter-number'>7</span>  <span class='chapter-title'>Chapter 4: Multi-Task Deep Learning at Low Frequency</span>"
     ]
   },
   {
-    "objectID": "book/02-disaggregation/04-multi-task-low-frequency.html#checking-the-combined-loss-itself",
-    "href": "book/02-disaggregation/04-multi-task-low-frequency.html#checking-the-combined-loss-itself",
+    "objectID": "book/03-disaggregation/04-multi-task-low-frequency.html#checking-the-combined-loss-itself",
+    "href": "book/03-disaggregation/04-multi-task-low-frequency.html#checking-the-combined-loss-itself",
     "title": "Chapter 4: Multi-Task Deep Learning at Low Frequency",
     "section": "Checking the combined loss itself",
     "text": "Checking the combined loss itself\nThe two task losses are summed unweighted, matching the paper’s own choice, worth checking directly rather than assuming neither term quietly dominates the other.\n\n\n\n\n   \n       \n       \n       \n   \n   \n          \n   \n   \n\n\n\n\nBoth terms decrease smoothly across every epoch for both backbones, and if anything the state (cross-entropy) loss stays two to three times larger than the power (pinball) loss throughout training, not the other way around. Nothing here suggests one task is starving the other, at least at this scale.",
     "crumbs": [
-      "Part 2: Disaggregation",
+      "Part 3: Disaggregation",
       "<span class='chapter-number'>7</span>  <span class='chapter-title'>Chapter 4: Multi-Task Deep Learning at Low Frequency</span>"
     ]
   },
   {
-    "objectID": "book/02-disaggregation/04-multi-task-low-frequency.html#what-reproducible-benchmarking-means-here",
-    "href": "book/02-disaggregation/04-multi-task-low-frequency.html#what-reproducible-benchmarking-means-here",
+    "objectID": "book/03-disaggregation/04-multi-task-low-frequency.html#what-reproducible-benchmarking-means-here",
+    "href": "book/03-disaggregation/04-multi-task-low-frequency.html#what-reproducible-benchmarking-means-here",
     "title": "Chapter 4: Multi-Task Deep Learning at Low Frequency",
     "section": "What “reproducible benchmarking” means here",
     "text": "What “reproducible benchmarking” means here\nDeepNLMTK.pdf is not where this chapter’s model code came from. Deep-NILMtk’s own UNETNILM* variants turned out to be single-task regression or mixture-density models, no joint state head at all, and its multi-task attention variant has a constructor signature mismatch that would fail on instantiation. What the toolkit paper is used for here is its actual contribution: a standardized template for comparing NILM models fairly, same split, same metrics, same held-out test set, model differences isolated from data or evaluation differences [2]. That discipline is exactly what the CNN1DModel vs UNETNiLM comparison above followed: identical heads, identical data, identical training budget, only the backbone differs.",
     "crumbs": [
-      "Part 2: Disaggregation",
+      "Part 3: Disaggregation",
       "<span class='chapter-number'>7</span>  <span class='chapter-title'>Chapter 4: Multi-Task Deep Learning at Low Frequency</span>"
     ]
   },
   {
-    "objectID": "book/02-disaggregation/04-multi-task-low-frequency.html#why-bother",
-    "href": "book/02-disaggregation/04-multi-task-low-frequency.html#why-bother",
+    "objectID": "book/03-disaggregation/04-multi-task-low-frequency.html#why-bother",
+    "href": "book/03-disaggregation/04-multi-task-low-frequency.html#why-bother",
     "title": "Chapter 4: Multi-Task Deep Learning at Low Frequency",
     "section": "Why bother",
     "text": "Why bother\nThree concrete things this buys beyond “another architecture.” First, deployability taken one step further than Chapter 3: no event detector at all is needed now, this works directly off the low read-rate every real smart meter already reports, not a high-frequency stream most utilities will never collect. Second, multi-task efficiency: one shared model instead of five separate single-appliance models to train, version, and keep working, a real engineering cost that compounds at fleet scale. Third, actionable uncertainty: a quantile band, not a point estimate, is what a downstream system, a demand-response signal, an anomaly flag, an appliance-health check, needs to decide how much to trust a specific prediction at a specific moment, not just on average across a test set.",
     "crumbs": [
-      "Part 2: Disaggregation",
+      "Part 3: Disaggregation",
       "<span class='chapter-number'>7</span>  <span class='chapter-title'>Chapter 4: Multi-Task Deep Learning at Low Frequency</span>"
     ]
   },
   {
-    "objectID": "book/02-disaggregation/04-multi-task-low-frequency.html#where-this-part-of-the-book-goes",
-    "href": "book/02-disaggregation/04-multi-task-low-frequency.html#where-this-part-of-the-book-goes",
+    "objectID": "book/03-disaggregation/04-multi-task-low-frequency.html#where-this-part-of-the-book-goes",
+    "href": "book/03-disaggregation/04-multi-task-low-frequency.html#where-this-part-of-the-book-goes",
     "title": "Chapter 4: Multi-Task Deep Learning at Low Frequency",
     "section": "Where this part of the book goes",
     "text": "Where this part of the book goes\nThis closes Part 2. The quantile regression this chapter leaned on is not a one-off trick: Part 3’s forecasting chapters, built on Twiga, reuse the same idea for a different target, whole-house load instead of per-appliance power, with the same payoff of a real uncertainty band instead of a single number.\n\n Common Mistake\nReporting one training run’s number as if it settles an architecture comparison, instead of checking whether the gap between architectures is larger than the run-to-run noise. It usually is not, at this scale: two close architectures and a light training budget together mean ordinary CPU floating-point non-determinism in convolution and batch-norm reduction order can move the result more than the architecture choice does. A single confident-looking decimal is not evidence of anything until it survives being re-run.",
     "crumbs": [
-      "Part 2: Disaggregation",
+      "Part 3: Disaggregation",
       "<span class='chapter-number'>7</span>  <span class='chapter-title'>Chapter 4: Multi-Task Deep Learning at Low Frequency</span>"
     ]
   },
   {
-    "objectID": "book/02-disaggregation/04-multi-task-low-frequency.html#references",
-    "href": "book/02-disaggregation/04-multi-task-low-frequency.html#references",
+    "objectID": "book/03-disaggregation/04-multi-task-low-frequency.html#references",
+    "href": "book/03-disaggregation/04-multi-task-low-frequency.html#references",
     "title": "Chapter 4: Multi-Task Deep Learning at Low Frequency",
     "section": "References",
     "text": "References\n\n\n[1] A. Faustine, L. Pereira, H. Bousbiat, and S. Kulkarni, “UNet-NILM: A deep neural network for multi-tasks appliances state detection and power estimation in NILM,” in Proceedings of the 5th international workshop on non-intrusive load monitoring, 2020, pp. 84–88. doi: 10.1145/3427771.3427859.\n\n\n[2] H. Bousbiat, A. Faustine, C. Klemenjak, L. Pereira, and W. Elmenreich, “Unlocking the full potential of neural NILM: On automation, hyperparameters & modular pipelines,” IEEE Transactions on Industrial Informatics, vol. 18, no. 10, 2022, doi: 10.1109/TII.2022.3206322.",
     "crumbs": [
-      "Part 2: Disaggregation",
+      "Part 3: Disaggregation",
       "<span class='chapter-number'>7</span>  <span class='chapter-title'>Chapter 4: Multi-Task Deep Learning at Low Frequency</span>"
     ]
   },
@@ -1306,13 +1306,178 @@
     ]
   },
   {
+    "objectID": "book/05-forecasting/01-forecastability.html",
+    "href": "book/05-forecasting/01-forecastability.html",
+    "title": "Chapter 1: Household Smart-Meter Forecastability",
+    "section": "",
+    "text": "Why forecastability\nA DSO forecasting a single feeder gets one smooth curve: thousands of households averaging out each other’s quirks into a predictable evening peak. A DSO forecasting one household gets something else entirely: a customer who works nights, a customer with an empty house half the year, a customer whose evening spikes exactly when the sun sets on their new rooftop panels. Part 5 forecasts at that second, harder scale, hundreds of individual AusNet customers, not one aggregate, using the same real smart-meter readings a utility already collects: load, and the Photovoltaic (PV) and Electric Vehicle (EV) signals hiding inside it. Before reaching for a model, this chapter asks the question every later chapter in this part depends on: how forecastable is a real household’s own signal, does that forecastability vary from one house to the next, and what does it say about which approach is actually worth using on them?\nIndividual household loads exhibit significantly greater volatility and are much more challenging to forecast than substation- or city-level aggregates. This is not a hypothesis unique to this chapter; it has been directly confirmed using approximate entropy on a real Irish smart-meter dataset [1]. This chapter examines whether similar variability exists within AusNet’s own pool of real households, rather than assuming findings transfer, and investigates the extent to which forecastability varies between individual homes.\nA second important finding challenges common assumptions: increased adoption of EV and PV does not necessarily result in a more volatile net load. A 2025 study demonstrates that simultaneous EV charging and PV generation, both concentrated around midday, can actually reduce net-load uncertainty by offsetting each other rather than compounding variability [2]. The intuitive narrative that ‘more Distributed Energy Resources (DER) means more volatility’ does not always hold, and this chapter directly tests this hypothesis using real AusNet data rather than relying on assumptions.\nTwo guiding principles inform the measurement approach in this chapter. First, forecastability should be evaluated prior to model development: metrics such as the Spectral Predictability Score and the Largest Lyapunov Exponent have been shown to correlate strongly with actual forecast performance on the M5 competition dataset [3]. Second, recommending a single ‘best approach’ often leads to unwarranted confidence. The Model Selection Confidence Set method, when applied to real Italian electricity load data, identifies sets of models that are statistically indistinguishable from the truth rather than selecting a single winner, and reveals that customers with noisier data yield larger, more ambiguous sets [4]. The decision table at the end of this chapter adopts this same transparent approach.\nTwo families of diagnostics do the actual measuring below. Entropy and long-range-dependence measures (permutation entropy, sample entropy, the Hurst exponent, detrended fluctuation analysis) come from nonlinear time-series analysis and originally had nothing to do with electricity at all: one was built for the Nile river [5], another for DNA sequences [6]. Classical Box-Jenkins time-series theory (autocorrelation, partial autocorrelation, unit-root and stationarity testing) is the standard toolkit behind every Autoregressive (AR)IMA-family forecaster, laid out in full in Hyndman and Athanasopoulos’s Forecasting: Principles and Practice [7]. Both families answer the same underlying question from different directions: how much real structure does this signal actually have, and is a model likely to find it?",
+    "crumbs": [
+      "Part 5: Forecasting",
+      "<span class='chapter-number'>14</span>  <span class='chapter-title'>Chapter 1: Household Smart-Meter Forecastability</span>"
+    ]
+  },
+  {
+    "objectID": "book/05-forecasting/01-forecastability.html#why-forecastability",
+    "href": "book/05-forecasting/01-forecastability.html#why-forecastability",
+    "title": "Chapter 1: Household Smart-Meter Forecastability",
+    "section": "",
+    "text": "Key Concept\nCertain signals are inherently more difficult to forecast, and this can be quantified prior to model development. Two signals may share the same average level and underlying daily cycle, yet differ substantially in forecastability: one may exhibit consistent repetition, allowing yesterday’s pattern to predict today, while the other may have its cycle obscured by significant noise. Metrics such as entropy, the Hurst exponent, autocorrelation, and stationarity each capture this distinction from different analytical perspectives before any model is trained.\n\n\n\n\n\n\n\nFigure 14.1: Two signals sharing the same average level and daily cycle. Left: a persistent signal, low entropy, Hurst above 0.5, where yesterday’s reading genuinely predicts today’s. Right: a volatile signal, the same cycle buried under noise large enough to swamp it, high entropy, Hurst near the random-walk boundary. Every metric in this chapter measures this same real distinction from a different angle.",
+    "crumbs": [
+      "Part 5: Forecasting",
+      "<span class='chapter-number'>14</span>  <span class='chapter-title'>Chapter 1: Household Smart-Meter Forecastability</span>"
+    ]
+  },
+  {
+    "objectID": "book/05-forecasting/01-forecastability.html#getting-the-data",
+    "href": "book/05-forecasting/01-forecastability.html#getting-the-data",
+    "title": "Chapter 1: Household Smart-Meter Forecastability",
+    "section": "Getting the data",
+    "text": "Getting the data\nThis chapter reuses the same real AusNet smart-meter pool Part 4 already vendored, no new fetch step needed. The dataset is public: 342 real households, uninterrupted 30-minute smart-meter readings across a full calendar year, freely downloadable with no signup gate, the same real data and the same fetch script every other Part 4 chapter already used.\nuv run python scripts/fetch_part4_ausnet_data.py",
+    "crumbs": [
+      "Part 5: Forecasting",
+      "<span class='chapter-number'>14</span>  <span class='chapter-title'>Chapter 1: Household Smart-Meter Forecastability</span>"
+    ]
+  },
+  {
+    "objectID": "book/05-forecasting/01-forecastability.html#hundreds-of-customers-not-one-aggregate-signal",
+    "href": "book/05-forecasting/01-forecastability.html#hundreds-of-customers-not-one-aggregate-signal",
+    "title": "Chapter 1: Household Smart-Meter Forecastability",
+    "section": "Hundreds of customers, not one aggregate signal",
+    "text": "Hundreds of customers, not one aggregate signal\nAusNet’s own real pool contains 342 real households, each with a full year of data at 30-minute resolution. Using every one of them, rather than working from one region-wide aggregate, is the only way to see whether forecastability itself varies from customer to customer, the question this whole chapter is built around. Checked directly rather than assumed: every one of the 342 real load series has genuine variance, no gaps, and no near-constant readings; the same real data Part 4 already ran a full OpenDSS time-series simulation against cleanly. No elaborate quality gate is needed here, unlike an earlier, since-dropped data source.\n\n\n\n\n   \n       \n       \n       \n   \n   \n          \n   \n   \n\n\n\n\nAn initial ranking of five real customers by the degree to which each day’s pattern repeats the previous one illustrates the central theme of this chapter: some households display a consistent evening rhythm, while others exhibit minimal repeatability.",
+    "crumbs": [
+      "Part 5: Forecasting",
+      "<span class='chapter-number'>14</span>  <span class='chapter-title'>Chapter 1: Household Smart-Meter Forecastability</span>"
+    ]
+  },
+  {
+    "objectID": "book/05-forecasting/01-forecastability.html#how-forecastable-is-a-real-customer",
+    "href": "book/05-forecasting/01-forecastability.html#how-forecastable-is-a-real-customer",
+    "title": "Chapter 1: Household Smart-Meter Forecastability",
+    "section": "How forecastable is a real customer?",
+    "text": "How forecastable is a real customer?\nFour metrics, two real theoretical traditions.\nPermutation entropy [8] asks a purely ordinal question: break the series into short overlapping windows, record each window’s ranking pattern, and measure how evenly those patterns are distributed. A signal with a strong, repeating shape produces a small handful of dominant patterns, low entropy; a signal closer to noise produces every ordering about equally often, entropy near its maximum.\nSample entropy [9] asks a related but distinct question directly in the signal’s own real units: pick two windows of length m that match within a tolerance, then check how often they still match once extended to length m+1. It was built to remove an earlier measure’s own self-matching bias, a real, checked improvement, not a cosmetic rename.\nThe Hurst exponent [5] was built to size reservoirs on the Nile from centuries of real flood records, nothing to do with electricity in its own original form. It measures long-range dependence through rescaled-range analysis: H = 0.5 is a pure random walk with no memory, H &gt; 0.5 is persistent (a high reading tends to be followed by more high readings), and H &lt; 0.5 is anti-persistent (mean-reverting). A persistent signal is the easier one for a model to learn from.\nThe DFA exponent [6] measures a close cousin of the same idea, built originally for DNA sequences, using detrended fluctuation analysis instead of the classical rescaled range. Its real practical advantage here is that it stays reliable on a signal that is drifting or trending, exactly the kind of real non-stationary behaviour a full year of household load actually has.\n\n\n\n\n\n\n\n\n\nForecastability Metrics Used Below\n\n\nMetric\nForecastable signal\n\n\n\n\nPermutation entropy\nnear 0 (regular)\n\n\nSample entropy\n&lt; 0.5 (regular)\n\n\nHurst exponent\n&gt; 0.5 (persistent)\n\n\nDFA exponent\n&gt; 0.5 (persistent)\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\nForecastability Metrics: Real Population Results\n\n\nMedian across all 342 real AusNet customers\n\n\nMetric\nMedian (342 customers)\nInterpretation\n\n\n\n\nPermutation entropy\n0.988\nClose to the theoretical maximum (1.0): ordering patterns are close to uniformly spread, little repeating shape\n\n\nSample entropy\n0.378\nBelow 0.5: a real, if modest, repeating structure across windows\n\n\nHurst exponent\n0.555\nPersistent (H &gt; 0.5): recent readings carry real information about near-future ones\n\n\nDFA exponent\n0.753\nPersistent (DFA &gt; 0.5), consistent with the Hurst reading once trends are removed\n\n\n\n\n\n\n\n\n\nAt the population level, permutation entropy for the median customer approaches its theoretical maximum (0.988), while the Hurst exponent (0.555) is only slightly above the random-walk threshold, indicating mild persistence rather than the strong forecastability observed in substation aggregates. These findings are consistent with each other and with the premise established by Peng et al.: individual household load is demonstrably more difficult to forecast than aggregate load, as confirmed here across 342 real customers rather than assumed from other contexts.",
+    "crumbs": [
+      "Part 5: Forecasting",
+      "<span class='chapter-number'>14</span>  <span class='chapter-title'>Chapter 1: Household Smart-Meter Forecastability</span>"
+    ]
+  },
+  {
+    "objectID": "book/05-forecasting/01-forecastability.html#meet-three-real-households",
+    "href": "book/05-forecasting/01-forecastability.html#meet-three-real-households",
+    "title": "Chapter 1: Household Smart-Meter Forecastability",
+    "section": "Meet three real households",
+    "text": "Meet three real households\nA population median is easy to state and hard to picture. Three real customers, one real week each, make it concrete: the most persistent household in this pool, the least persistent, and one sitting exactly at the population’s own median.\n\n\n\n\n   \n       \n       \n       \n   \n   \n          \n   \n   \n\n\n\n\nThe most persistent household exhibits a weekly pattern that remains nearly unchanged each night, with the evening peak consistently occurring at the same time. In contrast, the least persistent household shows no discernible repeating pattern, with significant variation in both the height and shape of evening peaks. The median household falls between these extremes, displaying a recognisable but noisier rhythm that is more representative of the broader set of 342 real customers analysed in this chapter.\n\n\n\n\n   \n       \n       \n       \n   \n   \n          \n   \n   \n\n\n\n\nAmong hundreds of customers, there exists a wide range of forecastability profiles, making it impossible to summarise the pool with a single metric. Some customers exhibit high persistence and are relatively easy to forecast, while others have Hurst exponents near zero, indicating behaviour similar to that of a random walk. Approximately one in ten customers yields a Hurst estimate below zero, which is a legitimate outcome of the rescaled-range estimator when applied to near-constant, low-variance households, rather than a data error.",
+    "crumbs": [
+      "Part 5: Forecasting",
+      "<span class='chapter-number'>14</span>  <span class='chapter-title'>Chapter 1: Household Smart-Meter Forecastability</span>"
+    ]
+  },
+  {
+    "objectID": "book/05-forecasting/01-forecastability.html#lag-structure-and-stationarity",
+    "href": "book/05-forecasting/01-forecastability.html#lag-structure-and-stationarity",
+    "title": "Chapter 1: Household Smart-Meter Forecastability",
+    "section": "Lag structure and stationarity",
+    "text": "Lag structure and stationarity\nClassical Box-Jenkins theory fills the gap left open by entropy and Hurst: which real lag carries the signal, and whether the series is drifting under its own diurnal or weekly cycle [7].\nThe autocorrelation function (Autocorrelation Function (ACF)) measures how strongly a series correlates with a lagged copy of itself. The partial autocorrelation function (Partial Autocorrelation Function (PACF)) asks a sharper question: how much does a given lag add on top of every shorter lag already in the model? The lag at which PACF drops within its own confidence band is the classical signal of how many autoregressive terms a model actually needs.\nStationarity asks whether a series’ own statistical properties stay stable over time. Two complementary tests decide it, deliberately paired because they test opposite null hypotheses: the Augmented Dickey-Fuller test [10] has a null of non-stationarity; the Kwiatkowski-Phillips-Schmidt-Shin (KPSS) test [11] has the opposite null, stationarity. Run together, they resolve into four honest verdicts rather than one test’s blind spot.\n\n\n\n\n\n\n\n\n\nLag Structure: Real Population Results\n\n\nMedian across all 342 real AusNet customers\n\n\nMetric\nMedian (342 customers)\nInterpretation\n\n\n\n\nDaily ACF (lag 48)\n0.334\nA real, moderate day-to-day repeat, not the near-perfect echo a factory shift pattern would show\n\n\nWeekly ACF (lag 336)\n0.305\nA slightly weaker repeat at one week than at one day: the daily rhythm dominates over the weekly one\n\n\nAR order\n4\nHalf of all customers need only this many autoregressive lags before PACF drops into its own confidence band\n\n\n\n\n\n\n\n\n\n\n\n\n\n   \n       \n       \n       \n   \n   \n          \n   \n   \n\n\n\n\n\n\n\n\n   \n       \n       \n       \n   \n   \n          \n   \n   \n\n\n\n\nFor the most persistent customer, the autocorrelation function (ACF) remains significant for lags extending into a second week. In contrast, the least persistent customer’s ACF barely exceeds its confidence band beyond the first day. Using the same set of metrics and 30-minute AusNet data, these results highlight two fundamentally different signal profiles.\n\n\n\n\n   \n       \n       \n       \n   \n   \n          \n   \n   \n\n\n\n\n\n\n\n\n\n\n\n\n\nStationarity Verdict Across the Real Customer Sample\n\n\nVerdict\nCustomers\nShare (%)\n\n\n\n\ntrend-stationary\n323\n94.4\n\n\nstationary\n19\n5.6\n\n\n\nn = 342 real AusNet customers\n\n\n\n\n\n\n\n\n\n\nA total of 94.4% of real customers are classified as trend-stationary, indicating that meaningful structure remains once a deterministic trend is removed. This finding challenges the simplistic interpretation that ‘non-stationary load’ equates to a pure random walk.",
+    "crumbs": [
+      "Part 5: Forecasting",
+      "<span class='chapter-number'>14</span>  <span class='chapter-title'>Chapter 1: Household Smart-Meter Forecastability</span>"
+    ]
+  },
+  {
+    "objectID": "book/05-forecasting/01-forecastability.html#a-spectral-view-of-predictability",
+    "href": "book/05-forecasting/01-forecastability.html#a-spectral-view-of-predictability",
+    "title": "Chapter 1: Household Smart-Meter Forecastability",
+    "section": "A spectral view of predictability",
+    "text": "A spectral view of predictability\nWhile entropy, the Hurst exponent, and autocorrelation analyse signals in the time domain, a frequency-domain perspective can reveal additional insights. Specifically, it can determine whether a customer’s consumption is characterised by a few dominant, regular cycles or is evenly distributed across the spectrum without clear periodicity. This approach underpins the Spectral Predictability Score developed by Wang, Klee, and Roos, which was validated prior to model development on the M5 competition data [3]. The version implemented here follows a similar rationale, using an inverted, normalized spectral entropy so that higher values correspond to greater forecastability. Importantly, its correlation with the Hurst exponent across all 342 real customers is nearly zero (-0.05), confirming that it provides an independent assessment rather than duplicating information.",
+    "crumbs": [
+      "Part 5: Forecasting",
+      "<span class='chapter-number'>14</span>  <span class='chapter-title'>Chapter 1: Household Smart-Meter Forecastability</span>"
+    ]
+  },
+  {
+    "objectID": "book/05-forecasting/01-forecastability.html#which-features-matter-and-does-that-differ-by-customer",
+    "href": "book/05-forecasting/01-forecastability.html#which-features-matter-and-does-that-differ-by-customer",
+    "title": "Chapter 1: Household Smart-Meter Forecastability",
+    "section": "Which features matter, and does that differ by customer?",
+    "text": "Which features matter, and does that differ by customer?\nKnowing a signal is forecastable is not the same as knowing what to feed a model. A real, honest ensemble of association metrics, ranked and aggregated across several independent statistical tests (Spearman, Analysis of Variance (ANOVA), mutual information, Xi, Predictive Power Score (PPS), random-forest importance) rather than any single one, answers a sharper question: which lag or calendar feature actually carries the signal for a given customer. To ensure robustness, the feature rankings from each metric are first standardised and then combined using a simple average rank approach, so that features consistently highlighted across multiple tests are prioritised. This method guards against bias from any single metric and offers a balanced, consensus-driven guide for feature selection.\nFor transparency and reproducibility, the actual feature selection process for each customer can be broken down into the following steps:\n\nFor a given customer, define the pool of candidate features to be tested (e.g., various lags, calendar variables such as hour of day, day of week, public holidays, and weather variables if available).\nCalculate all relevant association scores between each feature and the target variable using each method separately: compute Spearman correlation, run ANOVA, estimate mutual information, apply Xi, evaluate PPS, and assess feature importance via a random forest.\nFor each metric, rank all candidate features, assigning rank 1 to the strongest association as determined by that metric, and continue ranking to the least informative feature.\nStandardise the ranks by scaling (for example, using percentile rank or z-score) so that different scoring ranges across the metrics do not bias the aggregation.\nFor each feature, average its ranks or scaled scores across all metrics to produce a composite ranking.\nSelect the top features according to this composite rank, considering the highest-ranked features as primary candidates for model training, with additional review to ensure that feature selection reflects both statistical signal and domain plausibility.\n\nThis stepwise process provides a practical, defensible workflow that can be routinely applied by analysts working with new sets of household load data. It also ensures consistent feature selection across hundreds of customers while allowing genuine variation in which features are most predictive across different households.\n\n\n\n\n\n\n\n\n\nThe Single Most Relevant Feature, Per Customer\n\n\n24-hour-ahead net load\n\n\nTop feature\nCustomers\nShare (%)\n\n\n\n\nhalf_hour\n20\n50.0\n\n\nlag_0\n19\n47.5\n\n\nlag_48\n1\n2.5\n\n\n\nn = 40 real customers, ensemble-ranked (Spearman, ANOVA, mutual information, Xi, PPS, random-forest importance)\n\n\n\n\n\n\n\n\n\n\nIn a sample of 40 real customers, results are nearly evenly divided: for half, the most relevant feature for a 24-hour-ahead forecast is the specific half-hour of the day, while for nearly the other half, it is the most recent observed reading. Only one customer’s top feature was a full day’s lag. The most predictive feature varies genuinely from household to household, underscoring that no universal answer can be provided without direct evaluation.",
+    "crumbs": [
+      "Part 5: Forecasting",
+      "<span class='chapter-number'>14</span>  <span class='chapter-title'>Chapter 1: Household Smart-Meter Forecastability</span>"
+    ]
+  },
+  {
+    "objectID": "book/05-forecasting/01-forecastability.html#which-baseline-actually-wins-and-does-it-vary-by-customer",
+    "href": "book/05-forecasting/01-forecastability.html#which-baseline-actually-wins-and-does-it-vary-by-customer",
+    "title": "Chapter 1: Household Smart-Meter Forecastability",
+    "section": "Which baseline actually wins, and does it vary by customer?",
+    "text": "Which baseline actually wins, and does it vary by customer?\nA trained model’s real cost, engineering time, compute, and maintenance, only pays for itself if it beats the cheapest reasonable alternative. Hyndman and Athanasopoulos are direct about this: naive, seasonal-naive, drift, and average-based benchmarks exist precisely so a more complex method has something honest to beat [7]. Chapter 2 is where a trained tree ensemble gets that honest check; this chapter’s own job is narrower and comes first: which of twiga.models.baseline’s own persistence strategies already win for a given customer, with no model training at all.\n\n\n\n\n\n\n\n\n\nModel Performance, Averaged Across 342 Real Customers\n\n\n24-hour-ahead, last 90 real days held out per customer\n\n\nModel\nMAE\nRMSE\nCorr\nWMAPE\nSMAPE\n\n\n\n\nnaive\n0.359\n0.591\n0.077\n79.062\n63.550\n\n\nseasonal_naive\n0.295\n0.524\n0.258\n65.653\n51.902\n\n\ndrift\n0.370\n0.608\n0.075\n81.447\n66.898\n\n\nwindow_average\n0.289\n0.436\n0.073\n63.327\n60.427\n\n\n\ntwiga.models.baseline, real AusNet data\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\nWhich Baseline Wins, Per Customer\n\n\nNo model training, four persistence strategies\n\n\nBaseline\nCustomers\nShare (%)\n\n\n\n\nwindow_average\n239\n69.9\n\n\nseasonal_naive\n102\n29.8\n\n\nnaive\n1\n0.3\n\n\n\nn = 342 real AusNet customers, 24-hour-ahead, last 90 real days held out\n\n\n\n\n\n\n\n\n\n\nThere is no single, universal winner among the 342 real customers; however, one baseline approach is predominant: window-average outperforms for 70% of customers, seasonal-naive for another 30%, and plain persistence for almost none. This represents a verified divergence from Twiga’s published tutorial, which found seasonal-naive to be the best performer on a different dataset. It is important to report this difference transparently rather than assume results transfer across contexts.\nFor new customer deployments, analysts should operationalize baseline selection by first evaluating all key candidate baselines, such as window-average, seasonal-naive, and plain persistence, on a short, recent segment of each customer’s own data using simple out-of-sample error metrics like MAE or RMSE. The method with the lowest error on this holdout window should be adopted as the initial production baseline for that customer. To ensure ongoing model effectiveness, periodic automatic revalidation can be scheduled, in which the baseline is re-compared with available alternatives using the most recent data. This structured, repeatable approach ensures that the best-fitting baseline is maintained for each customer as data characteristics evolve.\n\n\n\n\n   \n       \n       \n       \n   \n   \n          \n   \n   \n\n\n\n\nThe weekly data from one representative customer illustrates these results: the window-average method closely follows the actual evening peak, while plain naive persistence consistently lags behind each real fluctuation.\n\nThe PV signal hiding in the net load\nAusNet’s own data shows a real, separately recorded seasonal PV shape, shared across customers and scaled by each customer’s assumed system size, rather than being blended invisibly into a single metered column as a real net-metering-only utility feed usually is. That real, known component enables a check no proxy could offer directly: does adding a known PV component to a customer’s own real load make that customer’s own net load look more or less forecastable, by the exact same entropy and Hurst battery run above? Net load with rising DER adoption does not necessarily just get more volatile either: Fias, Hashmi and Deconinck’s own finding is that joint EV and PV activity can offset each other through a compensatory daytime effect [2], worth checking what a known PV component alone does here rather than assumed.\n\n\n\n\n\n\n\n\n\nA Known PV Component Changes Measured Forecastability\n\n\nn = 103 real customers with an assumed 5 kVA system\n\n\nMetric\nMedian, load only\nMedian, with known PV\nInterpretation\n\n\n\n\nHurst exponent\n0.562\n0.630\nHigher with PV added: a known, regular daily generation cycle makes net load look *more* persistent, not less\n\n\nPermutation entropy\n0.988\n0.955\nSlightly lower with PV added: consistent with the same more-regular-signal finding from the Hurst reading\n\n\n\n\n\n\n\n\n\n\n\n\n\n   \n       \n       \n       \n   \n   \n          \n   \n   \n\n\n\n\nA notably counterintuitive finding emerges: introducing a known 5 kVA PV system to 103 real customers increases their median Hurst exponent (from 0.562 to 0.630) and slightly decreases permutation entropy. The presence of a regular daily generation cycle makes net load appear more persistent, not less, which contradicts the common assumption that ‘more DER means more volatile.’ This result aligns directly with the compensatory-effect finding reported by Fias, Hashmi, and Deconinck.",
+    "crumbs": [
+      "Part 5: Forecasting",
+      "<span class='chapter-number'>14</span>  <span class='chapter-title'>Chapter 1: Household Smart-Meter Forecastability</span>"
+    ]
+  },
+  {
+    "objectID": "book/05-forecasting/01-forecastability.html#load-pv-and-ev-which-signal-is-more-forecastable",
+    "href": "book/05-forecasting/01-forecastability.html#load-pv-and-ev-which-signal-is-more-forecastable",
+    "title": "Chapter 1: Household Smart-Meter Forecastability",
+    "section": "Load, PV, and EV: which signal is more forecastable?",
+    "text": "Load, PV, and EV: which signal is more forecastable?\nPart 4’s own EV-demand section already vendored a third real signal: diversified home EV-charging profiles from the UK’s real “Electric Nation” trial, at 1-minute resolution, weekday and weekend, diversified across 100-1,200 real vehicles. A real, honest caveat before comparing anything: this data is not the same kind of signal as load or PV. Load is 342 real individual households across a genuine full year; PV is one real, seasonally varying shape across the same year. The EV data is a single representative weekday shape and a single representative weekend shape, diversified across many real vehicles, with no per-vehicle time series and no real day-to-day variation at all. Making it long enough to run the same battery means tiling those two shapes across a synthetic year, a real, disclosed construction, not a genuine record of one EV owner’s own charging behaviour.\nBecause the tiled EV signal is constructed from repeated representative shapes rather than true longitudinal vehicle-level readings, it provides an upper bound on forecastability rather than mirroring real-world unpredictability. As a result, the high degree of regularity in these synthetic EV series may overstate the ease of forecasting compared to real household EV signals, which would display more irregular timing, skipped days, or behavioural variation. Caution is needed when interpreting these results for operational planning, since actual deployment environments will likely face lower forecastability for individual EV charging than these synthetic constructs suggest.\n\n\n\n\n\n\n\n\n\nLoad, PV, and EV: a Real Forecastability Comparison\n\n\nEV is a diversified, tiled construction, a ceiling, not a real individual customer's own variability\n\n\nSignal\nPerm. entropy\nSample entropy\nHurst\nDFA\nACF (daily)\nACF (weekly)\n\n\n\n\nLoad\n0.961\n0.407\n0.626\n0.909\n0.845\n0.751\n\n\nPV\n0.766\n0.082\n0.386\n0.731\n0.828\n0.774\n\n\nEV\n0.855\n0.201\n-0.01\n0.625\n0.954\n0.981\n\n\n\nLoad = population-mean across 342 real AusNet customers; PV = the real shared AusNet PV shape; EV = Team-Nando's real diversified UK Electric Nation profile, tiled weekday/weekend across a synthetic year\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n   \n       \n       \n       \n   \n   \n          \n   \n   \n\n\n\n\nThe constructed EV series emerges as the most ‘forecastable’ signal in this analysis, with daily ACF of 0.954 and weekly ACF of 0.981. This outcome is consistent with the earlier caveat: the diversified, tiled construction represents an upper bound for predictability, rather than reflecting the true unpredictability of an individual EV owner, as it omits real day-to-day variations such as changes in charging times or missed sessions. An additional, validated finding from this comparison is that the population-mean load’s daily ACF (0.845) is substantially higher than the median for individual customers (0.334, as reported earlier), reaffirming the aggregation-smooths-variability effect described by Peng et al. [1] from a new perspective.",
+    "crumbs": [
+      "Part 5: Forecasting",
+      "<span class='chapter-number'>14</span>  <span class='chapter-title'>Chapter 1: Household Smart-Meter Forecastability</span>"
+    ]
+  },
+  {
+    "objectID": "book/05-forecasting/01-forecastability.html#from-diagnostic-to-decision",
+    "href": "book/05-forecasting/01-forecastability.html#from-diagnostic-to-decision",
+    "title": "Chapter 1: Household Smart-Meter Forecastability",
+    "section": "From diagnostic to decision",
+    "text": "From diagnostic to decision\nA single recommendation that claims to fit every customer is false confidence; the same real lesson De Bortoli, Ferrari, Ravazzolo and Rossini draw from Italian electricity load data: report the set of approaches that are actually defensible for a given regime, not one falsely confident winner [4].\n\n\n\n\n\n\n\n\n\nWhich Baseline Wins, By Regime\n\n\nNo single winner dominates every regime the same way\n\n\nForecastability regime\nCustomers\nMost-often-winning baseline\nWin share (%)\nMean Hurst\n\n\n\n\npersistent\n104.0\nwindow_average\n78.0\n0.651\n\n\nregular\n126.0\nwindow_average\n60.0\n0.173\n\n\nvolatile / low-persistence\n112.0\nwindow_average\n73.0\n0.161\n\n\n\nn = 342 real AusNet customers with both a forecastability read and a baseline comparison\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n   \n       \n       \n       \n   \n   \n          \n   \n   \n\n\n\n\nThe window-average method consistently outperforms other approaches across all measured regimes (persistent, regular, and volatile), achieving a win share of 60-78% depending on the regime. Seasonal-naive remains the consistent runner-up. No regime automatically favours a trained model; even the most volatile and least-persistent customers are typically best served by a parameter-free baseline. Chapter 2 continues from this point, focusing on regimes in which residual error justifies deploying more complex models.",
+    "crumbs": [
+      "Part 5: Forecasting",
+      "<span class='chapter-number'>14</span>  <span class='chapter-title'>Chapter 1: Household Smart-Meter Forecastability</span>"
+    ]
+  },
+  {
+    "objectID": "book/05-forecasting/01-forecastability.html#why-bother",
+    "href": "book/05-forecasting/01-forecastability.html#why-bother",
+    "title": "Chapter 1: Household Smart-Meter Forecastability",
+    "section": "Why bother",
+    "text": "Why bother\nFrom a utility perspective, the decision table presented in this chapter serves as a practical triage tool rather than a purely academic exercise. A Distribution System Operator (DSO) tasked with forecasting for hundreds or thousands of individual customers cannot feasibly apply the same resource-intensive pipeline to all. The regime table clearly identifies which customers are adequately served by a cost-effective, parameter-free baseline (the majority, according to this data) and which warrant the additional complexity introduced in Chapter 2. This represents a genuine deployment-cost decision: resources are allocated to model development, tuning, and monitoring only where they are likely to yield tangible benefits.\nIn practical terms, a DSO can use the regime table by calculating each customer’s own Hurst exponent and permutation entropy, then applying the same real split this chapter’s own decision table already uses: a Hurst exponent above 0.6 marks a customer persistent; below that, a permutation entropy under this pool’s own population median marks a customer regular; everything else falls into the volatile, low-persistence group. The threshold is set from this chapter’s own real population, not an arbitrary fixed number, and should be recalculated from a new dataset’s own distribution rather than copied across datasets unchanged. Persistent and regular customers are the ones a simple window-average or seasonal-naive forecaster already serves well; the volatile group is where Chapter 2’s own extra machinery has an honest chance to earn its cost.\nFrom the customer’s perspective, this transparent approach ensures fairness. Customers whose measured forecastability indicates that a simple baseline is sufficient should not incur costs directly or indirectly for infrastructure designed to address more complex forecasting challenges they do not face. Conversely, customers with genuinely volatile signals, as identified by the regime table, are precisely those for whom a DSO’s investment in advanced, uncertainty-aware forecasting (addressed in Chapter 3) is justified.\nThese counterintuitive findings are significant for both utilities and customers. Incorporating a known PV component increased the forecastability of net load, while the diversified EV construction appeared as the most forecastable signal, though this does not reflect the unpredictability of individual vehicle behaviour. Interpreting these results without careful analysis could lead to the mistaken belief that ‘more DER means more predictable,’ precisely the type of false confidence that De Bortoli et al.’s confidence-set framework cautions against. Direct empirical evaluation, rather than assumption, underpins the integrity of this chapter’s recommendations.",
+    "crumbs": [
+      "Part 5: Forecasting",
+      "<span class='chapter-number'>14</span>  <span class='chapter-title'>Chapter 1: Household Smart-Meter Forecastability</span>"
+    ]
+  },
+  {
+    "objectID": "book/05-forecasting/01-forecastability.html#where-this-leaves-part-5",
+    "href": "book/05-forecasting/01-forecastability.html#where-this-leaves-part-5",
+    "title": "Chapter 1: Household Smart-Meter Forecastability",
+    "section": "Where this leaves Part 5",
+    "text": "Where this leaves Part 5\nForecastability varies substantially across individual customers, and a simple window-average baseline is effective for most, regardless of regime. The addition of a known PV component increases, rather than decreases, the persistence of net load. The diversified EV construction achieves a level of forecastability that is unattainable from any single vehicle’s actual charging behaviour. This chapter adopts a confidence-set approach, providing a nuanced framework for subsequent analysis rather than a single, overconfident recommendation.\nChapter 2 picks up the customers that this chapter’s own baselines do not already serve well, and asks whether profiling them into archetypes and reusing Part 4’s own Improved Deep Embedded Clustering (IDEC) clustering directly lets a shared model scale to hundreds of customers without training one model per household.",
+    "crumbs": [
+      "Part 5: Forecasting",
+      "<span class='chapter-number'>14</span>  <span class='chapter-title'>Chapter 1: Household Smart-Meter Forecastability</span>"
+    ]
+  },
+  {
+    "objectID": "book/05-forecasting/01-forecastability.html#references",
+    "href": "book/05-forecasting/01-forecastability.html#references",
+    "title": "Chapter 1: Household Smart-Meter Forecastability",
+    "section": "References",
+    "text": "References\n\n\n[1] Y. Peng et al., “Short-term load forecasting at different aggregation levels with predictability analysis,” in 2019 IEEE innovative smart grid technologies-asia (ISGT asia), 2019, pp. 3385–3390. doi: 10.1109/ISGT-Asia.2019.8881343.\n\n\n[2] A. Fias, M. U. Hashmi, and G. Deconinck, “Uncertainty quantification in load profiles with rising EV and PV adoption: The case of residential, industrial, and office buildings.” 2025. Available: https://arxiv.org/abs/2512.01914\n\n\n[3] R. Wang, S. Klee, and A. Roos, “Time series forecastability measures.” 2025. Available: https://arxiv.org/abs/2507.13556\n\n\n[4] P. De Bortoli, D. Ferrari, F. Ravazzolo, and L. Rossini, “Model selection confidence sets for time series models with applications to electricity load data.” 2026. Available: https://arxiv.org/abs/2602.16527\n\n\n[5] H. E. Hurst, “Long-term storage capacity of reservoirs,” Transactions of the American Society of Civil Engineers, vol. 116, no. 1, pp. 770–799, 1951.\n\n\n[6] C.-K. Peng, S. V. Buldyrev, S. Havlin, M. Simons, H. E. Stanley, and A. L. Goldberger, “Mosaic organization of DNA nucleotides,” Physical Review E, vol. 49, no. 2, pp. 1685–1689, 1994, doi: 10.1103/PhysRevE.49.1685.\n\n\n[7] R. J. Hyndman and G. Athanasopoulos, Forecasting: Principles and practice, 3rd ed. Melbourne, Australia: OTexts, 2021.\n\n\n[8] C. Bandt and B. Pompe, “Permutation entropy: A natural complexity measure for time series,” Physical Review Letters, vol. 88, no. 17, p. 174102, 2002, doi: 10.1103/PhysRevLett.88.174102.\n\n\n[9] J. S. Richman and J. R. Moorman, “Physiological time-series analysis using approximate entropy and sample entropy,” American Journal of Physiology-Heart and Circulatory Physiology, vol. 278, no. 6, pp. H2039–H2049, 2000, doi: 10.1152/ajpheart.2000.278.6.H2039.\n\n\n[10] D. A. Dickey and W. A. Fuller, “Distribution of the estimators for autoregressive time series with a unit root,” Journal of the American Statistical Association, vol. 74, no. 366a, pp. 427–431, 1979, doi: 10.1080/01621459.1979.10482531.\n\n\n[11] D. Kwiatkowski, P. C. B. Phillips, P. Schmidt, and Y. Shin, “Testing the null hypothesis of stationarity against the alternative of a unit root,” Journal of Econometrics, vol. 54, no. 1–3, pp. 159–178, 1992, doi: 10.1016/0304-4076(92)90104-Y.",
+    "crumbs": [
+      "Part 5: Forecasting",
+      "<span class='chapter-number'>14</span>  <span class='chapter-title'>Chapter 1: Household Smart-Meter Forecastability</span>"
+    ]
+  },
+  {
     "objectID": "about.html",
     "href": "about.html",
     "title": "About the Author",
     "section": "",
     "text": "Anthony Faustine\n    Principal ML Engineer  ·  Analog Devices, Ireland\n    \n       sambaiga.github.io\n       sambaiga\n       sambaiga\n       0000-0002-7838-533X\n       sambaiga@gmail.com\n    \n  \n\nEvery part of this book started as something I had to solve for real, not as a topic I picked to write about.\nThe earliest was disaggregation: teaching a model to look at one aggregate power reading and say which appliance was drawing it, the same problem Part 2 of this book covers. That question led to the one utilities actually pay for: not just what’s running now, but what demand and solar output will look like tomorrow, with an honest estimate of how wrong that forecast might be. My PhD took that question to the low-voltage substation, forecasting net load in the presence of solar and EV charging when a headline accuracy number wasn’t good enough to act on. At Eaton’s Centre for Intelligent Power, I ran that same question as Lead Data Scientist and Principal Investigator, securing €1.6M in competitive research funding and picking up the Eaton STAR Leadership Award along the way.\nToday, as Principal ML Engineer at Analog Devices, the question is the same one this book keeps returning to: not whether a model works in a notebook, but whether it survives contact with production, supply chain demand planning and edge inference in my case. That is the bar every chapter here holds itself to.\nThe open-source side of that decade is public: Twiga (point and probabilistic forecasting, one interface, every model), MLPForecast (uncertainty-aware net-load forecasting), and Deep-NILMtk (a community toolkit for non-intrusive load monitoring, the same disaggregation problem this book opens with).\nProjects  →  sambaiga.github.io/pages/projects\nThe published record runs the same thread: non-intrusive load monitoring, probabilistic forecasting, uncertainty quantification, physics-based intelligence, and AI for reliability engineering, across 10+ peer-reviewed papers in IEEE Transactions on Smart Grid, IEEE Transactions on Power Systems, and IEEE Transactions on Industrial Informatics.\nPublications  →  sambaiga.github.io/pages/publication  ·  ORCID\nI also write about machine learning, Bayesian thinking, and applied AI at:\nBlog  →  sambaiga.github.io/pages/blog",
     "crumbs": [
-      "<span class='chapter-number'>14</span>  <span class='chapter-title'>About the Author</span>"
+      "<span class='chapter-number'>15</span>  <span class='chapter-title'>About the Author</span>"
     ]
   },
   {
@@ -1320,9 +1485,9 @@
     "href": "acronyms.html",
     "title": "List of Acronyms",
     "section": "",
-    "text": "List Of Acronyms\n\nARI\n\nAdjusted Rand Index\n\nBESS\n\nBattery Energy Storage System\n\nCBR\n\nCase-Based Reasoning\n\nCRPS\n\nContinuously Ranked Probability Score\n\nDBI\n\nDavies-Bouldin Index\n\nDER\n\nDistributed Energy Resources\n\nDSO\n\nDistribution System Operator\n\nEV\n\nElectric Vehicle\n\nGNN\n\nGraph Neural Network\n\nHV\n\nHigh Voltage\n\nIDEC\n\nImproved Deep Embedded Clustering\n\nIEEE\n\nInstitute of Electrical and Electronics Engineers\n\nLTR\n\nLearning to Rank\n\nLV\n\nLow Voltage\n\nMV\n\nMedium Voltage\n\nNILM\n\nNon-Intrusive Load Monitoring\n\nNREL\n\nNational Renewable Energy Laboratory\n\nPCA\n\nPrincipal Component Analysis\n\nPPS\n\nPredictive Power Score\n\nPV\n\nPhotovoltaic\n\nRES\n\nRenewable Energy Sources\n\nSOM\n\nSelf-Organizing Map\n\nkNN\n\nk-Nearest Neighbors",
+    "text": "List Of Acronyms\n\nACF\n\nAutocorrelation Function\n\nADF\n\nAugmented Dickey-Fuller\n\nANOVA\n\nAnalysis of Variance\n\nAR\n\nAutoregressive\n\nARI\n\nAdjusted Rand Index\n\nBESS\n\nBattery Energy Storage System\n\nCBR\n\nCase-Based Reasoning\n\nCRPS\n\nContinuously Ranked Probability Score\n\nDBI\n\nDavies-Bouldin Index\n\nDER\n\nDistributed Energy Resources\n\nDFA\n\nDetrended Fluctuation Analysis\n\nDSO\n\nDistribution System Operator\n\nEV\n\nElectric Vehicle\n\nGNN\n\nGraph Neural Network\n\nHV\n\nHigh Voltage\n\nIDEC\n\nImproved Deep Embedded Clustering\n\nIEEE\n\nInstitute of Electrical and Electronics Engineers\n\nKPSS\n\nKwiatkowski-Phillips-Schmidt-Shin\n\nLTR\n\nLearning to Rank\n\nLV\n\nLow Voltage\n\nMV\n\nMedium Voltage\n\nNILM\n\nNon-Intrusive Load Monitoring\n\nNREL\n\nNational Renewable Energy Laboratory\n\nPACF\n\nPartial Autocorrelation Function\n\nPCA\n\nPrincipal Component Analysis\n\nPPS\n\nPredictive Power Score\n\nPV\n\nPhotovoltaic\n\nRES\n\nRenewable Energy Sources\n\nSOM\n\nSelf-Organizing Map\n\nkNN\n\nk-Nearest Neighbors",
     "crumbs": [
-      "<span class='chapter-number'>15</span>  <span class='chapter-title'>List of Acronyms</span>"
+      "<span class='chapter-number'>16</span>  <span class='chapter-title'>List of Acronyms</span>"
     ]
   }
 ]
