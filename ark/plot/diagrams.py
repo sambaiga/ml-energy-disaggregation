@@ -1341,3 +1341,119 @@ def known_vs_new_customer_diagram() -> plt.Figure:
     fig.tight_layout()
     plt.close(fig)
     return fig
+
+
+def archetype_distance_and_conformal_diagram() -> plt.Figure:
+    """Draw the two mechanics behind this chapter's real result.
+
+    Distance-to-centroid weighting, and the split-conformal calibration
+    that gates it. Left: a customer's own shape sits some distance from each of 5 archetype
+    centroids. Those distances become a softmax over negative distance, the
+    same mixture-of-experts idea Jacobs, Jordan, Nowlan and Hinton introduced
+    in 1991, closer centroids get more weight, not a hard, winner-take-all
+    assignment. Right: before trusting any of this for a new customer, a
+    calibrated distance threshold, tau, decides whether a real match exists
+    at all: tau is the (1-alpha) quantile of nearest-neighbor distances on a
+    held-back calibration split, the split-conformal guarantee Lei, G'Sell,
+    Rinaldo, Tibshirani and Wasserman formalized in 2018. A customer inside
+    tau is trusted; one beyond it safely falls back to the blind model.
+
+    Returns:
+        The matplotlib Figure, ready to display in a notebook cell.
+    """
+    fig, axes = plt.subplots(1, 2, figsize=(10.2, 4.6))
+
+    # ---- left panel: distance-to-centroid weighting ----
+    ax = axes[0]
+    ax.set_title("Distance becomes weight", fontsize=12, color=PRIMARY, fontweight="bold")
+    customer_xy = (0.0, 0.0)
+    rng = np.random.default_rng(3)
+    angles = np.linspace(0, 2 * np.pi, 5, endpoint=False) + 0.3
+    radii = np.array([1.0, 2.6, 1.8, 3.4, 2.2])
+    weights = np.exp(-radii / 1.3)
+    weights = weights / weights.sum()
+
+    for angle, radius, weight in zip(angles, radii, weights, strict=True):
+        cx, cy = radius * np.cos(angle), radius * np.sin(angle)
+        ax.plot([customer_xy[0], cx], [customer_xy[1], cy], color=TEXT_MUTED, linewidth=1.0 + 5 * weight, zorder=1)
+        ax.add_patch(
+            Circle(
+                (cx, cy),
+                0.42,
+                facecolor=SUCCESS,
+                edgecolor="white",
+                linewidth=1.2,
+                zorder=2,
+                alpha=0.55 + 0.45 * weight,
+            )
+        )
+        ax.text(
+            cx, cy, f"{weight:.0%}", fontsize=8, color="white", fontweight="bold", ha="center", va="center", zorder=3
+        )
+
+    ax.add_patch(Circle(customer_xy, 0.32, facecolor=PRIMARY, edgecolor="white", linewidth=1.4, zorder=4))
+    ax.text(
+        customer_xy[0],
+        customer_xy[1] - 0.85,
+        "New customer's\npartial-history shape",
+        fontsize=8.2,
+        color=PRIMARY,
+        ha="center",
+        va="top",
+        fontweight="bold",
+    )
+    ax.text(
+        0, 3.9, r"$w_i = e^{-d_i/T} \,/\, \sum_j e^{-d_j/T}$", fontsize=10.5, color=PRIMARY, ha="center", va="center"
+    )
+    ax.set_xlim(-4.0, 4.0)
+    ax.set_ylim(-4.3, 4.3)
+    ax.set_aspect("equal")
+    ax.axis("off")
+
+    # ---- right panel: split-conformal calibration ----
+    ax = axes[1]
+    ax.set_title('A calibrated "do we trust this" gate', fontsize=12, color=PRIMARY, fontweight="bold")
+    calib_scores = rng.gamma(2.2, 0.35, size=400)
+    tau = np.quantile(calib_scores, 0.9)
+    counts, bin_edges = np.histogram(calib_scores, bins=28)
+    bin_width = bin_edges[1] - bin_edges[0]
+    for left, count in zip(bin_edges[:-1], counts, strict=True):
+        trusted_bin = left + bin_width / 2 <= tau
+        ax.bar(
+            left,
+            count,
+            width=bin_width * 0.95,
+            align="edge",
+            color=SUCCESS if trusted_bin else DANGER,
+            alpha=0.75,
+            linewidth=0,
+        )
+
+    ax.axvline(tau, color=PRIMARY, linestyle="--", linewidth=1.6)
+    ax.set_ylim(0, counts.max() * 1.35)
+    ax.text(
+        tau, counts.max() * 1.18, r"$\tau$ = 90th percentile", fontsize=9, color=PRIMARY, ha="center", fontweight="bold"
+    )
+    ax.annotate(
+        "Trusted:\nblend the specialists",
+        xy=(tau * 0.45, counts.max() * 0.55),
+        fontsize=8.4,
+        color=SUCCESS,
+        ha="center",
+        fontweight="bold",
+    )
+    ax.annotate(
+        "Flagged:\nfall back to blind",
+        xy=(tau * 1.5, counts.max() * 0.55),
+        fontsize=8.4,
+        color=DANGER,
+        ha="center",
+        fontweight="bold",
+    )
+    ax.set_xlabel("Distance to nearest labeled neighbor")
+    ax.set_ylabel("Calibration customers")
+    ax.spines[["top", "right"]].set_visible(False)
+
+    fig.tight_layout()
+    plt.close(fig)
+    return fig
