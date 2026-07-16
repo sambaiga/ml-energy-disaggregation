@@ -1198,3 +1198,146 @@ def forecastability_diagram() -> plt.Figure:
     fig.tight_layout()
     plt.close(fig)
     return fig
+
+
+def _flow_box(
+    ax: plt.Axes,
+    xy: tuple[float, float],
+    width: float,
+    height: float,
+    label: str,
+    *,
+    color: str,
+    filled: bool = True,
+) -> None:
+    """A single labeled rounded box, the shared unit every panel below is built from."""
+    ax.add_patch(
+        FancyBboxPatch(
+            xy,
+            width,
+            height,
+            boxstyle="round,pad=0.02,rounding_size=0.06",
+            linewidth=1.6,
+            edgecolor=color,
+            facecolor=color if filled else "none",
+            alpha=1.0 if filled else 0.9,
+        )
+    )
+    ax.text(
+        xy[0] + width / 2,
+        xy[1] + height / 2,
+        label,
+        fontsize=8.3,
+        color="white" if filled else color,
+        fontweight="bold",
+        ha="center",
+        va="center",
+    )
+
+
+def _flow_arrow(ax: plt.Axes, xy_start: tuple[float, float], xy_end: tuple[float, float], color: str) -> None:
+    """A single straight downward flow arrow, the shared idiom both panels below use."""
+    ax.add_patch(
+        FancyArrowPatch(
+            xy_start,
+            xy_end,
+            arrowstyle="-|>",
+            mutation_scale=13,
+            color=color,
+            linewidth=1.5,
+            shrinkA=2,
+            shrinkB=2,
+        )
+    )
+
+
+def known_vs_new_customer_diagram() -> plt.Figure:
+    """Draw the two different mechanisms this chapter's real result calls for.
+
+    Left: a customer the system already has real history for. Their own
+    distance to each archetype centroid is just another feature, fed into
+    the same single shared model as the lag features, a legitimate
+    personalization signal because the model has already trained on this
+    exact customer. Right: a brand-new customer with no history in any
+    trained model yet. The same distance features, computed from whatever
+    partial history exists, first pass through Chapter 5's own calibrated
+    retrieval-confidence gate, reused directly, not reimplemented, before
+    deciding whether to trust a distance-weighted blend of the already-
+    trained archetype specialists or fall back to the safe global model.
+    Two different answers to "how should clustering and forecasting
+    combine," chosen by whether a customer is known or new, not by
+    preference.
+
+    Returns:
+        The matplotlib Figure, ready to display in a notebook cell.
+    """
+    fig, axes = plt.subplots(1, 2, figsize=(10.2, 5.0))
+
+    # ---- left panel: known customer ----
+    ax = axes[0]
+    ax.set_title("Known customer", fontsize=12, color=PRIMARY, fontweight="bold")
+    _flow_box(ax, (0.0, 3.6), 1.7, 0.6, "Lag features", color=INFO)
+    _flow_box(ax, (2.1, 3.6), 1.9, 0.6, "Own archetype\ndistance", color=SUCCESS)
+    _flow_box(ax, (0.9, 2.0), 2.2, 0.7, "One shared model", color=PRIMARY)
+    _flow_arrow(ax, (0.85, 3.6), (1.6, 2.7), color=INFO)
+    _flow_arrow(ax, (3.05, 3.6), (2.4, 2.7), color=SUCCESS)
+    _flow_arrow(ax, (2.0, 2.0), (2.0, 1.0), color=PRIMARY)
+    ax.text(
+        2.0,
+        0.55,
+        "Personalized forecast",
+        fontsize=9.5,
+        color=SUCCESS,
+        fontweight="bold",
+        ha="center",
+        va="center",
+    )
+    ax.text(
+        2.0,
+        4.5,
+        "A static distance signature\ndoubles as a personalization signal",
+        fontsize=8.2,
+        color=TEXT_MUTED,
+        style="italic",
+        ha="center",
+        va="bottom",
+    )
+
+    # ---- right panel: new customer ----
+    ax = axes[1]
+    ax.set_title("New customer", fontsize=12, color=PRIMARY, fontweight="bold")
+    _flow_box(ax, (0.9, 4.3), 2.2, 0.6, "Partial-history distance", color=WARNING)
+    _flow_arrow(ax, (2.0, 4.3), (2.0, 3.5), color=WARNING)
+    ax.scatter([2.0], [3.15], s=1400, marker="D", facecolor="white", edgecolor=PRIMARY, linewidth=1.6, zorder=3)
+    ax.text(2.0, 3.15, "Confident\nmatch?", fontsize=7.3, color=PRIMARY, fontweight="bold", ha="center", va="center")
+
+    _flow_arrow(ax, (2.5, 2.9), (3.3, 2.15), color=SUCCESS)
+    ax.text(3.45, 2.55, "yes", fontsize=8, color=SUCCESS, fontweight="bold", ha="left", va="center")
+    _flow_box(ax, (2.75, 1.55), 2.1, 0.65, "Blend of archetype\nspecialists", color=SUCCESS)
+
+    _flow_arrow(ax, (1.5, 2.9), (0.7, 2.15), color=DANGER)
+    ax.text(0.55, 2.55, "no", fontsize=8, color=DANGER, fontweight="bold", ha="right", va="center")
+    _flow_box(ax, (-0.35, 1.55), 2.1, 0.65, "Global model\n(safe fallback)", color=TEXT_MUTED)
+
+    _flow_arrow(ax, (0.7, 1.55), (1.8, 0.75), color=TEXT_MUTED)
+    _flow_arrow(ax, (3.8, 1.55), (2.2, 0.75), color=SUCCESS)
+    ax.text(
+        2.0,
+        0.4,
+        "Forecast, never worse than the floor",
+        fontsize=8.6,
+        color=PRIMARY,
+        fontweight="bold",
+        ha="center",
+        va="center",
+    )
+
+    for ax in axes:
+        ax.set_xlim(-0.8, 5.0)
+        ax.set_ylim(0.0, 5.1)
+        ax.set_aspect("equal")
+        ax.axis("off")
+
+    fig.tight_layout()
+    plt.close(fig)
+    return fig

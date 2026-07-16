@@ -15,7 +15,7 @@ description: "A structured, project-based path through smart meter data: ML foun
 <div class="cover-stat-row">
 <div class="cover-stat"><span class="stat-value">342</span><span class="stat-label">Real households</span></div>
 <div class="cover-stat"><span class="stat-value">16</span><span class="stat-label">Appliance types</span></div>
-<div class="cover-stat"><span class="stat-value">11</span><span class="stat-label">Chapters live</span></div>
+<div class="cover-stat"><span class="stat-value">12</span><span class="stat-label">Chapters live</span></div>
 </div>
 
 <p class="cover-author">By <a href="https://sambaiga.github.io/" style="color:#38BDF8;font-weight:600">Anthony Faustine</a>&nbsp;&nbsp;<a href="https://github.com/sambaiga" title="GitHub" style="color:#94A3B8"><i class="bi bi-github"></i></a>&nbsp;<a href="https://www.linkedin.com/in/sambaiga" title="LinkedIn" style="color:#94A3B8"><i class="bi bi-linkedin"></i></a>&nbsp;<a href="mailto:sambaiga@gmail.com" title="Email" style="color:#94A3B8"><i class="bi bi-envelope-at"></i></a></p>
@@ -139,13 +139,13 @@ description: "A structured, project-based path through smart meter data: ML foun
 <p class="act-desc">Household-scale load, PV, and EV forecastability and uncertainty, built on Twiga. The book's closing part, feeding its own forecasts back into Part 4's LV network model.</p>
 <ul class="act-chapters">
 <li><a href="book/05-forecasting/01-forecastability.qmd"><span class="ch-num">01</span><span class="ch-name">Household Smart-Meter Forecastability</span><i class="bi bi-check-circle-fill ch-check"></i></a></li>
-<li><span class="ch-row"><span class="ch-num">02</span><span class="ch-name">Scaling with customer archetypes</span><span class="ch-soon">Soon</span></span></li>
+<li><a href="book/05-forecasting/02-scaling-archetypes.qmd"><span class="ch-num">02</span><span class="ch-name">Scaling to Hundreds of Meters</span><i class="bi bi-check-circle-fill ch-check"></i></a></li>
 </ul>
 </div>
 </div>
 
 </div>
 
-<p style="color:#94A3B8;font-size:0.85rem;">11 chapters shipped so far, each with a runnable notebook. <a href="https://github.com/sambaiga/ml-energy-disaggregation" style="color:#64748B">Follow progress on GitHub</a>.</p>
+<p style="color:#94A3B8;font-size:0.85rem;">12 chapters shipped so far, each with a runnable notebook. <a href="https://github.com/sambaiga/ml-energy-disaggregation" style="color:#64748B">Follow progress on GitHub</a>.</p>
 
 </div>

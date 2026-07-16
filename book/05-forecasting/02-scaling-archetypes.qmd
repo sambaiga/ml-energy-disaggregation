@@ -1,0 +1,72 @@
+---
+title: "Chapter 2: Scaling to Hundreds of Meters"
+bibliography: ../../references.bib
+---
+
+Chapter 1 closed with an uncomfortable floor: for 70% of AusNet's 342 real customers, the simplest possible baseline, a plain window average with no training at all, already wins. A trained model earns its cost only if it clears that floor, and clearing it is only half of what a {{< acr DSO >}} actually needs from a deployment. The other half never shows up in an accuracy table: a new house connects tomorrow with zero history in any trained model, and something has to forecast it on day one anyway. This chapter checks both, honestly, on the same real customer pool, rather than assuming a trained model wins or that a clustering idea that looks good on paper survives contact with a customer it has never seen.
+
+## Getting the data
+
+Same real AusNet pool Chapter 1 used, no new fetch step. This chapter also reuses Chapter 4's own customer archetypes directly: `KMeans(n_clusters=5)` on each customer's peak-normalized 90-day seasonal shape, the same recipe Chapter 4 actually shipped, not the {{< acr IDEC >}} autoencoder variant Chapter 4 only used for a k-selection comparison.
+
+<div class='ark-concept'>
+
+<span class='ark-concept-title'><i class="bi bi-info-circle-fill"></i> Key Concept</span>
+
+Clustering and forecasting combine differently depending on whether a customer is known or new. For a customer the system already has real history for, a static archetype-distance feature legitimately doubles as a personalization signal inside a single shared model, since the model has already trained on that exact customer. For a brand-new customer, that same feature is meaningless, there is no signature yet to personalize against, and the right mechanism is a distance-weighted blend of already-trained specialists, gated by a calibrated check for whether a real match even exists.
+
+</div>
+
+![Two different mechanisms, chosen by whether a customer is known or new. Left: a customer with real history gets a single shared model that treats archetype distance as an ordinary, legitimately personalizing feature. Right: a brand-new customer's partial-history distance first passes through a calibrated confidence gate before deciding between a distance-weighted blend of archetype specialists and a safe global fallback.](../../assets/known-vs-new-customer-routing.svg){#fig-known-vs-new-customer-routing}
+
+## Does profiling actually help, for a customer you already have?
+
+Three approaches, compared honestly on the same 342 real customers and the same last-90-day holdout Chapter 1 used: one global `twiga.models.ml` LightGBM model [@ke2017lightgbm] trained on everyone pooled together with no archetype information at all, one LightGBM per archetype (5 separate models, hard-routed by cluster membership), and one single LightGBM that pools everyone together but also receives each customer's own distance to every archetype centroid as five extra features. The same lag-and-calendar feature recipe Chapter 1 built for feature-importance ranking underlies all three, put to its first real use training a model.
+
+{{< embed 02-scaling-archetypes-code.ipynb#887b9c5c >}}
+
+{{< embed 02-scaling-archetypes-code.ipynb#e6ee7960 >}}
+
+{{< embed 02-scaling-archetypes-code.ipynb#19eb08d1 >}}
+
+{{< embed 02-scaling-archetypes-code.ipynb#649ea05f >}}
+
+Unified wins on MAE, RMSE, Corr, and WMAPE, and is effectively tied on SMAPE. It beats the global blind model that ignores archetype information entirely, and it beats hard-routing to five separate archetype-specific models too, without needing five separate models to maintain in production. This matches a broader finding in the forecasting literature: a single model that shares statistical strength across many related series, rather than a strictly local model per series, has repeatedly shown surprising accuracy on grouped time series [@monteromanso2021global]. But this comparison has every customer's own real history inside the training pool. That is a fair test of whether profiling helps for a customer already known to the system, not of a customer it has never seen before, and those are genuinely different questions.
+
+## What does a brand-new house get forecast with?
+
+A {{< acr DSO >}} onboarding a new house tomorrow has no history for it in any trained model. The obvious idea is to reuse the unified model exactly as it is: compute the new house's own distance to each archetype centroid from whatever real history exists, and feed those distances into the same model. Checked directly, before trusting it.
+
+{{< embed 02-scaling-archetypes-code.ipynb#79b3c46e >}}
+
+{{< embed 02-scaling-archetypes-code.ipynb#68559944 >}}
+
+Even at 90 real days of history, exactly matching the full season used to build the archetype centroids in the first place, the unified model is still worse than the global blind model that ignores archetype information entirely. More history does not fix it. The distance features are not being ignored either, a direct feature-importance check shows LightGBM splits on them about as often as it splits on the lag features. What is actually happening: a customer's own centroid-distance vector is close to a unique signature during training, and the tree learns to recognize which known customer a row came from rather than what archetype behavior generalizes. That is a legitimate personalization signal for a customer the model has already trained on, exactly Experiment A's real win above, and exactly the wrong signal for a customer it has never seen: there is no signature to recognize yet.
+
+The fix keeps every trained archetype specialist from the comparison above but stops asking a single model to reason about static per-customer distances at all. Instead: blend the five specialists' own predictions directly, weighted by how close the new customer's partial-history shape sits to each archetype centroid, and gate the whole thing behind Chapter 5's own calibrated retrieval-confidence check, reused verbatim, not reimplemented, so a customer with no close real match anywhere in the known pool safely falls back to the blind model instead of a confident-looking guess.
+
+{{< embed 02-scaling-archetypes-code.ipynb#17272bc7 >}}
+
+{{< embed 02-scaling-archetypes-code.ipynb#0b765cad >}}
+
+{{< embed 02-scaling-archetypes-code.ipynb#f4745145 >}}
+
+The gated soft mixture is never worse than the blind floor at any history length, including a single real day, where the calibrated gate correctly trusts nothing yet and defers entirely. As real history accumulates, both the archetype-assignment accuracy and the retrieval-confidence trust rate climb together, from 32% and 0% at one day to 100% and 92% at a full season, and the gated mixture's own accuracy improves in step, ending as the best of the four approaches by a full season.
+
+## From mechanism to decision
+
+Two different answers to how clustering and forecasting should combine, and which one is right depends entirely on whether a customer is known or new, checked rather than assumed either way. For a customer the system already has any real history for, a single model that receives archetype distances as ordinary features wins outright, because that static distance signature legitimately doubles as a personalization signal. For a customer with no history in any trained model yet, that same mechanism actively fails, even with a perfect archetype match, because there is no signature yet to personalize against. The fix reuses machinery this book already built rather than inventing new machinery: Chapter 4's archetype centroids supply the distances, Chapter 5's own calibrated retrieval-confidence check supplies the honest "do we actually have a close real match" gate, and the two combine into a soft, distance-weighted blend of the same specialist models trained above. It is never worse than doing nothing, and it gets measurably better as real history accumulates, exactly the property a genuine day-one deployment needs.
+
+## Why bother
+
+A {{< acr DSO >}} does not get to choose between accurate and operationally maintainable, and does not get to wait for a new customer to accumulate a full season of history before forecasting them at all. The real, checked finding here is that both constraints have one honest answer each: reuse a single model with cluster information as a legitimate personalization signal once a customer has real history, and fall back to a calibrated, distance-weighted blend of already-trained specialists, safely gated, before that history exists. Neither answer was assumed going in. The first naive idea this chapter tried, reusing the same personalization mechanism for new customers, failed a genuine held-out test even with perfect information, and the fix that replaced it reuses machinery Chapters 4 and 5 already built rather than adding anything new.
+
+## Where this leaves Part 5
+
+A trained model clears Chapter 1's baseline floor, and sharing information across Chapter 4's archetypes inside a single model beats both training one model per customer and training one model for everyone. That same sharing mechanism does not survive contact with a customer it has never seen, and the fix that does, a calibrated, distance-weighted blend of specialists, is never worse than doing nothing while a new customer's history accumulates. Chapter 3 picks up the model this chapter found actually earns its cost and asks what that forecast is worth without a number attached to how wrong it might be.
+
+## References
+
+::: {#refs}
+:::
+</content>
