@@ -131,9 +131,11 @@ A trained model’s real cost, engineering time, compute, and maintenance, only 
 
 {{< embed 01-forecastability-code.ipynb#ac5c37dd >}}
 
+Check the Corr column before trusting MAE alone. Window-average posts the lowest MAE (0.289) and lowest RMSE (0.436) of the four baselines, the kind of number that looks like a clear winner if that is all a reader checks. But its correlation with the real signal is only 0.073, barely above drift’s own 0.075, the two worst of the four. Seasonal-naive’s MAE is higher, 0.295, yet its correlation is 0.258, more than three times window-average’s own and the best of the four by a wide margin. A rolling average forecast can post a low pointwise error just by staying close to the series’ own smoothed level. On a signal this noisy, damping the response lowers average error without tracking a single real peak or dip. Seasonal-naive copies the same half-hour from the day before, so it actually reproduces the shape of a real day, evening peak included, which is why its correlation is higher even though its average error is not the smallest. A single scalar metric, read without checking what it rewards, can crown a baseline that has not learned anything about the signal’s real structure.
+
 {{< embed 01-forecastability-code.ipynb#29a34e87 >}}
 
-There is no single, universal winner among the 342 real customers; however, one baseline approach is predominant: window-average outperforms for 70% of customers, seasonal-naive for another 30%, and plain persistence for almost none. This represents a verified divergence from Twiga’s published tutorial, which found seasonal-naive to be the best performer on a different dataset. It is important to report this difference transparently rather than assume results transfer across contexts.
+There is no single, universal winner among the 342 real customers, and the tally above is itself an MAE-only contest: window-average outperforms for 70% of customers, seasonal-naive for another 30%, and plain persistence for almost none. Given the correlation gap just shown, a deployment that also cares about tracking a customer’s real daily shape, not only minimizing average deviation, has a real case for favouring seasonal-naive more often than a MAE-only tally credits it for. This split is also a verified divergence from Twiga’s own published tutorial, which found seasonal-naive the best performer on a different dataset. Report a difference like this transparently rather than assume results transfer across contexts.
 
 
 
@@ -193,7 +195,7 @@ These counterintuitive findings are significant for both utilities and customers
 
 Forecastability varies substantially across individual customers, and a simple window-average baseline is effective for most, regardless of regime. The addition of a known {{< acr PV >}} component increases, rather than decreases, the persistence of net load. The diversified {{< acr EV >}} construction achieves a level of forecastability that is unattainable from any single vehicle’s actual charging behaviour. This chapter adopts a confidence-set approach, providing a nuanced framework for subsequent analysis rather than a single, overconfident recommendation.
 
-Chapter 2 picks up the customers that this chapter’s own baselines do not already serve well, and asks whether profiling them into archetypes and reusing Part 4’s own {{< acr IDEC >}} clustering directly lets a shared model scale to hundreds of customers without training one model per household.
+Chapter 2 checks whether a trained model clears this chapter's own baseline floor at all, and whether profiling customers into Part 4's own archetypes lets a single shared model scale to hundreds of customers without training one model per household.
 
 ## References
 

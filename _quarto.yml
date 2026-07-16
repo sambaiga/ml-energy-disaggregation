@@ -67,6 +67,7 @@ book:
     - part: "Part 5: Forecasting"
       chapters:
         - book/05-forecasting/01-forecastability.qmd
+        - book/05-forecasting/02-scaling-archetypes.qmd
     - about.qmd
     - acronyms.qmd
 
