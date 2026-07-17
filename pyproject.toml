@@ -52,6 +52,7 @@ mlops = [
 
 grid = [
     "OpenDSSDirect.py>=0.9.4",
+    "boto3>=1.34.0",
 ]
 
 test = [
