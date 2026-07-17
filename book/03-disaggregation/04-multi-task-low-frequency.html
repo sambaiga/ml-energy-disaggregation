@@ -134,10 +134,12 @@ window.Quarto = {
 
 <meta property="og:title" content="Chapter 4: Multi-Task Deep Learning at Low Frequency – Machine Learning for Smart Meter Data">
 <meta property="og:description" content="A structured, project-based path through smart meter data: disaggregation, forecasting, anomaly detection, and grid-edge value, from raw signal to business insight.">
+<meta property="og:image" content="https://sambaiga.github.io/ml-energy-disaggregation/assets/multi-task-shared-encoder-dual-heads.svg">
 <meta property="og:site_name" content="Machine Learning for Smart Meter Data">
 <meta name="twitter:title" content="Chapter 4: Multi-Task Deep Learning at Low Frequency – Machine Learning for Smart Meter Data">
 <meta name="twitter:description" content="A structured, project-based path through smart meter data: disaggregation, forecasting, anomaly detection, and grid-edge value, from raw signal to business insight.">
-<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://sambaiga.github.io/ml-energy-disaggregation/assets/multi-task-shared-encoder-dual-heads.svg">
+<meta name="twitter:card" content="summary_large_image">
 </head>
 
 <body class="nav-sidebar floating nav-fixed quarto-light"><script id="quarto-html-before-body" type="application/javascript">
@@ -1404,9 +1406,30 @@ x_t = \sum_{m=1}^{M} y_m(t) \cdot s_m(t) + \epsilon_t,
 <h2 class="anchored" data-anchor-id="two-backbones-one-set-of-heads">Two backbones, one set of heads</h2>
 <div class="ark-concept">
 <p><span class="ark-concept-title"><i class="bi bi-info-circle-fill"></i> Key Concept</span></p>
-<p>Multi-<em>target</em> quantile regression is not five separate regressions bolted together. A single shared network predicts a handful of quantiles per appliance at once (here, the paper’s own choice: 2.5%, 10%, 50%, 90%, 97.5%), trained with the pinball loss, which penalizes over- and under-prediction asymmetrically depending on which quantile is being fit. The payoff: a real uncertainty band around every prediction, not just a point estimate, at essentially no extra modeling cost over a plain regression head <span class="citation" data-cites="faustine2020unetnilm">[1]</span>.</p>
+<p>Multi-<em>target</em> quantile regression is not five separate regressions bolted together. A single shared network predicts a handful of quantiles per appliance at once (here, the paper’s own choice: 2.5%, 10%, 50%, 90%, 97.5%), trained with the pinball loss, which penalizes over- and under-prediction asymmetrically depending on which quantile is being fit: <span class="math display">\[
+\mathcal{L}_\tau(y, \hat y) =
+\begin{cases}
+\tau \cdot (y - \hat y) &amp; y \ge \hat y \\
+(1-\tau) \cdot (\hat y - y) &amp; y &lt; \hat y
+\end{cases}
+\]</span> for quantile level <span class="math inline">\(\tau \in (0, 1)\)</span>, real power <span class="math inline">\(y\)</span>, and the model’s own prediction <span class="math inline">\(\hat y\)</span> for that quantile. A low <span class="math inline">\(\tau\)</span> (e.g.&nbsp;0.025) penalizes over-prediction nine times more than under-prediction; a high <span class="math inline">\(\tau\)</span> (e.g.&nbsp;0.975) does the reverse; <span class="math inline">\(\tau=0.5\)</span> recovers plain absolute error. The payoff: a real uncertainty band around every prediction, not just a point estimate, at essentially no extra modeling cost over a plain regression head <span class="citation" data-cites="faustine2020unetnilm">[1]</span>.</p>
 </div>
-<p>Both backbones compared here end in the identical pair of heads: a per-appliance 2-way softmax for state, the same mechanism Chapter 3 used for multi-label appliance state, and a per-appliance multi-quantile linear head for power. <code>CNN1DModel</code> is a plain stacked-<code>Conv1D</code> encoder. <code>UNETNiLM</code> is a true U-Net: the same downsampling stack, followed by an upsampling stack with skip-connection concatenation back to the matching downsampling stage. Ported directly from the author’s own <code>UNETNiLM</code> repository, with two small fixes applied along the way: the checked-out <code>unet.py</code> imports <code>Conv1D</code>/<code>Deconv1D</code> from a <code>.block</code> module that does not exist (they live in <code>layers.py</code>), and its U-Net class referred to an undefined <code>num_classes</code> that needed to be a constructor argument. Both are one-line fixes, not a redesign; everything else is the original architecture, verified directly against the code, not just the paper’s prose.</p>
+<p>Both backbones compared here end in the identical pair of heads: a per-appliance 2-way softmax for state, the same mechanism Chapter 3 used for multi-label appliance state, and a per-appliance multi-quantile linear head for power. The two backbones differ only in how the shared representation <span class="math inline">\(h\)</span> gets built from the input window <span class="math inline">\(x\)</span>. <code>CNN1DModel</code> is a plain stacked encoder, each layer’s output feeding directly into the next with nothing carried across: <span class="math display">\[
+h = f_L\big(f_{L-1}(\cdots f_1(x) \cdots)\big).
+\]</span> <code>UNETNiLM</code> is a true U-Net: the same downsampling stack <span class="math inline">\(f_1, \dots,
+f_L\)</span>, followed by an upsampling stack <span class="math inline">\(g_L, \dots, g_1\)</span> where each upsampling layer concatenates its input with the matching downsampling stage’s own output before deconvolving, <span class="math display">\[
+h_l = g_l\big([\, h_{l+1} \, ; \, f_l(x) \,]\big),
+\]</span> <span class="math inline">\([\cdot\,;\,\cdot]\)</span> denoting channel-wise concatenation, so a detail computed early in the downsampling pass is available directly to the matching upsampling layer, not only through everything in between. Ported directly from the author’s own <code>UNETNiLM</code> repository, with two small fixes applied along the way: the checked-out <code>unet.py</code> imports <code>Conv1D</code>/<code>Deconv1D</code> from a <code>.block</code> module that does not exist (they live in <code>layers.py</code>), and its U-Net class referred to an undefined <code>num_classes</code> that needed to be a constructor argument. Both are one-line fixes, not a redesign; everything else is the original architecture, verified directly against the code, not just the paper’s prose.</p>
+<div id="fig-multi-task-shared-encoder-dual-heads" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-multi-task-shared-encoder-dual-heads-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="../../assets/multi-task-shared-encoder-dual-heads.svg" class="img-fluid figure-img">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-multi-task-shared-encoder-dual-heads-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;7.1: One shared encoder feeding two task heads: a per-appliance state classifier and a per-appliance multi-quantile power regressor, the same representation driving both rather than two unrelated models bolted together.
+</figcaption>
+</figure>
+</div>
 </section>
 <section id="live-results-does-the-u-net-actually-help-here" class="level2">
 <h2 class="anchored" data-anchor-id="live-results-does-the-u-net-actually-help-here">Live results: does the U-Net actually help here?</h2>
@@ -2679,7 +2702,12 @@ LightGBM: F1-macro=0.709  F1-eb=0.359</code></pre>
 </section>
 <section id="checking-the-combined-loss-itself" class="level2">
 <h2 class="anchored" data-anchor-id="checking-the-combined-loss-itself">Checking the combined loss itself</h2>
-<p>The two task losses are summed unweighted, matching the paper’s own choice, worth checking directly rather than assuming neither term quietly dominates the other.</p>
+<p>The two task losses are summed unweighted, matching the paper’s own choice: <span class="math display">\[
+\mathcal{L} = \mathcal{L}_{state} + \mathcal{L}_{power},
+\]</span> <span class="math display">\[
+\mathcal{L}_{state} = \text{CE}(s, \hat s), \qquad
+\mathcal{L}_{power} = \sum_{\tau} \mathcal{L}_\tau(y, \hat y_\tau),
+\]</span> the state term a plain cross-entropy between the true and predicted state <span class="math inline">\(s\)</span>, the power term a sum of the pinball loss above across every quantile level <span class="math inline">\(\tau\)</span> the power head predicts. No weight in front of either term, worth checking directly rather than assuming neither one quietly dominates the other.</p>
 <div class="quarto-embed-nb-cell" data-notebook="/home/runner/work/ml-energy-disaggregation/ml-energy-disaggregation/book/03-disaggregation/04-multi-task-low-frequency-code.ipynb" data-notebook-title="Multi-Task Deep Learning at Low Frequency" data-notebook-cellid="5fd46926">
 <div id="5fd46926" class="cell">
 <div class="cell-output cell-output-display">
