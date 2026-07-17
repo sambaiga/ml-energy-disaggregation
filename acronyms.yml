@@ -61,4 +61,8 @@ acronyms:
       longname: k-Nearest Neighbors
     - shortname: GNN
       longname: Graph Neural Network
+    - shortname: UMAP
+      longname: Uniform Manifold Approximation and Projection
+    - shortname: GMM
+      longname: Gaussian Mixture Model
 ...
