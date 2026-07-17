@@ -221,19 +221,31 @@ subsumes the other.
 ### Does the combination rule matter: average, max, median, or AOM?
 
 Plain averaging is one choice among several in the outlier-ensemble
-literature: maximization (flag if any detector is confident), median
-(robust to one detector's own miscalibration), and Average of Maximum,
-splitting detectors into random subgroups, taking the max within each,
-then averaging across subgroups, the combination Aggarwal and Sathe found
-most consistently effective in their own benchmarks
-[@aggarwal2015theoretical]. `pyod.models.combination` exists for exactly
-this, but tracing it directly shows it is a thin re-export of a separate
-package, `combo`, and `combo` declares `pyod` as its own hard dependency
-in return, dragging in `numba`, `llvmlite`, and `matplotlib` for what its
-own source turns out to be a handful of one-line `numpy` reductions.
-Implemented directly in `ark.anomaly.detectors` instead, verified
-byte-identical to `combo`'s own algorithm given the same detector shuffle
-order.
+literature. With $z_{c,d}$ the (already score-normalized) anomaly score
+detector $d \in \{1, \dots, D\}$ assigns customer-day $c$:
+$$
+\text{avg}(c) = \frac{1}{D}\sum_{d=1}^{D} z_{c,d}
+$$
+$$
+\text{max}(c) = \max_{d} z_{c,d}, \qquad \text{median}(c) = \operatorname{median}_{d}\, z_{c,d}
+$$
+maximization flags $c$ if any single detector is confident; median is
+robust to one detector's own miscalibration pulling the combined score
+off. Average of Maximum goes one step further: split the $D$ detectors
+into $G$ random subgroups $\mathcal{D}_1, \dots, \mathcal{D}_G$, take the
+max within each, then average across subgroups,
+$$
+\text{AOM}(c) = \frac{1}{G}\sum_{g=1}^{G} \max_{d \in \mathcal{D}_g} z_{c,d}
+$$
+the combination Aggarwal and Sathe found most consistently effective in
+their own benchmarks [@aggarwal2015theoretical]. `pyod.models.combination`
+exists for exactly this, but tracing it directly shows it is a thin
+re-export of a separate package, `combo`, and `combo` declares `pyod` as
+its own hard dependency in return, dragging in `numba`, `llvmlite`, and
+`matplotlib` for what its own source turns out to be a handful of
+one-line `numpy` reductions. Implemented directly in
+`ark.anomaly.detectors` instead, verified byte-identical to `combo`'s own
+algorithm given the same detector shuffle order.
 
 {{< embed 06-anomaly-detection-code.ipynb#fa6620e5 >}}
 
@@ -300,10 +312,23 @@ at whichever one confirmed the ensemble's own value first.
 ### How much can this threshold actually be trusted?
 
 A predicted anomaly score alone says nothing about how confident it is.
-Every earlier chapter that used split-conformal calibration set a single
-confidence level and moved on; this section makes the tradeoff itself
-visible instead, calibrating the same real pipeline at three different
-miscoverage rates.
+Every detector in this chapter, from here through Section 4, calibrates
+the same way: the combined anomaly score $z_c$ for a real, held-back
+calibration day $c$ is the nonconformity score itself, and the flagging
+threshold is its $(1-\alpha)$ empirical quantile across the $n$
+calibration days,
+$$
+\tau = \text{Quantile}_{\lceil (n+1)(1-\alpha) \rceil / n}\big(\{z_c\}_{c=1}^{n}\big)
+$$
+a customer-day flagged only once its own score $z > \tau$. This is the
+same finite-sample, distribution-free guarantee behind every other
+split-conformal threshold in this book [@lei2018distributionfree], the
+guarantee itself unchanged, only the nonconformity score's own meaning:
+a distance to a centroid in Chapter 3 or Chapter 4, an anomaly score
+here. Every earlier chapter that used split-conformal calibration set a
+single confidence level and moved on; this section makes the tradeoff
+itself visible instead, calibrating the same real pipeline at three
+different miscoverage rates $\alpha$.
 
 {{< embed 06-anomaly-detection-code.ipynb#64ec8589 >}}
 {{< embed 06-anomaly-detection-code.ipynb#0e53d324 >}}

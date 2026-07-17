@@ -33,6 +33,12 @@ This chapter reuses the same real AusNet smart-meter pool Part 4 already vendore
 uv run python scripts/fetch_part4_ausnet_data.py
 ```
 
+The generalization check later in this chapter reuses the same real {{< acr NREL >}} sample Part 4 Chapter 4 fetched, 760 real US buildings, restricted here to the 200 real ResStock homes:
+
+```bash
+uv run python scripts/fetch_part5_nrel_buildstock_data.py
+```
+
 ## Hundreds of customers, not one aggregate signal
 
 AusNet’s own real pool contains 342 real households, each with a full year of data at 30-minute resolution. Using every one of them, rather than working from one region-wide aggregate, is the only way to see whether forecastability itself varies from customer to customer, the question this whole chapter is built around. Checked directly rather than assumed: every one of the 342 real load series has genuine variance, no gaps, and no near-constant readings; the same real data Part 4 already ran a full OpenDSS time-series simulation against cleanly. No elaborate quality gate is needed here, unlike an earlier, since-dropped data source.
@@ -205,6 +211,22 @@ A single recommendation that claims to fit every customer is false confidence; t
 
 The window-average method consistently outperforms other approaches across all measured regimes (persistent, regular, and volatile), achieving a win share of 60-78% depending on the regime. Seasonal-naive remains the consistent runner-up. No regime automatically favours a trained model; even the most volatile and least-persistent customers are typically best served by a parameter-free baseline. Chapter 2 continues from this point, focusing on regimes in which residual error justifies deploying more complex models.
 
+## Does forecastability itself generalize beyond AusNet?
+
+Everything in this chapter is checked against one specific real population: 342 real Australian households, one country, one climate, one utility's own metering program. Part 4 Chapter 4 already asked a version of this question for clustering, whether shape-based archetypes recover real ground-truth building categories, and found a real, honest limit once the population changed. This chapter's own two headline findings, how forecastable a real household's signal actually is, and which baseline actually wins once Corr is checked alongside MAE, deserve the same honest check: are they a property of load forecasting in general, or a property of AusNet's own 342 customers specifically?
+
+{{< embed 01-forecastability-code.ipynb#5ff3cd14 >}}
+
+{{< embed 01-forecastability-code.ipynb#20c03e07 >}}
+
+Real, US ResStock households read as more regular by permutation entropy, 0.939 against AusNet's own 0.987, a genuine, checkable difference, not noise: a lower score means a smaller, more repeating set of ordinal patterns across the year. Sample entropy is nearly identical across the two real populations (0.394 against 0.407), and the Hurst and DFA exponents both stay in the same qualitative range, modestly higher for NREL on both. Forecastability is not a fixed, universal number for "household load," it depends on which real households, which real climate, and which real appliance mix a given population actually has, exactly the same lesson this chapter already drew from AusNet's own 342 customers not sharing one forecastability regime with each other, now shown to hold across countries as well as across customers within one country.
+
+{{< embed 01-forecastability-code.ipynb#6aa29674 >}}
+
+{{< embed 01-forecastability-code.ipynb#fe6789b0 >}}
+
+The baseline verdict does not just fail to transfer, it flips. Seasonal-naive wins the per-building MAE tally on 61% of these real NREL households, window-average on 36.5%, close to the exact reverse of AusNet's own 70/30 split favoring window-average. The diversity-weighted ranking agrees, and for a different, more clear-cut reason than it did on AusNet: seasonal-naive already wins outright on MAE, RMSE, WMAPE, and Corr here, so there is no MAE-versus-Corr conflict left for the ranking method to resolve, unlike AusNet's own comparison, where window-average's lower MAE was actively misleading once Corr was checked. Two real populations, two different honest verdicts, for what reads as a real, physical reason: a rolling window average smooths over exactly the kind of sharp, repeating evening ritual AusNet's own customers show weakly and inconsistently, while seasonal-naive's day-ago copy pays off precisely when a population's own daily rhythm repeats strongly and reliably, the same real pattern behind NREL's own lower permutation entropy above. This is the same honest divergence this chapter already reported once, against Twiga's own published tutorial on a different dataset, now confirmed a second time on a third real population: report a difference like this transparently rather than assume a forecastability finding, or a baseline recommendation, transfers across contexts it was never checked against.
+
 ## Why bother
 
 From a utility perspective, the decision table presented in this chapter serves as a practical triage tool rather than a purely academic exercise. A {{< acr DSO >}} tasked with forecasting for hundreds or thousands of individual customers cannot feasibly apply the same resource-intensive pipeline to all. The regime table clearly identifies which customers are adequately served by a cost-effective, parameter-free baseline (the majority, according to this data) and which warrant the additional complexity introduced in Chapter 2. This represents a genuine deployment-cost decision: resources are allocated to model development, tuning, and monitoring only where they are likely to yield tangible benefits.
@@ -220,6 +242,8 @@ These counterintuitive findings are significant for both utilities and customers
 ## Where this leaves Part 5
 
 Forecastability varies substantially across individual customers, and a simple window-average baseline is effective for most, regardless of regime. The addition of a known {{< acr PV >}} component increases, rather than decreases, the persistence of net load. The diversified {{< acr EV >}} construction achieves a level of forecastability that is unattainable from any single vehicle’s actual charging behaviour. This chapter adopts a confidence-set approach, providing a nuanced framework for subsequent analysis rather than a single, overconfident recommendation.
+
+Neither finding turned out to be a universal property of household load. Checked against 200 real NREL ResStock homes, a genuinely different country and climate, forecastability itself reads more regular, and the baseline verdict flips outright, seasonal-naive winning the majority where window-average won on AusNet. Both are worth deploying as a first read on a new population, neither is worth assuming transfers unchecked.
 
 Chapter 2 checks whether a trained model clears this chapter's own baseline floor at all, and whether profiling customers into Part 4's own archetypes lets a single shared model scale to hundreds of customers without training one model per household.
 
