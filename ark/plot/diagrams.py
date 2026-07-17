@@ -1538,3 +1538,92 @@ def three_uq_paradigms_diagram() -> plt.Figure:
     fig.tight_layout()
     plt.close(fig)
     return fig
+
+
+def ground_truth_vs_discovered_clusters_diagram() -> plt.Figure:
+    """Draw what ARI and NMI actually measure.
+
+    Agreement between two real partitions of the same objects, corrected
+    for chance. Left: the same 15 points colored by a real, known category (three
+    building types, say). Right: the same 15 points at the same positions,
+    colored by what an unsupervised clustering pass actually discovered
+    from shape alone, with a handful of real disagreements, a point whose
+    true category and discovered cluster do not match, marked with an
+    outline. Both indices summarize the whole grid of matches and
+    mismatches into one number: Hubert and Arabie's Adjusted Rand Index
+    counts agreeing and disagreeing pairs of points, corrected for the
+    agreement chance alone would produce; Strehl and Ghosh's Normalized
+    Mutual Information asks how much knowing one partition reduces
+    uncertainty about the other. Neither reaches its maximum just because
+    two partitions have the same number of groups, only if the actual
+    grouping of objects agrees.
+
+    Returns:
+        The matplotlib Figure, ready to display in a notebook cell.
+    """
+    rng = np.random.default_rng(5)
+    true_colors = [SUCCESS, WARNING, INFO]
+    # three explicit 2x3 grids, well separated, no overlap between or within groups
+    group_origins = [(-1.3, 0.9), (1.1, 0.9), (-0.1, -1.1)]
+    positions, true_labels = [], []
+    for g, (ox, oy) in enumerate(group_origins):
+        for r in range(2):
+            for c in range(3):
+                positions.append((ox + c * 0.55, oy - r * 0.55))
+                true_labels.append(g)
+    positions = np.array(positions)
+    true_labels = np.array(true_labels)
+
+    # a discovered clustering that mostly, but not perfectly, agrees
+    discovered_labels = true_labels.copy()
+    swap_idx = rng.choice(len(true_labels), size=3, replace=False)
+    for idx in swap_idx:
+        discovered_labels[idx] = (discovered_labels[idx] + 1) % 3
+
+    fig, axes = plt.subplots(1, 2, figsize=(9.0, 4.2))
+
+    ax = axes[0]
+    ax.set_title("Ground truth", fontsize=12, color=PRIMARY, fontweight="bold")
+    for i, (x, y) in enumerate(positions):
+        ax.add_patch(
+            Circle((x, y), 0.14, facecolor=true_colors[true_labels[i]], edgecolor="white", linewidth=1.2, zorder=2)
+        )
+
+    ax = axes[1]
+    ax.set_title("Discovered by clustering", fontsize=12, color=PRIMARY, fontweight="bold")
+    for i, (x, y) in enumerate(positions):
+        mismatched = discovered_labels[i] != true_labels[i]
+        ax.add_patch(
+            Circle(
+                (x, y),
+                0.14,
+                facecolor=true_colors[discovered_labels[i]],
+                edgecolor=DANGER if mismatched else "white",
+                linewidth=2.4 if mismatched else 1.2,
+                zorder=2,
+            )
+        )
+    mismatch_idx = np.flatnonzero(discovered_labels != true_labels)
+    for rank, i in enumerate(mismatch_idx):
+        x, y = positions[i]
+        label_y = 1.75 - rank * 0.32
+        ax.annotate(
+            "disagreement",
+            xy=(x, y),
+            xytext=(2.05, label_y),
+            fontsize=8,
+            color=DANGER,
+            va="center",
+            arrowprops={"arrowstyle": "-", "color": DANGER, "linewidth": 0.8},
+        )
+
+    for ax in axes:
+        ax.set_xlim(-1.8, 2.4)
+        ax.set_ylim(-2.0, 2.0)
+        ax.set_aspect("equal")
+        ax.axis("off")
+    axes[1].set_xlim(-1.8, 3.2)
+
+    fig.tight_layout()
+    plt.close(fig)
+    return fig
