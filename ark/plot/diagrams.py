@@ -1787,3 +1787,55 @@ def diversity_weighted_ranking_diagram() -> plt.Figure:
     fig.tight_layout()
     plt.close(fig)
     return fig
+
+
+def multi_task_shared_encoder_diagram() -> plt.Figure:
+    """Draw one shared encoder feeding a state head and a power head.
+
+    The single coupling this chapter's whole architecture rests on: one
+    representation of the input window, computed once, drives both a
+    per-appliance state classifier and a per-appliance multi-quantile power
+    regressor, rather than two unrelated models trained as if they had
+    nothing to do with each other.
+
+    Returns:
+        The matplotlib Figure, ready to display in a notebook cell.
+    """
+    fig, ax = plt.subplots(figsize=(5.6, 5.4))
+
+    _flow_box(ax, (0.7, 0.2), 2.6, 0.6, "Input window\n(100 readings)", color=TEXT_MUTED)
+    _flow_arrow(ax, (2.0, 0.8), (2.0, 1.55), color=PRIMARY)
+
+    _flow_box(ax, (0.4, 1.55), 3.2, 0.7, "Shared encoder\n(CNN1D / U-Net)", color=PRIMARY)
+
+    _flow_arrow(ax, (1.55, 2.25), (0.5, 3.1), color=SUCCESS)
+    _flow_arrow(ax, (2.45, 2.25), (3.5, 3.1), color=WARNING)
+
+    _flow_box(ax, (-0.6, 3.1), 2.2, 0.65, "State head\nsoftmax, 2-way", color=SUCCESS)
+    _flow_box(ax, (2.5, 3.1), 2.2, 0.65, "Power head\n5 quantiles", color=WARNING)
+
+    _flow_arrow(ax, (0.5, 3.75), (0.5, 4.35), color=SUCCESS)
+    _flow_arrow(ax, (3.6, 3.75), (3.6, 4.35), color=WARNING)
+
+    ax.text(0.5, 4.55, "on / off", fontsize=9.5, color=SUCCESS, fontweight="bold", ha="center", va="bottom")
+    ax.text(3.6, 4.55, "power band", fontsize=9.5, color=WARNING, fontweight="bold", ha="center", va="bottom")
+
+    ax.text(
+        2.0,
+        4.9,
+        "One representation, two tasks",
+        fontsize=11.5,
+        color=PRIMARY,
+        fontweight="bold",
+        ha="center",
+        va="bottom",
+    )
+
+    ax.set_xlim(-1.1, 5.1)
+    ax.set_ylim(-0.1, 5.3)
+    ax.set_aspect("equal")
+    ax.axis("off")
+
+    fig.tight_layout()
+    plt.close(fig)
+    return fig
