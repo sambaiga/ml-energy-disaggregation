@@ -137,6 +137,35 @@ div.csl-indent {
 
 <script type="application/javascript">define('jquery', [],function() {return window.jQuery;})</script>
 
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script defer="" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN" && texText && texText.data) {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
 
 <meta property="og:title" content="Chapter 6: Anomaly Detection Beyond the Meter – Machine Learning for Smart Meter Data">
 <meta property="og:description" content="A structured, project-based path through smart meter data: disaggregation, forecasting, anomaly detection, and grid-edge value, from raw signal to business insight.">
@@ -828,7 +857,13 @@ div.csl-indent {
 </section>
 <section id="does-the-combination-rule-matter-average-max-median-or-aom" class="level3">
 <h3 class="anchored" data-anchor-id="does-the-combination-rule-matter-average-max-median-or-aom">Does the combination rule matter: average, max, median, or AOM?</h3>
-<p>Plain averaging is one choice among several in the outlier-ensemble literature: maximization (flag if any detector is confident), median (robust to one detector’s own miscalibration), and Average of Maximum, splitting detectors into random subgroups, taking the max within each, then averaging across subgroups, the combination Aggarwal and Sathe found most consistently effective in their own benchmarks <span class="citation" data-cites="aggarwal2015theoretical">[5]</span>. <code>pyod.models.combination</code> exists for exactly this, but tracing it directly shows it is a thin re-export of a separate package, <code>combo</code>, and <code>combo</code> declares <code>pyod</code> as its own hard dependency in return, dragging in <code>numba</code>, <code>llvmlite</code>, and <code>matplotlib</code> for what its own source turns out to be a handful of one-line <code>numpy</code> reductions. Implemented directly in <code>ark.anomaly.detectors</code> instead, verified byte-identical to <code>combo</code>’s own algorithm given the same detector shuffle order.</p>
+<p>Plain averaging is one choice among several in the outlier-ensemble literature. With <span class="math inline">\(z_{c,d}\)</span> the (already score-normalized) anomaly score detector <span class="math inline">\(d \in \{1, \dots, D\}\)</span> assigns customer-day <span class="math inline">\(c\)</span>: <span class="math display">\[
+\text{avg}(c) = \frac{1}{D}\sum_{d=1}^{D} z_{c,d}
+\]</span> <span class="math display">\[
+\text{max}(c) = \max_{d} z_{c,d}, \qquad \text{median}(c) = \operatorname{median}_{d}\, z_{c,d}
+\]</span> maximization flags <span class="math inline">\(c\)</span> if any single detector is confident; median is robust to one detector’s own miscalibration pulling the combined score off. Average of Maximum goes one step further: split the <span class="math inline">\(D\)</span> detectors into <span class="math inline">\(G\)</span> random subgroups <span class="math inline">\(\mathcal{D}_1, \dots, \mathcal{D}_G\)</span>, take the max within each, then average across subgroups, <span class="math display">\[
+\text{AOM}(c) = \frac{1}{G}\sum_{g=1}^{G} \max_{d \in \mathcal{D}_g} z_{c,d}
+\]</span> the combination Aggarwal and Sathe found most consistently effective in their own benchmarks <span class="citation" data-cites="aggarwal2015theoretical">[5]</span>. <code>pyod.models.combination</code> exists for exactly this, but tracing it directly shows it is a thin re-export of a separate package, <code>combo</code>, and <code>combo</code> declares <code>pyod</code> as its own hard dependency in return, dragging in <code>numba</code>, <code>llvmlite</code>, and <code>matplotlib</code> for what its own source turns out to be a handful of one-line <code>numpy</code> reductions. Implemented directly in <code>ark.anomaly.detectors</code> instead, verified byte-identical to <code>combo</code>’s own algorithm given the same detector shuffle order.</p>
 <div class="quarto-embed-nb-cell" data-notebook="/home/runner/work/ml-energy-disaggregation/ml-energy-disaggregation/book/04-grid-edge/06-anomaly-detection-code.ipynb" data-notebook-title="Anomaly Detection Beyond the Meter" data-notebook-cellid="fa6620e5">
 <div id="fa6620e5" class="cell">
 <div class="cell-output cell-output-display">
@@ -1080,7 +1115,9 @@ div.csl-indent {
 </section>
 <section id="how-much-can-this-threshold-actually-be-trusted" class="level3">
 <h3 class="anchored" data-anchor-id="how-much-can-this-threshold-actually-be-trusted">How much can this threshold actually be trusted?</h3>
-<p>A predicted anomaly score alone says nothing about how confident it is. Every earlier chapter that used split-conformal calibration set a single confidence level and moved on; this section makes the tradeoff itself visible instead, calibrating the same real pipeline at three different miscoverage rates.</p>
+<p>A predicted anomaly score alone says nothing about how confident it is. Every detector in this chapter, from here through Section 4, calibrates the same way: the combined anomaly score <span class="math inline">\(z_c\)</span> for a real, held-back calibration day <span class="math inline">\(c\)</span> is the nonconformity score itself, and the flagging threshold is its <span class="math inline">\((1-\alpha)\)</span> empirical quantile across the <span class="math inline">\(n\)</span> calibration days, <span class="math display">\[
+\tau = \text{Quantile}_{\lceil (n+1)(1-\alpha) \rceil / n}\big(\{z_c\}_{c=1}^{n}\big)
+\]</span> a customer-day flagged only once its own score <span class="math inline">\(z &gt; \tau\)</span>. This is the same finite-sample, distribution-free guarantee behind every other split-conformal threshold in this book <span class="citation" data-cites="lei2018distributionfree">[9]</span>, the guarantee itself unchanged, only the nonconformity score’s own meaning: a distance to a centroid in Chapter 3 or Chapter 4, an anomaly score here. Every earlier chapter that used split-conformal calibration set a single confidence level and moved on; this section makes the tradeoff itself visible instead, calibrating the same real pipeline at three different miscoverage rates <span class="math inline">\(\alpha\)</span>.</p>
 <div class="quarto-embed-nb-cell" data-notebook="/home/runner/work/ml-energy-disaggregation/ml-energy-disaggregation/book/04-grid-edge/06-anomaly-detection-code.ipynb" data-notebook-title="Anomaly Detection Beyond the Meter" data-notebook-cellid="64ec8589">
 <div id="64ec8589" class="cell">
 <div class="cell-output cell-output-display">
@@ -3588,6 +3625,9 @@ voltage-violation event detector: 0/31 flagged (FPR=0.000), 0/5 are real violato
 </div>
 <div id="ref-lundberg2017shap" class="csl-entry" role="listitem">
 <div class="csl-left-margin">[8] </div><div class="csl-right-inline">S. M. Lundberg and S.-I. Lee, <span>“A unified approach to interpreting model predictions,”</span> in <em>Advances in neural information processing systems 30 (NeurIPS 2017)</em>, 2017, pp. 4765–4774.</div>
+</div>
+<div id="ref-lei2018distributionfree" class="csl-entry" role="listitem">
+<div class="csl-left-margin">[9] </div><div class="csl-right-inline">J. Lei, M. G’Sell, A. Rinaldo, R. J. Tibshirani, and L. Wasserman, <span>“Distribution-free predictive inference for regression,”</span> <em>Journal of the American Statistical Association</em>, vol. 113, no. 523, pp. 1094–1111, 2018, doi: <a href="https://doi.org/10.1080/01621459.2017.1307116">10.1080/01621459.2017.1307116</a>.</div>
 </div>
 </div>
 

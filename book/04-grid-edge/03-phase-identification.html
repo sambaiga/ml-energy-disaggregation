@@ -137,6 +137,35 @@ div.csl-indent {
 
 <script type="application/javascript">define('jquery', [],function() {return window.jQuery;})</script>
 
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script defer="" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN" && texText && texText.data) {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
 
 <meta property="og:title" content="Chapter 3: Phase Identification from Smart-Meter Data – Machine Learning for Smart Meter Data">
 <meta property="og:description" content="A structured, project-based path through smart meter data: disaggregation, forecasting, anomaly detection, and grid-edge value, from raw signal to business insight.">
@@ -512,6 +541,7 @@ div.csl-indent {
   <li><a href="#does-the-choice-of-association-measure-matter" id="toc-does-the-choice-of-association-measure-matter" class="nav-link" data-scroll-target="#does-the-choice-of-association-measure-matter">Does the choice of association measure matter?</a></li>
   <li><a href="#naming-the-clusters-with-a-handful-of-known-customers" id="toc-naming-the-clusters-with-a-handful-of-known-customers" class="nav-link" data-scroll-target="#naming-the-clusters-with-a-handful-of-known-customers">Naming the clusters with a handful of known customers</a></li>
   <li><a href="#beyond-a-point-estimate-conformal-phase-assignment-confidence" id="toc-beyond-a-point-estimate-conformal-phase-assignment-confidence" class="nav-link" data-scroll-target="#beyond-a-point-estimate-conformal-phase-assignment-confidence">Beyond a point estimate: conformal phase-assignment confidence</a></li>
+  <li><a href="#what-one-31-customer-feeder-cannot-answer" id="toc-what-one-31-customer-feeder-cannot-answer" class="nav-link" data-scroll-target="#what-one-31-customer-feeder-cannot-answer">What one 31-customer feeder cannot answer</a></li>
   <li><a href="#where-this-leaves-part-4" id="toc-where-this-leaves-part-4" class="nav-link" data-scroll-target="#where-this-leaves-part-4">Where this leaves Part 4</a></li>
   <li><a href="#references" id="toc-references" class="nav-link" data-scroll-target="#references">References</a></li>
   </ul>
@@ -551,7 +581,10 @@ div.csl-indent {
 <p>One study sits closer to this chapter than any of the others. Simonovska and Ochoa combined principal component analysis with unconstrained k-means clustering on smart-meter voltage traces and tested it on a real, anonymized 31-customer low-voltage feeder under varying levels of <a href="#acronyms_PV">Photovoltaic (PV)</a> penetration <span class="citation" data-cites="simonovska2021phasegrouping">[5]</span>. That feeder is the same one this book has used since Chapter 1. The method built and tested below follows the same principle, correlation structure over raw readings, dimensionality reduction, then clustering, checked here against this feeder’s own real phase records rather than assumed correct.</p>
 <div class="ark-concept">
 <p><span class="ark-concept-title"><i class="bi bi-info-circle-fill"></i> Key Concept</span></p>
-<p><strong>Correlation, not magnitude, is the signal.</strong> Two voltage traces that look similar in absolute level can be weakly correlated, and two traces at different absolute levels can be strongly correlated, if they move together over time. A phase-identification method that clusters on raw voltage magnitude is answering “which customers have a similar voltage level,” a question dominated by each customer’s distance from the transformer. A method that clusters on the correlation between voltage traces is answering “which customers’ voltage moves together,” the question that actually tracks phase membership. The rest of this chapter tests both and reports what the difference costs in practice.</p>
+<p><strong>Correlation, not magnitude, is the signal.</strong> Two voltage traces that look similar in absolute level can be weakly correlated, and two traces at different absolute levels can be strongly correlated, if they move together over time. For customers <span class="math inline">\(i\)</span> and <span class="math inline">\(j\)</span> with voltage traces <span class="math inline">\(v_i,
+v_j \in \mathbb{R}^{T}\)</span> over <span class="math inline">\(T\)</span> real time steps, Pearson correlation <span class="math display">\[
+\rho_{ij} = \frac{\sum_{t=1}^{T} (v_{i,t} - \bar{v}_i)(v_{j,t} - \bar{v}_j)}{\sqrt{\sum_{t=1}^{T} (v_{i,t} - \bar{v}_i)^2}\sqrt{\sum_{t=1}^{T} (v_{j,t} - \bar{v}_j)^2}}
+\]</span> is invariant to each customer’s own absolute voltage level, entering only through the centering <span class="math inline">\(\bar{v}_i\)</span>, <span class="math inline">\(\bar{v}_j\)</span>, and the normalization in the denominator. A phase-identification method that clusters on raw voltage magnitude is answering “which customers have a similar voltage level,” a question dominated by each customer’s distance from the transformer. A method that clusters on <span class="math inline">\(\rho_{ij}\)</span> is answering “which customers’ voltage moves together,” the question that actually tracks phase membership. The rest of this chapter tests both and reports what the difference costs in practice.</p>
 </div>
 <div id="fig-voltage-correlation-vs-magnitude" class="quarto-float quarto-figure quarto-figure-center anchored">
 <figure class="quarto-float quarto-float-fig figure">
@@ -620,6 +653,9 @@ All 31 houses now follow a real customer's day-45 reading</code></pre>
 <section id="a-first-naive-attempt" class="level2">
 <h2 class="anchored" data-anchor-id="a-first-naive-attempt">A first, naive attempt</h2>
 <p>The most direct application of the theory above skips a step. Treat each customer’s 48-point voltage trace as a feature vector, reduce it to two dimensions with <a href="#acronyms_PCA">Principal Component Analysis (PCA)</a>, and cluster the result into three groups. It is worth running this exact approach before reaching for anything more careful, and checking it honestly against the real answer already in hand, rather than assuming a plausible-sounding method works.</p>
+<p>Every result below is checked against that real answer with the <a href="#acronyms_ARI">Adjusted Rand Index (ARI)</a>, the same chance-corrected agreement measure Part 4 Chapter 4 uses later in this book to check a discovered clustering against a genuine ground-truth label: <span class="math display">\[
+\text{ARI} = \frac{\sum_{ij}\binom{n_{ij}}{2} - \left[\sum_i \binom{a_i}{2}\sum_j \binom{b_j}{2}\right]\big/\binom{n}{2}}{\frac{1}{2}\left[\sum_i \binom{a_i}{2} + \sum_j \binom{b_j}{2}\right] - \left[\sum_i \binom{a_i}{2}\sum_j \binom{b_j}{2}\right]\big/\binom{n}{2}}
+\]</span> where <span class="math inline">\(n_{ij}\)</span> counts customers placed in real phase <span class="math inline">\(i\)</span> and discovered cluster <span class="math inline">\(j\)</span> at once, and <span class="math inline">\(a_i\)</span>, <span class="math inline">\(b_j\)</span> are each partition’s own group sizes <span class="citation" data-cites="hubert1985comparing">[6]</span>. A score of 1.0 is a perfect match to the real phase labels; 0.0 is no better than the agreement random chance alone would produce.</p>
 <div class="quarto-embed-nb-cell" data-notebook="/home/runner/work/ml-energy-disaggregation/ml-energy-disaggregation/book/04-grid-edge/03-phase-identification-code.ipynb" data-notebook-title="Phase Identification" data-notebook-cellid="1da22105">
 <div id="1da22105" class="cell">
 <div class="cell-output cell-output-stdout">
@@ -1030,7 +1066,9 @@ All 31 houses now follow a real customer's day-45 reading</code></pre>
 </section>
 <section id="would-this-have-found-three-groups-unsupervised" class="level2">
 <h2 class="anchored" data-anchor-id="would-this-have-found-three-groups-unsupervised">Would this have found three groups unsupervised?</h2>
-<p>The number of phases, three, was supplied going in. A working deployment often does not know the right number of groups in advance, so it is worth asking whether the data itself would have revealed it. The silhouette score, a measure of how well separated a given clustering is, answers that directly.</p>
+<p>The number of phases, three, was supplied going in. A working deployment often does not know the right number of groups in advance, so it is worth asking whether the data itself would have revealed it. The silhouette score answers that directly: for customer <span class="math inline">\(i\)</span>, with <span class="math inline">\(a(i)\)</span> its own mean distance to every other member of its assigned cluster and <span class="math inline">\(b(i)\)</span> its mean distance to the nearest cluster it does not belong to, <span class="math display">\[
+s(i) = \frac{b(i) - a(i)}{\max\big(a(i), b(i)\big)}
+\]</span> averaged over every customer to give one score per candidate <span class="math inline">\(k\)</span>. A customer sitting much closer to its own cluster than to any other scores near 1; a customer sitting about equally close to both scores near 0.</p>
 <div class="quarto-embed-nb-cell" data-notebook="/home/runner/work/ml-energy-disaggregation/ml-energy-disaggregation/book/04-grid-edge/03-phase-identification-code.ipynb" data-notebook-title="Phase Identification" data-notebook-cellid="62b6a69a">
 <div id="62b6a69a" class="cell">
 <div class="cell-output cell-output-stdout">
@@ -2028,7 +2066,14 @@ k=6: silhouette = 0.698</code></pre>
 <section id="beyond-a-point-estimate-conformal-phase-assignment-confidence" class="level2">
 <h2 class="anchored" data-anchor-id="beyond-a-point-estimate-conformal-phase-assignment-confidence">Beyond a point estimate: conformal phase-assignment confidence</h2>
 <p>Naming the clusters still produces one label per customer, with no signal for which labels to trust. A utility deciding where to send a limited field crew needs exactly that signal: which assignments are solid, and which deserve a second look before anyone relies on them. Split conformal prediction supplies it with a statistical guarantee attached, not just an ad hoc score.</p>
-<p>The idea: for each candidate phase, measure how far a customer’s own correlation-embedding position sits from that phase’s centroid, built only from the known anchor customers. Calibrate a distance threshold using the anchors’ own leave-one-out scores against their real phase, at a chosen confidence level. Then, for every customer, report the <em>set</em> of phases within that threshold, not a single guess. A confident customer gets a single-phase set. An uncertain one gets more than one phase, or none at all if it does not sit close enough to any of the three centroids, itself a signal that something about that customer’s data is unusual and worth a closer look. Four small functions implement this: one to build each phase’s centroid from its anchor customers, one to score a point’s distance to a given phase’s centroid, one to calibrate the distance threshold from the anchors’ own leave-one-out scores, and one to assemble the resulting prediction sets.</p>
+<p>The idea: for each candidate phase, measure how far a customer’s own correlation-embedding position sits from that phase’s centroid, built only from the known anchor customers. Calibrate a distance threshold using the anchors’ own leave-one-out scores against their real phase, at a chosen confidence level. Then, for every customer, report the <em>set</em> of phases within that threshold, not a single guess. A confident customer gets a single-phase set. An uncertain one gets more than one phase, or none at all if it does not sit close enough to any of the three centroids, itself a signal that something about that customer’s data is unusual and worth a closer look.</p>
+<p>With <span class="math inline">\(A_p\)</span> the set of known anchor customers on real phase <span class="math inline">\(p \in
+\{1, 2, 3\}\)</span> and <span class="math inline">\(e_i\)</span> customer <span class="math inline">\(i\)</span>’s own embedding position, phase <span class="math inline">\(p\)</span>’s centroid is <span class="math inline">\(\hat{c}_p = \frac{1}{|A_p|}\sum_{j \in A_p} e_j\)</span>. The distance threshold is calibrated leave-one-out: for each anchor <span class="math inline">\(j \in
+A_p\)</span>, its nonconformity score is its own distance to the centroid built from every <em>other</em> anchor of its real phase, <span class="math display">\[
+r_j = \lVert e_j - \hat{c}_p^{(-j)} \rVert_2, \qquad \hat{c}_p^{(-j)} = \frac{1}{|A_p| - 1}\sum_{j' \in A_p \setminus \{j\}} e_{j'}
+\]</span> and <span class="math inline">\(\tau\)</span> is the <span class="math inline">\((1-\alpha)\)</span> empirical quantile across all <span class="math inline">\(m = \sum_p |A_p|\)</span> anchors’ own scores <span class="math inline">\(\{r_j\}\)</span>, the same finite-sample calibration recipe as every other conformal threshold in this book <span class="citation" data-cites="lei2018distributionfree">[7]</span>. Every customer <span class="math inline">\(i\)</span>, known or new, then gets a prediction <em>set</em>, not a single label: <span class="math display">\[
+\hat{S}(i) = \big\{\, p : \lVert e_i - \hat{c}_p \rVert_2 \le \tau \,\big\}
+\]</span> built from centroids fit on the <em>full</em> anchor sets this time, not held out. Four small functions implement this: one to build each phase’s centroid from its anchor customers, one to score a point’s distance to a given phase’s centroid, one to calibrate <span class="math inline">\(\tau\)</span> from the anchors’ own leave-one-out scores, and one to assemble the resulting prediction sets <span class="math inline">\(\hat{S}(i)\)</span>.</p>
 <p>A calibration set of ten known customers is enough to test this, the same order of magnitude the labeling sweep above already found reliable. On the full 24-hour correlation embedding, where the point estimate is already perfect, most customers get a clean single-phase set.</p>
 <div class="quarto-embed-nb-cell" data-notebook="/home/runner/work/ml-energy-disaggregation/ml-energy-disaggregation/book/04-grid-edge/03-phase-identification-code.ipynb" data-notebook-title="Phase Identification" data-notebook-cellid="63b8ddfc">
 <div id="63b8ddfc" class="cell">
@@ -2053,6 +2098,16 @@ conformal flagged as not confident: ['load_mg1_1', 'load_mg1_4', 'load_mg1_7', '
 <p>Four customers get flagged, all four the same real phase, and the one customer the point estimate actually mislabels is among them. The other three happen to keep their correct point-estimate label anyway, but their embedding position under the noisier 4-hour window sits too far from the anchor-derived centroid to earn a confident single-phase set. That is a more useful result than flagging one lucky-or-unlucky customer alone: it says an entire phase group’s evidence has gotten weaker under this window, not just that one guess happened to land wrong. A point estimate alone offers no way to tell a solid label from a lucky guess. A conformal prediction set does, with a statistical coverage guarantee behind it rather than an arbitrary score, at the cost of only the same handful of known customers the labeling step already needed.</p>
 </div>
 </section>
+<section id="what-one-31-customer-feeder-cannot-answer" class="level2">
+<h2 class="anchored" data-anchor-id="what-one-31-customer-feeder-cannot-answer">What one 31-customer feeder cannot answer</h2>
+<p>Every result above is real, and every one of them is checked against one specific, residential, 31-customer AusNet feeder. Honesty about a method’s own limits means naming what that single feeder cannot settle, not just what it can.</p>
+<p><strong>Generalization to non-residential loads and other topologies is untested, not assumed to hold.</strong> The mechanism this chapter relies on, same phase means same shared conductor path means correlated voltage, does not itself depend on a customer being residential: a three-phase commercial load or a large motor still shares that same physical path with everyone else on its phase. But this feeder carries only real households, so whether a non-residential customer’s own noisier, spikier real demand degrades the correlation signal, rather than just adding a different real shape to it, is a genuine open question this data cannot check. The same honesty applies to topology: this is one real feeder with one real transformer and one real backbone. A feeder with multiple parallel backbones, switchable ties, or a meshed low-voltage topology could break the assumption that “same phase” and “same upstream path” are the same thing, and that case was not tested here because this feeder does not have one.</p>
+<p><strong>Distributed generation was checked by this chapter’s own closest precedent, not by this chapter itself.</strong> Simonovska and Ochoa tested the same <a href="#acronyms_PCA">PCA</a>-plus-clustering principle on this exact feeder under varying <a href="#acronyms_PV">PV</a> penetration levels and found it held up <span class="citation" data-cites="simonovska2021phasegrouping">[5]</span>. This chapter’s own additions, the conformal confidence sets and the anchor-based naming sweep, were not re-run under high <a href="#acronyms_PV">PV</a> penetration, so whether <em>those</em> additions hold up under the same stress is inherited confidence, not a result this chapter independently verified.</p>
+<p><strong>Scalability is a real, computable claim, not a guess.</strong> Building the pairwise correlation matrix costs <span class="math inline">\(O(n^2 T)\)</span>, trivial at <span class="math inline">\(n=31\)</span> customers and <span class="math inline">\(T=48\)</span> half-hours. A real utility deployment with thousands of meters would need either a substation-by-substation partition, correlating only customers already known to share a transformer, never the full utility-wide population at once, or an accepted <span class="math inline">\(O(n^2)\)</span> memory cost that a modern machine still handles comfortably into the low thousands of customers per partition. The natural mitigant is structural, not algorithmic: two customers on genuinely different feeders never need comparing in the first place, so the real <span class="math inline">\(n\)</span> this complexity bound applies to is “customers per candidate feeder,” not “customers utility-wide.”</p>
+<p><strong>Data quality beyond a short window or a sparse meter subset is a real gap.</strong> This chapter stress-tested window length (down to 2 hours) and meter density (down to a handful of customers), and found mutual information and <a href="#acronyms_PPS">PPS</a> more robust than correlation once the window gets short. It did not inject the kind of data-quality fault Chapter 6 later builds and tests explicitly, a stuck reading, a communication dropout, a calibration drift, into this chapter’s own phase-identification pipeline. Whether a stuck or drifting meter quietly corrupts a customer’s own correlation with its true phase group, or gets caught by the same conformal confidence set that already catches a noisy 4-hour window, is untested here and a real, concrete extension for whoever picks this up next.</p>
+<p><strong>Deployment is a real, statable sequence, not a research question.</strong> A utility adopting this needs, in order: a smart-meter voltage history per customer (many <a href="#acronyms_AMI">Advanced Metering Infrastructure (AMI)</a> deployments already collect this for billing, the same real infrastructure Short’s own 2013 method assumed <span class="citation" data-cites="short2013phaseid">[1]</span>); a handful of anchor customers per phase with independently verified phase, three to four per phase by this chapter’s own sensitivity sweep, from a recent service record or a physical spot check, never from the clustering result itself being validated; and a periodic re-run as the record system drifts further from the physical network, the same real gap this chapter opened with. The conformal confidence set is the natural integration point into an existing asset-management or <a href="#acronyms_GIS">Geographic Information System (GIS)</a> system: a customer whose prediction set is empty or contains more than one phase is exactly the exception list a field-verification workflow already knows how to consume, no new category of alert to invent.</p>
+<p><strong>The method generalizes to any real number of phases, already demonstrated rather than assumed.</strong> Nothing in the correlation-plus- clustering recipe is specific to three groups. The silhouette sweep earlier in this chapter already found the right <span class="math inline">\(k\)</span> unsupervised on this feeder; the identical sweep would surface <span class="math inline">\(k=1\)</span> on a single-phase lateral or <span class="math inline">\(k=2\)</span> on a two-phase spur, the same procedure, not a new one.</p>
+</section>
 <section id="where-this-leaves-part-4" class="level2">
 <h2 class="anchored" data-anchor-id="where-this-leaves-part-4">Where this leaves Part 4</h2>
 <p>Phase connectivity for this feeder is no longer an assumption inherited from its <code>.dss</code> files; it is a checked, reproducible result. Correlating real smart-meter voltage readings and clustering on that correlation structure, rather than on the raw readings themselves, recovers every customer’s real phase exactly, using no more than seven meters and twelve hours of data. The same feeder Chapter 2 ran a hosting-capacity study and an <a href="#acronyms_EV">Electric Vehicle (EV)</a>-demand study on now has its phase labels independently confirmed rather than merely assumed correct. The deployment story goes one step further than clustering alone: a handful of known customers is enough to name the clusters, and a conformal confidence set on top of that naming tells a utility exactly which assignments to trust and which to send a field crew to check first, a statistically grounded answer none of this chapter’s own references provide.</p>
@@ -2075,6 +2130,12 @@ conformal flagged as not confident: ['load_mg1_1', 'load_mg1_4', 'load_mg1_7', '
 </div>
 <div id="ref-simonovska2021phasegrouping" class="csl-entry" role="listitem">
 <div class="csl-left-margin">[5] </div><div class="csl-right-inline">A. Simonovska and L. F. Ochoa, <span>“Phase grouping in <span>PV</span>-rich <span>LV</span> feeders: Smart meter data and unconstrained k-means,”</span> in <em>2021 IEEE madrid PowerTech</em>, 2021. doi: <a href="https://doi.org/10.1109/PowerTech46648.2021.9495097">10.1109/PowerTech46648.2021.9495097</a>.</div>
+</div>
+<div id="ref-hubert1985comparing" class="csl-entry" role="listitem">
+<div class="csl-left-margin">[6] </div><div class="csl-right-inline">L. Hubert and P. Arabie, <span>“Comparing partitions,”</span> <em>Journal of Classification</em>, vol. 2, no. 1, pp. 193–218, 1985, doi: <a href="https://doi.org/10.1007/BF01908075">10.1007/BF01908075</a>.</div>
+</div>
+<div id="ref-lei2018distributionfree" class="csl-entry" role="listitem">
+<div class="csl-left-margin">[7] </div><div class="csl-right-inline">J. Lei, M. G’Sell, A. Rinaldo, R. J. Tibshirani, and L. Wasserman, <span>“Distribution-free predictive inference for regression,”</span> <em>Journal of the American Statistical Association</em>, vol. 113, no. 523, pp. 1094–1111, 2018, doi: <a href="https://doi.org/10.1080/01621459.2017.1307116">10.1080/01621459.2017.1307116</a>.</div>
 </div>
 </div>
 
