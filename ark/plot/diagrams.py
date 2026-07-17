@@ -15,7 +15,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 from ark.plot.icons import ICONS, icon_font
-from ark.plot.tokens import DANGER, INFO, PRIMARY, SUCCESS, TEXT_MUTED, WARNING
+from ark.plot.tokens import DANGER, INFO, INFO_TINT, PRIMARY, SUCCESS, TEXT_MUTED, WARNING, WARNING_TINT
 
 
 def figure_axes_diagram() -> plt.Figure:
@@ -85,13 +85,13 @@ def broadcasting_diagram() -> plt.Figure:
     # The (5, 3) matrix: a grid of cells, one row per sample.
     for r in range(n_rows):
         for c in range(n_cols):
-            ax.add_patch(plt.Rectangle((c, -r), 0.92, 0.92, facecolor="#EAF3FA", edgecolor=INFO, linewidth=1))
+            ax.add_patch(plt.Rectangle((c, -r), 0.92, 0.92, facecolor=INFO_TINT, edgecolor=INFO, linewidth=1))
     ax.text(n_cols / 2, -n_rows - 0.3, "shape (5, 3)", ha="center", color=INFO, fontweight="bold")
 
     # The (3,) array: one row, drawn above the matrix, with dashed arrows
     # showing it "stretching" down to every row it gets broadcast against.
     for c in range(n_cols):
-        ax.add_patch(plt.Rectangle((c, 1.6), 0.92, 0.92, facecolor="#FFF1E6", edgecolor=WARNING, linewidth=1))
+        ax.add_patch(plt.Rectangle((c, 1.6), 0.92, 0.92, facecolor=WARNING_TINT, edgecolor=WARNING, linewidth=1))
         ax.annotate(
             "",
             xy=(c + 0.46, -n_rows + 1.1),

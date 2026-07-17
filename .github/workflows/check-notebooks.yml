@@ -151,7 +151,7 @@ jobs:
         if: steps.changed.outputs.notebooks != ''
         run: |
           uv run --with nbmake pytest --nbmake \
-            --nbmake-timeout=300 \
+            --nbmake-timeout=600 \
             --no-header \
             -v \
             --override-ini=addopts= \

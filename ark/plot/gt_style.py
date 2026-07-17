@@ -11,7 +11,17 @@ from __future__ import annotations
 from great_tables import GT, loc, style
 import pandas as pd
 
-from ark.plot.tokens import GRAY_300, PRIMARY, SURFACE_MUTED, TEXT_DARK, TEXT_MUTED, WHITE
+from ark.plot.tokens import (
+    GRAY_300,
+    HEADING_FONT_CANDIDATES,
+    INFO,
+    INFO_TINT,
+    PRIMARY,
+    SURFACE_MUTED,
+    TEXT_DARK,
+    TEXT_MUTED,
+    WHITE,
+)
 
 _FONT_NAMES = ["Libre Franklin", "Segoe UI", "Roboto", "Helvetica Neue", "sans-serif"]
 
@@ -69,7 +79,7 @@ def themed_gt(
             heading_title_font_weight="bold",
             heading_subtitle_font_size="13px",
             heading_padding="10px",
-            column_labels_background_color=PRIMARY,
+            column_labels_background_color=INFO,
             column_labels_font_weight="bold",
             column_labels_font_size="13px",
             column_labels_padding="9px",
@@ -79,10 +89,10 @@ def themed_gt(
             table_body_border_bottom_color=GRAY_300,
             table_body_border_bottom_width="1px",
             table_body_border_bottom_style="solid",
-            table_border_top_color=PRIMARY,
+            table_border_top_color=INFO,
             table_border_top_width="2px",
             table_border_top_style="solid",
-            table_border_bottom_color=PRIMARY,
+            table_border_bottom_color=INFO,
             table_border_bottom_width="1px",
             table_border_bottom_style="solid",
             source_notes_font_size="11px",
@@ -90,14 +100,14 @@ def themed_gt(
         )
         .tab_style(style=style.text(color=TEXT_DARK, weight="bold"), locations=loc.title())
         .tab_style(style=style.text(color=TEXT_MUTED), locations=loc.subtitle())
-        .tab_style(style=style.text(color=WHITE), locations=loc.column_labels())
+        .tab_style(style=style.text(color=WHITE, font=HEADING_FONT_CANDIDATES[0]), locations=loc.column_labels())
         .tab_style(style=style.text(color=TEXT_MUTED, style="italic"), locations=loc.source_notes())
     )
 
     if striped and n_rows is not None:
         even_rows = list(range(1, n_rows, 2))
         if even_rows:
-            gt = gt.tab_style(style=style.fill(color=SURFACE_MUTED), locations=loc.body(rows=even_rows))
+            gt = gt.tab_style(style=style.fill(color=INFO_TINT), locations=loc.body(rows=even_rows))
 
     return gt
 

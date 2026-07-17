@@ -45,6 +45,12 @@ SURFACE = WHITE  # $body-bg
 SURFACE_MUTED = GRAY_100  # $code-block-bg
 BORDER = GRAY_300
 
+# Light tint of INFO/WARNING, for a fill that needs to read as "belongs to"
+# that color's own category without competing with real data ink (a table's
+# even-row stripe, a diagram's own highlighted-region fill).
+INFO_TINT = "#EAF3FA"
+WARNING_TINT = "#FFF1E6"
+
 # ── Typography ─────────────────────────────────────────────────────────────
 # Loaded as web fonts on the site; matplotlib needs them installed locally to
 # render text in the same face, so callers should resolve against installed
