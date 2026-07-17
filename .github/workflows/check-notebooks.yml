@@ -143,6 +143,10 @@ jobs:
         if: steps.changed.outputs.notebooks != ''
         run: uv run python scripts/fetch_part4_ev_profiles.py
 
+      - name: Fetch Part 5 NREL buildstock data
+        if: steps.changed.outputs.notebooks != ''
+        run: uv run python scripts/fetch_part5_nrel_buildstock_data.py
+
       - name: Execute changed notebooks
         if: steps.changed.outputs.notebooks != ''
         run: |
