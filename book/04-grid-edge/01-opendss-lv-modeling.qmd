@@ -74,11 +74,22 @@ and each has a distinct signature:
   thermal (how much current a line or transformer can carry before it
   overheats), voltage (how far the actual voltage can drift from nominal),
   and phase balance (how evenly current is spread across the three phases).
-  Fluctuation and load growth are what push a feeder toward one of these
-  three limits; the limits themselves are what actually gets violated, and
-  a real violation is not just a number out of range, it risks equipment
-  damage, real power losses, a shortened lifespan for feeder assets, and,
-  in the worst case, an outage.
+  Stated as three real, checkable inequalities:
+  $$
+  |I_{line}| \le I_{rated}, \qquad V_{min} \le V_{pu} \le V_{max}
+  $$
+  $$
+  \text{VUF} = 100 \times \frac{\max_p |V_p - \bar V|}{\bar V} \le \text{VUF}_{max}
+  $$
+  where $\bar V = \tfrac{1}{3}\sum_p V_p$ is the average of the three real
+  phase voltages and VUF is the NEMA MG1 §14.35 voltage-unbalance factor,
+  the same "maximum deviation from the average, as a percentage" definition
+  a utility's own compliance report already uses. Fluctuation and load
+  growth are what push a feeder toward one of these three limits; the
+  limits themselves are what actually gets violated, and a real violation
+  is not just a number out of range, it risks equipment damage, real power
+  losses, a shortened lifespan for feeder assets, and, in the worst case, an
+  outage.
 
 ## Why a meter alone can't show it
 
@@ -108,14 +119,21 @@ behind every thread the rest of Part 4 follows.
 <span class="ark-concept-title"><i class="bi bi-info-circle-fill"></i> Key Concept</span>
 
 Every voltage number in this book's Part 4 chapters is reported in
-**per-unit (pu)**: the actual voltage divided by the network's nominal
-voltage at that point. A bus sitting exactly at nominal reads 1.0 pu,
+**per-unit (pu)**:
+$$
+V_{pu} = \frac{V_{actual}}{V_{nominal}}
+$$
+the actual voltage divided by the network's nominal voltage at that
+point. A bus sitting exactly at nominal reads 1.0 pu,
 regardless of whether that bus is an 11kV medium-voltage connection or a
 230V single-phase house. Per-unit is what makes a voltage reading portable
 across a network with several different nominal voltages, and it is the
 scale every diagram in this part uses.
 
 A typical statutory limit allows voltage to drift +10%/-6% from nominal,
+$$
+0.94 \le V_{pu} \le 1.10,
+$$
 1.10 pu down to 0.94 pu. Every voltage-compliance chart in this part checks
 a bus against exactly that band.
 :::
@@ -155,7 +173,18 @@ Once every element is defined, solving the network is one call:
 
 A converged solve means OpenDSS found a self-consistent set of voltages and
 currents across the whole network, the power-flow equivalent of balancing
-a set of equations.
+a set of equations. Concretely, one real equation per bus $i$:
+$$
+S_i = P_i + jQ_i = V_i \sum_{j} Y_{ij}^{*} V_j^{*}
+$$
+where $V_i$ is bus $i$'s own complex voltage phasor, $S_i$ is the real and
+reactive power injected there (positive for a source, negative for a real
+customer `Load`), and $Y_{ij}$ is the admittance between buses $i$ and $j$,
+built directly from every line's own real impedance. "Solving" the network
+means finding the one set of bus voltages $\{V_i\}$ that satisfies every
+one of these equations at once, given each `Load`'s own specified demand,
+the same real nonlinear system every power-flow solver, OpenDSS included,
+iterates toward rather than solves in closed form.
 
 ### Reading it back
 

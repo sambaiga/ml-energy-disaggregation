@@ -167,7 +167,11 @@ question gets a feeder-specific answer instead of a guess.
 A feeder can fail this test two different ways, not one. Chapter 1
 introduced the three constraints an {{< acr LV >}} network operates
 under: thermal, voltage, and phase balance. The notebook's own
-`run_penetration` function checks the first two together at every step:
+`run_penetration` function checks the first two together at every step,
+as two real inequalities:
+$$
+\max_i V_{i,pu}(t) \le 1.10, \qquad \max_t \big|S_{transformer}(t)\big| \le S_{rated} = 500 \text{ kVA},
+$$
 the worst bus voltage against the statutory limit, and the transformer's
 apparent power against its own 500 kVA nameplate rating.
 
@@ -213,7 +217,16 @@ no explicit `PVSystemList` applies to every `PVSystem` in the circuit at
 once, all 25 of them here, no per-house wiring required.
 
 **Volt-Watt** curtails real-power export once voltage crosses a
-threshold: full output stays available up to 1.05 pu, then ramps linearly
+threshold, a piecewise-linear function of the local bus voltage $V$:
+$$
+P(V) = P_{rated} \times
+\begin{cases}
+1 & V \le 1.05 \\[4pt]
+\dfrac{1.10 - V}{1.10 - 1.05} & 1.05 < V < 1.10 \\[4pt]
+0 & V \ge 1.10
+\end{cases}
+$$
+full output stays available up to 1.05 pu, then ramps linearly
 down to zero at 1.10 pu. It works, but it reduces the total generation
 exported. **Volt-VAr** takes a different lever: instead of cutting real
 power, it asks the inverter to absorb or supply reactive power, the same
@@ -291,9 +304,19 @@ chapter's own scenario, not reused verbatim.
 {{< embed 02-timeseries-der-modeling-code.ipynb#43ca733d >}}
 
 A late-afternoon-into-evening peak, exactly the window this chapter's own
-transformer chart already flagged as the feeder's busiest. The diversified
-curve peaks around 1.5kW per {{< acr EV >}}, not the charger's full
-7.36kW rating: most vehicles in the group are not charging at any given
+transformer chart already flagged as the feeder's busiest. Diversifying
+$N$ real vehicles' own charging profiles is a plain average across the
+group at each real time step $t$,
+$$
+\bar{P}(t) = \frac{1}{N}\sum_{n=1}^{N} P_n(t), \qquad \text{CF}(t) = \frac{\bar{P}(t)}{P_{rated}},
+$$
+where $P_n(t)$ is vehicle $n$'s own real charging power, 0 or the
+charger's rated power depending on whether it happens to be plugged in
+and drawing at that instant, and $\text{CF}(t)$, the coincidence factor,
+is that average expressed as a fraction of one charger's own full rating.
+The diversified curve peaks around 1.5kW per {{< acr EV >}}, not the
+charger's full 7.36kW rating, a peak coincidence factor of roughly 0.2:
+most vehicles in the group are not charging at any given
 moment, so the average demand per {{< acr EV >}} stays well under the
 rated maximum. That diversity is a genuine, physical mitigating effect,
 worth testing directly rather than assuming.
