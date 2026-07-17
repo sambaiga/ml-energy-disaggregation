@@ -15,7 +15,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 from ark.plot.icons import ICONS, icon_font
-from ark.plot.tokens import DANGER, INFO, INFO_TINT, PRIMARY, SUCCESS, TEXT_MUTED, WARNING, WARNING_TINT
+from ark.plot.tokens import AI_ACCENT, DANGER, INFO, INFO_TINT, PRIMARY, SUCCESS, TEXT_MUTED, WARNING, WARNING_TINT
 
 
 def figure_axes_diagram() -> plt.Figure:
@@ -1834,6 +1834,463 @@ def multi_task_shared_encoder_diagram() -> plt.Figure:
     ax.set_xlim(-1.1, 5.1)
     ax.set_ylim(-0.1, 5.3)
     ax.set_aspect("equal")
+    ax.axis("off")
+
+    fig.tight_layout()
+    plt.close(fig)
+    return fig
+
+
+def _icon_circle(ax: plt.Axes, center: tuple[float, float], radius: float, color: str) -> None:
+    """A plain circle outline, the shared frame every small icon glyph below sits inside."""
+    ax.add_patch(Circle(center, radius, facecolor="none", edgecolor=color, linewidth=1.8))
+
+
+def nilm_frequency_split_diagram() -> plt.Figure:
+    """Draw one meter signal splitting into the book's two acquisition regimes.
+
+    A single real meter reading can be sampled two very different ways.
+    Sampled in the kHz range and up, it supports load identification:
+    telling appliances apart by their own transient signature (Chapters
+    2-3). Sampled at the rate a real smart meter reports, it supports
+    energy estimation instead: how much power, not which appliance
+    exactly (Chapter 4). Same signal, two different jobs, depending only
+    on how fast it gets read.
+
+    Returns:
+        The matplotlib Figure, ready to display in a notebook cell.
+    """
+    fig, ax = plt.subplots(figsize=(7.5, 4.2))
+
+    _icon_circle(ax, (0.75, 2.1), 0.62, INFO)
+    step_x = [0.45, 0.45, 0.62, 0.62, 0.85, 0.85, 1.05]
+    step_y = [1.85, 2.25, 2.25, 2.45, 2.45, 1.95, 1.95]
+    ax.plot(step_x, step_y, color=INFO, linewidth=1.8, solid_joinstyle="round")
+    ax.text(0.75, 1.25, "Meter Signal", ha="center", fontsize=9.5, color=PRIMARY, fontweight="bold")
+
+    _curved_flow_arrow(ax, (1.35, 2.3), (2.75, 3.15), color=AI_ACCENT, rad=0.25)
+    _curved_flow_arrow(ax, (1.35, 1.9), (2.75, 1.05), color=SUCCESS, rad=-0.25)
+
+    _flow_box(ax, (2.8, 2.75), 3.0, 0.85, "HIGH FREQUENCY\nkHz and up\n(Chapters 2-3)", color=AI_ACCENT)
+    _flow_box(ax, (2.8, 0.6), 3.0, 0.85, "LOW FREQUENCY\nsmart-meter rate\n(Chapter 4)", color=SUCCESS)
+
+    _flow_arrow(ax, (5.85, 3.18), (6.55, 3.18), color=AI_ACCENT)
+    _flow_arrow(ax, (5.85, 1.03), (6.55, 1.03), color=SUCCESS)
+
+    _icon_circle(ax, (7.1, 3.18), 0.55, AI_ACCENT)
+    ax.plot(
+        [6.85, 6.98, 7.1, 7.22, 7.35],
+        [3.0, 3.35, 3.05, 3.35, 3.0],
+        color=AI_ACCENT,
+        linewidth=1.6,
+        solid_joinstyle="round",
+    )
+    ax.text(7.1, 2.45, "Load\nIdentification", ha="center", va="top", fontsize=9, color=PRIMARY, fontweight="bold")
+
+    _icon_circle(ax, (7.1, 1.03), 0.55, SUCCESS)
+    ax.plot(
+        [6.85, 6.98, 7.1, 7.22, 7.35],
+        [0.9, 0.95, 1.1, 1.05, 1.3],
+        color=SUCCESS,
+        linewidth=1.6,
+        solid_joinstyle="round",
+    )
+    ax.text(7.1, 0.35, "Energy\nEstimation", ha="center", va="top", fontsize=9, color=PRIMARY, fontweight="bold")
+
+    ax.set_xlim(0, 8)
+    ax.set_ylim(0, 4.2)
+    ax.set_aspect("equal")
+    ax.axis("off")
+    fig.tight_layout()
+    plt.close(fig)
+    return fig
+
+
+def nilm_transient_steady_state_diagram() -> plt.Figure:
+    """Draw a switch-on event's current waveform splitting into transient and steady state.
+
+    The first fraction of a second after a switch-on is transient: a fast,
+    decaying oscillation whose shape, duration, and harmonic content are
+    what make one appliance's fingerprint different from another's. Once
+    that dies out, the signal settles into the smooth, repeating cycle of
+    steady state, active power, reactive power, current, the same three
+    numbers every appliance eventually settles at.
+
+    Returns:
+        The matplotlib Figure, ready to display in a notebook cell.
+    """
+    fig, ax = plt.subplots(figsize=(7.5, 3.6))
+
+    t_transient = np.linspace(0, 1, 300)
+    envelope = np.exp(-3.2 * t_transient)
+    transient = envelope * np.sin(2 * np.pi * 9 * t_transient)
+
+    t_steady = np.linspace(1, 2.4, 300)
+    steady = 0.18 * np.sin(2 * np.pi * 4 * (t_steady - 1))
+
+    ax.axvspan(0, 1, color=AI_ACCENT, alpha=0.12)
+    ax.axvspan(1, 2.4, color=INFO, alpha=0.10)
+    ax.axvline(1, color=TEXT_MUTED, linestyle="dashed", linewidth=1.3)
+
+    ax.plot(t_transient, transient, color=PRIMARY, linewidth=1.8)
+    ax.plot(t_steady, steady, color=PRIMARY, linewidth=1.8)
+
+    ax.text(0.5, 1.15, "TRANSIENT", ha="center", fontsize=12, color=AI_ACCENT, fontweight="bold")
+    ax.text(0.5, 1.0, "shape, duration, harmonics", ha="center", fontsize=9.5, color=AI_ACCENT)
+    ax.text(1.7, 1.15, "STEADY STATE", ha="center", fontsize=12, color=INFO, fontweight="bold")
+    ax.text(1.7, 1.0, "active power, reactive power, current", ha="center", fontsize=9.5, color=INFO)
+    ax.text(1.2, -1.35, "switch-on settles", ha="center", fontsize=9.5, color=TEXT_MUTED, style="italic")
+
+    ax.set_xlim(0, 2.4)
+    ax.set_ylim(-1.5, 1.3)
+    ax.axis("off")
+    fig.tight_layout()
+    plt.close(fig)
+    return fig
+
+
+def _pill_box(ax: plt.Axes, xy: tuple[float, float], width: float, height: float, label: str, color: str) -> None:
+    """A rounded, unfilled pill, the shared idiom for a small result readout in the panels below."""
+    ax.add_patch(
+        FancyBboxPatch(
+            xy,
+            width,
+            height,
+            boxstyle="round,pad=0.02,rounding_size=0.3",
+            linewidth=1.6,
+            edgecolor=color,
+            facecolor="none",
+        )
+    )
+    ax.text(xy[0] + width / 2, xy[1] + height / 2, label, fontsize=8.5, color=PRIMARY, ha="center", va="center")
+
+
+def nilm_single_vs_multi_appliance_diagram() -> plt.Figure:
+    """Draw single-appliance learning against multi-appliance, multi-label learning.
+
+    Top: single-appliance learning trains and runs one model per
+    appliance, each blind to what the others are doing, a separate pass
+    through the same aggregate signal for every appliance. Bottom:
+    multi-appliance, multi-label learning trains one shared model that
+    reads every appliance's state off the same signal in a single pass,
+    the mechanism Chapter 3 builds on directly.
+
+    Returns:
+        The matplotlib Figure, ready to display in a notebook cell.
+    """
+    fig, axes = plt.subplots(2, 1, figsize=(7.6, 7.2))
+
+    appliances = ["Fridge", "Kettle", "Heater"]
+    states = ["ON", "OFF", "ON"]
+    row_ys = [3.0, 1.8, 0.6]
+
+    # ---- top panel: single-appliance ----
+    ax = axes[0]
+    ax.set_title("SINGLE-APPLIANCE", fontsize=13, color=PRIMARY, fontweight="bold", pad=14)
+    ax.text(
+        4.0,
+        4.15,
+        "a separate model, and a separate pass, per appliance",
+        ha="center",
+        fontsize=9.5,
+        color=TEXT_MUTED,
+        style="italic",
+    )
+    _flow_box(ax, (0.0, 1.75), 1.7, 0.9, "Aggregate\nsignal", color=INFO)
+    for i, (appl, state, y) in enumerate(zip(appliances, states, row_ys, strict=True)):
+        _curved_flow_arrow(ax, (1.75, 2.2), (2.7, y + 0.35), color=TEXT_MUTED, rad=0.18 * (1 - i))
+        _flow_box(ax, (2.75, y), 2.0, 0.7, f"{appl} model", color=TEXT_MUTED, filled=False)
+        _flow_arrow(ax, (4.8, y + 0.35), (5.3, y + 0.35), color=TEXT_MUTED)
+        _pill_box(ax, (5.35, y), 1.7, 0.7, f"{appl}: {state}", color=TEXT_MUTED)
+    ax.text(
+        7.6, 1.95, "three\nseparate\npasses", ha="left", va="center", fontsize=8.5, color=TEXT_MUTED, style="italic"
+    )
+    ax.set_xlim(-0.2, 9.2)
+    ax.set_ylim(0.2, 4.5)
+    ax.axis("off")
+
+    # ---- bottom panel: multi-appliance ----
+    ax = axes[1]
+    ax.set_title("MULTI-APPLIANCE (MULTI-LABEL)", fontsize=13, color=AI_ACCENT, fontweight="bold", pad=14)
+    ax.text(
+        4.0,
+        4.15,
+        "one shared model, one pass, every appliance at once",
+        ha="center",
+        fontsize=9.5,
+        color=AI_ACCENT,
+        style="italic",
+    )
+    _flow_box(ax, (0.0, 1.75), 1.7, 0.9, "Aggregate\nsignal", color=INFO)
+    _flow_arrow(ax, (1.75, 2.2), (2.7, 2.2), color=AI_ACCENT)
+    _flow_box(ax, (2.75, 1.75), 2.3, 0.9, "Multi-label\nmodel", color=AI_ACCENT)
+    for i, (appl, state, y) in enumerate(zip(appliances, states, row_ys, strict=True)):
+        _curved_flow_arrow(ax, (5.1, 2.2), (5.85, y + 0.35), color=AI_ACCENT, rad=0.18 * (1 - i))
+        _pill_box(ax, (5.9, y), 1.7, 0.7, f"{appl}: {state}", color=AI_ACCENT)
+    ax.text(
+        7.9,
+        1.95,
+        "one\npass",
+        ha="left",
+        va="center",
+        fontsize=8.5,
+        color=AI_ACCENT,
+        style="italic",
+        fontweight="bold",
+    )
+    ax.set_xlim(-0.2, 9.2)
+    ax.set_ylim(0.2, 4.5)
+    ax.axis("off")
+
+    fig.tight_layout()
+    plt.close(fig)
+    return fig
+
+
+def nilm_activation_extraction_diagram() -> plt.Figure:
+    """Draw one state transition splitting a waveform into a before-window and an after-window.
+
+    A fixed number of AC cycles immediately before a detected state
+    transition, and the same fixed number immediately after, aligned at
+    the voltage zero-crossing so the subtraction lines up in phase, not
+    just in time. Subtracting the two isolates whatever changed: the
+    appliance that just switched.
+
+    Returns:
+        The matplotlib Figure, ready to display in a notebook cell.
+    """
+    fig, ax = plt.subplots(figsize=(7.5, 3.6))
+
+    t_before = np.linspace(-8, 0, 260)
+    before = 0.55 * np.sin(2 * np.pi * 1.0 * t_before)
+
+    t_after = np.linspace(0, 8, 260)
+    after = 0.55 * np.sin(2 * np.pi * 1.0 * t_after) + 0.5 * np.sin(2 * np.pi * 1.6 * t_after + 0.6)
+
+    ax.axvspan(-8, 0, color=TEXT_MUTED, alpha=0.10)
+    ax.axvspan(0, 8, color=AI_ACCENT, alpha=0.12)
+    ax.axvline(0, color=PRIMARY, linestyle="dashed", linewidth=1.6)
+
+    ax.plot(t_before, before, color=TEXT_MUTED, linewidth=1.8)
+    ax.plot(t_after, after, color=AI_ACCENT, linewidth=1.8)
+
+    ax.text(0, 1.55, "ONE EVENT, TWO WINDOWS", ha="center", fontsize=13, color=PRIMARY, fontweight="bold")
+    ax.text(0, 1.28, "state transition", ha="center", fontsize=9.5, color=TEXT_MUTED)
+    ax.text(-4, -1.15, "Ns cycles before", ha="center", fontsize=10, color=TEXT_MUTED, fontweight="bold")
+    ax.text(4, -1.15, "Ns cycles after", ha="center", fontsize=10, color=AI_ACCENT, fontweight="bold")
+
+    ax.axhline(-1.55, color="#E5E7EB", linewidth=1.0, xmin=0.02, xmax=0.98)
+    ax.text(
+        0,
+        -1.85,
+        "activation current = after \u2212 before, aligned at the voltage zero-crossing",
+        ha="center",
+        fontsize=9.5,
+        color=PRIMARY,
+    )
+
+    ax.set_xlim(-8, 8)
+    ax.set_ylim(-2.1, 1.75)
+    ax.axis("off")
+    fig.tight_layout()
+    plt.close(fig)
+    return fig
+
+
+def _icon_box(ax: plt.Axes, center: tuple[float, float], size: float, color: str, *, is_circle: bool = False) -> None:
+    """An empty icon frame (box or circle) at `center`; the caller draws its own glyph on top."""
+    if is_circle:
+        ax.add_patch(Circle(center, size / 2, facecolor="none", edgecolor=color, linewidth=1.8))
+    else:
+        ax.add_patch(
+            FancyBboxPatch(
+                (center[0] - size / 2, center[1] - size / 2),
+                size,
+                size,
+                boxstyle="round,pad=0.02,rounding_size=0.08",
+                linewidth=1.8,
+                edgecolor=color,
+                facecolor="none",
+            )
+        )
+
+
+def nilm_wrg_pipeline_diagram() -> plt.Figure:
+    """Draw the activation-to-label pipeline: window, distance matrix, WRG image, CNN, label.
+
+    An activation window becomes a pairwise distance matrix, which
+    becomes a weighted recurrence graph image, which a small CNN
+    classifies directly, the same three-layer network Chapter 2 reuses
+    for the plain voltage-current (V-I) image and the amplitude-weighted
+    variant (AWRG) alike. Five stages, one flow, no step skipped.
+
+    Returns:
+        The matplotlib Figure, ready to display in a notebook cell.
+    """
+    fig, ax = plt.subplots(figsize=(7.6, 3.4))
+
+    xs = [0.7, 2.6, 4.5, 6.4, 8.1]
+    y = 2.0
+    size = 1.15
+
+    _icon_box(ax, (xs[0], y), size, AI_ACCENT)
+    t = np.linspace(0, 1, 40)
+    wave = 0.32 * np.sin(2 * np.pi * 2.2 * t) * np.exp(-1.4 * t)
+    ax.plot(xs[0] - 0.4 + t * 0.8, y + wave, color=AI_ACCENT, linewidth=1.4)
+
+    _icon_box(ax, (xs[1], y), size, TEXT_MUTED)
+    rng = np.random.default_rng(3)
+    grid_vals = rng.uniform(0.15, 0.55, (4, 4))
+    for r in range(4):
+        for c in range(4):
+            ax.add_patch(
+                plt.Rectangle(
+                    (xs[1] - 0.44 + c * 0.22, y + 0.44 - r * 0.22 - 0.2),
+                    0.2,
+                    0.2,
+                    facecolor=TEXT_MUTED,
+                    alpha=grid_vals[r, c],
+                    edgecolor="none",
+                )
+            )
+
+    _icon_box(ax, (xs[2], y), size, AI_ACCENT)
+    grid_vals2 = rng.uniform(0.25, 0.85, (3, 3))
+    for r in range(3):
+        for c in range(3):
+            ax.add_patch(
+                plt.Rectangle(
+                    (xs[2] - 0.33 + c * 0.22, y + 0.33 - r * 0.22 - 0.2),
+                    0.2,
+                    0.2,
+                    facecolor=AI_ACCENT,
+                    alpha=grid_vals2[r, c],
+                    edgecolor="none",
+                )
+            )
+
+    _icon_box(ax, (xs[3], y), size, TEXT_MUTED)
+    for dx, w in zip([-0.3, 0.02, 0.28], [0.2, 0.14, 0.1], strict=True):
+        ax.add_patch(
+            plt.Rectangle((xs[3] + dx, y - 0.38), w, 0.76, facecolor="none", edgecolor=TEXT_MUTED, linewidth=1.4)
+        )
+
+    _icon_box(ax, (xs[4], y), size, AI_ACCENT, is_circle=True)
+    ax.plot(
+        [xs[4] - 0.28, xs[4] - 0.06, xs[4] + 0.32],
+        [y - 0.02, y - 0.25, y + 0.28],
+        color=AI_ACCENT,
+        linewidth=2.2,
+        solid_joinstyle="round",
+        solid_capstyle="round",
+    )
+
+    labels = [
+        ("Activation\nwindow", AI_ACCENT),
+        ("Distance\nmatrix D", PRIMARY),
+        ("Weighted\nrecurrence graph", AI_ACCENT),
+        ("CNN\nclassifier", PRIMARY),
+        ("Appliance", PRIMARY),
+    ]
+    for x, (label, color) in zip(xs, labels, strict=True):
+        ax.text(x, y - 0.95, label, ha="center", va="top", fontsize=9, color=color, fontweight="bold")
+
+    for x0, x1 in zip(xs[:-1], xs[1:], strict=True):
+        ax.plot([x0 + size / 2, x1 - size / 2], [y, y], color="#CBD5E1", linewidth=1.4, zorder=0)
+
+    ax.text(
+        (xs[0] + xs[-1]) / 2,
+        3.15,
+        "FROM ONE ACTIVATION TO ONE LABEL",
+        ha="center",
+        fontsize=13,
+        color=PRIMARY,
+        fontweight="bold",
+    )
+
+    ax.axhline(0.35, color="#E5E7EB", linewidth=1.0, xmin=0.02, xmax=0.98)
+    ax.text(
+        (xs[0] + xs[-1]) / 2,
+        0.0,
+        "the same three-layer CNN classifies WRG, V-I, and AWRG images alike",
+        ha="center",
+        fontsize=9.5,
+        color=PRIMARY,
+    )
+
+    ax.set_xlim(-0.2, 8.9)
+    ax.set_ylim(-0.4, 3.5)
+    ax.set_aspect("equal")
+    ax.axis("off")
+    fig.tight_layout()
+    plt.close(fig)
+    return fig
+
+
+def nilm_softmax_vs_sigmoid_diagram() -> plt.Figure:
+    """Draw sigmoid-plus-threshold against the chapter's own two-logit softmax.
+
+    Top: the usual approach, one logit through a sigmoid, giving a
+    probability that only becomes a decision once an external 0.5 cutoff,
+    fixed after training, is bolted on. Bottom: this chapter's approach,
+    an off-logit and an on-logit through a two-way softmax, where the
+    decision boundary is learned as part of training rather than assumed
+    afterward.
+
+    Returns:
+        The matplotlib Figure, ready to display in a notebook cell.
+    """
+    fig, axes = plt.subplots(2, 1, figsize=(7.6, 5.6))
+
+    # ---- top panel: sigmoid + threshold ----
+    ax = axes[0]
+    ax.set_title("SIGMOID + THRESHOLD", fontsize=13, color=PRIMARY, fontweight="bold", pad=14)
+    ax.text(
+        4.4,
+        2.15,
+        "the usual approach: one logit, a cutoff bolted on after training",
+        ha="center",
+        fontsize=9.5,
+        color=TEXT_MUTED,
+        style="italic",
+    )
+    _flow_box(ax, (0.1, 0.85), 1.4, 0.9, "logit", color=PRIMARY, filled=False)
+    _flow_arrow(ax, (1.5, 1.3), (2.0, 1.3), color=TEXT_MUTED)
+    _icon_circle(ax, (2.55, 1.3), 0.55, INFO)
+    ax.text(2.55, 1.3, r"$\sigma$", ha="center", va="center", fontsize=17, color=INFO)
+    _flow_arrow(ax, (3.1, 1.3), (3.6, 1.3), color=TEXT_MUTED)
+    _pill_box(ax, (3.65, 0.95), 1.9, 0.7, "P(on) = 0.62", color=PRIMARY)
+    ax.axvline(6.05, color=TEXT_MUTED, linestyle="dashed", linewidth=1.4, ymin=0.2, ymax=0.85)
+    ax.text(6.05, 0.05, "0.5 cutoff, fixed", ha="center", fontsize=8.5, color=TEXT_MUTED, style="italic")
+    _flow_arrow(ax, (5.55, 1.3), (6.35, 1.3), color=TEXT_MUTED)
+    _pill_box(ax, (6.4, 0.95), 2.0, 0.7, "Decision: ON", color=PRIMARY)
+    ax.set_xlim(-0.2, 8.8)
+    ax.set_ylim(0.0, 2.5)
+    ax.axis("off")
+
+    # ---- bottom panel: two-logit softmax ----
+    ax = axes[1]
+    ax.set_title("TWO-LOGIT SOFTMAX", fontsize=13, color=AI_ACCENT, fontweight="bold", pad=14)
+    ax.text(
+        4.4,
+        2.15,
+        "this chapter's approach: the cutoff is learned, not bolted on",
+        ha="center",
+        fontsize=9.5,
+        color=AI_ACCENT,
+        style="italic",
+    )
+    _pill_box(ax, (0.0, 1.55), 1.5, 0.55, "off logit", color=AI_ACCENT)
+    _pill_box(ax, (0.0, 0.75), 1.5, 0.55, "on logit", color=AI_ACCENT)
+    _curved_flow_arrow(ax, (1.5, 1.83), (2.0, 1.55), color=AI_ACCENT, rad=-0.2)
+    _curved_flow_arrow(ax, (1.5, 1.03), (2.0, 1.3), color=AI_ACCENT, rad=0.2)
+    _flow_box(ax, (2.05, 0.95), 1.6, 0.9, "softmax\n(2-way)", color=AI_ACCENT)
+    _flow_arrow(ax, (3.65, 1.4), (4.15, 1.4), color=AI_ACCENT)
+    _pill_box(ax, (4.2, 1.05), 2.55, 0.7, "P(off)=0.35, P(on)=0.65", color=AI_ACCENT)
+    _flow_arrow(ax, (6.75, 1.4), (7.25, 1.4), color=AI_ACCENT)
+    _pill_box(ax, (7.3, 1.05), 2.0, 0.7, "Decision: ON", color=AI_ACCENT)
+    ax.set_xlim(-0.2, 9.6)
+    ax.set_ylim(0.4, 2.5)
     ax.axis("off")
 
     fig.tight_layout()
