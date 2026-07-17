@@ -141,3 +141,9 @@ resources/*
 # of any explicit `export` command. Stray output from book/04-grid-edge/'s
 # OpenDSS notebooks, not something to commit.
 *_Mon_*.csv
+
+# PyTorch Lightning auto-writes a lightning_logs/ (TensorBoard event files,
+# checkpoints) next to the working directory on every .fit() call, from
+# Part 5's own MLPGAM training notebooks. Build artifacts, not content.
+logs/
+lightning_logs/

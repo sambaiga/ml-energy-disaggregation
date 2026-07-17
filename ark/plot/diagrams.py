@@ -1457,3 +1457,84 @@ def archetype_distance_and_conformal_diagram() -> plt.Figure:
     fig.tight_layout()
     plt.close(fig)
     return fig
+
+
+def three_uq_paradigms_diagram() -> plt.Figure:
+    """Draw the three probabilistic paradigms this chapter checks, side by side.
+
+    Left: a parametric density (a real Gaussian curve), the only paradigm
+    that can price a risk-of-exceedance question directly, the shaded tail
+    is literally the probability a real load exceeds some threshold. Middle:
+    a quantile forecast, several quantile levels fit directly to noisy real
+    data with no assumed shape, the P95 line answering a capacity-sizing
+    question on its own. Right: a conformal interval, a fixed-width band
+    around a central forecast with a real, finite-sample coverage guarantee,
+    the only one of the three that holds regardless of whether the
+    underlying model's own assumptions are correct.
+
+    Returns:
+        The matplotlib Figure, ready to display in a notebook cell.
+    """
+    rng = np.random.default_rng(11)
+    fig, axes = plt.subplots(1, 3, figsize=(11.5, 3.6))
+
+    # ---- left: parametric density ----
+    ax = axes[0]
+    ax.set_title("Parametric", fontsize=11.5, color=PRIMARY, fontweight="bold")
+    x = np.linspace(-4, 4, 400)
+    y = np.exp(-(x**2) / 2) / np.sqrt(2 * np.pi)
+    threshold = 1.4
+    ax.plot(x, y, color=PRIMARY, linewidth=1.8)
+    ax.fill_between(x[x >= threshold], y[x >= threshold], color=DANGER, alpha=0.55)
+    ax.axvline(threshold, color=DANGER, linestyle="--", linewidth=1.2)
+    ax.text(threshold + 0.15, y.max() * 0.55, "P(load > X)", fontsize=9, color=DANGER, fontweight="bold")
+    ax.set_xlim(-4, 4)
+    ax.set_ylim(0, y.max() * 1.15)
+    ax.axis("off")
+
+    # ---- middle: quantile forecast ----
+    ax = axes[1]
+    ax.set_title("Quantile", fontsize=11.5, color=PRIMARY, fontweight="bold")
+    t = np.linspace(0, 10, 60)
+    noise_scale = 0.3 + 0.5 * np.abs(np.sin(t / 3))
+    points = 1.5 + 0.4 * t + rng.normal(0, 1, size=t.shape) * noise_scale
+    ax.scatter(t, points, s=10, color=TEXT_MUTED, alpha=0.6, zorder=1)
+    p50 = 1.5 + 0.4 * t
+    p95 = p50 + 1.8 * noise_scale
+    p05 = p50 - 1.8 * noise_scale
+    ax.plot(t, p50, color=PRIMARY, linewidth=1.6, zorder=2)
+    ax.plot(t, p95, color=WARNING, linewidth=1.6, linestyle="--", zorder=2)
+    ax.plot(t, p05, color=WARNING, linewidth=1.6, linestyle="--", zorder=2)
+    ax.text(t[-1], p95[-1], "  P95", fontsize=9, color=WARNING, fontweight="bold", va="center")
+    ax.text(t[-1], p50[-1], "  P50", fontsize=9, color=PRIMARY, fontweight="bold", va="center")
+    ax.text(t[-1], p05[-1], "  P5", fontsize=9, color=WARNING, fontweight="bold", va="center")
+    ax.set_xlim(0, 12.5)
+    ax.axis("off")
+
+    # ---- right: conformal guarantee band ----
+    ax = axes[2]
+    ax.set_title("Conformal", fontsize=11.5, color=PRIMARY, fontweight="bold")
+    t2 = np.linspace(0, 10, 60)
+    center = 2.0 + 0.25 * t2 + 0.6 * np.sin(t2 / 1.6)
+    band = 1.3
+    ax.fill_between(t2, center - band, center + band, color=SUCCESS, alpha=0.28, zorder=1)
+    ax.plot(t2, center, color=SUCCESS, linewidth=1.8, zorder=2)
+    covered = rng.uniform(-1, 1, size=12) * band * 0.8
+    idx = np.linspace(3, 56, 12).astype(int)
+    ax.scatter(t2[idx], center[idx] + covered, s=16, color=PRIMARY, zorder=3)
+    ax.text(
+        5,
+        center.min() - band - 0.35,
+        r"$\geq 90\%$ coverage, guaranteed",
+        fontsize=9,
+        color=SUCCESS,
+        fontweight="bold",
+        ha="center",
+    )
+    ax.set_xlim(0, 10)
+    ax.set_ylim(center.min() - band - 0.9, center.max() + band + 0.5)
+    ax.axis("off")
+
+    fig.tight_layout()
+    plt.close(fig)
+    return fig

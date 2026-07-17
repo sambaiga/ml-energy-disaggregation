@@ -1,0 +1,82 @@
+---
+title: "Chapter 3: What a Probabilistic Forecast Is Actually Worth"
+bibliography: ../../references.bib
+---
+
+Chapter 2 found a real, checked way to share information across Chapter 4's customer archetypes without training one model per customer, and closed with a single number: how far off, on average, the winning model's forecast sits from the truth. That number is useful, and it is also incomplete. A real deployment decision often needs the shape of the uncertainty around it, not just its average size. A risk-of-exceedance question, "how likely is this customer's load to exceed 3 kW tomorrow evening," needs a full density. A capacity-sizing question, "what is the P95 load a transformer must survive," needs a specific quantile. A compliance statement needs a guarantee that holds regardless of whether the underlying model happens to be well-specified. This chapter builds one real backbone, MLPGAM, into three different probabilistic paradigms, checks honestly what each is actually worth, and tests directly whether Chapter 2's own archetypes help here too, or whether an idea real and checked for point forecasts simply does not transfer to this different question.
+
+## Getting the data, and one backbone, three paradigms
+
+Same real AusNet pool the whole of Part 5 has used, same last-90-day holdout. Every paradigm below shares one backbone architecture, MLPGAM, so differences in the results come from the probabilistic paradigm itself, not from comparing unrelated architectures.
+
+<div class='ark-concept'>
+
+<span class='ark-concept-title'><i class="bi bi-info-circle-fill"></i> Key Concept</span>
+
+A point forecast and a probabilistic forecast answer different questions, and the three probabilistic paradigms here answer different questions from each other too. A parametric density is the only one that can price a risk-of-exceedance question directly, since it hands back a full $\mathcal{N}(\mu, \sigma^2)$ rather than a single number. A quantile forecast is the only one with no distributional assumption baked in, at the cost of needing its own calibration check before trusting it. Conformal calibration is the only one with an actual guarantee: under exchangeability, at least $1-\alpha$ of a calibration population's own true outcomes fall inside the interval by construction [@lei2018distributionfree], regardless of whether the underlying model's own distributional assumptions are correct. None of the three is strictly better; each is the right tool for a different real decision, the same discipline Chapter 6 already applied to comparing detection methods by which real decision they support.
+
+</div>
+
+![Three paradigms, one backbone. A parametric density answers a risk-of-exceedance question directly. A quantile forecast answers a capacity question with no distributional assumption. Conformal calibration wraps either one in a finite-sample coverage guarantee that holds regardless of whether the backbone's own assumptions are correct.](../../assets/three-uq-paradigms.svg){#fig-three-uq-paradigms}
+
+{{< embed 03-probabilistic-forecasting-code.ipynb#3560623e >}}
+
+Chapters 1 and 2 both fed a model a small, hand-picked table of features: the most recent reading, the same half-hour a day ago, two days ago, a week ago, plus the half-hour and the day of week. That recipe works well for a tree model like LightGBM, which reasons about a fixed set of columns one split at a time. MLPGAM reasons differently: it is a sequence model, and it expects a real, continuous stretch of a customer's own history as its input, not a curated handful of lag columns. Each training window here is one full real day of lookback immediately followed by the real day the model has to forecast, and the network is left to learn whatever temporal structure, daily rhythm, the slow decay of yesterday's influence on today, actually matters, directly from that raw sequence, rather than being told in advance which four or five moments in the past are worth looking at.
+
+{{< embed 03-probabilistic-forecasting-code.ipynb#cb9d4156 >}}
+
+## The parametric density
+
+The first paradigm asks MLPGAM to output two numbers for every half-hour of the forecast horizon, not one: a mean $\mu_{i,t+h}$ and a scale $\sigma_{i,t+h}$, together describing a full Normal density $\mathcal{N}(\mu_{i,t+h}, \sigma_{i,t+h}^2)$ over that customer's own load at that moment. Training looks different too: rather than minimizing a pointwise error like MAE or MSE, the network is trained to maximize the Normal log-likelihood of the real observed load under its own predicted density, so it is rewarded directly for getting both the center and the spread of its own uncertainty right, not just the center. That extra output is not free, and it is not free for a good reason: a real operational question like "what is the probability this customer's load exceeds 3 kW tomorrow evening" has a genuine, closed-form answer once $\mu$ and $\sigma$ are known, something a single point forecast can never provide on its own, however accurate that point happens to be.
+
+{{< embed 03-probabilistic-forecasting-code.ipynb#2875a15c >}}
+
+## The quantile forecast
+
+The Normal head above buys a full density, but it buys it by assuming the residuals actually follow a Normal shape, symmetric, thin-tailed, fully described by just a mean and a spread. Real household load does not always oblige that assumption: evening peaks can be sharper on one side than the other, and a handful of unusually large readings can sit well outside anything a Normal curve expects. `MLPGAMFpqr`, the FPSeq2Q architecture, sidesteps the assumption entirely. Rather than fitting one distributional family, it is trained with a pinball loss across several quantile levels at once, each level penalized separately for over- or under-shooting the real outcome, so the model learns the P5, the P50, the P95, and everything between directly from the data's own real shape, whatever that shape turns out to be. The practical payoff is a direct answer to a capacity question a {{< acr DSO >}} actually asks, "what P95 load must a transformer be sized to survive," without ever assuming the underlying noise looks Gaussian.
+
+{{< embed 03-probabilistic-forecasting-code.ipynb#ca8f8a41 >}}
+
+Look at the real gap between what FPQR's own P5-P95 band claims and what it actually delivers: close to 99% empirical coverage against a nominal 90% target. Nearly one in ten "misses" the model itself was designed to allow for essentially never happens; the interval is far wider than it needs to be, at real operational cost, since a transformer sized to a needlessly inflated P95 is a transformer over-built for the actual risk. A raw, uncalibrated model's own stated uncertainty, in other words, does not automatically mean what it claims to mean, in either the parametric or the quantile paradigm, and that real gap between the claimed and the actual is exactly the problem split-conformal calibration exists to close, next.
+
+## Split-conformal calibration: does it need calibrating at all?
+
+FPQR's own over-coverage above raises an honest question about the parametric head too: MLPGAMNormal already outputs a full $(\mu, \sigma)$ for every forecast, so why not just trust $\sigma$ as a calibrated interval on its own, the way the raw FPQR band was trusted a moment ago, and just proved untrustworthy? The answer is to stop trusting either model's own stated uncertainty at face value and calibrate it instead, using the exact same split-conformal machinery Chapter 2 already built for the archetype confidence gate, reused verbatim here, not reimplemented for a second time. The idea is to hold back a calibration slice of real customers, measure how far their true outcome actually sat from the model's own prediction relative to its own claimed scale, and use the resulting empirical distribution to correct the interval directly:
+$$\tau = \text{Quantile}_{1-\alpha}\Big(\Big\{\, \frac{|y_j - \mu_j|}{\sigma_j} : j \in \text{calibration set} \,\Big\}\Big), \qquad [\mu_i - \tau\sigma_i,\ \mu_i + \tau\sigma_i]$$
+This is a scaled non-conformity score, dividing each calibration residual by that same customer's own predicted $\sigma$ rather than using an unscaled residual directly, so a customer the model is already unsure about does not get penalized twice. The resulting guarantee is a real, finite-sample one, not asymptotic and not dependent on the Normal assumption being correct: Lei, G'Sell, Rinaldo, Tibshirani and Wasserman formalized exactly this result in 2018 [@lei2018distributionfree], under exchangeability, at least $1-\alpha$ of a calibration population's own true outcomes fall inside the resulting interval by construction, regardless of whether the underlying model's own distributional assumptions happen to be right.
+
+{{< embed 03-probabilistic-forecasting-code.ipynb#1681db1d >}}
+
+## Does calibrating per Chapter 2's own archetypes sharpen this?
+
+A single global $\tau$ treats every one of the 342 real customers as interchangeable for calibration purposes, which is a strange thing to do in a book that spent an entire chapter arguing customers are not interchangeable. Chapter 2's own real archetypes are already sitting right there, already computed, already validated on this same population, so the natural next question is whether calibrating separately per archetype, rather than once globally, produces a sharper interval at the same 90% guarantee. This is not a new idea invented for this chapter: the author's own exploratory notebook tried exactly this, calibrating per cluster instead of using one global threshold, though it built a fresh {{< acr UMAP >}} and {{< acr GMM >}} clustering pass just to run that check. Reusing Chapter 2's own already-computed archetypes here instead avoids that duplicated clustering effort entirely, and the real question is checked honestly below rather than assumed to come out sharper just because conditioning on more information usually sounds like it should help.
+
+{{< embed 03-probabilistic-forecasting-code.ipynb#bdc08e4d >}}
+
+Both approaches hit the 90% coverage target they were calibrated for, so neither one is broken in the sense of failing its own guarantee. But per-archetype calibration is measurably wider than the single global threshold, the opposite of what Chapter 2's own archetype-conditioning idea delivered when the question was point-forecast accuracy rather than interval calibration. That is a real, checked result, not the expected one, and it is worth understanding exactly why rather than filing it away as a curiosity. Two real diagnostics, computed directly on this same model and this same calibration split, explain the mechanism.
+
+{{< embed 03-probabilistic-forecasting-code.ipynb#12ae0941 >}}
+
+MLPGAMNormal's own predicted $\sigma$ is essentially constant across every archetype, the model has not learned much real heteroscedasticity by customer type. Real per-archetype differences do show up, but in $\tau$, not $\sigma$: $\tau$ ranges from roughly 0.77 to 1.00 across archetypes against a global 0.82. Calibration only needs the *tail* of a calibration set, the top 10% of scores, to estimate $\tau$ at $\alpha=0.1$; splitting an already-modest calibration set five ways shrinks that effective tail sample per archetype, adding real quantile-estimation noise that outweighs whatever conditioning benefit archetype membership might otherwise offer. The archetypes were built for shape similarity in Chapter 4, not for residual-scale heterogeneity, and here, checked directly, they do not transfer to this different question.
+
+## One honest comparison, not one winner
+
+Three paradigms have each been checked on their own terms above: a parametric density that prices risk directly but assumes a Normal shape, a quantile forecast that assumes nothing about shape but over-covered by nearly nine points before calibration, and a split-conformal wrapper that delivers an actual guarantee, sharper globally than per archetype. Putting all four real numbers, the parametric MAE, the quantile paradigm's own coverage and width, and both conformal variants, into one table makes the full tradeoff visible at once, rather than scattered across four separate results a reader has to hold in their head.
+
+{{< embed 03-probabilistic-forecasting-code.ipynb#9ed2ea6e >}}
+
+{{< embed 03-probabilistic-forecasting-code.ipynb#153d1ae4 >}}
+
+## Why bother
+
+None of the three paradigms is strictly better; each answers a different real question. The parametric head is the only one that prices a risk-of-exceedance question directly. The quantile head is the only one free of a distributional assumption, at the cost of needing its own calibration check, its raw intervals over-covered by nearly nine points here. Conformal calibration is the only one with an actual finite-sample guarantee, and checking whether Chapter 2's own archetypes sharpen it further was a real test, not an assumption: they do not, and the mechanism behind that answer, a near-constant learned scale and a tail-sample efficiency loss, is as real and useful a finding as a positive result would have been.
+
+## Where this leaves Part 5
+
+A point forecast alone was never the full deliverable this part set out to build. Chapter 2 found the model that earns its cost; this chapter attached an honest number to how wrong that model's own forecasts might be, and checked, rather than assumed, which calibration actually earns its own added complexity.
+
+## References
+
+::: {#refs}
+:::
+</content>
