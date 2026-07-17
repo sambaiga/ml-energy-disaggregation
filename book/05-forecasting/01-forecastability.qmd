@@ -133,6 +133,32 @@ A trained model’s real cost, engineering time, compute, and maintenance, only 
 
 Check the Corr column before trusting MAE alone. Window-average posts the lowest MAE (0.289) and lowest RMSE (0.436) of the four baselines, the kind of number that looks like a clear winner if that is all a reader checks. But its correlation with the real signal is only 0.073, barely above drift’s own 0.075, the two worst of the four. Seasonal-naive’s MAE is higher, 0.295, yet its correlation is 0.258, more than three times window-average’s own and the best of the four by a wide margin. A rolling average forecast can post a low pointwise error just by staying close to the series’ own smoothed level. On a signal this noisy, damping the response lowers average error without tracking a single real peak or dip. Seasonal-naive copies the same half-hour from the day before, so it actually reproduces the shape of a real day, evening peak included, which is why its correlation is higher even though its average error is not the smallest. A single scalar metric, read without checking what it rewards, can crown a baseline that has not learned anything about the signal’s real structure.
 
+Reading five columns and mentally weighing which one matters more is exactly the ad hoc judgment call this book asks a reader not to make silently. `twiga.core.data.selection` already solves an analogous problem for feature selection: rank candidates by several independent metrics at once, then combine those rankings so that metrics which mostly agree with each other do not collectively drown out the one metric saying something genuinely different. Applying the same logic to models instead of features turns the "check Corr before trusting MAE" instinct into an actual, repeatable method rather than a one-off warning.
+
+<div class='ark-concept'>
+
+<span class='ark-concept-title'><i class="bi bi-info-circle-fill"></i> Key Concept</span>
+
+Rank each of the $M$ baselines on each of $J$ metrics $M_1, \dots, M_J$ (orienting every metric so higher rank means better, negating the pointwise-error metrics first), then combine the per-metric ranks into one score, weighted by how much each metric disagrees with the others:
+$$
+u_j = 1 - \frac{1}{J-1}\sum_{j' \neq j} \left|\rho_S(M_j, M_{j'})\right|
+$$
+$$
+w_j = \frac{u_j}{\sum_{j'=1}^{J} u_{j'}}
+$$
+$$
+\text{score}(m) = \sum_{j=1}^{J} w_j \cdot \text{rank}_j(m)
+$$
+$\rho_S$ is Spearman rank correlation, computed across the baselines' own scores on each metric pair. MAE, RMSE, WMAPE, and SMAPE all measure pointwise error and tend to rank baselines almost identically, so each earns a small $u_j$ and a correspondingly small weight. Corr measures something the other four cannot, whether a forecast tracks the signal's real shape at all, disagrees with them often enough to earn a large $u_j$, and is weighted accordingly.
+
+</div>
+
+![Four pointwise-error metrics point in almost the same direction, so each is individually down-weighted; Corr points somewhere else entirely and is weighted more, exactly the diversity-weighted Borda count this chapter's own ranking table applies to these four baselines.](../../assets/diversity-weighted-ranking.svg){#fig-diversity-weighted-ranking}
+
+{{< embed 01-forecastability-code.ipynb#32b4d2c4 >}}
+
+Seasonal-naive comes out on top of this diversity-weighted ranking, not window-average, the opposite of what an MAE-only reading would crown. Corr alone carries roughly twice the weight of any single pointwise-error metric here, precisely because the four error metrics are busy agreeing with each other while Corr is the one column actually casting an independent vote. This is not a claim that MAE is the wrong metric to compute, only that treating it as the whole verdict, the way a one-line "lowest error wins" summary would, silently discards the one column that would have changed the answer.
+
 {{< embed 01-forecastability-code.ipynb#29a34e87 >}}
 
 There is no single, universal winner among the 342 real customers, and the tally above is itself an MAE-only contest: window-average outperforms for 70% of customers, seasonal-naive for another 30%, and plain persistence for almost none. Given the correlation gap just shown, a deployment that also cares about tracking a customer’s real daily shape, not only minimizing average deviation, has a real case for favouring seasonal-naive more often than a MAE-only tally credits it for. This split is also a verified divergence from Twiga’s own published tutorial, which found seasonal-naive the best performer on a different dataset. Report a difference like this transparently rather than assume results transfer across contexts.

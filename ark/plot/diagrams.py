@@ -1627,3 +1627,163 @@ def ground_truth_vs_discovered_clusters_diagram() -> plt.Figure:
     fig.tight_layout()
     plt.close(fig)
     return fig
+
+
+def cross_population_retrieval_trust_diagram() -> plt.Figure:
+    """Draw why a calibrated retrieval radius does not travel for free.
+
+    Left: AusNet's own labeled customers in shape-embedding space, with the
+    split-conformal radius tau drawn around them, calibrated so that tau
+    covers 90% of how far a held-back AusNet customer's own nearest real
+    neighbor ever sits. Every AusNet point at that scale sits inside its
+    own calibration, by construction. Right: the same tau circle, unmoved,
+    with real NREL ResStock buildings added. A real US home whose own
+    shape happens to resemble an AusNet household still falls inside tau
+    and gets a trustworthy retrieval. A real US home whose shape reflects
+    a genuinely different climate or appliance mix, electric resistance
+    heating in a cold state, say, falls outside it, and the same
+    conformal mechanism that flagged AusNet's own unusual customers
+    flags this one too, honestly, rather than silently extrapolating.
+
+    Returns:
+        The matplotlib Figure, ready to display in a notebook cell.
+    """
+    rng = np.random.default_rng(7)
+    tau_radius = 1.0
+    ausnet_pts = rng.normal(scale=0.42, size=(40, 2))
+
+    nrel_inside = rng.normal(scale=0.55, size=(10, 2))
+    nrel_inside = nrel_inside / np.maximum(np.linalg.norm(nrel_inside, axis=1, keepdims=True) / 0.85, 1.0)
+    angles = rng.uniform(0, 2 * np.pi, 9)
+    radii = rng.uniform(1.15, 1.75, 9)
+    nrel_outside = np.column_stack([radii * np.cos(angles), radii * np.sin(angles)])
+
+    fig, axes = plt.subplots(1, 2, figsize=(9.2, 4.4))
+
+    ax = axes[0]
+    ax.set_title("Calibrated on AusNet alone", fontsize=11.5, color=PRIMARY, fontweight="bold")
+    ax.add_patch(Circle((0, 0), tau_radius, facecolor=SUCCESS, alpha=0.08, edgecolor=SUCCESS, linewidth=1.6))
+    ax.scatter(ausnet_pts[:, 0], ausnet_pts[:, 1], s=34, color=INFO, edgecolor="white", linewidth=0.6, zorder=3)
+    ax.text(0, -1.32, r"$\tau$ = 90% of AusNet's own held-back distances", fontsize=8.5, color=SUCCESS, ha="center")
+
+    ax = axes[1]
+    ax.set_title("Same $\\tau$, real NREL buildings added", fontsize=11.5, color=PRIMARY, fontweight="bold")
+    ax.add_patch(Circle((0, 0), tau_radius, facecolor=SUCCESS, alpha=0.08, edgecolor=SUCCESS, linewidth=1.6))
+    ax.scatter(
+        ausnet_pts[:, 0], ausnet_pts[:, 1], s=28, color=INFO, alpha=0.5, edgecolor="white", linewidth=0.5, zorder=2
+    )
+    ax.scatter(
+        nrel_inside[:, 0],
+        nrel_inside[:, 1],
+        s=42,
+        color=SUCCESS,
+        edgecolor="white",
+        linewidth=0.8,
+        zorder=4,
+        label="NREL, trusted",
+    )
+    ax.scatter(
+        nrel_outside[:, 0],
+        nrel_outside[:, 1],
+        s=42,
+        color=DANGER,
+        edgecolor="white",
+        linewidth=0.8,
+        zorder=4,
+        label="NREL, flagged",
+    )
+    ax.legend(loc="lower right", fontsize=8, frameon=False)
+
+    for ax in axes:
+        ax.set_xlim(-2.0, 2.0)
+        ax.set_ylim(-2.0, 2.0)
+        ax.set_aspect("equal")
+        ax.axis("off")
+
+    fig.tight_layout()
+    plt.close(fig)
+    return fig
+
+
+def diversity_weighted_ranking_diagram() -> plt.Figure:
+    """Draw why a redundant metric should not count as much as an independent one.
+
+    Each metric is drawn as an arrow from the origin, its direction set by
+    how it ranks a fixed set of models: four pointwise-error metrics, MAE,
+    RMSE, WMAPE, SMAPE, tend to agree on which model is better, so their
+    arrows cluster at a similar angle. Corr asks a different question,
+    whether a model tracks the real signal's shape, and disagrees with the
+    error metrics often enough that its arrow points somewhere else
+    entirely. The bars on the right show the consequence: a metric whose
+    own arrow sits close to several others gets down-weighted in the final
+    ranking, exactly what this book's own diversity-weighted Borda count
+    does, since a nearly unanimous cluster of agreeing metrics should not
+    outvote the one metric actually saying something new.
+
+    Returns:
+        The matplotlib Figure, ready to display in a notebook cell.
+    """
+    error_color = WARNING
+    corr_color = SUCCESS
+
+    fig, axes = plt.subplots(1, 2, figsize=(9.4, 4.2), gridspec_kw={"width_ratios": [1.1, 0.9]})
+
+    ax = axes[0]
+    ax.set_title("Where each metric points", fontsize=11.5, color=PRIMARY, fontweight="bold")
+    error_angles_deg = [24, 34, 14, 44]
+    error_labels = ["MAE", "RMSE", "WMAPE", "SMAPE"]
+    for angle_deg, label in zip(error_angles_deg, error_labels, strict=True):
+        angle = np.deg2rad(angle_deg)
+        ax.annotate(
+            "",
+            xy=(np.cos(angle), np.sin(angle)),
+            xytext=(0, 0),
+            arrowprops={"arrowstyle": "-|>", "color": error_color, "linewidth": 2.0},
+        )
+        ax.text(
+            np.cos(angle) * 1.12, np.sin(angle) * 1.12, label, fontsize=9, color=error_color, ha="left", va="center"
+        )
+
+    corr_angle = np.deg2rad(150)
+    ax.annotate(
+        "",
+        xy=(np.cos(corr_angle), np.sin(corr_angle)),
+        xytext=(0, 0),
+        arrowprops={"arrowstyle": "-|>", "color": corr_color, "linewidth": 2.4},
+    )
+    ax.text(
+        np.cos(corr_angle) * 1.15,
+        np.sin(corr_angle) * 1.15,
+        "Corr",
+        fontsize=9.5,
+        color=corr_color,
+        fontweight="bold",
+        ha="right",
+        va="center",
+    )
+    ax.add_patch(Circle((0, 0), 1.0, facecolor="none", edgecolor=TEXT_MUTED, linewidth=0.8, linestyle="dashed"))
+    ax.set_xlim(-1.5, 1.5)
+    ax.set_ylim(-0.3, 1.5)
+    ax.set_aspect("equal")
+    ax.axis("off")
+
+    ax = axes[1]
+    ax.set_title("Weight in the final ranking", fontsize=11.5, color=PRIMARY, fontweight="bold")
+    metrics = ["MAE", "RMSE", "WMAPE", "SMAPE", "Corr"]
+    weights = [0.164, 0.164, 0.164, 0.18, 0.328]
+    colors = [error_color] * 4 + [corr_color]
+    y_pos = np.arange(len(metrics))[::-1]
+    ax.barh(y_pos, weights, color=colors, height=0.55)
+    for y, w in zip(y_pos, weights, strict=True):
+        ax.text(w + 0.01, y, f"{w:.3f}", va="center", fontsize=9, color=TEXT_MUTED)
+    ax.set_yticks(y_pos)
+    ax.set_yticklabels(metrics, fontsize=9.5)
+    ax.set_xlim(0, 0.42)
+    ax.set_xlabel("diversity weight", fontsize=9, color=TEXT_MUTED)
+    for spine in ("top", "right"):
+        ax.spines[spine].set_visible(False)
+    ax.tick_params(left=False)
+
+    fig.tight_layout()
+    plt.close(fig)
+    return fig

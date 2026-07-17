@@ -43,6 +43,22 @@ $x_{i,t}$ is the same lag-and-calendar feature recipe Chapter 1 built for featur
 
 Unified wins on MAE, RMSE, Corr, and WMAPE, and is effectively tied on SMAPE, real but modest margins, not dramatic ones: about 0.6% lower MAE and WMAPE than the blind floor, 1.6% lower RMSE, and a real correlation gain of roughly 3%, similarly modest against hard-routing to five separate archetype-specific models. Small margins, but they hold in the same direction on every metric, and they come without needing five separate models to maintain in production, a real operational value: one artifact to version, monitor, and retrain, not five. This matches a broader finding in the forecasting literature: a single model that shares statistical strength across many related series, rather than a strictly local model per series, has repeatedly shown surprising accuracy on grouped time series [@monteromanso2021global]. But this comparison has every customer's own real history inside the training pool. That is a fair test of whether profiling helps for a customer already known to the system, not of a customer it has never seen before, and those are genuinely different questions.
 
+"Wins on four metrics, ties on the fifth" is still five separate numbers a reader has to weigh by eye. Chapter 1 of this part turned that same weighing act into a formal, repeatable method rather than a prose judgment call: rank every candidate on every metric, then combine the per-metric ranks into one score, weighted by how much each metric disagrees with the others,
+$$
+u_j = 1 - \frac{1}{J-1}\sum_{j' \neq j} \left|\rho_S(M_j, M_{j'})\right|
+$$
+$$
+w_j = \frac{u_j}{\sum_{j'=1}^{J} u_{j'}}
+$$
+$$
+\text{score}(m) = \sum_{j=1}^{J} w_j \cdot \text{rank}_j(m)
+$$
+so that MAE, RMSE, WMAPE, and SMAPE, which largely agree with each other here, do not collectively outvote Corr, the one metric asking whether a model tracks the real signal's shape rather than just its average level.
+
+{{< embed 02-scaling-archetypes-code.ipynb#d12a26c5 >}}
+
+Unified comes out on top of this diversity-weighted ranking too, the same verdict the five-metric table already gave by eye, now backed by an explicit score rather than a reader's own five-way judgment call. That agreement is itself worth noting: unlike Chapter 1's own baseline comparison, where the formal ranking overturned the MAE-only answer, here the two methods agree because unified's own win is not built on a single metric's fluke, it holds in the same direction across all five, exactly the situation in which no amount of metric-weighting machinery should be expected to change the answer.
+
 {{< embed 02-scaling-archetypes-code.ipynb#410ff7b0 >}}
 
 {{< embed 02-scaling-archetypes-code.ipynb#f3876676 >}}
