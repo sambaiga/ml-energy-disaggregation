@@ -95,6 +95,15 @@ through 3 already vendored, no new fetch step needed:
 uv run python scripts/fetch_part4_ausnet_data.py
 ```
 
+Later in this chapter, a real generalization check against NREL's public
+ResStock and ComStock building-stock data needs one further fetch, a
+stratified sample of 760 real US buildings across 19 real subtypes,
+complementing AusNet's own real data, not replacing it:
+
+```bash
+uv run python scripts/fetch_part5_nrel_buildstock_data.py
+```
+
 ## A real season, not one day
 
 A single day is a noisy read on anyone's routine: a sick day, a weekend,
@@ -432,6 +441,36 @@ where the archetype labels stop changing on their own, before the
 cross-quarter stability question above even gets asked. A {{< acr DSO >}}
 trying to shortcut this analysis with a single day or week of new meter
 data would be clustering noise, not behavior.
+
+## Does this generalize beyond AusNet?
+
+Every check so far asks whether an archetype is *stable*, across quarters, across random seeds, across how much history feeds the clustering run. None of them can ask whether an archetype is *right*, because AusNet's own 342 real customers carry no independent, ground-truth label for what kind of customer each one actually is. That is not a gap this chapter can close with more AusNet data, no matter how much of it: the label simply does not exist for these real, anonymous meters.
+
+NREL's real ResStock and ComStock building-stock data, 760 real buildings stratified across 19 real subtypes from single-family homes to hospitals, does carry a genuine ground-truth label: `building_type`, assigned independently of anything this chapter's own clustering could see. Reusing the exact same recipe this chapter already committed to, peak-normalized mean daily shape, `KMeans`, no new method invented for this check, on a population where the right answer is actually known makes a real question checkable for the first time: does clustering by shape alone recover real, known categories, or does it find something else?
+
+<div class='ark-concept'>
+
+<span class='ark-concept-title'><i class="bi bi-info-circle-fill"></i> Key Concept</span>
+
+Two indices compare a discovered partition against a known one, both correcting for the agreement chance alone would produce. Hubert and Arabie's Adjusted Rand Index counts every pair of objects and asks whether the two partitions agree on whether that pair belongs together, then subtracts the agreement expected from random chance and rescales so a perfect match scores 1 and a chance-level match scores 0 [@hubert1985comparing]:
+$$\text{ARI} = \frac{\sum_{ij}\binom{n_{ij}}{2} - \left[\sum_i \binom{a_i}{2}\sum_j \binom{b_j}{2}\right]\big/\binom{n}{2}}{\frac{1}{2}\left[\sum_i \binom{a_i}{2} + \sum_j \binom{b_j}{2}\right] - \left[\sum_i \binom{a_i}{2}\sum_j \binom{b_j}{2}\right]\big/\binom{n}{2}}$$
+where $n_{ij}$ is the number of objects placed in true group $i$ and discovered group $j$ at once, and $a_i$, $b_j$ are each partition's own group sizes. Strehl and Ghosh's Normalized Mutual Information asks a different question, how much does knowing one partition reduce real uncertainty about the other [@strehl2002clusterensembles]:
+$$\text{NMI}(U, V) = \frac{I(U, V)}{\tfrac{1}{2}\left[H(U) + H(V)\right]}$$
+where $I(U,V)$ is the mutual information between the two partitions and $H(\cdot)$ is Shannon entropy. Neither index rewards a discovered partition just for having a similar number of groups to the true one; both only reward it for actually grouping the same real objects together.
+
+</div>
+
+![What ARI and NMI actually measure: agreement between two real partitions of the same objects, corrected for chance, not just matching group counts. A point whose true category and discovered cluster disagree is marked with an outline.](../../assets/ground-truth-vs-discovered-clusters.svg){#fig-ground-truth-vs-discovered-clusters}
+
+{{< embed 04-customer-feeder-clustering-code.ipynb#459405ad >}}
+
+{{< embed 04-customer-feeder-clustering-code.ipynb#510b288c >}}
+
+Every real ARI is close to 0, and every real NMI stays well short of 1, at every k tried, including k=19, matching the true number of subtypes exactly. Shape-based clustering, the same method that gave AusNet's own five archetypes real, checkable value earlier in this chapter, does not recover NREL's real building-type labels here. This is not the same question as before: AusNet's 342 customers are homes and homes only, so real archetypes there reflect genuine behavioral diversity within one functional category. NREL's 760 buildings span single-family homes, hospitals, warehouses, and schools at once, categories that plausibly differ in more than daily shape alone, and shape-based clustering alone is not enough to cleanly separate them.
+
+{{< embed 04-customer-feeder-clustering-code.ipynb#f76c2134 >}}
+
+The clusters are not a random shuffle either: one cluster comes out almost entirely commercial, another skews residential, a real, partial structure the low ARI/NMI scores do not fully credit on their own, since those indices score agreement with the full 19-way (or 5-way) label, not the coarser residential/commercial split. The honest reading holds either way: shape alone captures some real structure in a population this diverse, a known building type, occupancy schedule, or floor area would plausibly sharpen it further, and this chapter's own AusNet archetypes should be read as *behavioral* archetypes within one real customer category, not a general-purpose recipe for discovering functional building categories from shape alone.
 
 ## Feeder-level clustering
 

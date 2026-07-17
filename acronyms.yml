@@ -51,6 +51,8 @@ acronyms:
       longname: Self-Organizing Map
     - shortname: ARI
       longname: Adjusted Rand Index
+    - shortname: NMI
+      longname: Normalized Mutual Information
     - shortname: NREL
       longname: National Renewable Energy Laboratory
     - shortname: CBR
