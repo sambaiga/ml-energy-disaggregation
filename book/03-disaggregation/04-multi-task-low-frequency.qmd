@@ -73,7 +73,19 @@ bolted together. A single shared network predicts a handful of quantiles
 per appliance at once (here, the paper's own choice: 2.5%, 10%, 50%,
 90%, 97.5%), trained with the pinball loss, which penalizes over- and
 under-prediction asymmetrically depending on which quantile is being
-fit. The payoff: a real uncertainty band around every prediction, not
+fit:
+$$
+\mathcal{L}_\tau(y, \hat y) =
+\begin{cases}
+\tau \cdot (y - \hat y) & y \ge \hat y \\
+(1-\tau) \cdot (\hat y - y) & y < \hat y
+\end{cases}
+$$
+for quantile level $\tau \in (0, 1)$, real power $y$, and the model's own
+prediction $\hat y$ for that quantile. A low $\tau$ (e.g. 0.025)
+penalizes over-prediction nine times more than under-prediction; a high
+$\tau$ (e.g. 0.975) does the reverse; $\tau=0.5$ recovers plain absolute
+error. The payoff: a real uncertainty band around every prediction, not
 just a point estimate, at essentially no extra modeling cost over a
 plain regression head [@faustine2020unetnilm].
 :::
@@ -81,17 +93,33 @@ plain regression head [@faustine2020unetnilm].
 Both backbones compared here end in the identical pair of heads: a
 per-appliance 2-way softmax for state, the same mechanism Chapter 3 used
 for multi-label appliance state, and a per-appliance multi-quantile
-linear head for power. `CNN1DModel` is a plain stacked-`Conv1D` encoder.
-`UNETNiLM` is a true U-Net: the same downsampling stack, followed by an
-upsampling stack with skip-connection concatenation back to the matching
-downsampling stage. Ported directly from the author's own `UNETNiLM`
-repository, with two small fixes applied along the way: the checked-out
+linear head for power. The two backbones differ only in how the shared
+representation $h$ gets built from the input window $x$. `CNN1DModel` is
+a plain stacked encoder, each layer's output feeding directly into the
+next with nothing carried across:
+$$
+h = f_L\big(f_{L-1}(\cdots f_1(x) \cdots)\big).
+$$
+`UNETNiLM` is a true U-Net: the same downsampling stack $f_1, \dots,
+f_L$, followed by an upsampling stack $g_L, \dots, g_1$ where each
+upsampling layer concatenates its input with the matching downsampling
+stage's own output before deconvolving,
+$$
+h_l = g_l\big([\, h_{l+1} \, ; \, f_l(x) \,]\big),
+$$
+$[\cdot\,;\,\cdot]$ denoting channel-wise concatenation, so a detail
+computed early in the downsampling pass is available directly to the
+matching upsampling layer, not only through everything in between.
+Ported directly from the author's own `UNETNiLM` repository, with two
+small fixes applied along the way: the checked-out
 `unet.py` imports `Conv1D`/`Deconv1D` from a `.block` module that does not
 exist (they live in `layers.py`), and its U-Net class referred to an
 undefined `num_classes` that needed to be a constructor argument. Both
 are one-line fixes, not a redesign; everything else is the original
 architecture, verified directly against the code, not just the paper's
 prose.
+
+![One shared encoder feeding two task heads: a per-appliance state classifier and a per-appliance multi-quantile power regressor, the same representation driving both rather than two unrelated models bolted together.](../../assets/multi-task-shared-encoder-dual-heads.svg){#fig-multi-task-shared-encoder-dual-heads}
 
 ## Live results: does the U-Net actually help here?
 
@@ -139,8 +167,19 @@ above, nothing extra fit on top.
 ## Checking the combined loss itself
 
 The two task losses are summed unweighted, matching the paper's own
-choice, worth checking directly rather than assuming neither term quietly
-dominates the other.
+choice:
+$$
+\mathcal{L} = \mathcal{L}_{state} + \mathcal{L}_{power},
+$$
+$$
+\mathcal{L}_{state} = \text{CE}(s, \hat s), \qquad
+\mathcal{L}_{power} = \sum_{\tau} \mathcal{L}_\tau(y, \hat y_\tau),
+$$
+the state term a plain cross-entropy between the true and predicted
+state $s$, the power term a sum of the pinball loss above across every
+quantile level $\tau$ the power head predicts. No weight in front of
+either term, worth checking directly rather than assuming neither one
+quietly dominates the other.
 
 {{< embed 04-multi-task-low-frequency-code.ipynb#5fd46926 >}}
 
