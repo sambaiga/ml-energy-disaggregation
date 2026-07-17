@@ -137,6 +137,35 @@ div.csl-indent {
 
 <script type="application/javascript">define('jquery', [],function() {return window.jQuery;})</script>
 
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script defer="" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN" && texText && texText.data) {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
 
 <meta property="og:title" content="Chapter 2: Time-Series Simulation and DER Modeling – Machine Learning for Smart Meter Data">
 <meta property="og:description" content="A structured, project-based path through smart meter data: disaggregation, forecasting, anomaly detection, and grid-edge value, from raw signal to business insight.">
@@ -1924,7 +1953,9 @@ Largest gap, real data vs. the LoadShape's own pmult:   0.000000 kW</code></pre>
 <section id="the-hosting-capacity-crisis" class="level2">
 <h2 class="anchored" data-anchor-id="the-hosting-capacity-crisis">The hosting-capacity crisis</h2>
 <p>This is the business question a <a href="#acronyms_DSO">Distribution System Operator (DSO)</a> faces every time a new rooftop solar application arrives: does connecting one more customer’s <a href="#acronyms_PV">PV</a> system push this specific feeder past its statutory voltage limit? Say yes too often and customers wait months for a grid upgrade that may not have been necessary; say yes too rarely and a feeder starts violating compliance. A hosting-capacity study is how that question gets a feeder-specific answer instead of a guess.</p>
-<p>A feeder can fail this test two different ways, not one. Chapter 1 introduced the three constraints an <a href="#acronyms_LV">LV</a> network operates under: thermal, voltage, and phase balance. The notebook’s own <code>run_penetration</code> function checks the first two together at every step: the worst bus voltage against the statutory limit, and the transformer’s apparent power against its own 500 kVA nameplate rating.</p>
+<p>A feeder can fail this test two different ways, not one. Chapter 1 introduced the three constraints an <a href="#acronyms_LV">LV</a> network operates under: thermal, voltage, and phase balance. The notebook’s own <code>run_penetration</code> function checks the first two together at every step, as two real inequalities: <span class="math display">\[
+\max_i V_{i,pu}(t) \le 1.10, \qquad \max_t \big|S_{transformer}(t)\big| \le S_{rated} = 500 \text{ kVA},
+\]</span> the worst bus voltage against the statutory limit, and the transformer’s apparent power against its own 500 kVA nameplate rating.</p>
 <p>Day 363 is the sunniest day in the dataset, the tallest curve in this chapter’s own <a href="#acronyms_PV">PV</a> diversity chart, and the worst case for a hosting-capacity study: if a penetration level is ever going to cause a violation, a low-demand, high-sun day is where it shows up first.</p>
 <div class="quarto-embed-nb-cell" data-notebook="/home/runner/work/ml-energy-disaggregation/ml-energy-disaggregation/book/04-grid-edge/02-timeseries-der-modeling-code.ipynb" data-notebook-title="Time-Series Simulation and DER Modeling" data-notebook-cellid="7931e39b">
 <div id="7931e39b" class="cell">
@@ -2581,7 +2612,14 @@ Name: vmax_pu, dtype: float64</code></pre>
 <section id="fixing-the-crisis" class="level2">
 <h2 class="anchored" data-anchor-id="fixing-the-crisis">Fixing the crisis</h2>
 <p>80% penetration is the violation found above. The same scenario, the same 25 <a href="#acronyms_PV">PV</a> systems on the same feeder, gets Volt-Watt and Volt-VAr control applied directly rather than a fresh demonstration network. Both are smart-inverter functions standardized by <a href="#acronyms_IEEE">Institute of Electrical and Electronics Engineers (IEEE)</a> 1547-2018 <span class="citation" data-cites="ieee1547-2018">[1]</span>, modeled in OpenDSS as an <code>InvControl</code> element driven by an <code>XYCurve</code> of four voltage/output setpoints. A single <code>InvControl</code> with no explicit <code>PVSystemList</code> applies to every <code>PVSystem</code> in the circuit at once, all 25 of them here, no per-house wiring required.</p>
-<p><strong>Volt-Watt</strong> curtails real-power export once voltage crosses a threshold: full output stays available up to 1.05 pu, then ramps linearly down to zero at 1.10 pu. It works, but it reduces the total generation exported. <strong>Volt-VAr</strong> takes a different lever: instead of cutting real power, it asks the inverter to absorb or supply reactive power, the same principle behind Conservative Voltage Reduction, flattening a feeder’s voltage profile without reducing real generation.</p>
+<p><strong>Volt-Watt</strong> curtails real-power export once voltage crosses a threshold, a piecewise-linear function of the local bus voltage <span class="math inline">\(V\)</span>: <span class="math display">\[
+P(V) = P_{rated} \times
+\begin{cases}
+1 &amp; V \le 1.05 \\[4pt]
+\dfrac{1.10 - V}{1.10 - 1.05} &amp; 1.05 &lt; V &lt; 1.10 \\[4pt]
+0 &amp; V \ge 1.10
+\end{cases}
+\]</span> full output stays available up to 1.05 pu, then ramps linearly down to zero at 1.10 pu. It works, but it reduces the total generation exported. <strong>Volt-VAr</strong> takes a different lever: instead of cutting real power, it asks the inverter to absorb or supply reactive power, the same principle behind Conservative Voltage Reduction, flattening a feeder’s voltage profile without reducing real generation.</p>
 <div class="quarto-embed-nb-cell" data-notebook="/home/runner/work/ml-energy-disaggregation/ml-energy-disaggregation/book/04-grid-edge/02-timeseries-der-modeling-code.ipynb" data-notebook-title="Time-Series Simulation and DER Modeling" data-notebook-cellid="646d5b69">
 <div id="646d5b69" class="cell">
 <div class="cell-output cell-output-display">
@@ -3487,7 +3525,9 @@ Downsampled to 48 half-hour points; peak 1.49 kW/EV at hour 21:00</code></pre>
 </div>
 </div>
 </div>
-<p>A late-afternoon-into-evening peak, exactly the window this chapter’s own transformer chart already flagged as the feeder’s busiest. The diversified curve peaks around 1.5kW per <a href="#acronyms_EV">EV</a>, not the charger’s full 7.36kW rating: most vehicles in the group are not charging at any given moment, so the average demand per <a href="#acronyms_EV">EV</a> stays well under the rated maximum. That diversity is a genuine, physical mitigating effect, worth testing directly rather than assuming.</p>
+<p>A late-afternoon-into-evening peak, exactly the window this chapter’s own transformer chart already flagged as the feeder’s busiest. Diversifying <span class="math inline">\(N\)</span> real vehicles’ own charging profiles is a plain average across the group at each real time step <span class="math inline">\(t\)</span>, <span class="math display">\[
+\bar{P}(t) = \frac{1}{N}\sum_{n=1}^{N} P_n(t), \qquad \text{CF}(t) = \frac{\bar{P}(t)}{P_{rated}},
+\]</span> where <span class="math inline">\(P_n(t)\)</span> is vehicle <span class="math inline">\(n\)</span>’s own real charging power, 0 or the charger’s rated power depending on whether it happens to be plugged in and drawing at that instant, and <span class="math inline">\(\text{CF}(t)\)</span>, the coincidence factor, is that average expressed as a fraction of one charger’s own full rating. The diversified curve peaks around 1.5kW per <a href="#acronyms_EV">EV</a>, not the charger’s full 7.36kW rating, a peak coincidence factor of roughly 0.2: most vehicles in the group are not charging at any given moment, so the average demand per <a href="#acronyms_EV">EV</a> stays well under the rated maximum. That diversity is a genuine, physical mitigating effect, worth testing directly rather than assuming.</p>
 <p>Every <a href="#acronyms_EV">EV</a>-owning house on this feeder gets its own copy of the diversified shape, an additional <code>Load</code> that adds demand on top of a house’s existing consumption rather than offsetting it. This time the worst-case day is not the sunniest, it is the day with the highest evening demand across the whole customer population, found the same way this chapter’s <a href="#acronyms_PV">PV</a> study found day 363: by checking, not assuming.</p>
 <div class="quarto-embed-nb-cell" data-notebook="/home/runner/work/ml-energy-disaggregation/ml-energy-disaggregation/book/04-grid-edge/02-timeseries-der-modeling-code.ipynb" data-notebook-title="Time-Series Simulation and DER Modeling" data-notebook-cellid="4519ce35">
 <div id="4519ce35" class="cell">

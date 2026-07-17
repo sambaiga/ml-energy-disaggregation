@@ -2,74 +2,74 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
     <loc>https://sambaiga.github.io/ml-energy-disaggregation/index.html</loc>
-    <lastmod>2026-07-17T20:22:55.448Z</lastmod>
+    <lastmod>2026-07-17T20:24:17.703Z</lastmod>
   </url>
   <url>
     <loc>https://sambaiga.github.io/ml-energy-disaggregation/preface.html</loc>
-    <lastmod>2026-07-17T20:22:55.448Z</lastmod>
+    <lastmod>2026-07-17T20:24:17.703Z</lastmod>
   </url>
   <url>
     <loc>https://sambaiga.github.io/ml-energy-disaggregation/how-to-use.html</loc>
-    <lastmod>2026-07-17T20:22:55.448Z</lastmod>
+    <lastmod>2026-07-17T20:24:17.703Z</lastmod>
   </url>
   <url>
     <loc>https://sambaiga.github.io/ml-energy-disaggregation/book/03-disaggregation/01-what-is-nilm.html</loc>
-    <lastmod>2026-07-17T20:22:55.412Z</lastmod>
+    <lastmod>2026-07-17T20:24:17.664Z</lastmod>
   </url>
   <url>
     <loc>https://sambaiga.github.io/ml-energy-disaggregation/book/03-disaggregation/02-feature-engineering.html</loc>
-    <lastmod>2026-07-17T20:22:55.415Z</lastmod>
+    <lastmod>2026-07-17T20:24:17.668Z</lastmod>
   </url>
   <url>
     <loc>https://sambaiga.github.io/ml-energy-disaggregation/book/03-disaggregation/03-multi-appliance-recognition.html</loc>
-    <lastmod>2026-07-17T20:22:55.416Z</lastmod>
+    <lastmod>2026-07-17T20:24:17.668Z</lastmod>
   </url>
   <url>
     <loc>https://sambaiga.github.io/ml-energy-disaggregation/book/03-disaggregation/04-multi-task-low-frequency.html</loc>
-    <lastmod>2026-07-17T20:22:55.417Z</lastmod>
+    <lastmod>2026-07-17T20:24:17.670Z</lastmod>
   </url>
   <url>
     <loc>https://sambaiga.github.io/ml-energy-disaggregation/book/04-grid-edge/01-opendss-lv-modeling.html</loc>
-    <lastmod>2026-07-17T20:22:55.421Z</lastmod>
+    <lastmod>2026-07-17T20:24:17.674Z</lastmod>
   </url>
   <url>
     <loc>https://sambaiga.github.io/ml-energy-disaggregation/book/04-grid-edge/02-timeseries-der-modeling.html</loc>
-    <lastmod>2026-07-17T20:22:55.425Z</lastmod>
+    <lastmod>2026-07-17T20:24:17.679Z</lastmod>
   </url>
   <url>
     <loc>https://sambaiga.github.io/ml-energy-disaggregation/book/04-grid-edge/03-phase-identification.html</loc>
-    <lastmod>2026-07-17T20:22:55.428Z</lastmod>
+    <lastmod>2026-07-17T20:24:17.681Z</lastmod>
   </url>
   <url>
     <loc>https://sambaiga.github.io/ml-energy-disaggregation/book/04-grid-edge/04-customer-feeder-clustering.html</loc>
-    <lastmod>2026-07-17T20:22:55.437Z</lastmod>
+    <lastmod>2026-07-17T20:24:17.692Z</lastmod>
   </url>
   <url>
     <loc>https://sambaiga.github.io/ml-energy-disaggregation/book/04-grid-edge/05-ranking-recommendation.html</loc>
-    <lastmod>2026-07-17T20:22:55.439Z</lastmod>
+    <lastmod>2026-07-17T20:24:17.694Z</lastmod>
   </url>
   <url>
     <loc>https://sambaiga.github.io/ml-energy-disaggregation/book/04-grid-edge/06-anomaly-detection.html</loc>
-    <lastmod>2026-07-17T20:22:55.439Z</lastmod>
+    <lastmod>2026-07-17T20:24:17.694Z</lastmod>
   </url>
   <url>
     <loc>https://sambaiga.github.io/ml-energy-disaggregation/book/05-forecasting/01-forecastability.html</loc>
-    <lastmod>2026-07-17T20:22:55.443Z</lastmod>
+    <lastmod>2026-07-17T20:24:17.698Z</lastmod>
   </url>
   <url>
     <loc>https://sambaiga.github.io/ml-energy-disaggregation/book/05-forecasting/02-scaling-archetypes.html</loc>
-    <lastmod>2026-07-17T20:22:55.446Z</lastmod>
+    <lastmod>2026-07-17T20:24:17.701Z</lastmod>
   </url>
   <url>
     <loc>https://sambaiga.github.io/ml-energy-disaggregation/book/05-forecasting/03-probabilistic-forecasting.html</loc>
-    <lastmod>2026-07-17T20:22:55.447Z</lastmod>
+    <lastmod>2026-07-17T20:24:17.702Z</lastmod>
   </url>
   <url>
     <loc>https://sambaiga.github.io/ml-energy-disaggregation/about.html</loc>
-    <lastmod>2026-07-17T20:22:55.403Z</lastmod>
+    <lastmod>2026-07-17T20:24:17.657Z</lastmod>
   </url>
   <url>
     <loc>https://sambaiga.github.io/ml-energy-disaggregation/acronyms.html</loc>
-    <lastmod>2026-07-17T20:22:55.403Z</lastmod>
+    <lastmod>2026-07-17T20:24:17.657Z</lastmod>
   </url>
 </urlset>
