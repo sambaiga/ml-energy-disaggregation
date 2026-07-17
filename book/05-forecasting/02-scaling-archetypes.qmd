@@ -73,7 +73,11 @@ A single train/test split is a snapshot, not a guarantee. The real check for whe
 
 {{< embed 02-scaling-archetypes-code.ipynb#07d48c85 >}}
 
-Unified beats the blind floor in all three expanding-window folds, not only in the final 90-day holdout used above. That is real evidence this is a genuine pattern rather than an artifact of one arbitrary split, checked the same way Twiga's own backtesting tutorial recommends checking any forecasting claim before trusting it.
+Unified beats the blind floor in all three expanding-window folds, not only in the final 90-day holdout used above. That is real evidence this is a genuine pattern rather than an artifact of one arbitrary split, checked the same way Twiga's own backtesting tutorial recommends checking any forecasting claim before trusting it. The same diversity-weighted ranking used throughout this chapter applies here too, averaged across the three folds:
+
+{{< embed 02-scaling-archetypes-code.ipynb#93a986b8 >}}
+
+Unified wins the formal ranking as well, the backtest is not just an MAE story repeated three times.
 
 ## What does a brand-new house get forecast with?
 
@@ -82,6 +86,10 @@ A {{< acr DSO >}} onboarding a new house tomorrow has no history for it in any t
 {{< embed 02-scaling-archetypes-code.ipynb#79b3c46e >}}
 
 {{< embed 02-scaling-archetypes-code.ipynb#68559944 >}}
+
+{{< embed 02-scaling-archetypes-code.ipynb#a3136277 >}}
+
+The diversity-weighted ranking agrees with the raw MAE table: this is not a case where a different metric would have told a kinder story, global blind wins outright, on error and on tracking the real signal alike.
 
 Even at 90 real days of history, exactly matching the full season used to build the archetype centroids in the first place, the unified model is still worse than the global blind model that ignores archetype information entirely. More history does not fix it. The distance features are not being ignored either, a direct feature-importance check shows LightGBM splits on them about as often as it splits on the lag features. What is actually happening is a real, checkable form of overfitting: for a known customer, $d_i$ is close to a fixed, near-unique vector across every one of their own training rows, so the tree learns to recognize which known customer a row came from rather than what archetype behavior generalizes. That is a legitimate personalization signal for a customer the model has already trained on, exactly the win above, and exactly the wrong signal for a customer it has never seen: there is no signature to recognize yet.
 
@@ -112,6 +120,12 @@ Population averages are easy to state and hard to feel. One customer from the 72
 Zooming out from one customer to all 72 held out entirely from training:
 
 {{< embed 02-scaling-archetypes-code.ipynb#0b765cad >}}
+
+Four candidates this time, not two, the richest comparison in this chapter, so the diversity-weighted ranking earns its keep here more than anywhere else so far:
+
+{{< embed 02-scaling-archetypes-code.ipynb#8f82b164 >}}
+
+Gated soft mixture comes out on top, averaged across all five history lengths, the same verdict the MAE chart already suggested, now checked against Corr and RMSE too rather than taken on faith from one column.
 
 Two more real numbers explain the shape of that chart.
 
