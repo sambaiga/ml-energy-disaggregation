@@ -134,6 +134,14 @@ network, fetched separately:
 uv run python scripts/fetch_part4_uk_mvlv_data.py
 ```
 
+The generalization check later in this chapter reuses Chapter 4's own
+{{< acr NREL >}} sample, a stratified 760 real US buildings, fetched the
+same way:
+
+```bash
+uv run python scripts/fetch_part5_nrel_buildstock_data.py
+```
+
 Chapter 4's own embedding, a peak-normalized, season-mean load shape per
 customer, and its k-means archetype labels, are recomputed here exactly
 as that chapter built them, not loaded from a saved file, so this chapter
@@ -206,25 +214,57 @@ archetype mean. If retrieval cannot beat that simpler baseline, it has
 not earned the extra machinery, the same discipline this book applied to
 {{< acr IDEC >}}.
 
-{{< embed 05-ranking-recommendation-code.ipynb#86df104a >}}
+A bare MAE comparison already answered this once in this book, and got it
+wrong: Chapter 1 of Part 5 found window-average posting the lowest MAE of
+four baselines while barely tracking the real signal at all. The same
+risk applies here, so each candidate is scored on both MAE and Spearman
+rank correlation between its predictions and the real outcome, since a
+method whose predictions do not even move in the right direction should
+not win just because its average error looks small, then combined with
+the same diversity-weighted Borda ranking used throughout this book's
+own multi-metric comparisons: rank each candidate on every metric,
+down-weight a metric by how much it already agrees with the others, and
+sum the weighted ranks. With metrics $M_1, \dots, M_J$ (MAE, Corr, and so
+on):
+$$
+u_j = 1 - \frac{1}{J-1}\sum_{j' \neq j} \left|\rho_S(M_j, M_{j'})\right|
+$$
+$$
+w_j = \frac{u_j}{\sum_{j'=1}^{J} u_{j'}}
+$$
+$$
+\text{score}(m) = \sum_{j=1}^{J} w_j \cdot \text{rank}_j(m)
+$$
+where $\rho_S$ is Spearman rank correlation, computed across the
+candidates' own scores on each metric pair.
 
-{{< embed 05-ranking-recommendation-code.ipynb#af59a6a4 >}}
+{{< embed 05-ranking-recommendation-code.ipynb#49862434 >}}
+
+{{< embed 05-ranking-recommendation-code.ipynb#cc65c357 >}}
 
 ::: {.ark-mistake}
 <span class="ark-mistake-title"><i class="bi bi-bug-fill"></i> Common Mistake</span>
 
 **Two different results, for a real, physical reason, not a coin flip.**
-For thermal risk, retrieval beats both baselines: a customer's own five
-nearest real neighbors predict their peak contribution better than their
-archetype's mean, and far better than the population mean. Retrieval
-earns its complexity here. For voltage risk, retrieval does not beat the
-population mean at all. Archetype does not either. Neither is a failure
-of the code, both are an honest report of what the variance decomposition
-above already predicted: voltage risk depends on bus position as much as
-on shape, and no amount of clever retrieval on shape alone can recover
-information the data never carried in the first place. Assuming a
-technique that works for one risk type will work for the other, without
-checking, is the actual mistake to avoid here.
+For thermal risk, retrieval wins outright on both metrics at once, the
+lowest MAE and the strongest rank correlation with the real outcome:
+a customer's own five nearest real neighbors predict their peak
+contribution better than their archetype's mean, and far better than the
+population mean. Retrieval earns its complexity here. For voltage risk,
+MAE alone makes all three candidates look like a three-way tie, 0.003
+apart from each other. Rank correlation breaks that tie and reveals
+something a bare MAE table hides completely: both retrieval and the
+archetype mean carry a real, negative correlation with the true outcome,
+worse than a constant population-mean prediction that carries none at
+all. Neither retrieval nor archetype membership merely fails to help for
+voltage risk, both actively point in the wrong direction, an honest
+report of what the variance decomposition above already predicted:
+voltage risk depends on bus position as much as on shape, and no amount
+of clever retrieval on shape alone can recover information the data
+never carried in the first place. Assuming a technique that works for
+one risk type will work for the other, without checking every metric
+that matters, not just the one that happens to look smallest, is the
+actual mistake to avoid here.
 
 :::
 
@@ -244,10 +284,19 @@ prediction itself: average the k nearest neighbors' risk, hand back a
 number, and say nothing about how much to trust it. Every customer gets
 an equally confident-looking answer, whether their nearest real match
 sits right next door in the embedding space or nowhere near it at all.
-Conformal calibration adds the piece that is missing. It calibrates a
-distance threshold, tau, on real held-back data, chosen so that tau
-covers 90% of how far a genuinely new customer should ever need to look
-to find their own nearest real match. A customer whose nearest labeled
+Conformal calibration adds the piece that is missing, a split-conformal
+threshold with the same finite-sample, distribution-free guarantee Lei
+and colleagues formalized for conformal prediction sets generally
+[@lei2018distributionfree]. Split a held-back calibration set of $n$
+labeled customers off from the training set, compute each one's own
+nonconformity score, its distance to its single nearest labeled training
+neighbor, $r_i = \min_{j \in \text{train}} \lVert x_i - x_j \rVert_2$,
+and take tau as the $\lceil (n+1)(1-\alpha) \rceil / n$ empirical
+quantile of those $n$ real scores:
+$$
+\tau = \text{Quantile}_{\lceil (n+1)(1-\alpha)/n \rceil}\left(\{r_i\}_{i=1}^{n}\right)
+$$
+with $\alpha = 0.1$ for 90% coverage. A customer whose nearest labeled
 neighbor sits within tau gets a prediction backed by real precedent. A
 customer whose nearest neighbor sits farther away than that gets flagged
 instead, an honest "no confident match nearby" rather than a number
@@ -526,6 +575,88 @@ Retrieval and ranking both generalize cleanly to customers this chapter
 has never seen before; recommendation simply has nothing to act on in
 this particular batch, an honest result rather than a manufactured one.
 
+## Does retrieval generalize to a genuinely different real population?
+
+Chapter 4 already asked a version of this question at the archetype
+level: does shape-based clustering, run on 760 real {{< acr NREL >}}
+ResStock and ComStock buildings, recover a genuinely different
+population's own real ground-truth building types? It found a real,
+honest limit there, low but non-random agreement, shape alone does not
+cleanly separate a population this diverse. Retrieval sits one level
+sharper than clustering, a single predicted number instead of a bucket
+label, and it deserves the same honest check, not an assumption that a
+technique validated on 342 real Australian customers simply carries over
+to a real, different country's own housing stock.
+
+Every retrieval check so far in this chapter needed an {{< acr LV >}}
+simulation to get a real risk label, and {{< acr NREL >}}'s own buildings
+have no equivalent OpenDSS model. This section restricts itself to what
+a smart meter alone can answer: each real customer's own maximum real
+demand during a real evening window, 18:00 to 21:00, read directly off
+their own recorded series, no network model, no synthetic scenario, the
+same coarse but genuinely real screening signal a {{< acr DSO >}} already
+has before commissioning any study at all.
+
+<div class='ark-concept'>
+
+<span class='ark-concept-title'><i class="bi bi-info-circle-fill"></i> Key Concept</span>
+
+Retrieval's own prediction is a k-nearest-neighbor mean in shape-embedding
+space:
+$$
+\hat{y}(x) = \frac{1}{k}\sum_{i \in N_k(x)} y_i
+$$
+where $N_k(x)$ is the k closest labeled points to a query $x$ by Euclidean
+distance in the same peak-normalized shape embedding Chapter 4 built. The
+technique's whole assumption is that nearby points in that embedding
+space share similar real outcomes. Nothing about that assumption
+requires the neighbors to come from the same country, climate, or
+appliance mix as the query, and nothing guarantees it holds when they do
+not.
+
+</div>
+
+{{< embed 05-ranking-recommendation-code.ipynb#e85bb3ae >}}
+
+{{< embed 05-ranking-recommendation-code.ipynb#8805af2d >}}
+
+Retrieval, trained purely on 342 real AusNet customers, does not beat a
+plain population-mean baseline here, and its predictions carry a
+slightly negative rank correlation with these real US buildings' own
+actual evening peaks. That is not a bug in the k-nearest-neighbor code,
+it is the same honest limit Chapter 4 already found at the clustering
+level, now visible one level sharper: a real, different population's own
+relationship between daily shape and peak demand, driven by a different
+climate and a different heating and cooling technology mix, is not
+something 342 Australian customers' own real history can teach a
+retrieval model to predict. Population mean is not a stronger method
+here, it is simply not misled by neighbors that were never truly
+comparable to begin with.
+
+{{< embed 05-ranking-recommendation-code.ipynb#b7507084 >}}
+
+The same split-conformal threshold {{< acr DSO >}}s already trust for
+flagging an unusual AusNet customer generalizes correctly here without
+any change at all: it was calibrated once, only on AusNet's own
+held-back data, and it never saw a single {{< acr NREL >}} building
+during that calibration. Roughly half of these real US homes still land
+close enough to a real AusNet neighbor to be trusted; the other half do
+not, and the same honest "no confident match nearby" flag that catches
+AusNet's own unusual customers catches them too.
+
+![The same calibrated trust radius, unmoved, checked against a population it never saw during calibration. A real US home whose own shape happens to resemble an AusNet household still falls inside tau; one reflecting a genuinely different climate or appliance mix falls outside it, flagged honestly rather than silently extrapolated.](../../assets/cross-population-retrieval-trust.svg){#fig-cross-population-retrieval-trust}
+
+Recommendation is deliberately left out of this generalization check.
+Every lever recommendation earlier in this chapter was checked against a
+real, re-simulated outcome, whether Volt-VAr or storage actually fixed a
+held-out customer's own violation, and that verification step is exactly
+the piece requiring an {{< acr LV >}} model {{< acr NREL >}}'s own
+buildings do not have here. Recommending a lever without a way to check
+whether it works would break this chapter's own standard rather than
+extend it, so this section stops at what a smart meter alone can
+honestly answer: retrieval and its own calibrated confidence, not a
+lever this chapter cannot verify.
+
 ## Feeder-level ranking on a real second network
 
 Everything above runs on AusNet's own real 31-customer feeder, the
@@ -703,7 +834,12 @@ a real violation exists to check it against, and honestly has nothing to
 say where one does not.
 The one place this chapter's own results stop generalizing, network-wide
 Volt-VAr control, is disclosed as plainly as everywhere it does, the same
-discipline this book has followed since Chapter 1.
+discipline this book has followed since Chapter 1. A second place joins
+it here: retrieval trained on 342 real Australian customers does not
+transfer to real US buildings from a genuinely different climate, and
+the calibrated confidence threshold built to catch AusNet's own unusual
+customers correctly flags roughly half of them as unfamiliar rather than
+silently extrapolating.
 
 ## Where this leaves Part 4
 
