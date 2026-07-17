@@ -67,4 +67,8 @@ acronyms:
       longname: Uniform Manifold Approximation and Projection
     - shortname: GMM
       longname: Gaussian Mixture Model
+    - shortname: AMI
+      longname: Advanced Metering Infrastructure
+    - shortname: GIS
+      longname: Geographic Information System
 ...

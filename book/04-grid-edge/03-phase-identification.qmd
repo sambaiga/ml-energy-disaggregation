@@ -90,13 +90,12 @@ this feeder's own real phase records rather than assumed correct.
 **Correlation, not magnitude, is the signal.** Two voltage traces that
 look similar in absolute level can be weakly correlated, and two traces
 at different absolute levels can be strongly correlated, if they move
-together over time. A phase-identification method that clusters on raw
-voltage magnitude is answering "which customers have a similar voltage
-level," a question dominated by each customer's distance from the
-transformer. A method that clusters on the correlation between voltage
-traces is answering "which customers' voltage moves together," the
-question that actually tracks phase membership. The rest of this chapter
-tests both and reports what the difference costs in practice.
+together over time. For customers $i$ and $j$ with voltage traces $v_i,
+v_j \in \mathbb{R}^{T}$ over $T$ real time steps, Pearson correlation
+$$
+\rho_{ij} = \frac{\sum_{t=1}^{T} (v_{i,t} - \bar{v}_i)(v_{j,t} - \bar{v}_j)}{\sqrt{\sum_{t=1}^{T} (v_{i,t} - \bar{v}_i)^2}\sqrt{\sum_{t=1}^{T} (v_{j,t} - \bar{v}_j)^2}}
+$$
+is invariant to each customer's own absolute voltage level, entering only through the centering $\bar{v}_i$, $\bar{v}_j$, and the normalization in the denominator. A phase-identification method that clusters on raw voltage magnitude is answering "which customers have a similar voltage level," a question dominated by each customer's distance from the transformer. A method that clusters on $\rho_{ij}$ is answering "which customers' voltage moves together," the question that actually tracks phase membership. The rest of this chapter tests both and reports what the difference costs in practice.
 
 :::
 
@@ -161,6 +160,15 @@ groups. It is worth running this exact approach before reaching for
 anything more careful, and checking it honestly against the real answer
 already in hand, rather than assuming a plausible-sounding method works.
 
+Every result below is checked against that real answer with the
+{{< acr ARI >}}, the same chance-corrected agreement measure Part 4
+Chapter 4 uses later in this book to check a discovered clustering
+against a genuine ground-truth label:
+$$
+\text{ARI} = \frac{\sum_{ij}\binom{n_{ij}}{2} - \left[\sum_i \binom{a_i}{2}\sum_j \binom{b_j}{2}\right]\big/\binom{n}{2}}{\frac{1}{2}\left[\sum_i \binom{a_i}{2} + \sum_j \binom{b_j}{2}\right] - \left[\sum_i \binom{a_i}{2}\sum_j \binom{b_j}{2}\right]\big/\binom{n}{2}}
+$$
+where $n_{ij}$ counts customers placed in real phase $i$ and discovered cluster $j$ at once, and $a_i$, $b_j$ are each partition's own group sizes [@hubert1985comparing]. A score of 1.0 is a perfect match to the real phase labels; 0.0 is no better than the agreement random chance alone would produce.
+
 {{< embed 03-phase-identification-code.ipynb#1da22105 >}}
 
 ::: {.ark-mistake}
@@ -214,8 +222,15 @@ customer on this feeder.
 The number of phases, three, was supplied going in. A working deployment
 often does not know the right number of groups in advance, so it is worth
 asking whether the data itself would have revealed it. The silhouette
-score, a measure of how well separated a given clustering is, answers
-that directly.
+score answers that directly: for customer $i$, with $a(i)$ its own
+mean distance to every other member of its assigned cluster and $b(i)$
+its mean distance to the nearest cluster it does not belong to,
+$$
+s(i) = \frac{b(i) - a(i)}{\max\big(a(i), b(i)\big)}
+$$
+averaged over every customer to give one score per candidate $k$. A
+customer sitting much closer to its own cluster than to any other scores
+near 1; a customer sitting about equally close to both scores near 0.
 
 {{< embed 03-phase-identification-code.ipynb#62b6a69a >}}
 
@@ -342,11 +357,22 @@ phases within that threshold, not a single guess. A confident customer
 gets a single-phase set. An uncertain one gets more than one phase, or
 none at all if it does not sit close enough to any of the three
 centroids, itself a signal that something about that customer's data is
-unusual and worth a closer look. Four small functions implement this:
-one to build each phase's centroid from its anchor customers, one to
-score a point's distance to a given phase's centroid, one to calibrate
-the distance threshold from the anchors' own leave-one-out scores, and
-one to assemble the resulting prediction sets.
+unusual and worth a closer look.
+
+With $A_p$ the set of known anchor customers on real phase $p \in
+\{1, 2, 3\}$ and $e_i$ customer $i$'s own embedding position, phase
+$p$'s centroid is $\hat{c}_p = \frac{1}{|A_p|}\sum_{j \in A_p} e_j$. The
+distance threshold is calibrated leave-one-out: for each anchor $j \in
+A_p$, its nonconformity score is its own distance to the centroid built
+from every *other* anchor of its real phase,
+$$
+r_j = \lVert e_j - \hat{c}_p^{(-j)} \rVert_2, \qquad \hat{c}_p^{(-j)} = \frac{1}{|A_p| - 1}\sum_{j' \in A_p \setminus \{j\}} e_{j'}
+$$
+and $\tau$ is the $(1-\alpha)$ empirical quantile across all $m = \sum_p |A_p|$ anchors' own scores $\{r_j\}$, the same finite-sample calibration recipe as every other conformal threshold in this book [@lei2018distributionfree]. Every customer $i$, known or new, then gets a prediction *set*, not a single label:
+$$
+\hat{S}(i) = \big\{\, p : \lVert e_i - \hat{c}_p \rVert_2 \le \tau \,\big\}
+$$
+built from centroids fit on the *full* anchor sets this time, not held out. Four small functions implement this: one to build each phase's centroid from its anchor customers, one to score a point's distance to a given phase's centroid, one to calibrate $\tau$ from the anchors' own leave-one-out scores, and one to assemble the resulting prediction sets $\hat{S}(i)$.
 
 A calibration set of ten known customers is enough to test this, the
 same order of magnitude the labeling sweep above already found reliable.
@@ -381,6 +407,88 @@ rather than an arbitrary score, at the cost of only the same handful of
 known customers the labeling step already needed.
 
 :::
+
+## What one 31-customer feeder cannot answer
+
+Every result above is real, and every one of them is checked against one
+specific, residential, 31-customer AusNet feeder. Honesty about a
+method's own limits means naming what that single feeder cannot settle,
+not just what it can.
+
+**Generalization to non-residential loads and other topologies is
+untested, not assumed to hold.** The mechanism this chapter relies on,
+same phase means same shared conductor path means correlated voltage,
+does not itself depend on a customer being residential: a three-phase
+commercial load or a large motor still shares that same physical path
+with everyone else on its phase. But this feeder carries only real
+households, so whether a non-residential customer's own noisier,
+spikier real demand degrades the correlation signal, rather than just
+adding a different real shape to it, is a genuine open question this
+data cannot check. The same honesty applies to topology: this is one
+real feeder with one real transformer and one real backbone. A feeder
+with multiple parallel backbones, switchable ties, or a meshed
+low-voltage topology could break the assumption that "same phase" and
+"same upstream path" are the same thing, and that case was not tested
+here because this feeder does not have one.
+
+**Distributed generation was checked by this chapter's own closest
+precedent, not by this chapter itself.** Simonovska and Ochoa tested the
+same {{< acr PCA >}}-plus-clustering principle on this exact feeder under
+varying {{< acr PV >}} penetration levels and found it held up
+[@simonovska2021phasegrouping]. This chapter's own additions, the
+conformal confidence sets and the anchor-based naming sweep, were not
+re-run under high {{< acr PV >}} penetration, so whether *those*
+additions hold up under the same stress is inherited confidence, not a
+result this chapter independently verified.
+
+**Scalability is a real, computable claim, not a guess.** Building the
+pairwise correlation matrix costs $O(n^2 T)$, trivial at $n=31$
+customers and $T=48$ half-hours. A real utility deployment with
+thousands of meters would need either a substation-by-substation
+partition, correlating only customers already known to share a
+transformer, never the full utility-wide population at once, or an
+accepted $O(n^2)$ memory cost that a modern machine still handles
+comfortably into the low thousands of customers per partition. The
+natural mitigant is structural, not algorithmic: two customers on
+genuinely different feeders never need comparing in the first place, so
+the real $n$ this complexity bound applies to is "customers per
+candidate feeder," not "customers utility-wide."
+
+**Data quality beyond a short window or a sparse meter subset is a real
+gap.** This chapter stress-tested window length (down to 2 hours) and
+meter density (down to a handful of customers), and found mutual
+information and {{< acr PPS >}} more robust than correlation once the
+window gets short. It did not inject the kind of data-quality fault
+Chapter 6 later builds and tests explicitly, a stuck reading, a
+communication dropout, a calibration drift, into this chapter's own
+phase-identification pipeline. Whether a stuck or drifting meter quietly
+corrupts a customer's own correlation with its true phase group, or gets
+caught by the same conformal confidence set that already catches a noisy
+4-hour window, is untested here and a real, concrete extension for
+whoever picks this up next.
+
+**Deployment is a real, statable sequence, not a research question.** A
+utility adopting this needs, in order: a smart-meter voltage history per
+customer (many {{< acr AMI >}} deployments already collect this for
+billing, the same real infrastructure Short's own 2013 method assumed
+[@short2013phaseid]); a handful of anchor customers per phase with
+independently verified phase, three to four per phase by this chapter's
+own sensitivity sweep, from a recent service record or a physical spot
+check, never from the clustering result itself being validated; and a
+periodic re-run as the record system drifts further from the physical
+network, the same real gap this chapter opened with. The conformal
+confidence set is the natural integration point into an existing
+asset-management or {{< acr GIS >}} system: a customer whose prediction
+set is empty or contains more than one phase is exactly the exception
+list a field-verification workflow already knows how to consume, no new
+category of alert to invent.
+
+**The method generalizes to any real number of phases, already
+demonstrated rather than assumed.** Nothing in the correlation-plus-
+clustering recipe is specific to three groups. The silhouette sweep
+earlier in this chapter already found the right $k$ unsupervised on this
+feeder; the identical sweep would surface $k=1$ on a single-phase
+lateral or $k=2$ on a two-phase spur, the same procedure, not a new one.
 
 ## Where this leaves Part 4
 
