@@ -71,4 +71,8 @@ acronyms:
       longname: Advanced Metering Infrastructure
     - shortname: GIS
       longname: Geographic Information System
+    - shortname: UQ
+      longname: Uncertainty Quantification
+    - shortname: PICP
+      longname: Prediction Interval Coverage Probability
 ...
