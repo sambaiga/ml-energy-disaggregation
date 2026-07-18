@@ -79,4 +79,6 @@ acronyms:
       longname: Fraction Proposal Network
     - shortname: QVN
       longname: Quantile Value Network
+    - shortname: CVaR
+      longname: Conditional Value-at-Risk
 ...

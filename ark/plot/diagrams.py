@@ -2466,3 +2466,121 @@ def trained_specialist_vs_zero_shot_diagram() -> plt.Figure:
     fig.tight_layout()
     plt.close(fig)
     return fig
+
+
+def _net_injection_panel(
+    ax: plt.Axes,
+    title: str,
+    demand_height: float,
+    net_color: str,
+    voltage_label: str,
+) -> None:
+    """One panel of `net_injection_offset_diagram`: one customer bus, PV export against local demand."""
+    bus_xy = (0.5, 0.05)
+    ax.add_patch(Circle(bus_xy, 0.16, facecolor=PRIMARY, edgecolor="white", linewidth=1.6, zorder=3))
+    ax.text(
+        bus_xy[0],
+        bus_xy[1],
+        ICONS["house-fill"],
+        fontproperties=icon_font(13),
+        color="white",
+        ha="center",
+        va="center",
+        zorder=4,
+    )
+
+    export_top = 0.05 + 0.95
+    ax.add_patch(
+        FancyArrowPatch(
+            (0.25, bus_xy[1] + 0.18),
+            (0.25, export_top),
+            arrowstyle="-|>",
+            mutation_scale=16,
+            color=WARNING,
+            linewidth=2.2,
+            shrinkA=0,
+            shrinkB=0,
+        )
+    )
+    ax.text(0.12, export_top - 0.05, "PV export", fontsize=7.8, color=WARNING, fontweight="bold", ha="right")
+
+    ax.add_patch(
+        FancyArrowPatch(
+            (0.75, bus_xy[1] + 0.18 + demand_height),
+            (0.75, bus_xy[1] + 0.18),
+            arrowstyle="-|>",
+            mutation_scale=16,
+            color=INFO,
+            linewidth=2.2,
+            shrinkA=0,
+            shrinkB=0,
+        )
+    )
+    ax.text(
+        0.88,
+        bus_xy[1] + 0.18 + demand_height + 0.03,
+        "local\ndemand",
+        fontsize=7.8,
+        color=INFO,
+        fontweight="bold",
+        ha="left",
+        va="bottom",
+    )
+
+    net_top = 0.05 + 0.95 - demand_height
+    ax.add_patch(
+        FancyArrowPatch(
+            (0.5, bus_xy[1] + 0.18),
+            (0.5, max(net_top, bus_xy[1] + 0.24)),
+            arrowstyle="-|>",
+            mutation_scale=20,
+            color=net_color,
+            linewidth=3.2,
+            shrinkA=0,
+            shrinkB=0,
+        )
+    )
+
+    ax.text(
+        0.5,
+        1.14,
+        f"net injection\n{voltage_label}",
+        fontsize=8.4,
+        color=net_color,
+        fontweight="bold",
+        ha="center",
+        va="bottom",
+    )
+    ax.set_title(title, fontsize=12, color=PRIMARY, fontweight="bold", pad=22)
+    ax.set_xlim(0.0, 1.0)
+    ax.set_ylim(-0.15, 1.3)
+    ax.set_aspect("equal")
+    ax.axis("off")
+
+
+def net_injection_offset_diagram() -> plt.Figure:
+    """Draw why a customer's own local demand offsets PV export at the point of common coupling.
+
+    Left: a low-demand customer, most of a fixed PV export flows onto the
+    network unopposed, a large net injection and a large voltage rise.
+    Right: the same fixed PV export, but a customer with high local demand
+    consumes most of it before it ever reaches the network, a small net
+    injection and a small voltage rise. The mechanism behind this chapter's
+    own real finding, that a forecast's upper-demand quantile is not a
+    uniformly worse case once real PV penetration is high enough.
+
+    Returns:
+        The matplotlib Figure, ready to display in a notebook cell.
+    """
+    fig, axes = plt.subplots(1, 2, figsize=(9.0, 4.6))
+
+    _net_injection_panel(
+        axes[0], "Low local demand", demand_height=0.15, net_color=DANGER, voltage_label="large, $\\Delta V$ high"
+    )
+    _net_injection_panel(
+        axes[1], "High local demand", demand_height=0.65, net_color=SUCCESS, voltage_label="small, $\\Delta V$ low"
+    )
+
+    fig.tight_layout()
+    plt.close(fig)
+    return fig
