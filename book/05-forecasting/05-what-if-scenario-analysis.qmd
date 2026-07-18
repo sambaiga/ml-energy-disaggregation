@@ -46,13 +46,36 @@ A second, more useful finding sits underneath that headline number. "P95" sounds
 
 {{< embed 05-what-if-scenario-analysis-code.ipynb#f384ff5d >}}
 
-No, and the real reason is physical, not statistical. At low {{< acr PV >}} penetration the transformer's own throughput is mostly driven by load itself, so the upper-demand scenario does raise utilization, exactly what "P95 means worse" assumes: 9.30% against 2.81-4.01% at 0-20% penetration. Past roughly 40% penetration, that reverses: a customer with higher local demand consumes more of their own {{< acr PV >}} export before it ever reaches the transformer, so higher demand *lowers* both transformer utilization and worst-case voltage, 17.62% against 22.69-22.82% at 80% penetration. This is the same real compensatory mechanism Part 5 Chapter 1 already found between {{< acr PV >}} and {{< acr EV >}} activity [@fias2025uncertainty], now showing up between forecast demand and {{< acr PV >}} export instead. A {{< acr DSO >}} that reflexively treats a forecast's upper quantile as the universal worst case for every constraint gets this backwards at high {{< acr PV >}} penetration; which quantile is actually the risk depends on which constraint, and how much {{< acr PV >}} is already on the feeder, not on "higher demand" as a blanket rule.
+{{< embed 05-what-if-scenario-analysis-code.ipynb#0f8c4a5e >}}
+
+No, and the real reason is physical, not statistical. At low {{< acr PV >}} penetration the transformer's own throughput is mostly driven by load itself, so the upper-demand scenario does raise utilization, exactly what "P95 means worse" assumes: 9.30% against 2.81-4.01% at 0-20% penetration. Past roughly 40% penetration, that reverses: a customer with higher local demand consumes more of their own {{< acr PV >}} export before it ever reaches the transformer, so higher demand *lowers* both transformer utilization and worst-case voltage, 17.62% against 22.69-22.82% at 80% penetration. This is the same real compensatory mechanism Part 5 Chapter 1 already found between {{< acr PV >}} and {{< acr EV >}} activity [@fias2025uncertainty], now showing up between forecast demand and {{< acr PV >}} export instead.
+
+<div class='ark-concept'>
+
+<span class='ark-concept-title'><i class="bi bi-info-circle-fill"></i> Key Concept</span>
+
+Voltage rise from {{< acr PV >}} export is not a function of a customer's own {{< acr PV >}} output alone; it depends on the *net* injection at that customer's own bus, generation minus local demand. The linearized branch-flow approximation Baran and Wu introduced for radial distribution networks [@baran1989capacitors] makes this precise, the standard explanatory lens for this mechanism, not the literal equation the OpenDSS solve above performs, which is a full nonlinear AC power flow. For a bus $i$ with resistance $R_i$ and reactance $X_i$ back to the source:
+$$
+\Delta V_i \approx \frac{R_i P_{net,i} + X_i Q_{net,i}}{V_{nominal}}
+$$
+$$
+P_{net,i} = P_{PV,i} - P_{load,i}
+$$
+Two customers with identical {{< acr PV >}} systems can see very different voltage rises purely because their own local demand differs. A customer whose demand nearly matches their {{< acr PV >}} export has $P_{net,i} \approx 0$ and barely moves the local voltage; the same {{< acr PV >}} output with little local demand pushes nearly the full output onto the network as $P_{net,i}$, and $\Delta V_i$ rises accordingly. A forecast's upper-demand scenario raises $P_{load,i}$, which lowers $P_{net,i}$ for a fixed {{< acr PV >}} export, which lowers $\Delta V_i$: the opposite of what "higher demand means worse" naively expects, once real {{< acr PV >}} export is actually on the feeder.
+
+</div>
+
+![Why a customer's own local demand offsets PV export at the point of common coupling. Left: low local demand, most of a fixed PV export flows onto the network unopposed, a large net injection and a large voltage rise. Right: the same fixed PV export, but high local demand consumes most of it locally first, a small net injection and a small voltage rise, the mechanism behind the reversal above.](../../assets/net-injection-offset.svg){#fig-net-injection-offset}
+
+A {{< acr DSO >}} that reflexively treats a forecast's upper quantile as the universal worst case for every constraint gets this backwards at high {{< acr PV >}} penetration; which quantile is actually the risk depends on which constraint, and how much {{< acr PV >}} is already on the feeder, not on "higher demand" as a blanket rule.
 
 ## Does a rule-based mitigation lever fix the real worst case?
 
 Because the upper quantile is not automatically the worst case, this section identifies the *actual* worst-case load source at the shared 80% breach penetration, historical replay, marginally the highest of the three at 1.1047 pu, rather than assuming it is the upper-quantile scenario in advance. Part 4 Chapter 2's own two real inverter-control levers, Volt-Watt and Volt-VAr, apply unchanged.
 
 {{< embed 05-what-if-scenario-analysis-code.ipynb#fab5538d >}}
+
+{{< embed 05-what-if-scenario-analysis-code.ipynb#edfce984 >}}
 
 Both levers fix the real worst case: Volt-Watt brings the feeder to 1.0878 pu, Volt-VAr further still to 1.0710 pu, both back under the 1.10 pu limit with no new customer, no new equipment, no change to the {{< acr PV >}} penetration level itself. The same real finding Part 4 Chapter 2 already reported, now confirmed against a forecast-identified worst case rather than only a historical one.
 
