@@ -1,0 +1,1427 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.9.38">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="description" content="A structured, project-based path through smart meter data: disaggregation, forecasting, anomaly detection, and grid-edge value, from raw signal to business insight.">
+
+<title>Part 5 Chapter 6: Can Smart-Meter Readings Fill In What the Grid Cannot See – Machine Learning for Smart Meter Data</title>
+<style>
+/* Default styles provided by pandoc.
+** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+*/
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for citations */
+div.csl-bib-body { }
+div.csl-entry {
+  clear: both;
+  margin-bottom: 0em;
+}
+.hanging-indent div.csl-entry {
+  margin-left:2em;
+  text-indent:-2em;
+}
+div.csl-left-margin {
+  min-width:2em;
+  float:left;
+}
+div.csl-right-inline {
+  margin-left:2em;
+  padding-left:1em;
+}
+div.csl-indent {
+  margin-left: 2em;
+}</style>
+
+
+<script src="https://cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.min.js" integrity="sha384-ZvpUoO/+PpLXR1lu4jmpXWu80pZlYUAfxl5NsBMWOEPSjUn/6Z/hRTt8+pR6L4N2" crossorigin="anonymous"></script><script src="../../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../../">
+<link href="../../about.html" rel="next">
+<link href="../../book/05-forecasting/05-what-if-scenario-analysis.html" rel="prev">
+<link href="../../assets/favicon.svg" rel="icon" type="image/svg+xml">
+<script src="../../site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="../../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="../../site_libs/quarto-html/popper.min.js"></script>
+<script src="../../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-de63f62b328812d8e578a4d74e282472.css" rel="stylesheet" class="quarto-color-scheme" id="quarto-text-highlighting-styles">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-dark-6b6957c917596b414ec0b78690761e87.css" rel="stylesheet" class="quarto-color-scheme quarto-color-alternate" id="quarto-text-highlighting-styles">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-de63f62b328812d8e578a4d74e282472.css" rel="stylesheet" class="quarto-color-scheme-extra" id="quarto-text-highlighting-styles">
+<script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../../site_libs/bootstrap/bootstrap-9661ac00a33b6c2a7ffb2cb4cb9f2155.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
+<link href="../../site_libs/bootstrap/bootstrap-dark-9b208294319f478b9205897e46a7db35.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="dark">
+<link href="../../site_libs/bootstrap/bootstrap-9661ac00a33b6c2a7ffb2cb4cb9f2155.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme-extra" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+<script src="https://cdn.jsdelivr.net/npm/requirejs@2.3.6/require.min.js" integrity="sha384-c9c+LnTbwQ3aujuU7ULEPVvgLs+Fn6fJUvIGTsuu1ZcCf11fiEubah0ttpca4ntM sha384-6V1/AdqZRWk1KAlWbKBlGhN7VG4iE/yAZcO6NZPMF8od0vukrvr0tg4qY6NSrItx" crossorigin="anonymous"></script>
+
+<script type="application/javascript">define('jquery', [],function() {return window.jQuery;})</script>
+
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script defer="" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN" && texText && texText.data) {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+<meta property="og:title" content="Part 5 Chapter 6: Can Smart-Meter Readings Fill In What the Grid Cannot See – Machine Learning for Smart Meter Data">
+<meta property="og:description" content="A structured, project-based path through smart meter data: disaggregation, forecasting, anomaly detection, and grid-edge value, from raw signal to business insight.">
+<meta property="og:image" content="https://sambaiga.github.io/ml-energy-disaggregation/assets/pseudo-measurement-observability.svg">
+<meta property="og:site_name" content="Machine Learning for Smart Meter Data">
+<meta name="twitter:title" content="Part 5 Chapter 6: Can Smart-Meter Readings Fill In What the Grid Cannot See – Machine Learning for Smart Meter Data">
+<meta name="twitter:description" content="A structured, project-based path through smart meter data: disaggregation, forecasting, anomaly detection, and grid-edge value, from raw signal to business insight.">
+<meta name="twitter:image" content="https://sambaiga.github.io/ml-energy-disaggregation/assets/pseudo-measurement-observability.svg">
+<meta name="twitter:card" content="summary_large_image">
+</head>
+
+<body class="nav-sidebar floating nav-fixed quarto-light"><script id="quarto-html-before-body" type="application/javascript">
+    const toggleBodyColorMode = (bsSheetEl) => {
+      const mode = bsSheetEl.getAttribute("data-mode");
+      const bodyEl = window.document.querySelector("body");
+      if (mode === "dark") {
+        bodyEl.classList.add("quarto-dark");
+        bodyEl.classList.remove("quarto-light");
+      } else {
+        bodyEl.classList.add("quarto-light");
+        bodyEl.classList.remove("quarto-dark");
+      }
+    }
+    const toggleBodyColorPrimary = () => {
+      const bsSheetEl = window.document.querySelector("link#quarto-bootstrap:not([rel=disabled-stylesheet])");
+      if (bsSheetEl) {
+        toggleBodyColorMode(bsSheetEl);
+      }
+    }
+    const setColorSchemeToggle = (alternate) => {
+      const toggles = window.document.querySelectorAll('.quarto-color-scheme-toggle');
+      for (let i=0; i < toggles.length; i++) {
+        const toggle = toggles[i];
+        if (toggle) {
+          if (alternate) {
+            toggle.classList.add("alternate");
+          } else {
+            toggle.classList.remove("alternate");
+          }
+        }
+      }
+    };
+    const toggleColorMode = (alternate) => {
+      // Switch the stylesheets
+      const primaryStylesheets = window.document.querySelectorAll('link.quarto-color-scheme:not(.quarto-color-alternate)');
+      const alternateStylesheets = window.document.querySelectorAll('link.quarto-color-scheme.quarto-color-alternate');
+      manageTransitions('#quarto-margin-sidebar .nav-link', false);
+      if (alternate) {
+        // note: dark is layered on light, we don't disable primary!
+        enableStylesheet(alternateStylesheets);
+        for (const sheetNode of alternateStylesheets) {
+          if (sheetNode.id === "quarto-bootstrap") {
+            toggleBodyColorMode(sheetNode);
+          }
+        }
+      } else {
+        disableStylesheet(alternateStylesheets);
+        enableStylesheet(primaryStylesheets)
+        toggleBodyColorPrimary();
+      }
+      manageTransitions('#quarto-margin-sidebar .nav-link', true);
+      // Switch the toggles
+      setColorSchemeToggle(alternate)
+      // Hack to workaround the fact that safari doesn't
+      // properly recolor the scrollbar when toggling (#1455)
+      if (navigator.userAgent.indexOf('Safari') > 0 && navigator.userAgent.indexOf('Chrome') == -1) {
+        manageTransitions("body", false);
+        window.scrollTo(0, 1);
+        setTimeout(() => {
+          window.scrollTo(0, 0);
+          manageTransitions("body", true);
+        }, 40);
+      }
+    }
+    const disableStylesheet = (stylesheets) => {
+      for (let i=0; i < stylesheets.length; i++) {
+        const stylesheet = stylesheets[i];
+        stylesheet.rel = 'disabled-stylesheet';
+      }
+    }
+    const enableStylesheet = (stylesheets) => {
+      for (let i=0; i < stylesheets.length; i++) {
+        const stylesheet = stylesheets[i];
+        if(stylesheet.rel !== 'stylesheet') { // for Chrome, which will still FOUC without this check
+          stylesheet.rel = 'stylesheet';
+        }
+      }
+    }
+    const manageTransitions = (selector, allowTransitions) => {
+      const els = window.document.querySelectorAll(selector);
+      for (let i=0; i < els.length; i++) {
+        const el = els[i];
+        if (allowTransitions) {
+          el.classList.remove('notransition');
+        } else {
+          el.classList.add('notransition');
+        }
+      }
+    }
+    const isFileUrl = () => {
+      return window.location.protocol === 'file:';
+    }
+    const hasAlternateSentinel = () => {
+      let styleSentinel = getColorSchemeSentinel();
+      if (styleSentinel !== null) {
+        return styleSentinel === "alternate";
+      } else {
+        return false;
+      }
+    }
+    const setStyleSentinel = (alternate) => {
+      const value = alternate ? "alternate" : "default";
+      if (!isFileUrl()) {
+        window.localStorage.setItem("quarto-color-scheme", value);
+      } else {
+        localAlternateSentinel = value;
+      }
+    }
+    const getColorSchemeSentinel = () => {
+      if (!isFileUrl()) {
+        const storageValue = window.localStorage.getItem("quarto-color-scheme");
+        return storageValue != null ? storageValue : localAlternateSentinel;
+      } else {
+        return localAlternateSentinel;
+      }
+    }
+    const toggleGiscusIfUsed = (isAlternate, darkModeDefault) => {
+      const baseTheme = document.querySelector('#giscus-base-theme')?.value ?? 'light';
+      const alternateTheme = document.querySelector('#giscus-alt-theme')?.value ?? 'dark';
+      let newTheme = '';
+      if(authorPrefersDark) {
+        newTheme = isAlternate ? baseTheme : alternateTheme;
+      } else {
+        newTheme = isAlternate ? alternateTheme : baseTheme;
+      }
+      const changeGiscusTheme = () => {
+        // From: https://github.com/giscus/giscus/issues/336
+        const sendMessage = (message) => {
+          const iframe = document.querySelector('iframe.giscus-frame');
+          if (!iframe) return;
+          iframe.contentWindow.postMessage({ giscus: message }, 'https://giscus.app');
+        }
+        sendMessage({
+          setConfig: {
+            theme: newTheme
+          }
+        });
+      }
+      const isGiscussLoaded = window.document.querySelector('iframe.giscus-frame') !== null;
+      if (isGiscussLoaded) {
+        changeGiscusTheme();
+      }
+    };
+    const authorPrefersDark = false;
+    const darkModeDefault = authorPrefersDark;
+      document.querySelector('link#quarto-text-highlighting-styles.quarto-color-scheme-extra').rel = 'disabled-stylesheet';
+      document.querySelector('link#quarto-bootstrap.quarto-color-scheme-extra').rel = 'disabled-stylesheet';
+    let localAlternateSentinel = darkModeDefault ? 'alternate' : 'default';
+    // Dark / light mode switch
+    window.quartoToggleColorScheme = () => {
+      // Read the current dark / light value
+      let toAlternate = !hasAlternateSentinel();
+      toggleColorMode(toAlternate);
+      setStyleSentinel(toAlternate);
+      toggleGiscusIfUsed(toAlternate, darkModeDefault);
+      window.dispatchEvent(new Event('resize'));
+    };
+    // Switch to dark mode if need be
+    if (hasAlternateSentinel()) {
+      toggleColorMode(true);
+    } else {
+      toggleColorMode(false);
+    }
+  </script>
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+    <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container mx-auto">
+    <a class="navbar-brand" href="../../index.html">
+    <span class="navbar-title">Machine Learning for Smart Meter Data</span>
+    </a>
+  </div>
+            <div id="quarto-search" class="" title="Search"></div>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" role="menu" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav navbar-nav-scroll ms-auto">
+  <li class="nav-item compact">
+    <a class="nav-link" href="mailto:sambaiga@gmail.com"> <i class="bi bi-envelope-at" role="img" aria-label="Email Anthony Faustine">
+</i> 
+<span class="menu-text"></span></a>
+  </li>  
+  <li class="nav-item compact">
+    <a class="nav-link" href="https://www.linkedin.com/in/sambaiga"> <i class="bi bi-linkedin" role="img" aria-label="LinkedIn">
+</i> 
+<span class="menu-text"></span></a>
+  </li>  
+  <li class="nav-item compact">
+    <a class="nav-link" href="https://github.com/sambaiga/ml-energy-disaggregation"> <i class="bi bi-github" role="img" aria-label="View source on GitHub">
+</i> 
+<span class="menu-text"></span></a>
+  </li>  
+</ul>
+          </div> <!-- /navcollapse -->
+            <div class="quarto-navbar-tools">
+    <a href="https://github.com/sambaiga/ml-energy-disaggregation" title="Source Code" class="quarto-navigation-tool px-1" aria-label="Source Code"><i class="bi bi-github"></i></a>
+  <a href="" class="quarto-color-scheme-toggle quarto-navigation-tool  px-1" onclick="window.quartoToggleColorScheme(); return false;" title="Toggle dark mode"><i class="bi"></i></a>
+</div>
+      </div> <!-- /container-fluid -->
+    </nav>
+  <nav class="quarto-secondary-nav">
+    <div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
+      </button>
+        <a class="flex-grow-1 no-decor" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+          <h1 class="quarto-secondary-nav-title"><span class="chapter-title">Part 5 Chapter 6: Can Smart-Meter Readings Fill In What the Grid Cannot See</span></h1>
+        </a>     
+    </div>
+  </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation floating overflow-auto">
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../index.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">Welcome</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../preface.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">Preface</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../how-to-use.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">How to Use This Book</span></a>
+  </div>
+</li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="false">
+ <span class="menu-text">Part 3: Disaggregation</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="false" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../book/03-disaggregation/01-what-is-nilm.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">Chapter 1: Non-Intrusive Load Monitoring</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../book/03-disaggregation/02-feature-engineering.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">Chapter 2: Appliance Recognition</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../book/03-disaggregation/03-multi-appliance-recognition.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">Chapter 3: Multi-Appliance Recognition</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../book/03-disaggregation/04-multi-task-low-frequency.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">Chapter 4: Multi-Task Deep Learning at Low Frequency</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="false">
+ <span class="menu-text">Part 4: Grid-Edge Value</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="false" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth1 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../book/04-grid-edge/01-opendss-lv-modeling.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">Chapter 1: Modeling the Low-Voltage Network</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../book/04-grid-edge/02-timeseries-der-modeling.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">Chapter 2: Time-Series Simulation and DER Modeling</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../book/04-grid-edge/03-phase-identification.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">Chapter 3: Phase Identification from Smart-Meter Data</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../book/04-grid-edge/04-customer-feeder-clustering.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">Chapter 4: Customer and Feeder Clustering</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../book/04-grid-edge/05-ranking-recommendation.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">Chapter 5: Ranking and Recommendation under DER</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../book/04-grid-edge/06-anomaly-detection.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">Chapter 6: Anomaly Detection Beyond the Meter</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="true">
+ <span class="menu-text">Part 5: Forecasting</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-3" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../book/05-forecasting/01-forecastability.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">Chapter 1: Household Smart-Meter Forecastability</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../book/05-forecasting/02-scaling-archetypes.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">Chapter 2: Scaling to Hundreds of Meters</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../book/05-forecasting/03-probabilistic-forecasting.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">Chapter 3: What a Probabilistic Forecast Is Actually Worth</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../book/05-forecasting/04-foundation-models.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">Part 5 Chapter 4: Do Foundation Models Fail Like Everything Else Does?</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../book/05-forecasting/05-what-if-scenario-analysis.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">Part 5 Chapter 5: What the Grid Actually Faces When These Forecasts Come True</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../book/05-forecasting/06-lv-state-estimation.html" class="sidebar-item-text sidebar-link active"><span class="chapter-title">Part 5 Chapter 6: Can Smart-Meter Readings Fill In What the Grid Cannot See</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../about.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">About the Author</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../acronyms.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">List of Acronyms</span></a>
+  </div>
+</li>
+    </ul>
+    </div>
+</nav>
+<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">In this chapter</h2>
+   
+  <ul>
+  <li><a href="#setup-a-second-power-flow-engine-for-one-real-reason" id="toc-setup-a-second-power-flow-engine-for-one-real-reason" class="nav-link active" data-scroll-target="#setup-a-second-power-flow-engine-for-one-real-reason">Setup: a second power-flow engine, for one real reason</a></li>
+  <li><a href="#converting-the-network-and-checking-the-conversion-before-trusting-it" id="toc-converting-the-network-and-checking-the-conversion-before-trusting-it" class="nav-link" data-scroll-target="#converting-the-network-and-checking-the-conversion-before-trusting-it">Converting the network, and checking the conversion before trusting it</a></li>
+  <li><a href="#ground-truth-what-a-fully-instrumented-network-would-show" id="toc-ground-truth-what-a-fully-instrumented-network-would-show" class="nav-link" data-scroll-target="#ground-truth-what-a-fully-instrumented-network-would-show">Ground truth: what a fully-instrumented network would show</a></li>
+  <li><a href="#can-a-substation-only-dso-solve-this-at-all" id="toc-can-a-substation-only-dso-solve-this-at-all" class="nav-link" data-scroll-target="#can-a-substation-only-dso-solve-this-at-all">Can a substation-only DSO solve this at all?</a></li>
+  <li><a href="#smart-meter-readings-as-pseudo-measurements" id="toc-smart-meter-readings-as-pseudo-measurements" class="nav-link" data-scroll-target="#smart-meter-readings-as-pseudo-measurements">Smart-meter readings as pseudo-measurements</a></li>
+  <li><a href="#does-partial-smart-meter-coverage-work" id="toc-does-partial-smart-meter-coverage-work" class="nav-link" data-scroll-target="#does-partial-smart-meter-coverage-work">Does partial smart-meter coverage work?</a></li>
+  <li><a href="#a-few-real-sensors-instead-of-chasing-full-coverage" id="toc-a-few-real-sensors-instead-of-chasing-full-coverage" class="nav-link" data-scroll-target="#a-few-real-sensors-instead-of-chasing-full-coverage">A few real sensors, instead of chasing full coverage</a></li>
+  <li><a href="#why-bother" id="toc-why-bother" class="nav-link" data-scroll-target="#why-bother">Why bother</a></li>
+  <li><a href="#where-this-leaves-part-5" id="toc-where-this-leaves-part-5" class="nav-link" data-scroll-target="#where-this-leaves-part-5">Where this leaves Part 5</a></li>
+  <li><a href="#references" id="toc-references" class="nav-link" data-scroll-target="#references">References</a></li>
+  </ul>
+<div class="toc-actions"><ul><li><a href="https://github.com/sambaiga/ml-energy-disaggregation/edit/main/book/05-forecasting/06-lv-state-estimation.qmd" class="toc-action"><i class="bi bi-github"></i>Edit this page</a></li><li><a href="https://github.com/sambaiga/ml-energy-disaggregation/issues/new" class="toc-action"><i class="bi empty"></i>Report an issue</a></li><li><a href="https://github.com/sambaiga/ml-energy-disaggregation/blob/main/book/05-forecasting/06-lv-state-estimation.qmd" class="toc-action"><i class="bi empty"></i>View source</a></li></ul></div></nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title d-none d-lg-block"><span class="chapter-title">Part 5 Chapter 6: Can Smart-Meter Readings Fill In What the Grid Cannot See</span></h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<p>Every earlier chapter in this part assumed the network’s own state was already known. Part 4 solved it directly with OpenDSS; Part 5 Chapter 5 swept it across scenarios. Real low-voltage networks do not hand that over for free. Below the substation, most real feeders have no real-time telemetry at all: a <a href="#acronyms_DSO">Distribution System Operator (DSO)</a> often cannot say what a specific customer’s own bus voltage is right now without a truck roll. Distribution System State Estimation (<a href="#acronyms_DSSE">Distribution System State Estimation (DSSE)</a>) is the established technique for inferring a network’s full state from whatever real measurements exist, plus a network model. The real, checkable question this chapter asks: can smart-meter readings, treated honestly as imperfect pseudo-measurements, serve as that missing data, and how much of it is actually needed?</p>
+<p>Three chained questions structure what follows:</p>
+<ul>
+<li>Can a <a href="#acronyms_DSO">DSO</a> with only substation-level telemetry, the real, typical starting point below the substation, run state estimation on this feeder at all?</li>
+<li>Do smart-meter readings, treated as real pseudo-measurements rather than assumed to work, restore that ability, and how much coverage does it actually take?</li>
+<li>Is a handful of real branch-level sensors a genuine substitute for the last mile of that coverage, or does that assumption need checking too?</li>
+</ul>
+<section id="setup-a-second-power-flow-engine-for-one-real-reason" class="level2">
+<h2 class="anchored" data-anchor-id="setup-a-second-power-flow-engine-for-one-real-reason">Setup: a second power-flow engine, for one real reason</h2>
+<p>OpenDSS, this book’s own power-flow engine everywhere else, has no real <a href="#acronyms_WLS">Weighted Least Squares (WLS)</a> state-estimation module of its own; its own documentation says as much directly, only a narrower load-allocation feature exists <span class="citation" data-cites="opendss-stateestimation">[1]</span>. <code>pandapower</code> does have one, <code>pandapower.estimation</code>, real and well-established since Schweppe and Wildes first formalized the problem <span class="citation" data-cites="schweppe1970stateestimation">[2]</span>, so this chapter adds it as a second, narrowly-scoped dependency, reusing Part 4’s own AusNet network model rather than building a new one.</p>
+<div class="ark-concept">
+<p><span class="ark-concept-title"><i class="bi bi-info-circle-fill"></i> Key Concept</span></p>
+<p>Weighted-least-squares state estimation finds the state <span class="math inline">\(x\)</span>, voltage magnitude and angle at every bus, that best explains a real, noisy set of measurements <span class="math inline">\(z\)</span>, minimizing <span class="math display">\[
+J(x) = \sum_i \frac{\big(z_i - h_i(x)\big)^2}{\sigma_i^2}
+\]</span> where <span class="math inline">\(h_i(x)\)</span> is what measurement <span class="math inline">\(i\)</span> would read given state <span class="math inline">\(x\)</span>, computed directly from the same real power-flow equations OpenDSS solves, and <span class="math inline">\(\sigma_i\)</span> is that measurement’s own assumed uncertainty, a real substation voltage transformer trusted far more than a periodic smart-meter reading. A real measurement and a pseudo-measurement enter this same objective identically; the only difference is <span class="math inline">\(\sigma_i\)</span>, honestly reflecting how much that source is actually worth trusting. This only has a real solution at all when the network is <em>observable</em>: at least as many independent measurements as unknown states, <span class="math inline">\(2N - 1\)</span> for <span class="math inline">\(N\)</span> buses (voltage magnitude and angle at every bus but the slack reference, whose own angle is fixed by definition) <span class="citation" data-cites="schweppe1970stateestimation">[2]</span>, not a fixed absolute count but one this chapter’s own network genuinely has to clear.</p>
+</div>
+<div id="fig-pseudo-measurement-observability" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-pseudo-measurement-observability-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="../../assets/pseudo-measurement-observability.svg" class="img-fluid figure-img">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-pseudo-measurement-observability-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;19.1: Why smart-meter readings can turn an unobservable feeder into an observable one. Left: a substation with its own real telemetry, and every customer bus downstream genuinely unknown, the real starting point for most real low-voltage feeders. Right: the same one real substation measurement, but every customer’s own smart-meter reading now treated as a real pseudo-measurement, turning an unobservable network into one a real WLS estimator can actually solve.
+</figcaption>
+</figure>
+</div>
+<div class="quarto-embed-nb-cell" data-notebook="/home/runner/work/ml-energy-disaggregation/ml-energy-disaggregation/book/05-forecasting/06-lv-state-estimation-code.ipynb" data-notebook-title="Can Smart-Meter Readings Fill In What the Grid Cannot See" data-notebook-cellid="afc8d171">
+<div id="afc8d171" class="cell">
+<div class="cell-output cell-output-stdout">
+<pre><code>load_data: (342, 365, 48) (customers, days, half-hours)</code></pre>
+</div>
+</div>
+</div>
+</section>
+<section id="converting-the-network-and-checking-the-conversion-before-trusting-it" class="level2">
+<h2 class="anchored" data-anchor-id="converting-the-network-and-checking-the-conversion-before-trusting-it">Converting the network, and checking the conversion before trusting it</h2>
+<p><code>from_opendss</code> builds a balanced, positive-sequence <code>pandapower</code> network directly from the same real <code>LVcircuit-master.txt</code> Part 4 and Part 5 Chapter 5 both use, no hand-rolled bus-by-bus translation needed. Two real issues surfaced when this was checked directly against OpenDSS’s own solve, rather than trusted on faith. First, the converter needs <code>Set VoltageBases</code>/<code>CalcVoltageBases</code> already applied, the same step this book’s own <code>Circuit.load()</code> wrapper already runs; without it, every bus loses its voltage base and the transformer gets silently dropped. Second, even with that fixed, the converter assigns the transformer’s own secondary rating from the declared system voltage base (0.400 kV) instead of the transformer’s own real nameplate rating, confirmed directly from <code>LVcircuit-transformers.txt</code>’s own <code>kVs=[22 0.433]</code>, an 8% voltage error otherwise.</p>
+<div class="quarto-embed-nb-cell" data-notebook="/home/runner/work/ml-energy-disaggregation/ml-energy-disaggregation/book/05-forecasting/06-lv-state-estimation-code.ipynb" data-notebook-title="Can Smart-Meter Readings Fill In What the Grid Cannot See" data-notebook-cellid="09040d11">
+<div id="09040d11" class="cell">
+<div class="cell-output cell-output-stdout">
+<pre><code>pandapower vm_pu at bus_mg1_t1: 1.080671
+OpenDSS-solved vm_pu at bus_mg1_t1:  1.080649
+n_bus=61, n_line=59, n_load=31, n_trafo=1</code></pre>
+</div>
+</div>
+</div>
+<p>Both fixes are verified, not assumed: with the network’s own nominal placeholder loads (no real customer data applied yet), <code>pandapower</code>’s own re-solved voltage matches OpenDSS’s own solve to four decimal places.</p>
+</section>
+<section id="ground-truth-what-a-fully-instrumented-network-would-show" class="level2">
+<h2 class="anchored" data-anchor-id="ground-truth-what-a-fully-instrumented-network-would-show">Ground truth: what a fully-instrumented network would show</h2>
+<p>A real customer-to-bus assignment, the same convention Part 5 Chapter 5 already uses, and one real test-day, evening-peak half-hour.</p>
+<div class="quarto-embed-nb-cell" data-notebook="/home/runner/work/ml-energy-disaggregation/ml-energy-disaggregation/book/05-forecasting/06-lv-state-estimation-code.ipynb" data-notebook-title="Can Smart-Meter Readings Fill In What the Grid Cannot See" data-notebook-cellid="4a4d6fe1">
+<div id="4a4d6fe1" class="cell">
+<div class="cell-output cell-output-stdout">
+<pre><code>real evening-peak load, 31 customers, total 13.2 kW
+true voltage range: 1.0000 - 1.0818 pu</code></pre>
+</div>
+</div>
+</div>
+<p>Solving the converted network with every real load in place gives the one thing a real <a href="#acronyms_DSO">DSO</a> never has directly: the true voltage at every single bus, used below only to check each scenario’s own estimate against, never fed to the estimator itself.</p>
+</section>
+<section id="can-a-substation-only-dso-solve-this-at-all" class="level2">
+<h2 class="anchored" data-anchor-id="can-a-substation-only-dso-solve-this-at-all">Can a substation-only DSO solve this at all?</h2>
+<p><code>zero_injection</code> lets the <a href="#acronyms_WLS">WLS</a> solver treat every real junction bus with no customer of its own, confirmed directly from the network’s own topology (29 of them here), as an exact constraint rather than an unknown, real structure this network already has, not an assumption. Even with that structure exploited, a <a href="#acronyms_DSO">DSO</a> with only its own substation-level voltage and power telemetry is checked directly against the real observability requirement above rather than assumed to clear it.</p>
+<div class="quarto-embed-nb-cell" data-notebook="/home/runner/work/ml-energy-disaggregation/ml-energy-disaggregation/book/05-forecasting/06-lv-state-estimation-code.ipynb" data-notebook-title="Can Smart-Meter Readings Fill In What the Grid Cannot See" data-notebook-cellid="336b8f48">
+<div id="336b8f48" class="cell">
+<div class="cell-output cell-output-stdout">
+<pre><code>real junction buses with no customer of their own: 29</code></pre>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code>observable with substation telemetry alone: False</code></pre>
+</div>
+</div>
+</div>
+<p>No: this feeder’s own real topology needs real information at every one of its 31 real customer buses, or an explicit zero-injection exemption, and a real substation-only <a href="#acronyms_DSO">DSO</a> has neither for any of them. This is not a noisy or imprecise estimate, it is no estimate at all; the <a href="#acronyms_WLS">WLS</a> solver has no way to resolve the state even in principle.</p>
+</section>
+<section id="smart-meter-readings-as-pseudo-measurements" class="level2">
+<h2 class="anchored" data-anchor-id="smart-meter-readings-as-pseudo-measurements">Smart-meter readings as pseudo-measurements</h2>
+<p>Each real customer’s own smart-meter reading, real active and reactive power consumption, becomes a pseudo-measurement at that customer’s own bus, not a voltage reading real household smart meters do not usually report. A real 10% uncertainty band reflects that these are periodic <a href="#acronyms_AMI">Advanced Metering Infrastructure (AMI)</a> readings, not real-time <a href="#acronyms_SCADA">Supervisory Control and Data Acquisition (SCADA)</a>-grade telemetry, a genuinely different, less trustworthy kind of measurement than the substation’s own.</p>
+<div class="quarto-embed-nb-cell" data-notebook="/home/runner/work/ml-energy-disaggregation/ml-energy-disaggregation/book/05-forecasting/06-lv-state-estimation-code.ipynb" data-notebook-title="Can Smart-Meter Readings Fill In What the Grid Cannot See" data-notebook-cellid="d79076cb">
+<div id="d79076cb" class="cell">
+<div class="cell-output cell-output-stdout">
+<pre><code>observable with full smart-meter coverage: True
+RMSE against true voltage: 0.0034 pu, max error: 0.0043 pu</code></pre>
+</div>
+</div>
+</div>
+<p>Real smart-meter pseudo-measurements, at every real customer bus, do restore observability, and the resulting estimate is genuinely accurate: well within a tenth of a percent of true voltage at every bus. The real, more useful question is how much of that coverage is actually needed, checked directly below rather than assumed to scale smoothly.</p>
+</section>
+<section id="does-partial-smart-meter-coverage-work" class="level2">
+<h2 class="anchored" data-anchor-id="does-partial-smart-meter-coverage-work">Does partial smart-meter coverage work?</h2>
+<div class="quarto-embed-nb-cell" data-notebook="/home/runner/work/ml-energy-disaggregation/ml-energy-disaggregation/book/05-forecasting/06-lv-state-estimation-code.ipynb" data-notebook-title="Can Smart-Meter Readings Fill In What the Grid Cannot See" data-notebook-cellid="f473a8b2">
+<div id="f473a8b2" class="cell">
+<div class="cell-output cell-output-display">
+<div id="tphccpelzf" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:100%;height:auto;">
+<style>
+#tphccpelzf table {
+          font-family: 'Libre Franklin', 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+          -webkit-font-smoothing: antialiased;
+          -moz-osx-font-smoothing: grayscale;
+        }
+
+#tphccpelzf thead, tbody, tfoot, tr, td, th { border-style: none !important; }
+ tr { background-color: transparent !important; }
+#tphccpelzf p { margin: 0 !important; padding: 0 !important; }
+ #tphccpelzf .gt_table { display: table !important; border-collapse: collapse !important; line-height: normal !important; margin-left: auto !important; margin-right: auto !important; color: #171717 !important; font-size: 13px !important; font-weight: normal !important; font-style: normal !important; background-color: #FFFFFF !important; width: 100% !important; border-top-style: solid !important; border-top-width: 2px !important; border-top-color: #0369A1 !important; border-right-style: none !important; border-right-width: 2px !important; border-right-color: #D3D3D3 !important; border-bottom-style: solid !important; border-bottom-width: 1px !important; border-bottom-color: #0369A1 !important; border-left-style: none !important; border-left-width: 2px !important; border-left-color: #D3D3D3 !important; }
+ #tphccpelzf .gt_caption { padding-top: 4px !important; padding-bottom: 4px !important; }
+ #tphccpelzf .gt_title { color: #171717 !important; font-size: 16px !important; font-weight: bold !important; padding-top: 10px !important; padding-bottom: 10px !important; padding-left: 5px !important; padding-right: 5px !important; border-bottom-color: #FFFFFF !important; border-bottom-width: 0 !important; }
+ #tphccpelzf .gt_subtitle { color: #171717 !important; font-size: 13px !important; font-weight: initial !important; padding-top: 9px !important; padding-bottom: 11px !important; padding-left: 5px !important; padding-right: 5px !important; border-top-color: #FFFFFF !important; border-top-width: 0 !important; }
+ #tphccpelzf .gt_heading { background-color: #FFFFFF !important; text-align: center !important; border-bottom-color: #FFFFFF !important; border-left-style: none !important; border-left-width: 1px !important; border-left-color: #D3D3D3 !important; border-right-style: none !important; border-right-width: 1px !important; border-right-color: #D3D3D3 !important; }
+ #tphccpelzf .gt_bottom_border { border-bottom-style: solid !important; border-bottom-width: 2px !important; border-bottom-color: #D3D3D3 !important; }
+ #tphccpelzf .gt_col_headings { border-top-style: solid !important; border-top-width: 2px !important; border-top-color: #D3D3D3 !important; border-bottom-style: solid !important; border-bottom-width: 1px !important; border-bottom-color: #D3D3D3 !important; border-left-style: none !important; border-left-width: 1px !important; border-left-color: #D3D3D3 !important; border-right-style: none !important; border-right-width: 1px !important; border-right-color: #D3D3D3 !important; }
+ #tphccpelzf .gt_col_heading { color: #FFFFFF !important; background-color: #0369A1 !important; font-size: 13px !important; font-weight: bold !important; text-transform: inherit !important; border-left-style: none !important; border-left-width: 1px !important; border-left-color: #D3D3D3 !important; border-right-style: none !important; border-right-width: 1px !important; border-right-color: #D3D3D3 !important; vertical-align: bottom !important; padding-top: 9px !important; padding-bottom: 11px !important; padding-left: 5px !important; padding-right: 5px !important; overflow-x: hidden !important; }
+ #tphccpelzf .gt_column_spanner_outer { color: #FFFFFF !important; background-color: #0369A1 !important; font-size: 13px !important; font-weight: bold !important; text-transform: inherit !important; padding-top: 0 !important; padding-bottom: 0 !important; padding-left: 4px !important; padding-right: 4px !important; }
+ #tphccpelzf .gt_column_spanner_outer:first-child { padding-left: 0 !important; }
+ #tphccpelzf .gt_column_spanner_outer:last-child { padding-right: 0 !important; }
+ #tphccpelzf .gt_column_spanner { border-bottom-style: solid !important; border-bottom-width: 1px !important; border-bottom-color: #D3D3D3 !important; vertical-align: bottom !important; padding-top: 9px !important; padding-bottom: 9px !important; overflow-x: hidden !important; display: inline-block !important; width: 100% !important; }
+ #tphccpelzf .gt_spanner_row { border-bottom-style: hidden !important; }
+ #tphccpelzf .gt_group_heading { padding-top: 8px !important; padding-bottom: 8px !important; padding-left: 5px !important; padding-right: 5px !important; color: #171717 !important; background-color: #FFFFFF !important; font-size: 100% !important; font-weight: initial !important; text-transform: inherit !important; border-top-style: solid !important; border-top-width: 2px !important; border-top-color: #D3D3D3 !important; border-bottom-style: solid !important; border-bottom-width: 2px !important; border-bottom-color: #D3D3D3 !important; border-left-style: none !important; border-left-width: 1px !important; border-left-color: #D3D3D3 !important; border-right-style: none !important; border-right-width: 1px !important; border-right-color: #D3D3D3 !important; vertical-align: middle !important; text-align: left !important; }
+ #tphccpelzf .gt_empty_group_heading { padding: 0.5px !important; color: #171717 !important; background-color: #FFFFFF !important; font-size: 100% !important; font-weight: initial !important; border-top-style: solid !important; border-top-width: 2px !important; border-top-color: #D3D3D3 !important; border-bottom-style: solid !important; border-bottom-width: 2px !important; border-bottom-color: #D3D3D3 !important; vertical-align: middle !important; }
+ #tphccpelzf .gt_from_md> :first-child { margin-top: 0 !important; }
+ #tphccpelzf .gt_from_md> :last-child { margin-bottom: 0 !important; }
+ #tphccpelzf .gt_row { padding-top: 7px !important; padding-bottom: 7px !important; padding-left: 5px !important; padding-right: 5px !important; margin: 10px !important; border-top-style: solid !important; border-top-width: 1px !important; border-top-color: #D3D3D3 !important; border-left-style: none !important; border-left-width: 1px !important; border-left-color: #D3D3D3 !important; border-right-style: none !important; border-right-width: 1px !important; border-right-color: #D3D3D3 !important; vertical-align: middle !important; overflow-x: hidden !important; }
+ #tphccpelzf .gt_stub { color: #171717 !important; background-color: #FFFFFF !important; font-size: 100% !important; font-weight: initial !important; text-transform: inherit !important; border-right-style: solid !important; border-right-width: 2px !important; border-right-color: #D3D3D3 !important; padding-left: 5px !important; padding-right: 5px !important; }
+ #tphccpelzf .gt_stub_row_group { color: #171717 !important; background-color: #FFFFFF !important; font-size: 100% !important; font-weight: initial !important; text-transform: inherit !important; border-right-style: solid !important; border-right-width: 2px !important; border-right-color: #D3D3D3 !important; padding-left: 5px !important; padding-right: 5px !important; vertical-align: top !important; }
+ #tphccpelzf .gt_row_group_first td { border-top-width: 2px !important; }
+ #tphccpelzf .gt_row_group_first th { border-top-width: 2px !important; }
+ #tphccpelzf .gt_striped { color: #171717 !important; background-color: #F4F4F4 !important; }
+ #tphccpelzf .gt_table_body { border-top-style: solid !important; border-top-width: 2px !important; border-top-color: #D3D3D3 !important; border-bottom-style: solid !important; border-bottom-width: 1px !important; border-bottom-color: #DEE2E6 !important; }
+ #tphccpelzf .gt_summary_row { color: #171717 !important; background-color: #FFFFFF !important; text-transform: inherit !important; padding-top: 8px !important; padding-bottom: 8px !important; padding-left: 5px !important; padding-right: 5px !important; }
+ #tphccpelzf .gt_first_summary_row { border-top-style: solid !important; border-top-width: 2px !important; border-top-color: #D3D3D3 !important; }
+ #tphccpelzf .gt_last_summary_row_top { border-bottom-style: solid !important; border-bottom-width: 2px !important; border-bottom-color: #D3D3D3 !important; }
+ #tphccpelzf .gt_grand_summary_row { color: #171717 !important; background-color: #FFFFFF !important; text-transform: inherit !important; padding-top: 8px !important; padding-bottom: 8px !important; padding-left: 5px !important; padding-right: 5px !important; }
+ #tphccpelzf .gt_first_grand_summary_row_bottom { border-top-style: double !important; border-top-width: 6px !important; border-top-color: #D3D3D3 !important; }
+ #tphccpelzf .gt_last_grand_summary_row_top { border-bottom-style: double !important; border-bottom-width: 6px !important; border-bottom-color: #D3D3D3 !important; }
+ #tphccpelzf .gt_sourcenotes { color: #171717 !important; background-color: #FFFFFF !important; border-bottom-style: none !important; border-bottom-width: 2px !important; border-bottom-color: #D3D3D3 !important; border-left-style: none !important; border-left-width: 2px !important; border-left-color: #D3D3D3 !important; border-right-style: none !important; border-right-width: 2px !important; border-right-color: #D3D3D3 !important; }
+ #tphccpelzf .gt_sourcenote { font-size: 11px !important; padding-top: 6px !important; padding-bottom: 6px !important; padding-left: 5px !important; padding-right: 5px !important; text-align: left !important; }
+ #tphccpelzf .gt_left { text-align: left !important; }
+ #tphccpelzf .gt_center { text-align: center !important; }
+ #tphccpelzf .gt_right { text-align: right !important; font-variant-numeric: tabular-nums !important; }
+ #tphccpelzf .gt_font_normal { font-weight: normal !important; }
+ #tphccpelzf .gt_font_bold { font-weight: bold !important; }
+ #tphccpelzf .gt_font_italic { font-style: italic !important; }
+ #tphccpelzf .gt_super { font-size: 65% !important; }
+ #tphccpelzf .gt_footnotes { color: font-color(#FFFFFF) !important; background-color: #FFFFFF !important; border-bottom-style: none !important; border-bottom-width: 2px !important; border-bottom-color: #D3D3D3 !important; border-left-style: none !important; border-left-width: 2px !important; border-left-color: #D3D3D3 !important; border-right-style: none !important; border-right-width: 2px !important; border-right-color: #D3D3D3 !important; }
+ #tphccpelzf .gt_footnote { margin: 0px !important; font-size: 90% !important; padding-top: 4px !important; padding-bottom: 4px !important; padding-left: 5px !important; padding-right: 5px !important; }
+ #tphccpelzf .gt_sourcenotes { color: #171717 !important; background-color: #FFFFFF !important; border-bottom-style: none !important; border-bottom-width: 2px !important; border-bottom-color: #D3D3D3 !important; border-left-style: none !important; border-left-width: 2px !important; border-left-color: #D3D3D3 !important; border-right-style: none !important; border-right-width: 2px !important; border-right-color: #D3D3D3 !important; }
+ #tphccpelzf .gt_sourcenote { font-size: 11px !important; padding-top: 6px !important; padding-bottom: 6px !important; padding-left: 5px !important; padding-right: 5px !important; text-align: left !important; }
+ #tphccpelzf .gt_footnote_marks { font-size: 75% !important; vertical-align: 0.4em !important; position: initial !important; }
+ #tphccpelzf .gt_asterisk { font-size: 100% !important; vertical-align: 0 !important; }
+ 
+</style>
+
+<table class="gt_table caption-top table table-sm table-striped small" data-quarto-bootstrap="false">
+<thead>
+<tr class="gt_heading header">
+<td colspan="5" class="gt_heading gt_title gt_font_normal" style="color: #171717; font-weight: bold"><strong>Does Partial Smart-Meter Coverage Achieve Observability?</strong></td>
+</tr>
+<tr class="gt_col_headings even">
+<th id="Smart-meter-coverage" class="gt_col_heading gt_columns_bottom_border gt_right" data-quarto-table-cell-role="th" style="color: #FFFFFF; font-family: Jost" scope="col">Smart-meter coverage</th>
+<th id="Customers" class="gt_col_heading gt_columns_bottom_border gt_right" data-quarto-table-cell-role="th" style="color: #FFFFFF; font-family: Jost" scope="col">Customers</th>
+<th id="Observable" class="gt_col_heading gt_columns_bottom_border gt_center" data-quarto-table-cell-role="th" style="color: #FFFFFF; font-family: Jost" scope="col">Observable</th>
+<th id="Solved" class="gt_col_heading gt_columns_bottom_border gt_center" data-quarto-table-cell-role="th" style="color: #FFFFFF; font-family: Jost" scope="col">Solved</th>
+<th id="RMSE-(pu)" class="gt_col_heading gt_columns_bottom_border gt_right" data-quarto-table-cell-role="th" style="color: #FFFFFF; font-family: Jost" scope="col">RMSE (pu)</th>
+</tr>
+</thead>
+<tbody class="gt_table_body">
+<tr class="odd">
+<td class="gt_row gt_right">20%</td>
+<td class="gt_row gt_right">6/31</td>
+<td class="gt_row gt_center">False</td>
+<td class="gt_row gt_center">False</td>
+<td class="gt_row gt_right"><na></na></td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_right" style="background-color: #EAF3FA">30%</td>
+<td class="gt_row gt_right" style="background-color: #EAF3FA">9/31</td>
+<td class="gt_row gt_center" style="background-color: #EAF3FA">False</td>
+<td class="gt_row gt_center" style="background-color: #EAF3FA">False</td>
+<td class="gt_row gt_right" style="background-color: #EAF3FA"><na></na></td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_right">40%</td>
+<td class="gt_row gt_right">12/31</td>
+<td class="gt_row gt_center">False</td>
+<td class="gt_row gt_center">False</td>
+<td class="gt_row gt_right"><na></na></td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_right" style="background-color: #EAF3FA">50%</td>
+<td class="gt_row gt_right" style="background-color: #EAF3FA">16/31</td>
+<td class="gt_row gt_center" style="background-color: #EAF3FA">False</td>
+<td class="gt_row gt_center" style="background-color: #EAF3FA">False</td>
+<td class="gt_row gt_right" style="background-color: #EAF3FA"><na></na></td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_right">60%</td>
+<td class="gt_row gt_right">19/31</td>
+<td class="gt_row gt_center">False</td>
+<td class="gt_row gt_center">False</td>
+<td class="gt_row gt_right"><na></na></td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_right" style="background-color: #EAF3FA">70%</td>
+<td class="gt_row gt_right" style="background-color: #EAF3FA">22/31</td>
+<td class="gt_row gt_center" style="background-color: #EAF3FA">False</td>
+<td class="gt_row gt_center" style="background-color: #EAF3FA">False</td>
+<td class="gt_row gt_right" style="background-color: #EAF3FA"><na></na></td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_right">80%</td>
+<td class="gt_row gt_right">25/31</td>
+<td class="gt_row gt_center">False</td>
+<td class="gt_row gt_center">False</td>
+<td class="gt_row gt_right"><na></na></td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_right" style="background-color: #EAF3FA">90%</td>
+<td class="gt_row gt_right" style="background-color: #EAF3FA">28/31</td>
+<td class="gt_row gt_center" style="background-color: #EAF3FA">False</td>
+<td class="gt_row gt_center" style="background-color: #EAF3FA">False</td>
+<td class="gt_row gt_right" style="background-color: #EAF3FA"><na></na></td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_right">100%</td>
+<td class="gt_row gt_right">31/31</td>
+<td class="gt_row gt_center">True</td>
+<td class="gt_row gt_center">True</td>
+<td class="gt_row gt_right">0.0034507551783273245</td>
+</tr>
+</tbody><tfoot>
+<tr class="gt_sourcenotes odd">
+<td colspan="5" class="gt_sourcenote" style="color: #6B7280; font-style: italic"><span class="gt_from_md">Same real network, same real evening-peak load, coverage swept from 20% to 100%</span></td>
+</tr>
+</tfoot>
+
+</table>
+
+
+</div>
+</div>
+</div>
+</div>
+<p>Not smoothly: every coverage level below 100% fails to achieve observability, including 90%, a single real customer’s own unmeasured, non-zero consumption is enough to leave the system unsolvable, regardless of how many other customers are metered. Full smart-meter rollout is not a nice-to-have here, it is a hard requirement, at least for this specific approach of one pseudo-measurement per customer bus and nothing else.</p>
+</section>
+<section id="a-few-real-sensors-instead-of-chasing-full-coverage" class="level2">
+<h2 class="anchored" data-anchor-id="a-few-real-sensors-instead-of-chasing-full-coverage">A few real sensors, instead of chasing full coverage</h2>
+<p>A real <a href="#acronyms_DSO">DSO</a> rarely has full smart-meter rollout and nothing else; it is more likely to have partial <a href="#acronyms_AMI">AMI</a> coverage plus a handful of real branch-level power-flow sensors at key points in the feeder, the kind of investment an operator can actually make. Checked directly, and checked honestly: a single random draw per configuration turned out to be genuinely misleading here, since which specific customers happen to be metered and which specific branches happen to carry a sensor both matter, not just how many of each. Every configuration below is repeated across 8 real random draws, reporting how often it actually produces a usable estimate, not just whether one particular draw happened to.</p>
+<div class="quarto-embed-nb-cell" data-notebook="/home/runner/work/ml-energy-disaggregation/ml-energy-disaggregation/book/05-forecasting/06-lv-state-estimation-code.ipynb" data-notebook-title="Can Smart-Meter Readings Fill In What the Grid Cannot See" data-notebook-cellid="ab78c290">
+<div id="ab78c290" class="cell">
+<div class="cell-output cell-output-display">
+<div id="ayoycycbaa" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:100%;height:auto;">
+<style>
+#ayoycycbaa table {
+          font-family: 'Libre Franklin', 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+          -webkit-font-smoothing: antialiased;
+          -moz-osx-font-smoothing: grayscale;
+        }
+
+#ayoycycbaa thead, tbody, tfoot, tr, td, th { border-style: none !important; }
+ tr { background-color: transparent !important; }
+#ayoycycbaa p { margin: 0 !important; padding: 0 !important; }
+ #ayoycycbaa .gt_table { display: table !important; border-collapse: collapse !important; line-height: normal !important; margin-left: auto !important; margin-right: auto !important; color: #171717 !important; font-size: 13px !important; font-weight: normal !important; font-style: normal !important; background-color: #FFFFFF !important; width: 100% !important; border-top-style: solid !important; border-top-width: 2px !important; border-top-color: #0369A1 !important; border-right-style: none !important; border-right-width: 2px !important; border-right-color: #D3D3D3 !important; border-bottom-style: solid !important; border-bottom-width: 1px !important; border-bottom-color: #0369A1 !important; border-left-style: none !important; border-left-width: 2px !important; border-left-color: #D3D3D3 !important; }
+ #ayoycycbaa .gt_caption { padding-top: 4px !important; padding-bottom: 4px !important; }
+ #ayoycycbaa .gt_title { color: #171717 !important; font-size: 16px !important; font-weight: bold !important; padding-top: 10px !important; padding-bottom: 10px !important; padding-left: 5px !important; padding-right: 5px !important; border-bottom-color: #FFFFFF !important; border-bottom-width: 0 !important; }
+ #ayoycycbaa .gt_subtitle { color: #171717 !important; font-size: 13px !important; font-weight: initial !important; padding-top: 9px !important; padding-bottom: 11px !important; padding-left: 5px !important; padding-right: 5px !important; border-top-color: #FFFFFF !important; border-top-width: 0 !important; }
+ #ayoycycbaa .gt_heading { background-color: #FFFFFF !important; text-align: center !important; border-bottom-color: #FFFFFF !important; border-left-style: none !important; border-left-width: 1px !important; border-left-color: #D3D3D3 !important; border-right-style: none !important; border-right-width: 1px !important; border-right-color: #D3D3D3 !important; }
+ #ayoycycbaa .gt_bottom_border { border-bottom-style: solid !important; border-bottom-width: 2px !important; border-bottom-color: #D3D3D3 !important; }
+ #ayoycycbaa .gt_col_headings { border-top-style: solid !important; border-top-width: 2px !important; border-top-color: #D3D3D3 !important; border-bottom-style: solid !important; border-bottom-width: 1px !important; border-bottom-color: #D3D3D3 !important; border-left-style: none !important; border-left-width: 1px !important; border-left-color: #D3D3D3 !important; border-right-style: none !important; border-right-width: 1px !important; border-right-color: #D3D3D3 !important; }
+ #ayoycycbaa .gt_col_heading { color: #FFFFFF !important; background-color: #0369A1 !important; font-size: 13px !important; font-weight: bold !important; text-transform: inherit !important; border-left-style: none !important; border-left-width: 1px !important; border-left-color: #D3D3D3 !important; border-right-style: none !important; border-right-width: 1px !important; border-right-color: #D3D3D3 !important; vertical-align: bottom !important; padding-top: 9px !important; padding-bottom: 11px !important; padding-left: 5px !important; padding-right: 5px !important; overflow-x: hidden !important; }
+ #ayoycycbaa .gt_column_spanner_outer { color: #FFFFFF !important; background-color: #0369A1 !important; font-size: 13px !important; font-weight: bold !important; text-transform: inherit !important; padding-top: 0 !important; padding-bottom: 0 !important; padding-left: 4px !important; padding-right: 4px !important; }
+ #ayoycycbaa .gt_column_spanner_outer:first-child { padding-left: 0 !important; }
+ #ayoycycbaa .gt_column_spanner_outer:last-child { padding-right: 0 !important; }
+ #ayoycycbaa .gt_column_spanner { border-bottom-style: solid !important; border-bottom-width: 1px !important; border-bottom-color: #D3D3D3 !important; vertical-align: bottom !important; padding-top: 9px !important; padding-bottom: 9px !important; overflow-x: hidden !important; display: inline-block !important; width: 100% !important; }
+ #ayoycycbaa .gt_spanner_row { border-bottom-style: hidden !important; }
+ #ayoycycbaa .gt_group_heading { padding-top: 8px !important; padding-bottom: 8px !important; padding-left: 5px !important; padding-right: 5px !important; color: #171717 !important; background-color: #FFFFFF !important; font-size: 100% !important; font-weight: initial !important; text-transform: inherit !important; border-top-style: solid !important; border-top-width: 2px !important; border-top-color: #D3D3D3 !important; border-bottom-style: solid !important; border-bottom-width: 2px !important; border-bottom-color: #D3D3D3 !important; border-left-style: none !important; border-left-width: 1px !important; border-left-color: #D3D3D3 !important; border-right-style: none !important; border-right-width: 1px !important; border-right-color: #D3D3D3 !important; vertical-align: middle !important; text-align: left !important; }
+ #ayoycycbaa .gt_empty_group_heading { padding: 0.5px !important; color: #171717 !important; background-color: #FFFFFF !important; font-size: 100% !important; font-weight: initial !important; border-top-style: solid !important; border-top-width: 2px !important; border-top-color: #D3D3D3 !important; border-bottom-style: solid !important; border-bottom-width: 2px !important; border-bottom-color: #D3D3D3 !important; vertical-align: middle !important; }
+ #ayoycycbaa .gt_from_md> :first-child { margin-top: 0 !important; }
+ #ayoycycbaa .gt_from_md> :last-child { margin-bottom: 0 !important; }
+ #ayoycycbaa .gt_row { padding-top: 7px !important; padding-bottom: 7px !important; padding-left: 5px !important; padding-right: 5px !important; margin: 10px !important; border-top-style: solid !important; border-top-width: 1px !important; border-top-color: #D3D3D3 !important; border-left-style: none !important; border-left-width: 1px !important; border-left-color: #D3D3D3 !important; border-right-style: none !important; border-right-width: 1px !important; border-right-color: #D3D3D3 !important; vertical-align: middle !important; overflow-x: hidden !important; }
+ #ayoycycbaa .gt_stub { color: #171717 !important; background-color: #FFFFFF !important; font-size: 100% !important; font-weight: initial !important; text-transform: inherit !important; border-right-style: solid !important; border-right-width: 2px !important; border-right-color: #D3D3D3 !important; padding-left: 5px !important; padding-right: 5px !important; }
+ #ayoycycbaa .gt_stub_row_group { color: #171717 !important; background-color: #FFFFFF !important; font-size: 100% !important; font-weight: initial !important; text-transform: inherit !important; border-right-style: solid !important; border-right-width: 2px !important; border-right-color: #D3D3D3 !important; padding-left: 5px !important; padding-right: 5px !important; vertical-align: top !important; }
+ #ayoycycbaa .gt_row_group_first td { border-top-width: 2px !important; }
+ #ayoycycbaa .gt_row_group_first th { border-top-width: 2px !important; }
+ #ayoycycbaa .gt_striped { color: #171717 !important; background-color: #F4F4F4 !important; }
+ #ayoycycbaa .gt_table_body { border-top-style: solid !important; border-top-width: 2px !important; border-top-color: #D3D3D3 !important; border-bottom-style: solid !important; border-bottom-width: 1px !important; border-bottom-color: #DEE2E6 !important; }
+ #ayoycycbaa .gt_summary_row { color: #171717 !important; background-color: #FFFFFF !important; text-transform: inherit !important; padding-top: 8px !important; padding-bottom: 8px !important; padding-left: 5px !important; padding-right: 5px !important; }
+ #ayoycycbaa .gt_first_summary_row { border-top-style: solid !important; border-top-width: 2px !important; border-top-color: #D3D3D3 !important; }
+ #ayoycycbaa .gt_last_summary_row_top { border-bottom-style: solid !important; border-bottom-width: 2px !important; border-bottom-color: #D3D3D3 !important; }
+ #ayoycycbaa .gt_grand_summary_row { color: #171717 !important; background-color: #FFFFFF !important; text-transform: inherit !important; padding-top: 8px !important; padding-bottom: 8px !important; padding-left: 5px !important; padding-right: 5px !important; }
+ #ayoycycbaa .gt_first_grand_summary_row_bottom { border-top-style: double !important; border-top-width: 6px !important; border-top-color: #D3D3D3 !important; }
+ #ayoycycbaa .gt_last_grand_summary_row_top { border-bottom-style: double !important; border-bottom-width: 6px !important; border-bottom-color: #D3D3D3 !important; }
+ #ayoycycbaa .gt_sourcenotes { color: #171717 !important; background-color: #FFFFFF !important; border-bottom-style: none !important; border-bottom-width: 2px !important; border-bottom-color: #D3D3D3 !important; border-left-style: none !important; border-left-width: 2px !important; border-left-color: #D3D3D3 !important; border-right-style: none !important; border-right-width: 2px !important; border-right-color: #D3D3D3 !important; }
+ #ayoycycbaa .gt_sourcenote { font-size: 11px !important; padding-top: 6px !important; padding-bottom: 6px !important; padding-left: 5px !important; padding-right: 5px !important; text-align: left !important; }
+ #ayoycycbaa .gt_left { text-align: left !important; }
+ #ayoycycbaa .gt_center { text-align: center !important; }
+ #ayoycycbaa .gt_right { text-align: right !important; font-variant-numeric: tabular-nums !important; }
+ #ayoycycbaa .gt_font_normal { font-weight: normal !important; }
+ #ayoycycbaa .gt_font_bold { font-weight: bold !important; }
+ #ayoycycbaa .gt_font_italic { font-style: italic !important; }
+ #ayoycycbaa .gt_super { font-size: 65% !important; }
+ #ayoycycbaa .gt_footnotes { color: font-color(#FFFFFF) !important; background-color: #FFFFFF !important; border-bottom-style: none !important; border-bottom-width: 2px !important; border-bottom-color: #D3D3D3 !important; border-left-style: none !important; border-left-width: 2px !important; border-left-color: #D3D3D3 !important; border-right-style: none !important; border-right-width: 2px !important; border-right-color: #D3D3D3 !important; }
+ #ayoycycbaa .gt_footnote { margin: 0px !important; font-size: 90% !important; padding-top: 4px !important; padding-bottom: 4px !important; padding-left: 5px !important; padding-right: 5px !important; }
+ #ayoycycbaa .gt_sourcenotes { color: #171717 !important; background-color: #FFFFFF !important; border-bottom-style: none !important; border-bottom-width: 2px !important; border-bottom-color: #D3D3D3 !important; border-left-style: none !important; border-left-width: 2px !important; border-left-color: #D3D3D3 !important; border-right-style: none !important; border-right-width: 2px !important; border-right-color: #D3D3D3 !important; }
+ #ayoycycbaa .gt_sourcenote { font-size: 11px !important; padding-top: 6px !important; padding-bottom: 6px !important; padding-left: 5px !important; padding-right: 5px !important; text-align: left !important; }
+ #ayoycycbaa .gt_footnote_marks { font-size: 75% !important; vertical-align: 0.4em !important; position: initial !important; }
+ #ayoycycbaa .gt_asterisk { font-size: 100% !important; vertical-align: 0 !important; }
+ 
+</style>
+
+<table class="gt_table caption-top table table-sm table-striped small" data-quarto-bootstrap="false">
+<thead>
+<tr class="gt_heading header">
+<td colspan="4" class="gt_heading gt_title gt_font_normal" style="color: #171717; font-weight: bold"><strong>How Often Do a Few Real Sensors Restore a Usable Estimate?</strong></td>
+</tr>
+<tr class="gt_col_headings even">
+<th id="AMI-coverage" class="gt_col_heading gt_columns_bottom_border gt_right" data-quarto-table-cell-role="th" style="color: #FFFFFF; font-family: Jost" scope="col">AMI coverage</th>
+<th id="Real-line-sensors" class="gt_col_heading gt_columns_bottom_border gt_right" data-quarto-table-cell-role="th" style="color: #FFFFFF; font-family: Jost" scope="col">Real line sensors</th>
+<th id="Solved" class="gt_col_heading gt_columns_bottom_border gt_right" data-quarto-table-cell-role="th" style="color: #FFFFFF; font-family: Jost" scope="col">Solved</th>
+<th id="Mean-RMSE-when-solved-(pu)" class="gt_col_heading gt_columns_bottom_border gt_right" data-quarto-table-cell-role="th" style="color: #FFFFFF; font-family: Jost" scope="col">Mean RMSE when solved (pu)</th>
+</tr>
+</thead>
+<tbody class="gt_table_body">
+<tr class="odd">
+<td class="gt_row gt_right">50%</td>
+<td class="gt_row gt_right">0</td>
+<td class="gt_row gt_right">0/8</td>
+<td class="gt_row gt_right"><na></na></td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_right" style="background-color: #EAF3FA">50%</td>
+<td class="gt_row gt_right" style="background-color: #EAF3FA">2</td>
+<td class="gt_row gt_right" style="background-color: #EAF3FA">0/8</td>
+<td class="gt_row gt_right" style="background-color: #EAF3FA"><na></na></td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_right">50%</td>
+<td class="gt_row gt_right">5</td>
+<td class="gt_row gt_right">0/8</td>
+<td class="gt_row gt_right"><na></na></td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_right" style="background-color: #EAF3FA">50%</td>
+<td class="gt_row gt_right" style="background-color: #EAF3FA">10</td>
+<td class="gt_row gt_right" style="background-color: #EAF3FA">0/8</td>
+<td class="gt_row gt_right" style="background-color: #EAF3FA"><na></na></td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_right">70%</td>
+<td class="gt_row gt_right">0</td>
+<td class="gt_row gt_right">0/8</td>
+<td class="gt_row gt_right"><na></na></td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_right" style="background-color: #EAF3FA">70%</td>
+<td class="gt_row gt_right" style="background-color: #EAF3FA">2</td>
+<td class="gt_row gt_right" style="background-color: #EAF3FA">0/8</td>
+<td class="gt_row gt_right" style="background-color: #EAF3FA"><na></na></td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_right">70%</td>
+<td class="gt_row gt_right">5</td>
+<td class="gt_row gt_right">0/8</td>
+<td class="gt_row gt_right"><na></na></td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_right" style="background-color: #EAF3FA">70%</td>
+<td class="gt_row gt_right" style="background-color: #EAF3FA">10</td>
+<td class="gt_row gt_right" style="background-color: #EAF3FA">0/8</td>
+<td class="gt_row gt_right" style="background-color: #EAF3FA"><na></na></td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_right">90%</td>
+<td class="gt_row gt_right">0</td>
+<td class="gt_row gt_right">0/8</td>
+<td class="gt_row gt_right"><na></na></td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_right" style="background-color: #EAF3FA">90%</td>
+<td class="gt_row gt_right" style="background-color: #EAF3FA">2</td>
+<td class="gt_row gt_right" style="background-color: #EAF3FA">0/8</td>
+<td class="gt_row gt_right" style="background-color: #EAF3FA"><na></na></td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_right">90%</td>
+<td class="gt_row gt_right">5</td>
+<td class="gt_row gt_right">0/8</td>
+<td class="gt_row gt_right"><na></na></td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_right" style="background-color: #EAF3FA">90%</td>
+<td class="gt_row gt_right" style="background-color: #EAF3FA">10</td>
+<td class="gt_row gt_right" style="background-color: #EAF3FA">2/8</td>
+<td class="gt_row gt_right" style="background-color: #EAF3FA">0.00026988540128307923</td>
+</tr>
+</tbody><tfoot>
+<tr class="gt_sourcenotes odd">
+<td colspan="4" class="gt_sourcenote" style="color: #6B7280; font-style: italic"><span class="gt_from_md">Same real network and load, 8 independent random draws per configuration, each draw picking which customers are metered and which branches carry a sensor</span></td>
+</tr>
+</tfoot>
+
+</table>
+
+
+</div>
+</div>
+</div>
+</div>
+<p>A real, more sobering finding than a single draw suggested. Only one configuration ever produces a usable estimate at all across 8 real draws, 90% coverage plus 10 real sensors, and even there it only solves a quarter of the time. Every other combination tested, including 90% coverage with 5 sensors, and 70% coverage with as many as 10, never solves once. A handful of real sensors is not a reliable substitute for chasing the last mile of smart-meter coverage on this feeder; at best it is a marginal, inconsistent supplement that only starts to help once coverage is already high. Full <a href="#acronyms_AMI">AMI</a> rollout remains the one lever checked here that reliably works.</p>
+</section>
+<section id="why-bother" class="level2">
+<h2 class="anchored" data-anchor-id="why-bother">Why bother</h2>
+<p>A <a href="#acronyms_DSO">DSO</a> without full network telemetry is not a hypothetical, it is the real, typical starting point below the substation, and this chapter checked what that actually means rather than assuming smart meters are an obvious fix. Three real, checked findings: substation-only telemetry is not just inaccurate, it makes <a href="#acronyms_WLS">WLS</a> state estimation impossible outright on this feeder. Smart-meter readings, treated honestly as pseudo-measurements with real <a href="#acronyms_AMI">AMI</a>-grade uncertainty, do fix that, but only once every real customer is covered, not gradually. And a handful of real branch-level sensors, checked across repeated random draws rather than one convenient one, turned out to be a weak, inconsistent supplement at best, not the reliable substitute for full coverage a single lucky draw first suggested, a real result worth reporting exactly as found rather than the more flattering one. None of this was assumed going in; every number above came from running the same real <a href="#acronyms_WLS">WLS</a> estimator against the same real network Part 4 and Part 5 Chapter 5 already built and validated.</p>
+</section>
+<section id="where-this-leaves-part-5" class="level2">
+<h2 class="anchored" data-anchor-id="where-this-leaves-part-5">Where this leaves Part 5</h2>
+<p>Chapter 5 checked whether a zero-shot forecast, put to a real network-planning use, changes a real operational decision. This chapter checked a genuinely different real use for the same data this part has built throughout: not planning for a future scenario, but filling in a network’s own current, unmeasured state. Full smart-meter coverage does that reliably; a handful of extra sensors, checked honestly rather than assumed, mostly does not. That is where this book’s own real, six-chapter path through smart-meter data, disaggregation, forecasting, and grid-edge value, closes: not with a single model or a single clean answer, but with the same discipline applied throughout, checking every real claim against real data rather than assuming it holds.</p>
+</section>
+<section id="references" class="level2">
+<h2 class="anchored" data-anchor-id="references">References</h2>
+<div id="refs" class="references csl-bib-body" data-entry-spacing="0" role="list" style="display: none">
+<div id="ref-opendss-stateestimation" class="csl-entry" role="listitem">
+<div class="csl-left-margin">[1] </div><div class="csl-right-inline">Electric Power Research Institute, <span>“OpenDSS and state estimation.”</span> EPRI OpenDSS documentation, 2024. Available: <a href="https://opendss.epri.com/OpenDSSandStateEstimation.html">https://opendss.epri.com/OpenDSSandStateEstimation.html</a></div>
+</div>
+<div id="ref-schweppe1970stateestimation" class="csl-entry" role="listitem">
+<div class="csl-left-margin">[2] </div><div class="csl-right-inline">F. C. Schweppe and J. Wildes, <span>“Power system static-state estimation, part i: Exact model,”</span> <em>IEEE Transactions on Power Apparatus and Systems</em>, vol. PAS–89, no. 1, pp. 120–125, 1970, doi: <a href="https://doi.org/10.1109/TPAS.1970.292678">10.1109/TPAS.1970.292678</a>.</div>
+</div>
+</div>
+<p></p>
+
+
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    // Ensure there is a toggle, if there isn't float one in the top right
+    if (window.document.querySelector('.quarto-color-scheme-toggle') === null) {
+      const a = window.document.createElement('a');
+      a.classList.add('top-right');
+      a.classList.add('quarto-color-scheme-toggle');
+      a.href = "";
+      a.onclick = function() { try { window.quartoToggleColorScheme(); } catch {} return false; };
+      const i = window.document.createElement("i");
+      i.classList.add('bi');
+      a.appendChild(i);
+      window.document.body.appendChild(a);
+    }
+    setColorSchemeToggle(hasAlternateSentinel())
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp("https:\/\/sambaiga\.github\.io\/ml-energy-disaggregation\/");
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+<nav class="page-navigation">
+  <div class="nav-page nav-page-previous">
+      <a href="../../book/05-forecasting/05-what-if-scenario-analysis.html" class="pagination-link" aria-label="Part 5 Chapter 5: What the Grid Actually Faces When These Forecasts Come True">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text"><span class="chapter-title">Part 5 Chapter 5: What the Grid Actually Faces When These Forecasts Come True</span></span>
+      </a>          
+  </div>
+  <div class="nav-page nav-page-next">
+      <a href="../../about.html" class="pagination-link" aria-label="About the Author">
+        <span class="nav-page-text"><span class="chapter-title">About the Author</span></span> <i class="bi bi-arrow-right-short"></i>
+      </a>
+  </div>
+</nav>
+</div> <!-- /content -->
+<footer class="footer">
+  <div class="nav-footer">
+    <div class="nav-footer-left">
+<p><span class="faux-block">© 2025–2026 <a href="https://sambaiga.github.io/">Anthony Faustine</a></span> <span class="faux-block">Code licensed under <a href="https://www.apache.org/licenses/LICENSE-2.0">Apache 2.0</a></span></p>
+</div>   
+    <div class="nav-footer-center">
+<div class="footer-social">
+<p><a href="mailto:sambaiga@gmail.com" title="Email"><i class="bi bi-envelope-at-fill"></i></a> <a href="https://github.com/sambaiga" title="GitHub"><i class="bi bi-github"></i></a> <a href="https://www.linkedin.com/in/sambaiga" title="LinkedIn"><i class="bi bi-linkedin"></i></a></p>
+</div>
+<div class="toc-actions d-sm-block d-md-none"><ul><li><a href="https://github.com/sambaiga/ml-energy-disaggregation/edit/main/book/05-forecasting/06-lv-state-estimation.qmd" class="toc-action"><i class="bi bi-github"></i>Edit this page</a></li><li><a href="https://github.com/sambaiga/ml-energy-disaggregation/issues/new" class="toc-action"><i class="bi empty"></i>Report an issue</a></li><li><a href="https://github.com/sambaiga/ml-energy-disaggregation/blob/main/book/05-forecasting/06-lv-state-estimation.qmd" class="toc-action"><i class="bi empty"></i>View source</a></li></ul></div></div>
+    <div class="nav-footer-right">
+<p><span class="faux-block">Made with <a href="https://quarto.org">Quarto</a></span> <span class="faux-block"><a href="https://github.com/sambaiga/ml-energy-disaggregation"><i class="bi bi-github"></i> View source</a></span></p>
+</div>
+  </div>
+</footer>
+
+
+
+
+</body></html>

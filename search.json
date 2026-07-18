@@ -1959,7 +1959,7 @@
     "href": "book/05-forecasting/05-what-if-scenario-analysis.html#where-this-leaves-part-5",
     "title": "Part 5 Chapter 5: What the Grid Actually Faces When These Forecasts Come True",
     "section": "Where this leaves Part 5",
-    "text": "Where this leaves Part 5\nChapter 4 checked whether a zero-shot forecast fails on the same customers a trained model does. This chapter checked something a point-accuracy number alone cannot answer: whether that same forecast, put to a real network-planning use, changes a real operational decision. It mostly does not move the headline breach point here, and it meaningfully complicates the naive “upper quantile is always worse” assumption a what-if analysis might otherwise lean on unchecked.",
+    "text": "Where this leaves Part 5\nChapter 4 checked whether a zero-shot forecast fails on the same customers a trained model does. This chapter checked something a point-accuracy number alone cannot answer: whether that same forecast, put to a real network-planning use, changes a real operational decision. It mostly does not move the headline breach point here, and it meaningfully complicates the naive “upper quantile is always worse” assumption a what-if analysis might otherwise lean on unchecked. Chapter 6 turns to a different real gap this chapter’s own full-network solve papers over: most real feeders have no such visibility below the substation at all, and checks whether smart-meter readings can genuinely fill that in.",
     "crumbs": [
       "Part 5: Forecasting",
       "<span class='chapter-number'>18</span>  <span class='chapter-title'>Part 5 Chapter 5: What the Grid Actually Faces When These Forecasts Come True</span>"
@@ -1977,13 +1977,134 @@
     ]
   },
   {
+    "objectID": "book/05-forecasting/06-lv-state-estimation.html",
+    "href": "book/05-forecasting/06-lv-state-estimation.html",
+    "title": "Part 5 Chapter 6: Can Smart-Meter Readings Fill In What the Grid Cannot See",
+    "section": "",
+    "text": "Setup: a second power-flow engine, for one real reason\nEvery earlier chapter in this part assumed the network’s own state was already known. Part 4 solved it directly with OpenDSS; Part 5 Chapter 5 swept it across scenarios. Real low-voltage networks do not hand that over for free. Below the substation, most real feeders have no real-time telemetry at all: a Distribution System Operator (DSO) often cannot say what a specific customer’s own bus voltage is right now without a truck roll. Distribution System State Estimation (Distribution System State Estimation (DSSE)) is the established technique for inferring a network’s full state from whatever real measurements exist, plus a network model. The real, checkable question this chapter asks: can smart-meter readings, treated honestly as imperfect pseudo-measurements, serve as that missing data, and how much of it is actually needed?\nThree chained questions structure what follows:\nOpenDSS, this book’s own power-flow engine everywhere else, has no real Weighted Least Squares (WLS) state-estimation module of its own; its own documentation says as much directly, only a narrower load-allocation feature exists [1]. pandapower does have one, pandapower.estimation, real and well-established since Schweppe and Wildes first formalized the problem [2], so this chapter adds it as a second, narrowly-scoped dependency, reusing Part 4’s own AusNet network model rather than building a new one.",
+    "crumbs": [
+      "Part 5: Forecasting",
+      "<span class='chapter-number'>19</span>  <span class='chapter-title'>Part 5 Chapter 6: Can Smart-Meter Readings Fill In What the Grid Cannot See</span>"
+    ]
+  },
+  {
+    "objectID": "book/05-forecasting/06-lv-state-estimation.html#setup-a-second-power-flow-engine-for-one-real-reason",
+    "href": "book/05-forecasting/06-lv-state-estimation.html#setup-a-second-power-flow-engine-for-one-real-reason",
+    "title": "Part 5 Chapter 6: Can Smart-Meter Readings Fill In What the Grid Cannot See",
+    "section": "",
+    "text": "Key Concept\nWeighted-least-squares state estimation finds the state \\(x\\), voltage magnitude and angle at every bus, that best explains a real, noisy set of measurements \\(z\\), minimizing \\[\nJ(x) = \\sum_i \\frac{\\big(z_i - h_i(x)\\big)^2}{\\sigma_i^2}\n\\] where \\(h_i(x)\\) is what measurement \\(i\\) would read given state \\(x\\), computed directly from the same real power-flow equations OpenDSS solves, and \\(\\sigma_i\\) is that measurement’s own assumed uncertainty, a real substation voltage transformer trusted far more than a periodic smart-meter reading. A real measurement and a pseudo-measurement enter this same objective identically; the only difference is \\(\\sigma_i\\), honestly reflecting how much that source is actually worth trusting. This only has a real solution at all when the network is observable: at least as many independent measurements as unknown states, \\(2N - 1\\) for \\(N\\) buses (voltage magnitude and angle at every bus but the slack reference, whose own angle is fixed by definition) [2], not a fixed absolute count but one this chapter’s own network genuinely has to clear.\n\n\n\n\n\n\n\nFigure 19.1: Why smart-meter readings can turn an unobservable feeder into an observable one. Left: a substation with its own real telemetry, and every customer bus downstream genuinely unknown, the real starting point for most real low-voltage feeders. Right: the same one real substation measurement, but every customer’s own smart-meter reading now treated as a real pseudo-measurement, turning an unobservable network into one a real WLS estimator can actually solve.\n\n\n\n\n\n\nload_data: (342, 365, 48) (customers, days, half-hours)",
+    "crumbs": [
+      "Part 5: Forecasting",
+      "<span class='chapter-number'>19</span>  <span class='chapter-title'>Part 5 Chapter 6: Can Smart-Meter Readings Fill In What the Grid Cannot See</span>"
+    ]
+  },
+  {
+    "objectID": "book/05-forecasting/06-lv-state-estimation.html#converting-the-network-and-checking-the-conversion-before-trusting-it",
+    "href": "book/05-forecasting/06-lv-state-estimation.html#converting-the-network-and-checking-the-conversion-before-trusting-it",
+    "title": "Part 5 Chapter 6: Can Smart-Meter Readings Fill In What the Grid Cannot See",
+    "section": "Converting the network, and checking the conversion before trusting it",
+    "text": "Converting the network, and checking the conversion before trusting it\nfrom_opendss builds a balanced, positive-sequence pandapower network directly from the same real LVcircuit-master.txt Part 4 and Part 5 Chapter 5 both use, no hand-rolled bus-by-bus translation needed. Two real issues surfaced when this was checked directly against OpenDSS’s own solve, rather than trusted on faith. First, the converter needs Set VoltageBases/CalcVoltageBases already applied, the same step this book’s own Circuit.load() wrapper already runs; without it, every bus loses its voltage base and the transformer gets silently dropped. Second, even with that fixed, the converter assigns the transformer’s own secondary rating from the declared system voltage base (0.400 kV) instead of the transformer’s own real nameplate rating, confirmed directly from LVcircuit-transformers.txt’s own kVs=[22 0.433], an 8% voltage error otherwise.\n\n\n\npandapower vm_pu at bus_mg1_t1: 1.080671\nOpenDSS-solved vm_pu at bus_mg1_t1:  1.080649\nn_bus=61, n_line=59, n_load=31, n_trafo=1\n\n\n\nBoth fixes are verified, not assumed: with the network’s own nominal placeholder loads (no real customer data applied yet), pandapower’s own re-solved voltage matches OpenDSS’s own solve to four decimal places.",
+    "crumbs": [
+      "Part 5: Forecasting",
+      "<span class='chapter-number'>19</span>  <span class='chapter-title'>Part 5 Chapter 6: Can Smart-Meter Readings Fill In What the Grid Cannot See</span>"
+    ]
+  },
+  {
+    "objectID": "book/05-forecasting/06-lv-state-estimation.html#ground-truth-what-a-fully-instrumented-network-would-show",
+    "href": "book/05-forecasting/06-lv-state-estimation.html#ground-truth-what-a-fully-instrumented-network-would-show",
+    "title": "Part 5 Chapter 6: Can Smart-Meter Readings Fill In What the Grid Cannot See",
+    "section": "Ground truth: what a fully-instrumented network would show",
+    "text": "Ground truth: what a fully-instrumented network would show\nA real customer-to-bus assignment, the same convention Part 5 Chapter 5 already uses, and one real test-day, evening-peak half-hour.\n\n\n\nreal evening-peak load, 31 customers, total 13.2 kW\ntrue voltage range: 1.0000 - 1.0818 pu\n\n\n\nSolving the converted network with every real load in place gives the one thing a real DSO never has directly: the true voltage at every single bus, used below only to check each scenario’s own estimate against, never fed to the estimator itself.",
+    "crumbs": [
+      "Part 5: Forecasting",
+      "<span class='chapter-number'>19</span>  <span class='chapter-title'>Part 5 Chapter 6: Can Smart-Meter Readings Fill In What the Grid Cannot See</span>"
+    ]
+  },
+  {
+    "objectID": "book/05-forecasting/06-lv-state-estimation.html#can-a-substation-only-dso-solve-this-at-all",
+    "href": "book/05-forecasting/06-lv-state-estimation.html#can-a-substation-only-dso-solve-this-at-all",
+    "title": "Part 5 Chapter 6: Can Smart-Meter Readings Fill In What the Grid Cannot See",
+    "section": "Can a substation-only DSO solve this at all?",
+    "text": "Can a substation-only DSO solve this at all?\nzero_injection lets the WLS solver treat every real junction bus with no customer of its own, confirmed directly from the network’s own topology (29 of them here), as an exact constraint rather than an unknown, real structure this network already has, not an assumption. Even with that structure exploited, a DSO with only its own substation-level voltage and power telemetry is checked directly against the real observability requirement above rather than assumed to clear it.\n\n\n\nreal junction buses with no customer of their own: 29\n\n\nobservable with substation telemetry alone: False\n\n\n\nNo: this feeder’s own real topology needs real information at every one of its 31 real customer buses, or an explicit zero-injection exemption, and a real substation-only DSO has neither for any of them. This is not a noisy or imprecise estimate, it is no estimate at all; the WLS solver has no way to resolve the state even in principle.",
+    "crumbs": [
+      "Part 5: Forecasting",
+      "<span class='chapter-number'>19</span>  <span class='chapter-title'>Part 5 Chapter 6: Can Smart-Meter Readings Fill In What the Grid Cannot See</span>"
+    ]
+  },
+  {
+    "objectID": "book/05-forecasting/06-lv-state-estimation.html#smart-meter-readings-as-pseudo-measurements",
+    "href": "book/05-forecasting/06-lv-state-estimation.html#smart-meter-readings-as-pseudo-measurements",
+    "title": "Part 5 Chapter 6: Can Smart-Meter Readings Fill In What the Grid Cannot See",
+    "section": "Smart-meter readings as pseudo-measurements",
+    "text": "Smart-meter readings as pseudo-measurements\nEach real customer’s own smart-meter reading, real active and reactive power consumption, becomes a pseudo-measurement at that customer’s own bus, not a voltage reading real household smart meters do not usually report. A real 10% uncertainty band reflects that these are periodic Advanced Metering Infrastructure (AMI) readings, not real-time Supervisory Control and Data Acquisition (SCADA)-grade telemetry, a genuinely different, less trustworthy kind of measurement than the substation’s own.\n\n\n\nobservable with full smart-meter coverage: True\nRMSE against true voltage: 0.0034 pu, max error: 0.0043 pu\n\n\n\nReal smart-meter pseudo-measurements, at every real customer bus, do restore observability, and the resulting estimate is genuinely accurate: well within a tenth of a percent of true voltage at every bus. The real, more useful question is how much of that coverage is actually needed, checked directly below rather than assumed to scale smoothly.",
+    "crumbs": [
+      "Part 5: Forecasting",
+      "<span class='chapter-number'>19</span>  <span class='chapter-title'>Part 5 Chapter 6: Can Smart-Meter Readings Fill In What the Grid Cannot See</span>"
+    ]
+  },
+  {
+    "objectID": "book/05-forecasting/06-lv-state-estimation.html#does-partial-smart-meter-coverage-work",
+    "href": "book/05-forecasting/06-lv-state-estimation.html#does-partial-smart-meter-coverage-work",
+    "title": "Part 5 Chapter 6: Can Smart-Meter Readings Fill In What the Grid Cannot See",
+    "section": "Does partial smart-meter coverage work?",
+    "text": "Does partial smart-meter coverage work?\n\n\n\n\n\n\n\n\n\nDoes Partial Smart-Meter Coverage Achieve Observability?\n\n\nSmart-meter coverage\nCustomers\nObservable\nSolved\nRMSE (pu)\n\n\n\n\n20%\n6/31\nFalse\nFalse\n\n\n\n30%\n9/31\nFalse\nFalse\n\n\n\n40%\n12/31\nFalse\nFalse\n\n\n\n50%\n16/31\nFalse\nFalse\n\n\n\n60%\n19/31\nFalse\nFalse\n\n\n\n70%\n22/31\nFalse\nFalse\n\n\n\n80%\n25/31\nFalse\nFalse\n\n\n\n90%\n28/31\nFalse\nFalse\n\n\n\n100%\n31/31\nTrue\nTrue\n0.0034507551783273245\n\n\n\nSame real network, same real evening-peak load, coverage swept from 20% to 100%\n\n\n\n\n\n\n\n\n\n\nNot smoothly: every coverage level below 100% fails to achieve observability, including 90%, a single real customer’s own unmeasured, non-zero consumption is enough to leave the system unsolvable, regardless of how many other customers are metered. Full smart-meter rollout is not a nice-to-have here, it is a hard requirement, at least for this specific approach of one pseudo-measurement per customer bus and nothing else.",
+    "crumbs": [
+      "Part 5: Forecasting",
+      "<span class='chapter-number'>19</span>  <span class='chapter-title'>Part 5 Chapter 6: Can Smart-Meter Readings Fill In What the Grid Cannot See</span>"
+    ]
+  },
+  {
+    "objectID": "book/05-forecasting/06-lv-state-estimation.html#a-few-real-sensors-instead-of-chasing-full-coverage",
+    "href": "book/05-forecasting/06-lv-state-estimation.html#a-few-real-sensors-instead-of-chasing-full-coverage",
+    "title": "Part 5 Chapter 6: Can Smart-Meter Readings Fill In What the Grid Cannot See",
+    "section": "A few real sensors, instead of chasing full coverage",
+    "text": "A few real sensors, instead of chasing full coverage\nA real DSO rarely has full smart-meter rollout and nothing else; it is more likely to have partial AMI coverage plus a handful of real branch-level power-flow sensors at key points in the feeder, the kind of investment an operator can actually make. Checked directly, and checked honestly: a single random draw per configuration turned out to be genuinely misleading here, since which specific customers happen to be metered and which specific branches happen to carry a sensor both matter, not just how many of each. Every configuration below is repeated across 8 real random draws, reporting how often it actually produces a usable estimate, not just whether one particular draw happened to.\n\n\n\n\n\n\n\n\n\nHow Often Do a Few Real Sensors Restore a Usable Estimate?\n\n\nAMI coverage\nReal line sensors\nSolved\nMean RMSE when solved (pu)\n\n\n\n\n50%\n0\n0/8\n\n\n\n50%\n2\n0/8\n\n\n\n50%\n5\n0/8\n\n\n\n50%\n10\n0/8\n\n\n\n70%\n0\n0/8\n\n\n\n70%\n2\n0/8\n\n\n\n70%\n5\n0/8\n\n\n\n70%\n10\n0/8\n\n\n\n90%\n0\n0/8\n\n\n\n90%\n2\n0/8\n\n\n\n90%\n5\n0/8\n\n\n\n90%\n10\n2/8\n0.00026988540128307923\n\n\n\nSame real network and load, 8 independent random draws per configuration, each draw picking which customers are metered and which branches carry a sensor\n\n\n\n\n\n\n\n\n\n\nA real, more sobering finding than a single draw suggested. Only one configuration ever produces a usable estimate at all across 8 real draws, 90% coverage plus 10 real sensors, and even there it only solves a quarter of the time. Every other combination tested, including 90% coverage with 5 sensors, and 70% coverage with as many as 10, never solves once. A handful of real sensors is not a reliable substitute for chasing the last mile of smart-meter coverage on this feeder; at best it is a marginal, inconsistent supplement that only starts to help once coverage is already high. Full AMI rollout remains the one lever checked here that reliably works.",
+    "crumbs": [
+      "Part 5: Forecasting",
+      "<span class='chapter-number'>19</span>  <span class='chapter-title'>Part 5 Chapter 6: Can Smart-Meter Readings Fill In What the Grid Cannot See</span>"
+    ]
+  },
+  {
+    "objectID": "book/05-forecasting/06-lv-state-estimation.html#why-bother",
+    "href": "book/05-forecasting/06-lv-state-estimation.html#why-bother",
+    "title": "Part 5 Chapter 6: Can Smart-Meter Readings Fill In What the Grid Cannot See",
+    "section": "Why bother",
+    "text": "Why bother\nA DSO without full network telemetry is not a hypothetical, it is the real, typical starting point below the substation, and this chapter checked what that actually means rather than assuming smart meters are an obvious fix. Three real, checked findings: substation-only telemetry is not just inaccurate, it makes WLS state estimation impossible outright on this feeder. Smart-meter readings, treated honestly as pseudo-measurements with real AMI-grade uncertainty, do fix that, but only once every real customer is covered, not gradually. And a handful of real branch-level sensors, checked across repeated random draws rather than one convenient one, turned out to be a weak, inconsistent supplement at best, not the reliable substitute for full coverage a single lucky draw first suggested, a real result worth reporting exactly as found rather than the more flattering one. None of this was assumed going in; every number above came from running the same real WLS estimator against the same real network Part 4 and Part 5 Chapter 5 already built and validated.",
+    "crumbs": [
+      "Part 5: Forecasting",
+      "<span class='chapter-number'>19</span>  <span class='chapter-title'>Part 5 Chapter 6: Can Smart-Meter Readings Fill In What the Grid Cannot See</span>"
+    ]
+  },
+  {
+    "objectID": "book/05-forecasting/06-lv-state-estimation.html#where-this-leaves-part-5",
+    "href": "book/05-forecasting/06-lv-state-estimation.html#where-this-leaves-part-5",
+    "title": "Part 5 Chapter 6: Can Smart-Meter Readings Fill In What the Grid Cannot See",
+    "section": "Where this leaves Part 5",
+    "text": "Where this leaves Part 5\nChapter 5 checked whether a zero-shot forecast, put to a real network-planning use, changes a real operational decision. This chapter checked a genuinely different real use for the same data this part has built throughout: not planning for a future scenario, but filling in a network’s own current, unmeasured state. Full smart-meter coverage does that reliably; a handful of extra sensors, checked honestly rather than assumed, mostly does not. That is where this book’s own real, six-chapter path through smart-meter data, disaggregation, forecasting, and grid-edge value, closes: not with a single model or a single clean answer, but with the same discipline applied throughout, checking every real claim against real data rather than assuming it holds.",
+    "crumbs": [
+      "Part 5: Forecasting",
+      "<span class='chapter-number'>19</span>  <span class='chapter-title'>Part 5 Chapter 6: Can Smart-Meter Readings Fill In What the Grid Cannot See</span>"
+    ]
+  },
+  {
+    "objectID": "book/05-forecasting/06-lv-state-estimation.html#references",
+    "href": "book/05-forecasting/06-lv-state-estimation.html#references",
+    "title": "Part 5 Chapter 6: Can Smart-Meter Readings Fill In What the Grid Cannot See",
+    "section": "References",
+    "text": "References\n\n\n[1] Electric Power Research Institute, “OpenDSS and state estimation.” EPRI OpenDSS documentation, 2024. Available: https://opendss.epri.com/OpenDSSandStateEstimation.html\n\n\n[2] F. C. Schweppe and J. Wildes, “Power system static-state estimation, part i: Exact model,” IEEE Transactions on Power Apparatus and Systems, vol. PAS–89, no. 1, pp. 120–125, 1970, doi: 10.1109/TPAS.1970.292678.",
+    "crumbs": [
+      "Part 5: Forecasting",
+      "<span class='chapter-number'>19</span>  <span class='chapter-title'>Part 5 Chapter 6: Can Smart-Meter Readings Fill In What the Grid Cannot See</span>"
+    ]
+  },
+  {
     "objectID": "about.html",
     "href": "about.html",
     "title": "About the Author",
     "section": "",
     "text": "Anthony Faustine\n    Principal ML Engineer  ·  Analog Devices, Ireland\n    \n       sambaiga.github.io\n       sambaiga\n       sambaiga\n       0000-0002-7838-533X\n       sambaiga@gmail.com\n    \n  \n\nEvery part of this book started as something I had to solve for real, not as a topic I picked to write about.\nThe earliest was disaggregation: teaching a model to look at one aggregate power reading and say which appliance was drawing it, the same problem Part 2 of this book covers. That question led to the one utilities actually pay for: not just what’s running now, but what demand and solar output will look like tomorrow, with an honest estimate of how wrong that forecast might be. My PhD took that question to the low-voltage substation, forecasting net load in the presence of solar and EV charging when a headline accuracy number wasn’t good enough to act on. At Eaton’s Centre for Intelligent Power, I ran that same question as Lead Data Scientist and Principal Investigator, securing €1.6M in competitive research funding and picking up the Eaton STAR Leadership Award along the way.\nToday, as Principal ML Engineer at Analog Devices, the question is the same one this book keeps returning to: not whether a model works in a notebook, but whether it survives contact with production, supply chain demand planning and edge inference in my case. That is the bar every chapter here holds itself to.\nThe open-source side of that decade is public: Twiga (point and probabilistic forecasting, one interface, every model), MLPForecast (uncertainty-aware net-load forecasting), and Deep-NILMtk (a community toolkit for non-intrusive load monitoring, the same disaggregation problem this book opens with).\nProjects  →  sambaiga.github.io/pages/projects\nThe published record runs the same thread: non-intrusive load monitoring, probabilistic forecasting, uncertainty quantification, physics-based intelligence, and AI for reliability engineering, across 10+ peer-reviewed papers in IEEE Transactions on Smart Grid, IEEE Transactions on Power Systems, and IEEE Transactions on Industrial Informatics.\nPublications  →  sambaiga.github.io/pages/publication  ·  ORCID\nI also write about machine learning, Bayesian thinking, and applied AI at:\nBlog  →  sambaiga.github.io/pages/blog",
     "crumbs": [
-      "<span class='chapter-number'>19</span>  <span class='chapter-title'>About the Author</span>"
+      "<span class='chapter-number'>20</span>  <span class='chapter-title'>About the Author</span>"
     ]
   },
   {
@@ -1991,9 +2112,9 @@
     "href": "acronyms.html",
     "title": "List of Acronyms",
     "section": "",
-    "text": "List Of Acronyms\n\nACF\n\nAutocorrelation Function\n\nADF\n\nAugmented Dickey-Fuller\n\nAMI\n\nAdvanced Metering Infrastructure\n\nANOVA\n\nAnalysis of Variance\n\nAR\n\nAutoregressive\n\nARI\n\nAdjusted Rand Index\n\nBESS\n\nBattery Energy Storage System\n\nCBR\n\nCase-Based Reasoning\n\nCRPS\n\nContinuously Ranked Probability Score\n\nCVaR\n\nConditional Value-at-Risk\n\nDBI\n\nDavies-Bouldin Index\n\nDER\n\nDistributed Energy Resources\n\nDFA\n\nDetrended Fluctuation Analysis\n\nDSO\n\nDistribution System Operator\n\nEV\n\nElectric Vehicle\n\nFPN\n\nFraction Proposal Network\n\nGIS\n\nGeographic Information System\n\nGMM\n\nGaussian Mixture Model\n\nGNN\n\nGraph Neural Network\n\nHV\n\nHigh Voltage\n\nIDEC\n\nImproved Deep Embedded Clustering\n\nIEEE\n\nInstitute of Electrical and Electronics Engineers\n\nKPSS\n\nKwiatkowski-Phillips-Schmidt-Shin\n\nLTR\n\nLearning to Rank\n\nLV\n\nLow Voltage\n\nMV\n\nMedium Voltage\n\nNILM\n\nNon-Intrusive Load Monitoring\n\nNMI\n\nNormalized Mutual Information\n\nNREL\n\nNational Renewable Energy Laboratory\n\nPACF\n\nPartial Autocorrelation Function\n\nPCA\n\nPrincipal Component Analysis\n\nPICP\n\nPrediction Interval Coverage Probability\n\nPPS\n\nPredictive Power Score\n\nPV\n\nPhotovoltaic\n\nQVN\n\nQuantile Value Network\n\nRES\n\nRenewable Energy Sources\n\nSOM\n\nSelf-Organizing Map\n\nUMAP\n\nUniform Manifold Approximation and Projection\n\nUQ\n\nUncertainty Quantification\n\nkNN\n\nk-Nearest Neighbors",
+    "text": "List Of Acronyms\n\nACF\n\nAutocorrelation Function\n\nADF\n\nAugmented Dickey-Fuller\n\nAMI\n\nAdvanced Metering Infrastructure\n\nANOVA\n\nAnalysis of Variance\n\nAR\n\nAutoregressive\n\nARI\n\nAdjusted Rand Index\n\nBESS\n\nBattery Energy Storage System\n\nCBR\n\nCase-Based Reasoning\n\nCRPS\n\nContinuously Ranked Probability Score\n\nCVaR\n\nConditional Value-at-Risk\n\nDBI\n\nDavies-Bouldin Index\n\nDER\n\nDistributed Energy Resources\n\nDFA\n\nDetrended Fluctuation Analysis\n\nDSO\n\nDistribution System Operator\n\nDSSE\n\nDistribution System State Estimation\n\nEV\n\nElectric Vehicle\n\nFPN\n\nFraction Proposal Network\n\nGIS\n\nGeographic Information System\n\nGMM\n\nGaussian Mixture Model\n\nGNN\n\nGraph Neural Network\n\nHV\n\nHigh Voltage\n\nIDEC\n\nImproved Deep Embedded Clustering\n\nIEEE\n\nInstitute of Electrical and Electronics Engineers\n\nKPSS\n\nKwiatkowski-Phillips-Schmidt-Shin\n\nLTR\n\nLearning to Rank\n\nLV\n\nLow Voltage\n\nMV\n\nMedium Voltage\n\nNILM\n\nNon-Intrusive Load Monitoring\n\nNMI\n\nNormalized Mutual Information\n\nNREL\n\nNational Renewable Energy Laboratory\n\nPACF\n\nPartial Autocorrelation Function\n\nPCA\n\nPrincipal Component Analysis\n\nPICP\n\nPrediction Interval Coverage Probability\n\nPPS\n\nPredictive Power Score\n\nPV\n\nPhotovoltaic\n\nQVN\n\nQuantile Value Network\n\nRES\n\nRenewable Energy Sources\n\nSCADA\n\nSupervisory Control and Data Acquisition\n\nSOM\n\nSelf-Organizing Map\n\nUMAP\n\nUniform Manifold Approximation and Projection\n\nUQ\n\nUncertainty Quantification\n\nWLS\n\nWeighted Least Squares\n\nkNN\n\nk-Nearest Neighbors",
     "crumbs": [
-      "<span class='chapter-number'>20</span>  <span class='chapter-title'>List of Acronyms</span>"
+      "<span class='chapter-number'>21</span>  <span class='chapter-title'>List of Acronyms</span>"
     ]
   }
 ]
