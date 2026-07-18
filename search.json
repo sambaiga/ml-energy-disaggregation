@@ -1867,13 +1867,123 @@
     ]
   },
   {
+    "objectID": "book/05-forecasting/05-what-if-scenario-analysis.html",
+    "href": "book/05-forecasting/05-what-if-scenario-analysis.html",
+    "title": "Part 5 Chapter 5: What the Grid Actually Faces When These Forecasts Come True",
+    "section": "",
+    "text": "Reusing Part 4’s own network, unmodified\nPart 4 Chapter 2 already ran a real hosting-capacity study on this exact 342-customer AusNet feeder: sweep Photovoltaic (PV) penetration from 0 to 100%, watch the worst-case voltage climb, find the level where it first breaches 1.10 pu. That study is genuinely useful, and it has one real limitation, stated plainly rather than glossed over: every load in it comes from a day that already happened, replayed from the historical record. A Distribution System Operator (DSO) planning for next year’s PV applications cannot replay next year’s load; the only thing it can do is forecast it.\nThis chapter closes that gap directly, and it is deliberately integration work, not a new open question. Every mechanism it needs already exists and is already validated: Part 4’s own Circuit handle on the OpenDSS network, its own rule-based Volt-Watt and Volt-VAr mitigation levers, and Part 5 Chapter 4’s own zero-shot Chronos-2 forecast, which needs no fitting step on this population at all. The real, checkable question is narrower and more useful than “does the network model work”: does trusting a forecast, instead of a historical replay, change the answer to a real operational question a DSO actually asks?\nTwo chained questions structure what follows:\nbuild_ausnet_network() below is byte-for-byte the same function Part 4 Chapter 2 built: the same LVcircuit-master.txt, the same 31 real customer loads, the same 500 kVA transformer.",
+    "crumbs": [
+      "Part 5: Forecasting",
+      "<span class='chapter-number'>18</span>  <span class='chapter-title'>Part 5 Chapter 5: What the Grid Actually Faces When These Forecasts Come True</span>"
+    ]
+  },
+  {
+    "objectID": "book/05-forecasting/05-what-if-scenario-analysis.html#reusing-part-4s-own-network-unmodified",
+    "href": "book/05-forecasting/05-what-if-scenario-analysis.html#reusing-part-4s-own-network-unmodified",
+    "title": "Part 5 Chapter 5: What the Grid Actually Faces When These Forecasts Come True",
+    "section": "",
+    "text": "load_data: (342, 365, 48) (customers, days, half-hours)\n\n\n{'converged': True,\n 'n_buses': 61,\n 'n_lines': 59,\n 'n_loads': 31,\n 'n_transformers': 1,\n 'total_p_loss_kw': 0.6107992120127365,\n 'total_q_loss_kvar': 0.15519491021295995}",
+    "crumbs": [
+      "Part 5: Forecasting",
+      "<span class='chapter-number'>18</span>  <span class='chapter-title'>Part 5 Chapter 5: What the Grid Actually Faces When These Forecasts Come True</span>"
+    ]
+  },
+  {
+    "objectID": "book/05-forecasting/05-what-if-scenario-analysis.html#a-forecast-not-a-replay-driving-the-network",
+    "href": "book/05-forecasting/05-what-if-scenario-analysis.html#a-forecast-not-a-replay-driving-the-network",
+    "title": "Part 5 Chapter 5: What the Grid Actually Faces When These Forecasts Come True",
+    "section": "A forecast, not a replay, driving the network",
+    "text": "A forecast, not a replay, driving the network\nChapter 4’s own Chronos-2, recomputed exactly as that chapter built it, zero-shot, no fitting step on this data. Each customer’s own day 362 becomes the context window; day 363, the same sunniest real day Part 4 Chapter 2’s own hosting-capacity study already uses, becomes the forecast target. A single forecast call hands back two real scenarios worth keeping separate: the point forecast, and the 0.95 quantile, an upper-demand scenario that sounds like the natural worst case to plan against.\n\n\n\n\n\n\nzero-shot point forecast, day 363, population MAE: 0.2135\nP95 scenario sits above the point forecast by, on average, 0.8714 kW per half-hour",
+    "crumbs": [
+      "Part 5: Forecasting",
+      "<span class='chapter-number'>18</span>  <span class='chapter-title'>Part 5 Chapter 5: What the Grid Actually Faces When These Forecasts Come True</span>"
+    ]
+  },
+  {
+    "objectID": "book/05-forecasting/05-what-if-scenario-analysis.html#one-sweep-function-three-real-load-sources",
+    "href": "book/05-forecasting/05-what-if-scenario-analysis.html#one-sweep-function-three-real-load-sources",
+    "title": "Part 5 Chapter 5: What the Grid Actually Faces When These Forecasts Come True",
+    "section": "One sweep function, three real load sources",
+    "text": "One sweep function, three real load sources\nReusing Part 4 Chapter 2’s own run_penetration almost entirely as written. The one change: instead of indexing a fixed historical day out of load_data, run_scenario takes a load_source array directly, one row per customer, so the exact same customer-to-PV assignment, PV profile, reactive-power synthesis, and mitigation-control logic runs unchanged against a historical, point-forecast, or upper-quantile load.",
+    "crumbs": [
+      "Part 5: Forecasting",
+      "<span class='chapter-number'>18</span>  <span class='chapter-title'>Part 5 Chapter 5: What the Grid Actually Faces When These Forecasts Come True</span>"
+    ]
+  },
+  {
+    "objectID": "book/05-forecasting/05-what-if-scenario-analysis.html#does-trusting-the-forecast-change-the-hosting-capacity-answer",
+    "href": "book/05-forecasting/05-what-if-scenario-analysis.html#does-trusting-the-forecast-change-the-hosting-capacity-answer",
+    "title": "Part 5 Chapter 5: What the Grid Actually Faces When These Forecasts Come True",
+    "section": "Does trusting the forecast change the hosting-capacity answer?",
+    "text": "Does trusting the forecast change the hosting-capacity answer?\nSame network, same PV penetration sweep, same customer-to-PV assignment (same random seed across scenarios), so any difference below comes from the load source alone.\n\n\n\n\n\n\n\n\n\nscenario\nHistorical replay\nZero-shot P95 stress\nZero-shot point forecast\n\n\npenetration\n\n\n\n\n\n\n\n0\n1.0823\n1.0820\n1.0823\n\n\n20\n1.0876\n1.0859\n1.0878\n\n\n40\n1.0956\n1.0940\n1.0959\n\n\n60\n1.0973\n1.0929\n1.0966\n\n\n80\n1.1047\n1.1005\n1.1040\n\n\n100\n1.1046\n1.1004\n1.1039\n\n\n\n\n\n\n\n\n\n\n\n\n   \n       \n       \n       \n   \n   \n          \n   \n   \n\n\n\n\n\n\n\n\n\n\n\n\n\nAt What PV Penetration Does This Feeder First Breach 1.10 pu?\n\n\nScenario\nFirst breach at penetration\n\n\n\n\nHistorical replay\n80\n\n\nZero-shot point forecast\n80\n\n\nZero-shot P95 stress\n80\n\n\n\nDay 363, the sunniest real day, same customer-to-PV assignment across scenarios\n\n\n\n\n\n\n\n\n\n\nAll three scenarios first breach 1.10 pu at the same 80% penetration level here. The forecast does not move this particular answer, a real, checked result rather than an assumed one, and worth reporting exactly as found: a genuine generalization check does not get to pick the more dramatic-sounding outcome after the fact.",
+    "crumbs": [
+      "Part 5: Forecasting",
+      "<span class='chapter-number'>18</span>  <span class='chapter-title'>Part 5 Chapter 5: What the Grid Actually Faces When These Forecasts Come True</span>"
+    ]
+  },
+  {
+    "objectID": "book/05-forecasting/05-what-if-scenario-analysis.html#does-the-upper-quantile-behave-like-a-uniformly-worse-case",
+    "href": "book/05-forecasting/05-what-if-scenario-analysis.html#does-the-upper-quantile-behave-like-a-uniformly-worse-case",
+    "title": "Part 5 Chapter 5: What the Grid Actually Faces When These Forecasts Come True",
+    "section": "Does the upper quantile behave like a uniformly worse case?",
+    "text": "Does the upper quantile behave like a uniformly worse case?\nA second, more useful finding sits underneath that headline number. “P95” sounds like it should mean worse, for every constraint, at every penetration level. Checked directly against transformer utilization, not assumed, it does not.\n\n\n\n\n\n\n\n\n\nscenario\nHistorical replay\nZero-shot P95 stress\nZero-shot point forecast\n\n\npenetration\n\n\n\n\n\n\n\n0\n4.00\n9.30\n2.81\n\n\n20\n4.01\n9.11\n3.87\n\n\n40\n10.03\n8.92\n9.90\n\n\n60\n16.88\n11.64\n16.75\n\n\n80\n22.82\n17.62\n22.69\n\n\n100\n28.67\n23.40\n28.53\n\n\n\n\n\n\n\n\n\n\n\n\n   \n       \n       \n       \n   \n   \n          \n   \n   \n\n\n\n\nNo, and the real reason is physical, not statistical. At low PV penetration the transformer’s own throughput is mostly driven by load itself, so the upper-demand scenario does raise utilization, exactly what “P95 means worse” assumes: 9.30% against 2.81-4.01% at 0-20% penetration. Past roughly 40% penetration, that reverses: a customer with higher local demand consumes more of their own PV export before it ever reaches the transformer, so higher demand lowers both transformer utilization and worst-case voltage, 17.62% against 22.69-22.82% at 80% penetration. This is the same real compensatory mechanism Part 5 Chapter 1 already found between PV and Electric Vehicle (EV) activity [1], now showing up between forecast demand and PV export instead.\n\n Key Concept\nVoltage rise from PV export is not a function of a customer’s own PV output alone; it depends on the net injection at that customer’s own bus, generation minus local demand. The linearized branch-flow approximation Baran and Wu introduced for radial distribution networks [2] makes this precise, the standard explanatory lens for this mechanism, not the literal equation the OpenDSS solve above performs, which is a full nonlinear AC power flow. For a bus \\(i\\) with resistance \\(R_i\\) and reactance \\(X_i\\) back to the source: \\[\n\\Delta V_i \\approx \\frac{R_i P_{net,i} + X_i Q_{net,i}}{V_{nominal}}\n\\] \\[\nP_{net,i} = P_{PV,i} - P_{load,i}\n\\] Two customers with identical PV systems can see very different voltage rises purely because their own local demand differs. A customer whose demand nearly matches their PV export has \\(P_{net,i} \\approx 0\\) and barely moves the local voltage; the same PV output with little local demand pushes nearly the full output onto the network as \\(P_{net,i}\\), and \\(\\Delta V_i\\) rises accordingly. A forecast’s upper-demand scenario raises \\(P_{load,i}\\), which lowers \\(P_{net,i}\\) for a fixed PV export, which lowers \\(\\Delta V_i\\): the opposite of what “higher demand means worse” naively expects, once real PV export is actually on the feeder.\n\n\n\n\n\n\n\nFigure 18.1: Why a customer’s own local demand offsets PV export at the point of common coupling. Left: low local demand, most of a fixed PV export flows onto the network unopposed, a large net injection and a large voltage rise. Right: the same fixed PV export, but high local demand consumes most of it locally first, a small net injection and a small voltage rise, the mechanism behind the reversal above.\n\n\n\nA DSO that reflexively treats a forecast’s upper quantile as the universal worst case for every constraint gets this backwards at high PV penetration; which quantile is actually the risk depends on which constraint, and how much PV is already on the feeder, not on “higher demand” as a blanket rule.",
+    "crumbs": [
+      "Part 5: Forecasting",
+      "<span class='chapter-number'>18</span>  <span class='chapter-title'>Part 5 Chapter 5: What the Grid Actually Faces When These Forecasts Come True</span>"
+    ]
+  },
+  {
+    "objectID": "book/05-forecasting/05-what-if-scenario-analysis.html#does-a-rule-based-mitigation-lever-fix-the-real-worst-case",
+    "href": "book/05-forecasting/05-what-if-scenario-analysis.html#does-a-rule-based-mitigation-lever-fix-the-real-worst-case",
+    "title": "Part 5 Chapter 5: What the Grid Actually Faces When These Forecasts Come True",
+    "section": "Does a rule-based mitigation lever fix the real worst case?",
+    "text": "Does a rule-based mitigation lever fix the real worst case?\nBecause the upper quantile is not automatically the worst case, this section identifies the actual worst-case load source at the shared 80% breach penetration, historical replay, marginally the highest of the three at 1.1047 pu, rather than assuming it is the upper-quantile scenario in advance. Part 4 Chapter 2’s own two real inverter-control levers, Volt-Watt and Volt-VAr, apply unchanged.\n\n\n\n\n\n\n\n\n\nDoes Volt-Watt or Volt-VAr Fix the Real Worst Case?\n\n\nControl\nvmax_pu\nStill breaching 1.10 pu\n\n\n\n\nNo control\n1.1047\nTrue\n\n\nVolt-Watt\n1.0878\nFalse\n\n\nVolt-VAr\n1.071\nFalse\n\n\n\nPV penetration 80%, historical replay load, day 363\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n   \n       \n       \n       \n   \n   \n          \n   \n   \n\n\n\n\nBoth levers fix the real worst case: Volt-Watt brings the feeder to 1.0878 pu, Volt-VAr further still to 1.0710 pu, both back under the 1.10 pu limit with no new customer, no new equipment, no change to the PV penetration level itself. The same real finding Part 4 Chapter 2 already reported, now confirmed against a forecast-identified worst case rather than only a historical one.",
+    "crumbs": [
+      "Part 5: Forecasting",
+      "<span class='chapter-number'>18</span>  <span class='chapter-title'>Part 5 Chapter 5: What the Grid Actually Faces When These Forecasts Come True</span>"
+    ]
+  },
+  {
+    "objectID": "book/05-forecasting/05-what-if-scenario-analysis.html#why-bother",
+    "href": "book/05-forecasting/05-what-if-scenario-analysis.html#why-bother",
+    "title": "Part 5 Chapter 5: What the Grid Actually Faces When These Forecasts Come True",
+    "section": "Why bother",
+    "text": "Why bother\nTwo real, checked answers, not one assumed going in. First: at least on this feeder, on this day, trusting a zero-shot forecast instead of a historical replay does not change which PV penetration level first breaches the feeder’s own voltage limit, a genuine reassurance that Part 4’s own hosting-capacity conclusion is not an artifact of using historical rather than forecasted load. Second, and more useful precisely because it was not the expected answer: a forecast’s upper quantile is not a universal worst case. It raises transformer utilization at low PV penetration and lowers both utilization and worst-case voltage at high penetration, because higher local demand increasingly offsets PV export as penetration grows. A DSO building a what-if analysis around “always plan for the P95 scenario” would get this backwards on a feeder with real PV adoption, exactly the kind of assumption this book’s own discipline exists to check rather than take for granted.\nOne real scope limit, disclosed rather than hidden. The author’s own resources/cvar_flexibility work explores a further angle, an optimal customer-flexibility dispatch under a Conditional Value-at-Risk (CVaR) risk objective, using a forecast’s own uncertainty as the risk input directly rather than only checking a fixed set of scenarios against it. That formulation is not yet vendored in this book’s own copy of that work, and no equivalent public methodology could be confirmed against this dataset within this chapter’s own scope. Rather than force an unverified optimization into print, this chapter stops at the scenario-comparison result above; a CVaR-based dispatch chapter remains a real, open extension, not a solved one.",
+    "crumbs": [
+      "Part 5: Forecasting",
+      "<span class='chapter-number'>18</span>  <span class='chapter-title'>Part 5 Chapter 5: What the Grid Actually Faces When These Forecasts Come True</span>"
+    ]
+  },
+  {
+    "objectID": "book/05-forecasting/05-what-if-scenario-analysis.html#where-this-leaves-part-5",
+    "href": "book/05-forecasting/05-what-if-scenario-analysis.html#where-this-leaves-part-5",
+    "title": "Part 5 Chapter 5: What the Grid Actually Faces When These Forecasts Come True",
+    "section": "Where this leaves Part 5",
+    "text": "Where this leaves Part 5\nChapter 4 checked whether a zero-shot forecast fails on the same customers a trained model does. This chapter checked something a point-accuracy number alone cannot answer: whether that same forecast, put to a real network-planning use, changes a real operational decision. It mostly does not move the headline breach point here, and it meaningfully complicates the naive “upper quantile is always worse” assumption a what-if analysis might otherwise lean on unchecked.",
+    "crumbs": [
+      "Part 5: Forecasting",
+      "<span class='chapter-number'>18</span>  <span class='chapter-title'>Part 5 Chapter 5: What the Grid Actually Faces When These Forecasts Come True</span>"
+    ]
+  },
+  {
+    "objectID": "book/05-forecasting/05-what-if-scenario-analysis.html#references",
+    "href": "book/05-forecasting/05-what-if-scenario-analysis.html#references",
+    "title": "Part 5 Chapter 5: What the Grid Actually Faces When These Forecasts Come True",
+    "section": "References",
+    "text": "References\n\n\n[1] A. Fias, M. U. Hashmi, and G. Deconinck, “Uncertainty quantification in load profiles with rising EV and PV adoption: The case of residential, industrial, and office buildings.” 2025. Available: https://arxiv.org/abs/2512.01914\n\n\n[2] M. E. Baran and F. F. Wu, “Optimal sizing of capacitors placed on a radial distribution system,” IEEE Transactions on Power Delivery, vol. 4, no. 1, pp. 735–743, 1989, doi: 10.1109/61.19265.",
+    "crumbs": [
+      "Part 5: Forecasting",
+      "<span class='chapter-number'>18</span>  <span class='chapter-title'>Part 5 Chapter 5: What the Grid Actually Faces When These Forecasts Come True</span>"
+    ]
+  },
+  {
     "objectID": "about.html",
     "href": "about.html",
     "title": "About the Author",
     "section": "",
     "text": "Anthony Faustine\n    Principal ML Engineer  ·  Analog Devices, Ireland\n    \n       sambaiga.github.io\n       sambaiga\n       sambaiga\n       0000-0002-7838-533X\n       sambaiga@gmail.com\n    \n  \n\nEvery part of this book started as something I had to solve for real, not as a topic I picked to write about.\nThe earliest was disaggregation: teaching a model to look at one aggregate power reading and say which appliance was drawing it, the same problem Part 2 of this book covers. That question led to the one utilities actually pay for: not just what’s running now, but what demand and solar output will look like tomorrow, with an honest estimate of how wrong that forecast might be. My PhD took that question to the low-voltage substation, forecasting net load in the presence of solar and EV charging when a headline accuracy number wasn’t good enough to act on. At Eaton’s Centre for Intelligent Power, I ran that same question as Lead Data Scientist and Principal Investigator, securing €1.6M in competitive research funding and picking up the Eaton STAR Leadership Award along the way.\nToday, as Principal ML Engineer at Analog Devices, the question is the same one this book keeps returning to: not whether a model works in a notebook, but whether it survives contact with production, supply chain demand planning and edge inference in my case. That is the bar every chapter here holds itself to.\nThe open-source side of that decade is public: Twiga (point and probabilistic forecasting, one interface, every model), MLPForecast (uncertainty-aware net-load forecasting), and Deep-NILMtk (a community toolkit for non-intrusive load monitoring, the same disaggregation problem this book opens with).\nProjects  →  sambaiga.github.io/pages/projects\nThe published record runs the same thread: non-intrusive load monitoring, probabilistic forecasting, uncertainty quantification, physics-based intelligence, and AI for reliability engineering, across 10+ peer-reviewed papers in IEEE Transactions on Smart Grid, IEEE Transactions on Power Systems, and IEEE Transactions on Industrial Informatics.\nPublications  →  sambaiga.github.io/pages/publication  ·  ORCID\nI also write about machine learning, Bayesian thinking, and applied AI at:\nBlog  →  sambaiga.github.io/pages/blog",
     "crumbs": [
-      "<span class='chapter-number'>18</span>  <span class='chapter-title'>About the Author</span>"
+      "<span class='chapter-number'>19</span>  <span class='chapter-title'>About the Author</span>"
     ]
   },
   {
@@ -1881,9 +1991,9 @@
     "href": "acronyms.html",
     "title": "List of Acronyms",
     "section": "",
-    "text": "List Of Acronyms\n\nACF\n\nAutocorrelation Function\n\nADF\n\nAugmented Dickey-Fuller\n\nAMI\n\nAdvanced Metering Infrastructure\n\nANOVA\n\nAnalysis of Variance\n\nAR\n\nAutoregressive\n\nARI\n\nAdjusted Rand Index\n\nBESS\n\nBattery Energy Storage System\n\nCBR\n\nCase-Based Reasoning\n\nCRPS\n\nContinuously Ranked Probability Score\n\nDBI\n\nDavies-Bouldin Index\n\nDER\n\nDistributed Energy Resources\n\nDFA\n\nDetrended Fluctuation Analysis\n\nDSO\n\nDistribution System Operator\n\nEV\n\nElectric Vehicle\n\nFPN\n\nFraction Proposal Network\n\nGIS\n\nGeographic Information System\n\nGMM\n\nGaussian Mixture Model\n\nGNN\n\nGraph Neural Network\n\nHV\n\nHigh Voltage\n\nIDEC\n\nImproved Deep Embedded Clustering\n\nIEEE\n\nInstitute of Electrical and Electronics Engineers\n\nKPSS\n\nKwiatkowski-Phillips-Schmidt-Shin\n\nLTR\n\nLearning to Rank\n\nLV\n\nLow Voltage\n\nMV\n\nMedium Voltage\n\nNILM\n\nNon-Intrusive Load Monitoring\n\nNMI\n\nNormalized Mutual Information\n\nNREL\n\nNational Renewable Energy Laboratory\n\nPACF\n\nPartial Autocorrelation Function\n\nPCA\n\nPrincipal Component Analysis\n\nPICP\n\nPrediction Interval Coverage Probability\n\nPPS\n\nPredictive Power Score\n\nPV\n\nPhotovoltaic\n\nQVN\n\nQuantile Value Network\n\nRES\n\nRenewable Energy Sources\n\nSOM\n\nSelf-Organizing Map\n\nUMAP\n\nUniform Manifold Approximation and Projection\n\nUQ\n\nUncertainty Quantification\n\nkNN\n\nk-Nearest Neighbors",
+    "text": "List Of Acronyms\n\nACF\n\nAutocorrelation Function\n\nADF\n\nAugmented Dickey-Fuller\n\nAMI\n\nAdvanced Metering Infrastructure\n\nANOVA\n\nAnalysis of Variance\n\nAR\n\nAutoregressive\n\nARI\n\nAdjusted Rand Index\n\nBESS\n\nBattery Energy Storage System\n\nCBR\n\nCase-Based Reasoning\n\nCRPS\n\nContinuously Ranked Probability Score\n\nCVaR\n\nConditional Value-at-Risk\n\nDBI\n\nDavies-Bouldin Index\n\nDER\n\nDistributed Energy Resources\n\nDFA\n\nDetrended Fluctuation Analysis\n\nDSO\n\nDistribution System Operator\n\nEV\n\nElectric Vehicle\n\nFPN\n\nFraction Proposal Network\n\nGIS\n\nGeographic Information System\n\nGMM\n\nGaussian Mixture Model\n\nGNN\n\nGraph Neural Network\n\nHV\n\nHigh Voltage\n\nIDEC\n\nImproved Deep Embedded Clustering\n\nIEEE\n\nInstitute of Electrical and Electronics Engineers\n\nKPSS\n\nKwiatkowski-Phillips-Schmidt-Shin\n\nLTR\n\nLearning to Rank\n\nLV\n\nLow Voltage\n\nMV\n\nMedium Voltage\n\nNILM\n\nNon-Intrusive Load Monitoring\n\nNMI\n\nNormalized Mutual Information\n\nNREL\n\nNational Renewable Energy Laboratory\n\nPACF\n\nPartial Autocorrelation Function\n\nPCA\n\nPrincipal Component Analysis\n\nPICP\n\nPrediction Interval Coverage Probability\n\nPPS\n\nPredictive Power Score\n\nPV\n\nPhotovoltaic\n\nQVN\n\nQuantile Value Network\n\nRES\n\nRenewable Energy Sources\n\nSOM\n\nSelf-Organizing Map\n\nUMAP\n\nUniform Manifold Approximation and Projection\n\nUQ\n\nUncertainty Quantification\n\nkNN\n\nk-Nearest Neighbors",
     "crumbs": [
-      "<span class='chapter-number'>19</span>  <span class='chapter-title'>List of Acronyms</span>"
+      "<span class='chapter-number'>20</span>  <span class='chapter-title'>List of Acronyms</span>"
     ]
   }
 ]
