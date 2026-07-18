@@ -70,7 +70,13 @@ jobs:
           # resources/london-lcl/data/Partitioned LCL Data.zip, fetched
           # locally via scripts/fetch_london_lcl_data.py (~760MB), gitignored
           # and not fetched in CI.
-          SKIP_LIST="book/03-disaggregation/02-feature-engineering-code.ipynb book/03-disaggregation/03-multi-appliance-recognition-code.ipynb book/03-disaggregation/04-multi-task-low-frequency-code.ipynb book/04-grid-edge/04-customer-feeder-clustering-code.ipynb book/04-grid-edge/05-ranking-recommendation-code.ipynb book/04-grid-edge/06-anomaly-detection-code.ipynb book/05-forecasting/04-foundation-models-code.ipynb book/04-grid-edge/04-customer-feeder-clustering-london-code.ipynb"
+          # book/04-grid-edge/04-customer-feeder-clustering-goiener-code.ipynb
+          # is the same exploratory replica against GoiEner: needs
+          # resources/goiener/data/imp-post.tzst, fetched locally via
+          # scripts/fetch_goiener_data.py, gitignored, plus the zstandard
+          # package (not a project dependency, GoiEner is still only under
+          # evaluation), neither available in CI.
+          SKIP_LIST="book/03-disaggregation/02-feature-engineering-code.ipynb book/03-disaggregation/03-multi-appliance-recognition-code.ipynb book/03-disaggregation/04-multi-task-low-frequency-code.ipynb book/04-grid-edge/04-customer-feeder-clustering-code.ipynb book/04-grid-edge/05-ranking-recommendation-code.ipynb book/04-grid-edge/06-anomaly-detection-code.ipynb book/05-forecasting/04-foundation-models-code.ipynb book/04-grid-edge/04-customer-feeder-clustering-london-code.ipynb book/04-grid-edge/04-customer-feeder-clustering-goiener-code.ipynb"
 
           # Helper: find all notebooks, excluding archived ones
           find_notebooks() {
