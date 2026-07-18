@@ -1008,3 +1008,28 @@ table {
 #refs.csl-bib-body {
   display: block !important;
 }
+
+// ── Responsive safety net ──────────────────────────────────────────────────
+// A wide table, a long display equation, or a fixed-pixel-width embedded
+// plot should scroll within its own box on a narrow screen, never force the
+// whole page wider. Confirmed via a real 375px-viewport check: without this,
+// a single long MathJax equation pushed the entire <body> to roughly double
+// the viewport width, cutting off body text on both edges, not just the
+// equation itself. `.cell-output-display` wraps every notebook-cell output
+// (every themed_gt table and every lets-plot figure in this book comes
+// through it); `img`/`mjx-container` cover the handful of things authored
+// directly in a .qmd file instead (illustrative diagrams, inline formulas).
+.cell-output-display {
+  overflow-x: auto;
+}
+
+img {
+  max-width: 100%;
+  height: auto;
+}
+
+mjx-container {
+  overflow-x: auto;
+  overflow-y: hidden;
+  max-width: 100%;
+}
