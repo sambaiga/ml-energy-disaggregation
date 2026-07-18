@@ -145,7 +145,7 @@ Two honest limits, not yet solved here rather than papered over. The archetypes 
 
 ## Where this leaves Part 5
 
-A trained model clears Chapter 1's baseline floor, and sharing information across Chapter 4's archetypes inside a single model beats both training one model per customer and training one model for everyone. That same sharing mechanism does not survive contact with a customer it has never seen, and the fix that does, a calibrated, distance-weighted blend of specialists, is never worse than doing nothing while a new customer's history accumulates. Chapter 3 picks up the model this chapter found actually earns its cost and asks what that forecast is worth without a number attached to how wrong it might be.
+A trained model clears Chapter 1's baseline floor, and sharing information across Chapter 4's archetypes inside a single model beats both training one model per customer and training one model for everyone. That same sharing mechanism does not survive contact with a customer it has never seen, and the fix that does, a calibrated, distance-weighted blend of specialists, is never worse than doing nothing while a new customer's history accumulates. Chapter 3 picks up the model this chapter found actually earns its cost and asks what that forecast is worth without a number attached to how wrong it might be; Part 5 Chapter 4 asks a further question neither chapter can answer on its own, whether a foundation model pretrained on none of this data, given no fitting step at all, gets the same customers wrong that this chapter's trained model does.
 
 ## References
 

@@ -2296,3 +2296,94 @@ def nilm_softmax_vs_sigmoid_diagram() -> plt.Figure:
     fig.tight_layout()
     plt.close(fig)
     return fig
+
+
+def trained_specialist_vs_zero_shot_diagram() -> plt.Figure:
+    """Draw the two ways a forecaster can come to know a population.
+
+    Left: the trained specialist every earlier chapter in this part builds,
+    a per-population pipeline, collect history, engineer lag and distance
+    features, fit a model, that only knows the population it was fit on;
+    a new population (NREL, say) means repeating every step. Right: a
+    foundation model, pretrained once on a large general time-series corpus
+    before this book ever saw the data, that consumes a customer's own raw
+    context window directly and forecasts with no fitting step at all, on
+    AusNet or on NREL alike.
+
+    Returns:
+        The matplotlib Figure, ready to display in a notebook cell.
+    """
+    fig, axes = plt.subplots(1, 2, figsize=(10.2, 5.4))
+
+    # ---- left panel: trained specialist, one pipeline per population ----
+    ax = axes[0]
+    ax.set_title("Trained specialist", fontsize=12, color=PRIMARY, fontweight="bold")
+    _flow_box(ax, (0.9, 4.4), 2.2, 0.6, "Population history", color=INFO)
+    _flow_arrow(ax, (2.0, 4.4), (2.0, 3.7), color=INFO)
+    _flow_box(ax, (0.9, 3.05), 2.2, 0.6, "Lag + distance\nfeatures", color=INFO)
+    _flow_arrow(ax, (2.0, 3.05), (2.0, 2.35), color=INFO)
+    _flow_box(ax, (0.9, 1.7), 2.2, 0.6, "Fit one model", color=PRIMARY)
+    _flow_arrow(ax, (2.0, 1.7), (2.0, 1.0), color=PRIMARY)
+    ax.text(
+        2.0,
+        0.6,
+        "Forecast, this\npopulation only",
+        fontsize=8.8,
+        color=PRIMARY,
+        fontweight="bold",
+        ha="center",
+        va="center",
+    )
+    ax.add_patch(
+        FancyArrowPatch(
+            (3.3, 4.7),
+            (3.3, 1.9),
+            connectionstyle="arc3,rad=0.5",
+            arrowstyle="-|>",
+            mutation_scale=13,
+            color=WARNING,
+            linewidth=1.5,
+        )
+    )
+    ax.text(
+        3.85,
+        3.3,
+        "new\npopulation:\nrepeat",
+        fontsize=7.6,
+        color=WARNING,
+        fontweight="bold",
+        ha="center",
+        va="center",
+    )
+
+    # ---- right panel: zero-shot foundation model, one model for any population ----
+    ax = axes[1]
+    ax.set_title("Zero-shot foundation model", fontsize=12, color=PRIMARY, fontweight="bold")
+    _flow_box(ax, (0.9, 4.4), 2.2, 0.6, "Pretrained once,\ngeneral corpus", color=TEXT_MUTED, filled=False)
+    _flow_arrow(ax, (2.0, 4.4), (2.0, 3.7), color=TEXT_MUTED)
+    _flow_box(ax, (0.9, 3.05), 2.2, 0.6, "Frozen model", color=SUCCESS)
+    _flow_arrow(ax, (0.5, 1.7), (1.75, 2.95), color=SUCCESS)
+    _flow_box(ax, (-0.6, 1.1), 2.2, 0.6, "AusNet customer's\nown context window", color=SUCCESS, filled=False)
+    _flow_arrow(ax, (3.5, 1.7), (2.25, 2.95), color=SUCCESS)
+    _flow_box(ax, (2.4, 1.1), 2.2, 0.6, "NREL customer's\nown context window", color=SUCCESS, filled=False)
+    _flow_arrow(ax, (2.0, 3.05), (2.0, 0.4), color=SUCCESS)
+    ax.text(
+        2.0,
+        0.05,
+        "Forecast, either population,\nno fitting step",
+        fontsize=8.8,
+        color=SUCCESS,
+        fontweight="bold",
+        ha="center",
+        va="center",
+    )
+
+    for ax in axes:
+        ax.set_xlim(-1.0, 5.0)
+        ax.set_ylim(-0.3, 5.2)
+        ax.set_aspect("equal")
+        ax.axis("off")
+
+    fig.tight_layout()
+    plt.close(fig)
+    return fig

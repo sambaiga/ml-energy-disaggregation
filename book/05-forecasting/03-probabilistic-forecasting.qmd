@@ -130,7 +130,7 @@ None of the three paradigms is strictly better; each answers a different real qu
 
 ## Where this leaves Part 5
 
-A point forecast alone was never the full deliverable this part set out to build. Chapter 2 found the model that earns its cost; this chapter attached an honest number to how wrong that model's own forecasts might be, and checked, rather than assumed, which calibration actually earns its own added complexity.
+A point forecast alone was never the full deliverable this part set out to build. Chapter 2 found the model that earns its cost; this chapter attached an honest number to how wrong that model's own forecasts might be, and checked, rather than assumed, which calibration actually earns its own added complexity. Part 5 Chapter 4 checks a different kind of cost: whether a pretrained foundation model, never trained or calibrated on this population at all, still fails on the same customers these trained models do.
 
 ## References
 
