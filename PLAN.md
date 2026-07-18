@@ -738,6 +738,44 @@ Items below), not deleted, in case a future chapter or a Volume 2 wants a
 larger, longer, reactive-power-bearing pool again; they are simply no
 longer this part's own primary data.
 
+**A third generalization-check population for smart-meter clustering,
+found and verified this session: Low Carbon London.** AusNet's own
+342-customer, one-feeder, one-country pool is real but narrow; NREL
+ResStock already complements it once (a US, physics-simulated population),
+but a genuine metered clustering benchmark was still missing. Checked
+directly, not assumed, against three real candidates: the CER Irish Smart
+Metering Trial (4,225 households, half-hourly, 2009-2010, the most-cited
+dataset in household load *clustering* literature specifically, but gated
+behind ISSDA's own signed Data Request Form, a real human-identity/
+research-justification process the author has to complete personally, not
+automatable); GoiEner (12,000-17,500 Spanish households, hourly not
+half-hourly, Zenodo, CC-BY-4.0, backed by a real peer-reviewed data
+descriptor [Quesada et al., *Scientific Data* 2024] but with only a
+self-published clustering methodology, no independent third-party
+clustering paper found); and **Low Carbon London** (5,567 London
+households, half-hourly, Nov 2011-Feb 2014, CC-BY-4.0, no registration,
+hosted directly by the Greater London Authority at
+`data.london.gov.uk/download/vqm0d/...`, confirmed via the Datastore's own
+API, not a guessed URL). London wins on every axis that matters for this
+book: same half-hourly resolution as AusNet (no resampling needed),
+directly downloadable with no access gate, and still actively used in
+independent clustering work as recently as a 2025 UPEC conference paper,
+unlike GoiEner. `scripts/fetch_london_lcl_data.py` (pulls the official
+partitioned 168-file CSV archive) and `scripts/explore_london_lcl_data.py`
+(streams a sample of real households straight out of the zip, no full
+extraction) are both built and verified: real sample profiles pulled and
+visually checked, mostly believable household shapes plus one genuinely
+suspicious near-perfectly-periodic outlier (a ~12-hour sawtooth between 0
+and 0.055 kWh, more likely a fixed-cycle appliance or a metering artifact
+than real human behavior), the same "passes a naive completeness filter
+but is not real household data" lesson AusNet and GoiEner both already
+taught. Not yet wired into any chapter; the concrete next step is adding
+it as a third population in Part 5 Chapter 1's own forecastability check
+and Chapter 2's own archetype-clustering validation, the same
+generalization-check role NREL already plays, once a real data-quality
+gate (matching the Lede/Porsgrunn `dd77b84`/`de662cf` precedent) is built
+for it.
+
 Six chapters, organized around real questions rather than model
 architectures, revised into this shape after the user rejected an earlier,
 architecture-first draft directly: "This plan is focused on ML model
