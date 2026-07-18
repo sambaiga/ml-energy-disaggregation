@@ -2584,3 +2584,81 @@ def net_injection_offset_diagram() -> plt.Figure:
     fig.tight_layout()
     plt.close(fig)
     return fig
+
+
+def _dsse_feeder_panel(ax: plt.Axes, title: str, customer_measured: list[bool]) -> None:
+    """One panel of `pseudo_measurement_observability_diagram`: one substation, a row of customer buses."""
+    sub_xy = (0.5, 1.5)
+    ax.add_patch(Circle(sub_xy, 0.22, facecolor=PRIMARY, edgecolor="white", linewidth=1.6, zorder=3))
+    ax.text(
+        sub_xy[0],
+        sub_xy[1],
+        ICONS["hdd-network-fill"],
+        fontproperties=icon_font(16),
+        color="white",
+        ha="center",
+        va="center",
+        zorder=4,
+    )
+
+    n = len(customer_measured)
+    xs = np.linspace(0.3, 0.3 + 0.85 * (n - 1), n)
+    for x, measured in zip(xs, customer_measured, strict=True):
+        color = SUCCESS if measured else TEXT_MUTED
+        ax.plot([sub_xy[0], x], [sub_xy[1] - 0.22, 0.32], color=color, linewidth=1.3, alpha=0.8, zorder=1)
+        ax.add_patch(Circle((x, 0.15), 0.155, facecolor=color, edgecolor="white", linewidth=1.3, zorder=2))
+        ax.text(
+            x,
+            0.15,
+            ICONS["house-fill"],
+            fontproperties=icon_font(10),
+            color="white",
+            ha="center",
+            va="center",
+            zorder=3,
+        )
+        if measured:
+            badge_xy = (x + 0.13, 0.15 + 0.17)
+            ax.add_patch(Circle(badge_xy, 0.09, facecolor=SUCCESS, edgecolor="white", linewidth=0.8, zorder=4))
+            ax.text(
+                badge_xy[0],
+                badge_xy[1],
+                ICONS["speedometer2"],
+                fontproperties=icon_font(6.5),
+                color="white",
+                ha="center",
+                va="center",
+                zorder=5,
+            )
+        else:
+            ax.text(x, 0.15, "?", fontsize=9, color="white", fontweight="bold", ha="center", va="center", zorder=5)
+
+    ax.set_title(title, fontsize=12, color=PRIMARY, fontweight="bold", pad=10)
+    ax.set_xlim(-0.05, xs[-1] + 0.35)
+    ax.set_ylim(-0.15, 1.85)
+    ax.set_aspect("equal")
+    ax.axis("off")
+
+
+def pseudo_measurement_observability_diagram() -> plt.Figure:
+    """Draw why smart-meter readings can turn an unobservable feeder into an observable one.
+
+    Left: a substation with its own real telemetry (voltage and power), and
+    every customer bus downstream genuinely unknown, no measurement of any
+    kind, the real starting point for most real low-voltage feeders below
+    the substation. Right: the same feeder, the same one real substation
+    measurement, but every customer's own smart-meter reading now treated
+    as a real pseudo-measurement, turning an unobservable network into one
+    a real weighted-least-squares state estimator can actually solve.
+
+    Returns:
+        The matplotlib Figure, ready to display in a notebook cell.
+    """
+    fig, axes = plt.subplots(1, 2, figsize=(9.0, 3.6))
+
+    _dsse_feeder_panel(axes[0], "Substation telemetry only", [False, False, False, False, False])
+    _dsse_feeder_panel(axes[1], "Smart-meter pseudo-measurements", [True, True, True, True, True])
+
+    fig.tight_layout()
+    plt.close(fig)
+    return fig
