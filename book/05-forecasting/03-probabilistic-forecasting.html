@@ -68,9 +68,9 @@ div.csl-indent {
 <link href="../../site_libs/quarto-html/quarto-syntax-highlighting-de63f62b328812d8e578a4d74e282472.css" rel="stylesheet" class="quarto-color-scheme-extra" id="quarto-text-highlighting-styles">
 <script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="../../site_libs/bootstrap/bootstrap-3555ad1fa724cd38279a55975d75dd38.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
-<link href="../../site_libs/bootstrap/bootstrap-dark-22c3121b58b17b28dc2005f6089551c2.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="dark">
-<link href="../../site_libs/bootstrap/bootstrap-3555ad1fa724cd38279a55975d75dd38.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme-extra" id="quarto-bootstrap" data-mode="light">
+<link href="../../site_libs/bootstrap/bootstrap-34b54a82811d545da4590e73c0fdd015.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
+<link href="../../site_libs/bootstrap/bootstrap-dark-91283df74973ef79b51806451a3ec64e.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="dark">
+<link href="../../site_libs/bootstrap/bootstrap-34b54a82811d545da4590e73c0fdd015.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme-extra" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -496,14 +496,14 @@ window.Quarto = {
    
   <ul>
   <li><a href="#borrow-do-not-invent" id="toc-borrow-do-not-invent" class="nav-link active" data-scroll-target="#borrow-do-not-invent">Borrow, do not invent</a></li>
-  <li><a href="#getting-the-data-and-one-backbone-three-paradigms" id="toc-getting-the-data-and-one-backbone-three-paradigms" class="nav-link" data-scroll-target="#getting-the-data-and-one-backbone-three-paradigms">Getting the data, and one backbone, three paradigms</a></li>
+  <li><a href="#the-data-and-the-backbone" id="toc-the-data-and-the-backbone" class="nav-link" data-scroll-target="#the-data-and-the-backbone">The data and the backbone</a></li>
   <li><a href="#the-parametric-density" id="toc-the-parametric-density" class="nav-link" data-scroll-target="#the-parametric-density">The parametric density</a></li>
   <li><a href="#the-quantile-forecast" id="toc-the-quantile-forecast" class="nav-link" data-scroll-target="#the-quantile-forecast">The quantile forecast</a></li>
-  <li><a href="#split-conformal-calibration-does-it-need-calibrating-at-all" id="toc-split-conformal-calibration-does-it-need-calibrating-at-all" class="nav-link" data-scroll-target="#split-conformal-calibration-does-it-need-calibrating-at-all">Split-conformal calibration: does it need calibrating at all?</a></li>
-  <li><a href="#does-calibrating-per-chapter-2s-own-archetypes-sharpen-this" id="toc-does-calibrating-per-chapter-2s-own-archetypes-sharpen-this" class="nav-link" data-scroll-target="#does-calibrating-per-chapter-2s-own-archetypes-sharpen-this">Does calibrating per Chapter 2’s own archetypes sharpen this?</a></li>
-  <li><a href="#does-the-backbone-matter-or-just-the-paradigm" id="toc-does-the-backbone-matter-or-just-the-paradigm" class="nav-link" data-scroll-target="#does-the-backbone-matter-or-just-the-paradigm">Does the backbone matter, or just the paradigm?</a></li>
-  <li><a href="#does-this-hold-up-beyond-ausnet" id="toc-does-this-hold-up-beyond-ausnet" class="nav-link" data-scroll-target="#does-this-hold-up-beyond-ausnet">Does this hold up beyond AusNet?</a></li>
-  <li><a href="#one-honest-comparison-not-one-winner" id="toc-one-honest-comparison-not-one-winner" class="nav-link" data-scroll-target="#one-honest-comparison-not-one-winner">One honest comparison, not one winner</a></li>
+  <li><a href="#split-conformal-calibration" id="toc-split-conformal-calibration" class="nav-link" data-scroll-target="#split-conformal-calibration">Split-conformal calibration</a></li>
+  <li><a href="#calibrating-per-archetype" id="toc-calibrating-per-archetype" class="nav-link" data-scroll-target="#calibrating-per-archetype">Calibrating per archetype</a></li>
+  <li><a href="#does-the-backbone-matter" id="toc-does-the-backbone-matter" class="nav-link" data-scroll-target="#does-the-backbone-matter">Does the backbone matter?</a></li>
+  <li><a href="#generalizing-beyond-ausnet" id="toc-generalizing-beyond-ausnet" class="nav-link" data-scroll-target="#generalizing-beyond-ausnet">Generalizing beyond AusNet</a></li>
+  <li><a href="#one-honest-comparison" id="toc-one-honest-comparison" class="nav-link" data-scroll-target="#one-honest-comparison">One honest comparison</a></li>
   <li><a href="#why-bother" id="toc-why-bother" class="nav-link" data-scroll-target="#why-bother">Why bother</a></li>
   <li><a href="#where-this-leaves-part-5" id="toc-where-this-leaves-part-5" class="nav-link" data-scroll-target="#where-this-leaves-part-5">Where this leaves Part 5</a></li>
   <li><a href="#references" id="toc-references" class="nav-link" data-scroll-target="#references">References</a></li>
@@ -544,10 +544,10 @@ window.Quarto = {
 </ul>
 <section id="borrow-do-not-invent" class="level2">
 <h2 class="anchored" data-anchor-id="borrow-do-not-invent">Borrow, do not invent</h2>
-<p>Every mechanism below already has a real name and a real precedent. <code>MLPGAMNormal</code>, the parametric backbone, is the author’s own published architecture for net-load forecasting with uncertainty estimates in low-voltage networks <span class="citation" data-cites="faustine2024mlpgam">[1]</span>. <code>MLPGAMFpqr</code>, the quantile backbone, is FPSeq2Q, fully parameterized sequence-to-quantile regression, the author’s own 2022 architecture <span class="citation" data-cites="faustine2022fpseq2q">[2]</span>. Split-conformal calibration is Lei, G’Sell, Rinaldo, Tibshirani and Wasserman’s 2018 finite-sample guarantee <span class="citation" data-cites="lei2018distributionfree">[3]</span>, applied here through the author’s own Conformal-MLPF implementation for low-voltage net-load forecasting with PV generation <span class="citation" data-cites="faustine2024conformalmlpf">[4]</span>. NGBoost and QRLightGBM, the second backbone this chapter checks every finding against, are borrowed as-is from their own established libraries, not reimplemented. Nothing here is invented for this chapter; every mechanism is checked directly against real data, not assumed to work because the name is a real one.</p>
+<p>Every mechanism below already has a real name and a real precedent. <code>MLPGAMNormal</code>, the parametric backbone, is the author’s own published architecture for net-load forecasting with uncertainty estimates in low-voltage networks <span class="citation" data-cites="faustine2024mlpgam">[1]</span>. <code>MLPGAMFpqr</code>, the quantile backbone, is FPSeq2Q, fully parameterized sequence-to-quantile regression, the author’s own 2022 architecture, first presented in the author’s own PhD thesis before being generalized in <code>twiga</code> to attach to any neural backbone, not just this one <span class="citation" data-cites="faustine2022fpseq2q">[2]</span>. Split-conformal calibration is Lei, G’Sell, Rinaldo, Tibshirani and Wasserman’s 2018 finite-sample guarantee <span class="citation" data-cites="lei2018distributionfree">[3]</span>, applied here through the author’s own Conformal-MLPF implementation for low-voltage net-load forecasting with PV generation <span class="citation" data-cites="faustine2024conformalmlpf">[4]</span>. NGBoost and QRLightGBM, the second backbone this chapter checks every finding against, are borrowed as-is from their own established libraries, not reimplemented. Nothing here is invented for this chapter; every mechanism is checked directly against real data, not assumed to work because the name is a real one.</p>
 </section>
-<section id="getting-the-data-and-one-backbone-three-paradigms" class="level2">
-<h2 class="anchored" data-anchor-id="getting-the-data-and-one-backbone-three-paradigms">Getting the data, and one backbone, three paradigms</h2>
+<section id="the-data-and-the-backbone" class="level2">
+<h2 class="anchored" data-anchor-id="the-data-and-the-backbone">The data and the backbone</h2>
 <p>Same real AusNet pool the whole of Part 5 has used, same last-90-day holdout. Every paradigm below shares one backbone architecture, MLPGAM, so differences in the results come from the probabilistic paradigm itself, not from comparing unrelated architectures.</p>
 <div class="ark-concept">
 <p><span class="ark-concept-title"><i class="bi bi-info-circle-fill"></i> Key Concept</span></p>
@@ -590,20 +590,20 @@ Figure&nbsp;16.1: Three paradigms, one backbone. A parametric density answers a 
 <div id="2875a15c" class="cell">
 <div class="cell-output cell-output-display">
 <script type="application/vnd.jupyter.widget-view+json">
-{"model_id":"e195da822f004060982e2ab764c996fc","version_major":2,"version_minor":0,"quarto_mimetype":"application/vnd.jupyter.widget-view+json"}
+{"model_id":"d4ec759be25d425eab8f0f883d3f4074","version_major":2,"version_minor":0,"quarto_mimetype":"application/vnd.jupyter.widget-view+json"}
 </script>
 </div>
 <div class="cell-output cell-output-stdout">
-<pre><code>MLPGAMNormal test MAE: 0.3628</code></pre>
+<pre><code>MLPGAMNormal test MAE: 0.3627</code></pre>
 </div>
 </div>
 </div>
-<p>A single test day makes this concrete rather than abstract. The dashed line is the real truth; the shaded band is the model’s own claimed 90% interval, mean <span class="math inline">\(\pm\)</span> 1.645 standard deviations, before any calibration at all.</p>
+<p>A single test day makes this concrete rather than abstract, chosen honestly: the real held-out window with the largest true dynamic range, not hand-picked for a nice-looking result. The dashed line is the real truth; the shaded band is the model’s own claimed 90% interval, mean <span class="math inline">\(\pm\)</span> 1.645 standard deviations, before any calibration at all.</p>
 <div class="quarto-embed-nb-cell" data-notebook="/home/runner/work/ml-energy-disaggregation/ml-energy-disaggregation/book/05-forecasting/03-probabilistic-forecasting-code.ipynb" data-notebook-title="What a Probabilistic Forecast Is Actually Worth" data-notebook-cellid="e3301f74">
 <div id="e3301f74" class="cell">
 <div class="cell-output cell-output-stdout">
 <pre><code>Parametric raw 90% band empirical coverage: 0.959 (nominal target: 0.90)
-Parametric raw 90% band mean width: 2.0247</code></pre>
+Parametric raw 90% band mean width: 2.0246</code></pre>
 </div>
 <div class="cell-output cell-output-display">
 
@@ -613,7 +613,7 @@ Parametric raw 90% band mean width: 2.0247</code></pre>
        <script type="text/javascript" data-lets-plot-script="library" src="https://cdn.jsdelivr.net/gh/JetBrains/lets-plot@v4.11.0/js-package/distr/lets-plot.min.js"></script>
    
    
-          <div id="ghAgcl"></div>
+          <div id="TyJBol"></div>
    <script type="text/javascript" data-lets-plot-script="plot">
    
    (function() {
@@ -638,7 +638,7 @@ Parametric raw 90% band mean width: 2.0247</code></pre>
        };
    }
    
-   const containerDiv = document.getElementById("ghAgcl");
+   const containerDiv = document.getElementById("TyJBol");
    let fig = null;
    
    function renderPlot() {
@@ -646,10 +646,10 @@ Parametric raw 90% band mean width: 2.0247</code></pre>
            const plotSpec = {
 "data":{
 "half_hour":[0.0,1.0,2.0,3.0,4.0,5.0,6.0,7.0,8.0,9.0,10.0,11.0,12.0,13.0,14.0,15.0,16.0,17.0,18.0,19.0,20.0,21.0,22.0,23.0,24.0,25.0,26.0,27.0,28.0,29.0,30.0,31.0,32.0,33.0,34.0,35.0,36.0,37.0,38.0,39.0,40.0,41.0,42.0,43.0,44.0,45.0,46.0,47.0],
-"truth":[0.6039999723434448,0.6179999709129333,0.6039999723434448,0.38199999928474426,0.33000001311302185,0.2460000067949295,0.2160000056028366,0.1899999976158142,0.23000000417232513,0.16599999368190765,0.2460000067949295,0.1340000033378601,0.2460000067949295,0.14399999380111694,0.22599999606609344,0.2639999985694885,0.26600000262260437,0.8579999804496765,0.6140000224113464,0.4560000002384186,0.36000001430511475,0.5260000228881836,0.4659999907016754,0.9679999947547913,0.5720000267028809,0.6320000290870667,0.5400000214576721,0.671999990940094,0.8740000128746033,0.5540000200271606,0.7799999713897705,0.5400000214576721,0.37599998712539673,0.6299999952316284,0.33399999141693115,0.31200000643730164,0.7020000219345093,0.31200000643730164,0.20600000023841858,0.2540000081062317,0.9739999771118164,0.9279999732971191,0.8640000224113464,0.6159999966621399,0.4819999933242798,0.42800000309944153,0.18400000035762787,0.36000001430511475],
-"mean":[0.4422149658203125,0.39863020181655884,0.3638208210468292,0.3381260931491852,0.3216116726398468,0.3078170716762543,0.2995874881744385,0.29363030195236206,0.29345113039016724,0.293454647064209,0.3030095398426056,0.31758370995521545,0.3283880352973938,0.36674824357032776,0.4166630804538727,0.47857731580734253,0.514542281627655,0.5131036639213562,0.4923965632915497,0.5016807913780212,0.5096014142036438,0.512541651725769,0.5152786374092102,0.5186575651168823,0.5235455632209778,0.5287317633628845,0.5324172377586365,0.5273110270500183,0.5294876098632813,0.5314508080482483,0.5343417525291443,0.5413079261779785,0.577343225479126,0.6298708915710449,0.6983559727668762,0.7840291857719421,0.8777593374252319,0.9333838224411011,0.9487941265106201,0.9336495995521545,0.9083605408668518,0.8839199542999268,0.8476132750511169,0.794530987739563,0.7330740690231323,0.6593663692474365,0.5795571208000183,0.5034765601158142],
-"lower":[-0.3561308979988098,-0.3400598168373108,-0.31972864270210266,-0.3056972324848175,-0.2947053015232086,-0.28499582409858704,-0.2812064290046692,-0.2783019542694092,-0.281482994556427,-0.2822437882423401,-0.28875961899757385,-0.2963798940181732,-0.31326884031295776,-0.3680928647518158,-0.43405482172966003,-0.4476540684700012,-0.49567919969558716,-0.4927920699119568,-0.48882773518562317,-0.49190306663513184,-0.5161553025245667,-0.5307562351226807,-0.5506954789161682,-0.5620452165603638,-0.5688052773475647,-0.5678830742835999,-0.5770956873893738,-0.5697893500328064,-0.5709978342056274,-0.5829464793205261,-0.5993946194648743,-0.6110975742340088,-0.6041254997253418,-0.627982497215271,-0.6512423157691956,-0.6607233881950378,-0.6686595678329468,-0.6261218786239624,-0.578163743019104,-0.5963044762611389,-0.5122019648551941,-0.5245118141174316,-0.45677608251571655,-0.41339111328125,-0.40107786655426025,-0.386310338973999,-0.3816017508506775,-0.37035703659057617],
-"upper":[1.24056077003479,1.1373202800750732,1.0473703145980835,0.9819494485855103,0.9379286766052246,0.900629997253418,0.8803814053535461,0.8655625581741333,0.8683852553367615,0.8691530823707581,0.8947787284851074,0.9315472841262817,0.9700449109077454,1.101589322090149,1.267380952835083,1.404808759689331,1.524763822555542,1.5189993381500244,1.473620891571045,1.4952646493911743,1.535358190536499,1.5558395385742188,1.5812528133392334,1.5993603467941284,1.615896463394165,1.6253466606140137,1.641930103302002,1.6244113445281982,1.62997305393219,1.645848035812378,1.6680781841278076,1.6937134265899658,1.7588119506835938,1.8877242803573608,2.0479543209075928,2.2287817001342773,2.424178123474121,2.492889404296875,2.4757518768310547,2.4636037349700928,2.328922986984253,2.292351722717285,2.1520025730133057,2.002453088760376,1.867226004600525,1.705043077468872,1.5407159328460693,1.3773101568222046]
+"truth":[1.8079999685287476,2.48799991607666,0.4699999988079071,0.3540000021457672,0.3240000009536743,1.5080000162124634,0.3100000023841858,0.2939999997615814,0.4699999988079071,0.33399999141693115,0.257999986410141,0.2879999876022339,1.3799999952316284,0.3100000023841858,0.2759999930858612,0.3959999978542328,0.621999979019165,0.5260000228881836,1.3380000591278076,3.9619998931884766,7.421999931335449,7.026000022888184,6.443999767303467,6.690000057220459,9.305999755859375,10.942000389099121,12.494000434875488,11.902000427246094,10.729999542236328,8.576000213623047,8.154000282287598,7.607999801635742,6.289999961853027,6.3520002365112305,7.171999931335449,9.319999694824219,10.300000190734863,10.015999794006348,8.496000289916992,7.435999870300293,8.291999816894531,12.470000267028809,8.82800006866455,9.1899995803833,9.168000221252441,8.960000038146973,10.086000442504883,5.372000217437744],
+"mean":[0.4424059987068176,0.39701083302497864,0.3628816604614258,0.33911481499671936,0.3206660747528076,0.3083643317222595,0.2992832362651825,0.29377180337905884,0.2933105528354645,0.2932182252407074,0.30287647247314453,0.3173885643482208,0.3281656503677368,0.367330938577652,0.4183048605918884,0.4770439565181732,0.5147693753242493,0.5125461220741272,0.4920400381088257,0.49907806515693665,0.5095039010047913,0.5111207365989685,0.5144318342208862,0.5180394053459167,0.5238522291183472,0.5287769436836243,0.533215343952179,0.5262512564659119,0.5282452702522278,0.5314048528671265,0.5338579416275024,0.5424144268035889,0.5751357078552246,0.6301332116127014,0.6962980628013611,0.7840785980224609,0.8775048851966858,0.9358599781990051,0.9486967325210571,0.9331966042518616,0.9074916243553162,0.8855342864990234,0.8469700813293457,0.7956773042678833,0.7342982292175293,0.6591795682907104,0.5790591835975647,0.5044251680374146],
+"lower":[-0.35586977005004883,-0.342103511095047,-0.32082849740982056,-0.30493608117103577,-0.2955051064491272,-0.284365713596344,-0.28160420060157776,-0.27780550718307495,-0.282086580991745,-0.2823757827281952,-0.289211630821228,-0.29646679759025574,-0.3137897253036499,-0.3678787648677826,-0.43318235874176025,-0.4499915540218353,-0.49477094411849976,-0.4936869740486145,-0.48858726024627686,-0.49526718258857727,-0.5155560374259949,-0.5324828028678894,-0.5520391464233398,-0.5636292099952698,-0.567136287689209,-0.5675966143608093,-0.5772103667259216,-0.5710002779960632,-0.5718916058540344,-0.5824161767959595,-0.5999385118484497,-0.6099003553390503,-0.6058993339538574,-0.6278210282325745,-0.6527644991874695,-0.6600654125213623,-0.6689614653587341,-0.6243619322776794,-0.5782147645950317,-0.5951223969459534,-0.5131483674049377,-0.521312952041626,-0.457527756690979,-0.41260576248168945,-0.39938461780548096,-0.38544487953186035,-0.38320088386535645,-0.36919474601745605],
+"upper":[1.240681767463684,1.1361252069473267,1.0465917587280273,0.9831657409667969,0.9368372559547424,0.901094377040863,0.8801707029342651,0.8653491139411926,0.8687076568603516,0.8688122034072876,0.8949645757675171,0.931243896484375,0.9701210260391235,1.1025406122207642,1.269792079925537,1.4040794372558594,1.5243096351623535,1.5187792778015137,1.4726673364639282,1.493423342704773,1.5345637798309326,1.5547242164611816,1.5809028148651123,1.599708080291748,1.6148407459259033,1.625150442123413,1.6436409950256348,1.6235027313232422,1.6283822059631348,1.6452258825302124,1.6676543951034546,1.694729208946228,1.7561707496643066,1.888087511062622,2.045360565185547,2.228222608566284,2.423971176147461,2.496081829071045,2.4756083488464355,2.4615156650543213,2.328131675720215,2.292381525039673,2.151467800140381,2.003960371017456,1.8679810762405396,1.7038040161132813,1.5413192510604858,1.3780450820922852]
 },
 "mapping":{
 "x":"half_hour"
@@ -891,11 +891,29 @@ Parametric raw 90% band mean width: 2.0247</code></pre>
 <section id="the-quantile-forecast" class="level2">
 <h2 class="anchored" data-anchor-id="the-quantile-forecast">The quantile forecast</h2>
 <p>The Normal head above buys a full density, but it buys it by assuming the residuals actually follow a Normal shape, symmetric, thin-tailed, fully described by just a mean and a spread. Real household load does not always oblige that assumption: evening peaks can be sharper on one side than the other, and a handful of unusually large readings can sit well outside anything a Normal curve expects. <code>MLPGAMFpqr</code>, the FPSeq2Q architecture, sidesteps the assumption entirely. Rather than fitting one distributional family, it is trained with a pinball loss across several quantile levels at once, each level penalized separately for over- or under-shooting the real outcome, so the model learns the P5, the P50, the P95, and everything between directly from the data’s own real shape, whatever that shape turns out to be. The practical payoff is a direct answer to a capacity question a <a href="#acronyms_DSO">Distribution System Operator (DSO)</a> actually asks, “what P95 load must a transformer be sized to survive,” without ever assuming the underlying noise looks Gaussian.</p>
+<div class="ark-concept">
+<p><span class="ark-concept-title"><i class="bi bi-info-circle-fill"></i> Key Concept</span></p>
+<p>Standard quantile regression fixes the quantile levels <span class="math inline">\(\tau\)</span> in advance, evenly spaced by convention, and learns only the values <span class="math inline">\(Q_\theta(\tau)\)</span> at those fixed levels. <code>QRLightGBM</code>, elsewhere in this chapter’s own backbone comparison, is exactly that: five fixed levels, <span class="math inline">\(\tau \in \{0.05, 0.25, 0.5, 0.75, 0.95\}\)</span>, chosen once and never revisited. FPQR parameterizes both pieces instead, a Fraction Proposal Network (<a href="#acronyms_FPN">Fraction Proposal Network (FPN)</a>) that learns <em>where</em> to place the levels, and a Quantile Value Network (<a href="#acronyms_QVN">Quantile Value Network (QVN)</a>) that learns the values at those learned levels: <span class="math display">\[
+\hat\tau_\theta^{1:N} = \text{cumsum}\big(\text{softmax}(\text{FPN}(\phi))\big)
+\]</span> <span class="math display">\[
+Q_\theta(\hat\tau_\theta) = \text{QVN}(\hat\tau_\theta, \phi)
+\]</span> so the model can concentrate quantile levels wherever a customer’s own conditional distribution actually needs finer resolution, a sharper tail, a steeper rise, rather than spending five fixed levels evenly whether or not the data calls for it.</p>
+</div>
+<div id="fig-fpqr-vs-standard-qr" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-fpqr-vs-standard-qr-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="../../assets/fpqr-vs-standard-qr.svg" class="img-fluid figure-img">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-fpqr-vs-standard-qr-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;16.2: Standard QR fixes its quantile levels in advance and learns only the values at them. FPQR learns both: a Fraction Proposal Network places the levels, a Quantile Value Network reads values off them, concentrating resolution wherever the real conditional distribution needs it.
+</figcaption>
+</figure>
+</div>
 <div class="quarto-embed-nb-cell" data-notebook="/home/runner/work/ml-energy-disaggregation/ml-energy-disaggregation/book/05-forecasting/03-probabilistic-forecasting-code.ipynb" data-notebook-title="What a Probabilistic Forecast Is Actually Worth" data-notebook-cellid="ca8f8a41">
 <div id="ca8f8a41" class="cell">
 <div class="cell-output cell-output-display">
 <script type="application/vnd.jupyter.widget-view+json">
-{"model_id":"483bf5a906e44f08b496602bb0766dab","version_major":2,"version_minor":0,"quarto_mimetype":"application/vnd.jupyter.widget-view+json"}
+{"model_id":"373a750e78044975924bb2be0e98c7cc","version_major":2,"version_minor":0,"quarto_mimetype":"application/vnd.jupyter.widget-view+json"}
 </script>
 </div>
 <div class="cell-output cell-output-stdout">
@@ -915,7 +933,7 @@ FPQR raw P5-P95 mean width: 3.0809</code></pre>
        <script type="text/javascript" data-lets-plot-script="library" src="https://cdn.jsdelivr.net/gh/JetBrains/lets-plot@v4.11.0/js-package/distr/lets-plot.min.js"></script>
    
    
-          <div id="nV8I1C"></div>
+          <div id="83CLcU"></div>
    <script type="text/javascript" data-lets-plot-script="plot">
    
    (function() {
@@ -940,7 +958,7 @@ FPQR raw P5-P95 mean width: 3.0809</code></pre>
        };
    }
    
-   const containerDiv = document.getElementById("nV8I1C");
+   const containerDiv = document.getElementById("83CLcU");
    let fig = null;
    
    function renderPlot() {
@@ -948,7 +966,7 @@ FPQR raw P5-P95 mean width: 3.0809</code></pre>
            const plotSpec = {
 "data":{
 "half_hour":[0.0,1.0,2.0,3.0,4.0,5.0,6.0,7.0,8.0,9.0,10.0,11.0,12.0,13.0,14.0,15.0,16.0,17.0,18.0,19.0,20.0,21.0,22.0,23.0,24.0,25.0,26.0,27.0,28.0,29.0,30.0,31.0,32.0,33.0,34.0,35.0,36.0,37.0,38.0,39.0,40.0,41.0,42.0,43.0,44.0,45.0,46.0,47.0],
-"truth":[0.6039999723434448,0.6179999709129333,0.6039999723434448,0.38199999928474426,0.33000001311302185,0.2460000067949295,0.2160000056028366,0.1899999976158142,0.23000000417232513,0.16599999368190765,0.2460000067949295,0.1340000033378601,0.2460000067949295,0.14399999380111694,0.22599999606609344,0.2639999985694885,0.26600000262260437,0.8579999804496765,0.6140000224113464,0.4560000002384186,0.36000001430511475,0.5260000228881836,0.4659999907016754,0.9679999947547913,0.5720000267028809,0.6320000290870667,0.5400000214576721,0.671999990940094,0.8740000128746033,0.5540000200271606,0.7799999713897705,0.5400000214576721,0.37599998712539673,0.6299999952316284,0.33399999141693115,0.31200000643730164,0.7020000219345093,0.31200000643730164,0.20600000023841858,0.2540000081062317,0.9739999771118164,0.9279999732971191,0.8640000224113464,0.6159999966621399,0.4819999933242798,0.42800000309944153,0.18400000035762787,0.36000001430511475],
+"truth":[1.8079999685287476,2.48799991607666,0.4699999988079071,0.3540000021457672,0.3240000009536743,1.5080000162124634,0.3100000023841858,0.2939999997615814,0.4699999988079071,0.33399999141693115,0.257999986410141,0.2879999876022339,1.3799999952316284,0.3100000023841858,0.2759999930858612,0.3959999978542328,0.621999979019165,0.5260000228881836,1.3380000591278076,3.9619998931884766,7.421999931335449,7.026000022888184,6.443999767303467,6.690000057220459,9.305999755859375,10.942000389099121,12.494000434875488,11.902000427246094,10.729999542236328,8.576000213623047,8.154000282287598,7.607999801635742,6.289999961853027,6.3520002365112305,7.171999931335449,9.319999694824219,10.300000190734863,10.015999794006348,8.496000289916992,7.435999870300293,8.291999816894531,12.470000267028809,8.82800006866455,9.1899995803833,9.168000221252441,8.960000038146973,10.086000442504883,5.372000217437744],
 "median":[0.29322531819343567,0.22108030319213867,0.19870661199092865,0.17256467044353485,0.23502716422080994,0.1782948225736618,0.17802424728870392,0.1480599045753479,0.13035356998443604,0.16229738295078278,0.17161162197589874,0.2153787612915039,0.16182948648929596,0.24954253435134888,0.25772392749786377,0.31115061044692993,0.32910266518592834,0.29973748326301575,0.37106016278266907,0.3442037105560303,0.31972736120224,0.2938196361064911,0.32796457409858704,0.296923965215683,0.2705105245113373,0.2971785068511963,0.28454816341400146,0.30882740020751953,0.27522170543670654,0.3629665672779083,0.3270041346549988,0.43602219223976135,0.3845849335193634,0.3989661931991577,0.42573103308677673,0.3948390781879425,0.5179377794265747,0.6806524991989136,0.6338456869125366,0.7325078248977661,0.6768141984939575,0.6043524146080017,0.7311728596687317,0.6430073976516724,0.5661634206771851,0.3658495545387268,0.42438530921936035,0.3169560134410858],
 "p5":[-0.4465472996234894,-0.4784826636314392,-0.5001382827758789,-0.5117972493171692,-0.4947321116924286,-0.5172734260559082,-0.5176616311073303,-0.5285792350769043,-0.5408618450164795,-0.5168939828872681,-0.5220885276794434,-0.5073530077934265,-0.5248813033103943,-0.48230549693107605,-0.4685310125350952,-0.4427646994590759,-0.4422932267189026,-0.45642027258872986,-0.41309380531311035,-0.4229586720466614,-0.444508820772171,-0.45476964116096497,-0.4405589699745178,-0.44795769453048706,-0.5144849419593811,-0.45498767495155334,-0.4534003734588623,-0.4454664885997772,-0.4530333876609802,-0.4260338842868805,-0.43768832087516785,-0.39490804076194763,-0.411496102809906,-0.40867114067077637,-0.3806999623775482,-0.39112743735313416,-0.33891579508781433,-0.273312509059906,-0.2627277076244354,-0.23797103762626648,-0.25233888626098633,-0.3835115432739258,-0.218040332198143,-0.24857482314109802,-0.34632155299186707,-0.481135755777359,-0.4638167917728424,-0.42185166478157043],
 "p95":[2.0486953258514404,1.833621621131897,1.710799217224121,1.6349818706512451,1.6987212896347046,1.580115795135498,1.546621322631836,1.5069440603256226,1.4728525876998901,1.5403789281845093,1.5887130498886108,1.669345736503601,1.6157984733581543,1.8477798700332642,1.9454612731933594,2.2372732162475586,2.4536147117614746,2.550220489501953,2.6482021808624268,2.481884002685547,2.4862709045410156,2.6444826126098633,2.641180992126465,2.644857406616211,2.8365747928619385,2.7290754318237305,2.670261859893799,2.695446491241455,2.6260125637054443,2.8425827026367188,2.8897922039031982,3.1728522777557373,3.0204455852508545,3.46378231048584,3.6367855072021484,3.7076375484466553,4.1731767654418945,4.384277820587158,4.408481597900391,4.368899345397949,3.714749574661255,3.7801859378814697,3.689453363418579,3.385589361190796,3.399641990661621,2.7076539993286133,2.573343276977539,2.354609966278076]
@@ -1190,13 +1208,17 @@ FPQR raw P5-P95 mean width: 3.0809</code></pre>
 </div>
 <p>Look at the real gap between what FPQR’s own P5-P95 band claims and what it actually delivers: close to 99% empirical coverage against a nominal 90% target. Nearly one in ten “misses” the model itself was designed to allow for essentially never happens; the interval is far wider than it needs to be, at real operational cost, since a transformer sized to a needlessly inflated P95 is a transformer over-built for the actual risk. A raw, uncalibrated model’s own stated uncertainty, in other words, does not automatically mean what it claims to mean, in either the parametric or the quantile paradigm, and that real gap between the claimed and the actual is exactly the problem split-conformal calibration exists to close, next.</p>
 </section>
-<section id="split-conformal-calibration-does-it-need-calibrating-at-all" class="level2">
-<h2 class="anchored" data-anchor-id="split-conformal-calibration-does-it-need-calibrating-at-all">Split-conformal calibration: does it need calibrating at all?</h2>
-<p>FPQR’s own over-coverage above raises an honest question about the parametric head too: MLPGAMNormal already outputs a full <span class="math inline">\((\mu, \sigma)\)</span> for every forecast, so why not just trust <span class="math inline">\(\sigma\)</span> as a calibrated interval on its own, the way the raw FPQR band was trusted a moment ago, and just proved untrustworthy? The answer is to stop trusting either model’s own stated uncertainty at face value and calibrate it instead, using the exact same split-conformal machinery Chapter 2 already built for the archetype confidence gate, reused verbatim here, not reimplemented for a second time. The idea is to hold back a calibration slice of real customers, measure how far their true outcome actually sat from the model’s own prediction relative to its own claimed scale, and use the resulting empirical distribution to correct the interval directly: <span class="math display">\[\tau = \text{Quantile}_{1-\alpha}\Big(\Big\{\, \frac{|y_j - \mu_j|}{\sigma_j} : j \in \text{calibration set} \,\Big\}\Big), \qquad [\mu_i - \tau\sigma_i,\ \mu_i + \tau\sigma_i]\]</span> This is a scaled non-conformity score, dividing each calibration residual by that same customer’s own predicted <span class="math inline">\(\sigma\)</span> rather than using an unscaled residual directly, so a customer the model is already unsure about does not get penalized twice. The resulting guarantee is a real, finite-sample one, not asymptotic and not dependent on the Normal assumption being correct: Lei, G’Sell, Rinaldo, Tibshirani and Wasserman formalized exactly this result in 2018 <span class="citation" data-cites="lei2018distributionfree">[3]</span>, under exchangeability, at least <span class="math inline">\(1-\alpha\)</span> of a calibration population’s own true outcomes fall inside the resulting interval by construction, regardless of whether the underlying model’s own distributional assumptions happen to be right.</p>
+<section id="split-conformal-calibration" class="level2">
+<h2 class="anchored" data-anchor-id="split-conformal-calibration">Split-conformal calibration</h2>
+<p>FPQR’s own over-coverage above raises an honest question about the parametric head too: MLPGAMNormal already outputs a full <span class="math inline">\((\mu, \sigma)\)</span> for every forecast, so why not just trust <span class="math inline">\(\sigma\)</span> as a calibrated interval on its own, the way the raw FPQR band was trusted a moment ago, and just proved untrustworthy? The answer is to stop trusting either model’s own stated uncertainty at face value and calibrate it instead, using the exact same split-conformal machinery Chapter 2 already built for the archetype confidence gate, reused verbatim here, not reimplemented for a second time. The idea is to hold back a calibration slice of real customers, measure how far their true outcome actually sat from the model’s own prediction relative to its own claimed scale, and use the resulting empirical distribution to correct the interval directly: <span class="math display">\[
+\tau = \text{Quantile}_{1-\alpha}\Big(\Big\{\, \frac{|y_j - \mu_j|}{\sigma_j} : j \in \text{calibration set} \,\Big\}\Big)
+\]</span> <span class="math display">\[
+[\mu_i - \tau\sigma_i,\ \mu_i + \tau\sigma_i]
+\]</span> This is a scaled non-conformity score, dividing each calibration residual by that same customer’s own predicted <span class="math inline">\(\sigma\)</span> rather than using an unscaled residual directly, so a customer the model is already unsure about does not get penalized twice. The resulting guarantee is a real, finite-sample one, not asymptotic and not dependent on the Normal assumption being correct: Lei, G’Sell, Rinaldo, Tibshirani and Wasserman formalized exactly this result in 2018 <span class="citation" data-cites="lei2018distributionfree">[3]</span>, under exchangeability, at least <span class="math inline">\(1-\alpha\)</span> of a calibration population’s own true outcomes fall inside the resulting interval by construction, regardless of whether the underlying model’s own distributional assumptions happen to be right.</p>
 <div class="quarto-embed-nb-cell" data-notebook="/home/runner/work/ml-energy-disaggregation/ml-energy-disaggregation/book/05-forecasting/03-probabilistic-forecasting-code.ipynb" data-notebook-title="What a Probabilistic Forecast Is Actually Worth" data-notebook-cellid="1681db1d">
 <div id="1681db1d" class="cell">
 <div class="cell-output cell-output-stdout">
-<pre><code>Global conformal: coverage=0.899, mean width=1.0315</code></pre>
+<pre><code>Global conformal: coverage=0.899, mean width=1.0317</code></pre>
 </div>
 </div>
 </div>
@@ -1211,7 +1233,7 @@ FPQR raw P5-P95 mean width: 3.0809</code></pre>
        <script type="text/javascript" data-lets-plot-script="library" src="https://cdn.jsdelivr.net/gh/JetBrains/lets-plot@v4.11.0/js-package/distr/lets-plot.min.js"></script>
    
    
-          <div id="0cWTZB"></div>
+          <div id="QWXxOM"></div>
    <script type="text/javascript" data-lets-plot-script="plot">
    
    (function() {
@@ -1236,7 +1258,7 @@ FPQR raw P5-P95 mean width: 3.0809</code></pre>
        };
    }
    
-   const containerDiv = document.getElementById("0cWTZB");
+   const containerDiv = document.getElementById("QWXxOM");
    let fig = null;
    
    function renderPlot() {
@@ -1244,10 +1266,10 @@ FPQR raw P5-P95 mean width: 3.0809</code></pre>
            const plotSpec = {
 "data":{
 "half_hour":[0.0,1.0,2.0,3.0,4.0,5.0,6.0,7.0,8.0,9.0,10.0,11.0,12.0,13.0,14.0,15.0,16.0,17.0,18.0,19.0,20.0,21.0,22.0,23.0,24.0,25.0,26.0,27.0,28.0,29.0,30.0,31.0,32.0,33.0,34.0,35.0,36.0,37.0,38.0,39.0,40.0,41.0,42.0,43.0,44.0,45.0,46.0,47.0],
-"truth":[0.6039999723434448,0.6179999709129333,0.6039999723434448,0.38199999928474426,0.33000001311302185,0.2460000067949295,0.2160000056028366,0.1899999976158142,0.23000000417232513,0.16599999368190765,0.2460000067949295,0.1340000033378601,0.2460000067949295,0.14399999380111694,0.22599999606609344,0.2639999985694885,0.26600000262260437,0.8579999804496765,0.6140000224113464,0.4560000002384186,0.36000001430511475,0.5260000228881836,0.4659999907016754,0.9679999947547913,0.5720000267028809,0.6320000290870667,0.5400000214576721,0.671999990940094,0.8740000128746033,0.5540000200271606,0.7799999713897705,0.5400000214576721,0.37599998712539673,0.6299999952316284,0.33399999141693115,0.31200000643730164,0.7020000219345093,0.31200000643730164,0.20600000023841858,0.2540000081062317,0.9739999771118164,0.9279999732971191,0.8640000224113464,0.6159999966621399,0.4819999933242798,0.42800000309944153,0.18400000035762787,0.36000001430511475],
-"mean":[0.4422149658203125,0.39863020181655884,0.3638208210468292,0.3381260931491852,0.3216116726398468,0.3078170716762543,0.2995874881744385,0.29363030195236206,0.29345113039016724,0.293454647064209,0.3030095398426056,0.31758370995521545,0.3283880352973938,0.36674824357032776,0.4166630804538727,0.47857731580734253,0.514542281627655,0.5131036639213562,0.4923965632915497,0.5016807913780212,0.5096014142036438,0.512541651725769,0.5152786374092102,0.5186575651168823,0.5235455632209778,0.5287317633628845,0.5324172377586365,0.5273110270500183,0.5294876098632813,0.5314508080482483,0.5343417525291443,0.5413079261779785,0.577343225479126,0.6298708915710449,0.6983559727668762,0.7840291857719421,0.8777593374252319,0.9333838224411011,0.9487941265106201,0.9336495995521545,0.9083605408668518,0.8839199542999268,0.8476132750511169,0.794530987739563,0.7330740690231323,0.6593663692474365,0.5795571208000183,0.5034765601158142],
-"lower":[0.046000010990809415,0.047260392685483765,0.04800001240113616,0.050000021270449224,0.05122333041585847,0.04800001842184187,0.04999999944685385,0.04800000735419374,0.04999999463612603,0.047999998120152654,0.0460000059823642,0.0460000087193535,0.046000013646025906,0.04549647607085028,0.04399999474082961,0.04800001907379681,0.044000009738653034,0.04800001166783119,0.03799999507373286,0.031999996438379696,0.02799999019295285,0.020000017421011762,0.020557277139786834,-0.004684908422948553,-0.01290883570089818,-0.016536469172599766,-0.027165517747658185,-0.02337789793334366,-0.005024774195085513,-0.051098346740388934,-0.0253164890760047,-0.037384172577439756,-0.03731357420878112,-0.044258253555060634,-0.023287987307035962,0.00999999391185824,0.03600001046824275,0.04999999328551752,0.06000002703973806,0.07199997469906805,0.0719999798687283,0.07599995119998937,0.07199996707065637,0.06999999848218863,0.06599998077331293,0.057999972485589524,0.058000043430894266,0.04199999090406692],
-"upper":[0.8384299206498156,0.7500000109476339,0.6796416296925223,0.6262521650279211,0.5920000148638351,0.5676341249306667,0.5491749769020231,0.5392605965505304,0.5369022661442084,0.5389092960082653,0.560019073702847,0.5891674111910774,0.6107760569487617,0.6880000110698052,0.7893261661669158,0.9091546125408883,0.985084553516657,0.9782073161748812,0.9467931315093665,0.9713615863176628,0.9912028382143347,1.0050832860305263,1.0099999976786336,1.0420000386567132,1.0599999621428537,1.0739999958983688,1.0919999932649311,1.0779999520333803,1.063999993921648,1.1139999628368855,1.0939999941342933,1.1200000249333968,1.192000025167033,1.3040000366971505,1.4199999328407884,1.558058377632026,1.7195186643822211,1.8167676515966846,1.8375882259815022,1.795299224405241,1.7447211018649753,1.6918399573998641,1.6232265830315775,1.5190619769969373,1.4001481572729517,1.2607327660092835,1.1011141981691424,0.9649531293275615]
+"truth":[1.8079999685287476,2.48799991607666,0.4699999988079071,0.3540000021457672,0.3240000009536743,1.5080000162124634,0.3100000023841858,0.2939999997615814,0.4699999988079071,0.33399999141693115,0.257999986410141,0.2879999876022339,1.3799999952316284,0.3100000023841858,0.2759999930858612,0.3959999978542328,0.621999979019165,0.5260000228881836,1.3380000591278076,3.9619998931884766,7.421999931335449,7.026000022888184,6.443999767303467,6.690000057220459,9.305999755859375,10.942000389099121,12.494000434875488,11.902000427246094,10.729999542236328,8.576000213623047,8.154000282287598,7.607999801635742,6.289999961853027,6.3520002365112305,7.171999931335449,9.319999694824219,10.300000190734863,10.015999794006348,8.496000289916992,7.435999870300293,8.291999816894531,12.470000267028809,8.82800006866455,9.1899995803833,9.168000221252441,8.960000038146973,10.086000442504883,5.372000217437744],
+"mean":[0.4424059987068176,0.39701083302497864,0.3628816604614258,0.33911481499671936,0.3206660747528076,0.3083643317222595,0.2992832362651825,0.29377180337905884,0.2933105528354645,0.2932182252407074,0.30287647247314453,0.3173885643482208,0.3281656503677368,0.367330938577652,0.4183048605918884,0.4770439565181732,0.5147693753242493,0.5125461220741272,0.4920400381088257,0.49907806515693665,0.5095039010047913,0.5111207365989685,0.5144318342208862,0.5180394053459167,0.5238522291183472,0.5287769436836243,0.533215343952179,0.5262512564659119,0.5282452702522278,0.5314048528671265,0.5338579416275024,0.5424144268035889,0.5751357078552246,0.6301332116127014,0.6962980628013611,0.7840785980224609,0.8775048851966858,0.9358599781990051,0.9486967325210571,0.9331966042518616,0.9074916243553162,0.8855342864990234,0.8469700813293457,0.7956773042678833,0.7342982292175293,0.6591795682907104,0.5790591835975647,0.5044251680374146],
+"lower":[0.04599999829094337,0.04599999047444214,0.048000006716335974,0.05000002108577206,0.050000016507979694,0.04799999944785327,0.049999997238145966,0.04800000311526276,0.049999993068226445,0.04800001464036541,0.04575293532127134,0.04600001199822046,0.04600000163774354,0.04599999149723999,0.04600001197317738,0.04608791762554887,0.04400000360945455,0.04799999350206008,0.03800000002988568,0.03199999010537624,0.027999991762726495,0.01824150616568332,0.020000025314278247,-0.005921263425914702,-0.01229548061903074,-0.016446120244957285,-0.02556932471260609,-0.025497441427859258,-0.007509451957261604,-0.05119027456888503,-0.02628408067295851,-0.03517114834452428,-0.041728622309385344,-0.04373357899353891,-0.027403845056415577,0.010000016278080892,0.03600001063298919,0.050000025727698016,0.060000004140768226,0.07199995301945705,0.07199996780418871,0.07599996239014217,0.07200001926248234,0.07135463331874092,0.06600000028686281,0.05799998327054823,0.058000026850745456,0.042850324228169256],
+"upper":[0.8388119991226919,0.7480216755755151,0.6777633142065156,0.6282296089076667,0.5913321329976355,0.5687286639966658,0.548566475292219,0.5395436036428549,0.5366211126027025,0.5384364358410494,0.5600000096250177,0.5887771166982212,0.6103312990977301,0.688661885658064,0.7906097092105995,0.9079999954107976,0.985538747039044,0.9770922506461943,0.9460800761877657,0.966156140208497,0.991007810246856,1.0039999670322537,1.0088636431274942,1.0420000741177482,1.059999938855725,1.0740000076122058,1.092000012616964,1.077999954359683,1.0639999924617172,1.113999980303138,1.0939999639279634,1.120000001951702,1.1920000380198346,1.3040000022189417,1.4199999706591377,1.558157179766841,1.7190097597603824,1.8217199306703122,1.837393460901346,1.794393255484266,1.7429832809064436,1.6950686106079047,1.621940143396209,1.5199999752170257,1.4025964581481958,1.2603591533108727,1.100118340344384,0.9660000118466598]
 },
 "mapping":{
 "x":"half_hour"
@@ -1485,9 +1507,14 @@ FPQR raw P5-P95 mean width: 3.0809</code></pre>
 </div>
 </div>
 </section>
-<section id="does-calibrating-per-chapter-2s-own-archetypes-sharpen-this" class="level2">
-<h2 class="anchored" data-anchor-id="does-calibrating-per-chapter-2s-own-archetypes-sharpen-this">Does calibrating per Chapter 2’s own archetypes sharpen this?</h2>
-<p>A single global <span class="math inline">\(\tau\)</span> treats every one of the 342 real customers as interchangeable for calibration purposes, which is a strange thing to do in a book that spent an entire chapter arguing customers are not interchangeable. Chapter 2’s own real archetypes are already sitting right there, already computed, already validated on this same population, so the natural next question is whether calibrating separately per archetype, rather than once globally, produces a sharper interval at the same 90% guarantee. This is not a new idea invented for this chapter: the author’s own exploratory notebook tried exactly this, calibrating per cluster instead of using one global threshold, though it built a fresh <a href="#acronyms_UMAP">Uniform Manifold Approximation and Projection (UMAP)</a> and <a href="#acronyms_GMM">Gaussian Mixture Model (GMM)</a> clustering pass just to run that check. Reusing Chapter 2’s own already-computed archetypes here instead avoids that duplicated clustering effort entirely, and the real question is checked honestly below rather than assumed to come out sharper just because conditioning on more information usually sounds like it should help.</p>
+<section id="calibrating-per-archetype" class="level2">
+<h2 class="anchored" data-anchor-id="calibrating-per-archetype">Calibrating per archetype</h2>
+<p>A single global <span class="math inline">\(\tau\)</span> treats every one of the 342 real customers as interchangeable for calibration purposes, which is a strange thing to do in a book that spent an entire chapter arguing customers are not interchangeable. Chapter 2’s own real archetypes are already sitting right there, already computed, already validated on this same population, so the natural next question is whether calibrating separately per archetype, rather than once globally, produces a sharper interval at the same 90% guarantee. This is not a new idea invented for this chapter: the author’s own exploratory notebook tried exactly this, calibrating per cluster instead of using one global threshold, though it built a fresh <a href="#acronyms_UMAP">Uniform Manifold Approximation and Projection (UMAP)</a> and <a href="#acronyms_GMM">Gaussian Mixture Model (GMM)</a> clustering pass just to run that check. Reusing Chapter 2’s own already-computed archetypes here instead avoids that duplicated clustering effort entirely.</p>
+<p>Concretely, one threshold <span class="math inline">\(\tau_k\)</span> per archetype <span class="math inline">\(k\)</span>, calibrated only on that archetype’s own calibration customers, applied only to that archetype’s own eval customers: <span class="math display">\[
+\tau_k = \text{Quantile}_{1-\alpha}\Big(\Big\{\, \frac{|y_j - \mu_j|}{\sigma_j} : j \in \text{calibration set},\ \text{archetype}(j) = k \,\Big\}\Big)
+\]</span> <span class="math display">\[
+[\mu_i - \tau_{k(i)}\sigma_i,\ \mu_i + \tau_{k(i)}\sigma_i]
+\]</span> the same global formula above, just restricted to one archetype’s own calibration slice at a time, where <span class="math inline">\(k(i)\)</span> is customer <span class="math inline">\(i\)</span>’s own archetype. The real question is checked honestly below rather than assumed to come out sharper just because conditioning on more information usually sounds like it should help.</p>
 <div class="quarto-embed-nb-cell" data-notebook="/home/runner/work/ml-energy-disaggregation/ml-energy-disaggregation/book/05-forecasting/03-probabilistic-forecasting-code.ipynb" data-notebook-title="What a Probabilistic Forecast Is Actually Worth" data-notebook-cellid="bdc08e4d">
 <div id="bdc08e4d" class="cell">
 <div class="cell-output cell-output-stdout">
@@ -1567,12 +1594,12 @@ FPQR raw P5-P95 mean width: 3.0809</code></pre>
 <tbody class="gt_table_body">
 <tr class="odd">
 <td class="gt_row gt_left">Global conformal</td>
-<td class="gt_row gt_right">0.8992</td>
-<td class="gt_row gt_right">1.0315</td>
+<td class="gt_row gt_right">0.8993</td>
+<td class="gt_row gt_right">1.0317</td>
 </tr>
 <tr class="even">
 <td class="gt_row gt_left" style="background-color: #EAF3FA">Per-archetype conformal</td>
-<td class="gt_row gt_right" style="background-color: #EAF3FA">0.8989</td>
+<td class="gt_row gt_right" style="background-color: #EAF3FA">0.8987</td>
 <td class="gt_row gt_right" style="background-color: #EAF3FA">1.108</td>
 </tr>
 </tbody><tfoot>
@@ -1667,37 +1694,37 @@ FPQR raw P5-P95 mean width: 3.0809</code></pre>
 <tr class="odd">
 <td class="gt_row gt_left">0</td>
 <td class="gt_row gt_right">2868</td>
-<td class="gt_row gt_right">0.7684</td>
+<td class="gt_row gt_right">0.7682</td>
 <td class="gt_row gt_right">0.6154</td>
 </tr>
 <tr class="even">
 <td class="gt_row gt_left" style="background-color: #EAF3FA">1</td>
 <td class="gt_row gt_right" style="background-color: #EAF3FA">4656</td>
-<td class="gt_row gt_right" style="background-color: #EAF3FA">0.9758</td>
+<td class="gt_row gt_right" style="background-color: #EAF3FA">0.976</td>
 <td class="gt_row gt_right" style="background-color: #EAF3FA">0.6154</td>
 </tr>
 <tr class="odd">
 <td class="gt_row gt_left">2</td>
 <td class="gt_row gt_right">3368</td>
-<td class="gt_row gt_right">0.8173</td>
+<td class="gt_row gt_right">0.8172</td>
 <td class="gt_row gt_right">0.6154</td>
 </tr>
 <tr class="even">
 <td class="gt_row gt_left" style="background-color: #EAF3FA">3</td>
 <td class="gt_row gt_right" style="background-color: #EAF3FA">2255</td>
-<td class="gt_row gt_right" style="background-color: #EAF3FA">0.7889</td>
+<td class="gt_row gt_right" style="background-color: #EAF3FA">0.7887</td>
 <td class="gt_row gt_right" style="background-color: #EAF3FA">0.6154</td>
 </tr>
 <tr class="odd">
 <td class="gt_row gt_left">4</td>
 <td class="gt_row gt_right">2243</td>
-<td class="gt_row gt_right">0.9766</td>
+<td class="gt_row gt_right">0.977</td>
 <td class="gt_row gt_right">0.6154</td>
 </tr>
 <tr class="even">
 <td class="gt_row gt_left" style="background-color: #EAF3FA">Global</td>
 <td class="gt_row gt_right" style="background-color: #EAF3FA">15390</td>
-<td class="gt_row gt_right" style="background-color: #EAF3FA">0.8174</td>
+<td class="gt_row gt_right" style="background-color: #EAF3FA">0.8175</td>
 <td class="gt_row gt_right" style="background-color: #EAF3FA">0.6154</td>
 </tr>
 </tbody><tfoot>
@@ -1715,14 +1742,297 @@ FPQR raw P5-P95 mean width: 3.0809</code></pre>
 </div>
 <p>MLPGAMNormal’s own predicted <span class="math inline">\(\sigma\)</span> is essentially constant across every archetype, the model has not learned much real heteroscedasticity by customer type. Real per-archetype differences do show up, but in <span class="math inline">\(\tau\)</span>, not <span class="math inline">\(\sigma\)</span>: <span class="math inline">\(\tau\)</span> ranges from roughly 0.77 to 1.00 across archetypes against a global 0.82. Calibration only needs the <em>tail</em> of a calibration set, the top 10% of scores, to estimate <span class="math inline">\(\tau\)</span> at <span class="math inline">\(\alpha=0.1\)</span>; splitting an already-modest calibration set five ways shrinks that effective tail sample per archetype, adding real quantile-estimation noise that outweighs whatever conditioning benefit archetype membership might otherwise offer. The archetypes were built for shape similarity in Chapter 4, not for residual-scale heterogeneity, and here, checked directly, they do not transfer to this different question.</p>
 </section>
-<section id="does-the-backbone-matter-or-just-the-paradigm" class="level2">
-<h2 class="anchored" data-anchor-id="does-the-backbone-matter-or-just-the-paradigm">Does the backbone matter, or just the paradigm?</h2>
+<section id="does-the-backbone-matter" class="level2">
+<h2 class="anchored" data-anchor-id="does-the-backbone-matter">Does the backbone matter?</h2>
 <p>Every result above shares one architecture, MLPGAM, on purpose: differences in the numbers come from the probabilistic paradigm, not from comparing unrelated models. That is also a real limitation. FPQR’s own nine-point over-coverage, the near-constant learned <span class="math inline">\(\sigma\)</span> that made per-archetype calibration backfire, either could be a genuine property of this data, or an artifact of this one neural architecture. The only way to tell the difference honestly is to run the same three paradigms through a completely different kind of model and check whether the same findings hold up.</p>
 <p><code>NGBoost</code> and <code>QRLightGBM</code> are that second backbone: gradient-boosted trees, not a neural sequence encoder, trained on exactly the same raw lookback window, no calendar features here either, evaluated with the same <a href="#acronyms_UQ">Uncertainty Quantification (UQ)</a> machinery already built above. Conformal calibration wraps trivially over either backbone’s own residuals, <code>ConformalResidualFitting</code> for NGBoost’s <span class="math inline">\((\mu, \sigma)\)</span> output, <code>ConformalQuantileRegressor</code> for QRLightGBM’s quantile output, so this is a genuine backbone-for-backbone swap, not a reimplementation.</p>
 <div class="quarto-embed-nb-cell" data-notebook="/home/runner/work/ml-energy-disaggregation/ml-energy-disaggregation/book/05-forecasting/03-probabilistic-forecasting-code.ipynb" data-notebook-title="What a Probabilistic Forecast Is Actually Worth" data-notebook-cellid="4c41cd5f">
 <div id="4c41cd5f" class="cell">
 <div class="cell-output cell-output-stdout">
 <pre><code>NGBoost (Normal), 5,000-window subsample, test MAE: 0.2616, CRPS: 0.3348</code></pre>
+</div>
+</div>
+</div>
+<div class="quarto-embed-nb-cell" data-notebook="/home/runner/work/ml-energy-disaggregation/ml-energy-disaggregation/book/05-forecasting/03-probabilistic-forecasting-code.ipynb" data-notebook-title="What a Probabilistic Forecast Is Actually Worth" data-notebook-cellid="a5bfded0">
+<div id="a5bfded0" class="cell">
+<div class="cell-output cell-output-display">
+
+   
+       <meta charset="UTF-8">
+       <style> html, body { margin: 0; padding: 0; } </style>
+       <script type="text/javascript" data-lets-plot-script="library" src="https://cdn.jsdelivr.net/gh/JetBrains/lets-plot@v4.11.0/js-package/distr/lets-plot.min.js"></script>
+   
+   
+          <div id="5eVFIH"></div>
+   <script type="text/javascript" data-lets-plot-script="plot">
+   
+   (function() {
+   // ----------
+   
+   const forceImmediateRender = false;
+   const responsive = false;
+   
+   let sizing = {
+       width_mode: "MIN",
+       height_mode: "SCALED",
+       width: null, 
+       height: null 
+   };
+   
+   const preferredWidth = document.body.dataset.letsPlotPreferredWidth;
+   if (preferredWidth !== undefined) {
+       sizing = {
+           width_mode: 'FIXED',
+           height_mode: 'SCALED',
+           width: parseFloat(preferredWidth)
+       };
+   }
+   
+   const containerDiv = document.getElementById("5eVFIH");
+   let fig = null;
+   
+   function renderPlot() {
+       if (fig === null) {
+           const plotSpec = {
+"data":{
+"half_hour":[0.0,1.0,2.0,3.0,4.0,5.0,6.0,7.0,8.0,9.0,10.0,11.0,12.0,13.0,14.0,15.0,16.0,17.0,18.0,19.0,20.0,21.0,22.0,23.0,24.0,25.0,26.0,27.0,28.0,29.0,30.0,31.0,32.0,33.0,34.0,35.0,36.0,37.0,38.0,39.0,40.0,41.0,42.0,43.0,44.0,45.0,46.0,47.0],
+"truth":[1.8079999685287476,2.48799991607666,0.4699999988079071,0.3540000021457672,0.3240000009536743,1.5080000162124634,0.3100000023841858,0.2939999997615814,0.4699999988079071,0.33399999141693115,0.257999986410141,0.2879999876022339,1.3799999952316284,0.3100000023841858,0.2759999930858612,0.3959999978542328,0.621999979019165,0.5260000228881836,1.3380000591278076,3.9619998931884766,7.421999931335449,7.026000022888184,6.443999767303467,6.690000057220459,9.305999755859375,10.942000389099121,12.494000434875488,11.902000427246094,10.729999542236328,8.576000213623047,8.154000282287598,7.607999801635742,6.289999961853027,6.3520002365112305,7.171999931335449,9.319999694824219,10.300000190734863,10.015999794006348,8.496000289916992,7.435999870300293,8.291999816894531,12.470000267028809,8.82800006866455,9.1899995803833,9.168000221252441,8.960000038146973,10.086000442504883,5.372000217437744],
+"mean":[3.3455004958017103,2.262981003772087,2.5039339502704228,1.9324375280812682,1.9182713139915561,1.7989327042334324,1.833550558283335,1.7649166288099412,2.683611089480186,2.552209930471518,2.2406984864179833,1.217257286640358,2.579436942390814,1.9295031486856573,1.1724041391473266,0.6006913394417958,1.9150683383011504,3.7792624087364426,5.077621219604126,3.804082783031239,4.206147326444259,3.0060580113161017,3.794706791684379,3.262674775920153,3.7820446320094567,2.14366766798047,3.3316166517509638,1.6680129490229405,2.862141920323362,2.101556896531237,2.163440492798395,2.7273695265158726,1.3564859346747293,1.6108421951519758,1.1783975181453017,1.3732896673279753,3.0003123379156844,4.9437306240108345,4.955135240571578,5.967191784507001,3.2511470639781983,5.527331604359663,3.8064540797970756,3.3156628655332834,1.5290557409540788,1.7790099231478225,2.3142017246136724,2.4661137086541194],
+"lower":[-7.4311811937604855,-0.8289979826581759,1.533175937522556,0.9609236566407224,1.153396970113136,-6.0637857371742125,1.0428436162245518,1.1441091483685017,1.366052354200017,-4817.462261473343,-0.10389591134756593,-14.41876823836233,-17.491495569146046,0.05981373349952035,-6.472444214498142,-28.49797558834476,-12.739614229992844,-6.400556835016772,2.749209056557796,-0.1682796646965512,2.4667302940727946,1.59666315251681,-24.51715933528862,-10.773141662276352,2.597155142554362,0.9483168795827317,-18.921777629074928,-1.5542106101955138,-98.75889231125697,-12.572382908602261,-0.706380299511352,1.6918120261964649,-1.678784625676037,-0.15188222325517176,-0.18258245641898085,-0.523709468141184,-24.298891637594622,-174.77588940595754,-84.10851145536452,-21.89867024405681,-4.5067485037056185,-0.580600451287256,-4.356600933152441,-3.345944433158279,-2.5952316377862834,-40.21427257791512,-2.665272545843688,-27.726784494581693],
+"upper":[14.122182185363906,5.3549599902023495,3.4746919630182895,2.903951399521814,2.6831456578699764,9.661651145641077,2.624257500342118,2.3857241092513806,4.001169824760355,4822.566681334286,4.5852928841835325,16.853282811643048,22.650369453927674,3.7991925638717943,8.817252492792795,29.69935826722835,16.569750906595146,13.959081652489658,7.406033382650456,7.7764452307590295,5.945564358815723,4.415452870115393,32.10657291865738,17.29849121411666,4.9669341214645515,3.339018456378208,25.585010932576854,4.8902365082413946,104.4831761519037,16.775496701664736,5.033261285108142,3.76292702683528,4.391756495025495,3.3735666135591234,2.5393774927095842,3.2702888027971344,30.29951631342599,184.66335065397922,94.01878193650768,33.83305381307081,11.009042631662016,11.635263660006583,11.969509092746593,9.977270164224846,5.6533431196944415,43.77229242421077,7.293675995071032,32.659011911889934]
+},
+"mapping":{
+"x":"half_hour"
+},
+"data_meta":{
+"series_annotations":[{
+"type":"int",
+"column":"half_hour"
+},{
+"type":"float",
+"column":"truth"
+},{
+"type":"float",
+"column":"mean"
+},{
+"type":"float",
+"column":"lower"
+},{
+"type":"float",
+"column":"upper"
+}]
+},
+"ggtitle":{
+"text":"Same Real Test Day, NGBoost Parametric 90% Band",
+"subtitle":"Same window as every plot above, tree backbone instead of MLPGAM."
+},
+"guides":{
+"x":{
+"title":"Half-hour of forecast horizon"
+},
+"y":{
+"title":"Load (kW)"
+}
+},
+"theme":{
+"text":{
+"color":"#2d2d2d",
+"family":"'Libre Franklin', 'Segoe UI', Roboto, Helvetica, Arial, sans-serif",
+"size":12.0,
+"blank":false
+},
+"axis_title_x":{
+"face":"plain",
+"size":14.0,
+"margin":[10.0,0.0,0.0,0.0],
+"blank":false
+},
+"axis_title_y":{
+"face":"plain",
+"size":14.0,
+"margin":[0.0,10.0,0.0,0.0],
+"blank":false
+},
+"axis_text_x":{
+"color":"#666666",
+"angle":0.0,
+"hjust":0.5,
+"margin":[8.0,0.0,0.0,0.0],
+"blank":false
+},
+"axis_text_y":{
+"color":"#666666",
+"margin":[0.0,0.0,0.0,8.0],
+"blank":false
+},
+"axis_ticks":{
+"color":"#bbbbbb",
+"size":0.75,
+"blank":false
+},
+"axis_line":{
+"color":"#bbbbbb",
+"size":1.0,
+"blank":false
+},
+"legend_background":{
+"blank":true
+},
+"legend_text":{
+"size":12.0,
+"blank":false
+},
+"legend_title":{
+"face":"bold",
+"size":14.0,
+"blank":false
+},
+"legend_position":"none",
+"legend_spacing":10.0,
+"legend_key":{
+"blank":true
+},
+"panel_background":{
+"blank":true
+},
+"panel_border":{
+"blank":true
+},
+"panel_grid_minor":{
+"blank":true
+},
+"panel_grid_major_x":{
+"blank":true
+},
+"panel_grid_major_y":{
+"blank":true
+},
+"plot_background":{
+"blank":true
+},
+"plot_title":{
+"color":"#333333",
+"face":"bold",
+"size":19.0,
+"hjust":0.0,
+"margin":[0.0,0.0,6.0,0.0],
+"blank":false
+},
+"plot_subtitle":{
+"color":"#6b6b6b",
+"size":16.0,
+"hjust":0.0,
+"margin":[0.0,0.0,18.0,0.0],
+"blank":false
+},
+"plot_caption":{
+"color":"#999999",
+"face":"italic",
+"size":9.0,
+"hjust":1.0,
+"margin":[12.0,0.0,0.0,0.0],
+"blank":false
+},
+"plot_margin":[16.0,16.0,10.0,10.0],
+"strip_background":{
+"blank":true
+},
+"strip_text":{
+"family":"'Libre Franklin', 'Segoe UI', Roboto, Helvetica, Arial, sans-serif",
+"face":"bold",
+"size":12.0,
+"hjust":0.0,
+"blank":false
+}
+},
+"ggsize":{
+"width":960.0,
+"height":340.0
+},
+"kind":"plot",
+"scales":[],
+"layers":[{
+"geom":"ribbon",
+"mapping":{
+"ymin":"lower",
+"ymax":"upper"
+},
+"data_meta":{
+},
+"fill":"#0369A1",
+"alpha":0.2,
+"data":{
+}
+},{
+"geom":"line",
+"mapping":{
+"y":"mean"
+},
+"data_meta":{
+},
+"color":"#0369A1",
+"size":1.2,
+"data":{
+}
+},{
+"geom":"line",
+"mapping":{
+"y":"truth"
+},
+"data_meta":{
+},
+"color":"#EA580C",
+"size":1.0,
+"linetype":"dashed",
+"data":{
+}
+}],
+"metainfo_list":[],
+"spec_id":"4"
+};
+           fig = LetsPlot.buildPlotFromProcessedSpecs(plotSpec, containerDiv, sizing);
+       } else {
+           fig.updateView({});
+       }
+   }
+   
+   const renderImmediately = 
+       forceImmediateRender || (
+           sizing.width_mode === 'FIXED' && 
+           (sizing.height_mode === 'FIXED' || sizing.height_mode === 'SCALED')
+       );
+   
+   if (renderImmediately) {
+       renderPlot();
+   }
+   
+   if (!renderImmediately || responsive) {
+       // Set up observer for initial sizing or continuous monitoring
+       var observer = new ResizeObserver(function(entries) {
+           for (let entry of entries) {
+               if (entry.contentBoxSize && 
+                   entry.contentBoxSize[0].inlineSize > 0) {
+                   if (!responsive && observer) {
+                       observer.disconnect();
+                       observer = null;
+                   }
+                   renderPlot();
+                   if (!responsive) {
+                       break;
+                   }
+               }
+           }
+       });
+       
+       observer.observe(containerDiv);
+   }
+   
+   // ----------
+   })();
+   
+   </script>
+   
+
 </div>
 </div>
 </div>
@@ -1735,6 +2045,290 @@ QRLightGBM + CQR: coverage=0.900, mean width=0.9312</code></pre>
 </div>
 </div>
 </div>
+<div class="quarto-embed-nb-cell" data-notebook="/home/runner/work/ml-energy-disaggregation/ml-energy-disaggregation/book/05-forecasting/03-probabilistic-forecasting-code.ipynb" data-notebook-title="What a Probabilistic Forecast Is Actually Worth" data-notebook-cellid="5d89a3b9">
+<div id="5d89a3b9" class="cell">
+<div class="cell-output cell-output-display">
+
+   
+       <meta charset="UTF-8">
+       <style> html, body { margin: 0; padding: 0; } </style>
+       <script type="text/javascript" data-lets-plot-script="library" src="https://cdn.jsdelivr.net/gh/JetBrains/lets-plot@v4.11.0/js-package/distr/lets-plot.min.js"></script>
+   
+   
+          <div id="9yM4rP"></div>
+   <script type="text/javascript" data-lets-plot-script="plot">
+   
+   (function() {
+   // ----------
+   
+   const forceImmediateRender = false;
+   const responsive = false;
+   
+   let sizing = {
+       width_mode: "MIN",
+       height_mode: "SCALED",
+       width: null, 
+       height: null 
+   };
+   
+   const preferredWidth = document.body.dataset.letsPlotPreferredWidth;
+   if (preferredWidth !== undefined) {
+       sizing = {
+           width_mode: 'FIXED',
+           height_mode: 'SCALED',
+           width: parseFloat(preferredWidth)
+       };
+   }
+   
+   const containerDiv = document.getElementById("9yM4rP");
+   let fig = null;
+   
+   function renderPlot() {
+       if (fig === null) {
+           const plotSpec = {
+"data":{
+"half_hour":[0.0,1.0,2.0,3.0,4.0,5.0,6.0,7.0,8.0,9.0,10.0,11.0,12.0,13.0,14.0,15.0,16.0,17.0,18.0,19.0,20.0,21.0,22.0,23.0,24.0,25.0,26.0,27.0,28.0,29.0,30.0,31.0,32.0,33.0,34.0,35.0,36.0,37.0,38.0,39.0,40.0,41.0,42.0,43.0,44.0,45.0,46.0,47.0],
+"truth":[1.8079999685287476,2.48799991607666,0.4699999988079071,0.3540000021457672,0.3240000009536743,1.5080000162124634,0.3100000023841858,0.2939999997615814,0.4699999988079071,0.33399999141693115,0.257999986410141,0.2879999876022339,1.3799999952316284,0.3100000023841858,0.2759999930858612,0.3959999978542328,0.621999979019165,0.5260000228881836,1.3380000591278076,3.9619998931884766,7.421999931335449,7.026000022888184,6.443999767303467,6.690000057220459,9.305999755859375,10.942000389099121,12.494000434875488,11.902000427246094,10.729999542236328,8.576000213623047,8.154000282287598,7.607999801635742,6.289999961853027,6.3520002365112305,7.171999931335449,9.319999694824219,10.300000190734863,10.015999794006348,8.496000289916992,7.435999870300293,8.291999816894531,12.470000267028809,8.82800006866455,9.1899995803833,9.168000221252441,8.960000038146973,10.086000442504883,5.372000217437744],
+"median":[2.363573044822931,2.411971640348687,1.9479616955215795,2.2611296364589326,2.1148724214482613,2.2440899167381776,2.0468717618673784,1.8301954661064994,2.041344416003754,2.031142588420918,1.7915973523993218,2.0401284560563564,1.980791154060686,1.9913924353928871,1.3972919578932674,1.2670704873880025,1.0418104991586146,1.5363366734648867,2.1228079900633183,1.9766973969111077,2.3204371668081123,1.8267825229741321,1.7529826168710123,2.0833049415911873,1.723479336992885,0.9352293806210598,1.603796777933579,1.4606199082386047,1.3436838198602186,2.306952719234527,1.483261919299994,1.9320966504170436,1.2738196050178436,1.9342864798640813,1.837542727743527,2.0916180527034403,1.7764772711544192,1.9768013863597358,2.2690497676906816,2.062915448945891,2.708551895904986,2.7578329475080783,1.9402942166865162,2.2779551429364853,2.770346547585033,2.1894475269700835,2.257149858542379,2.0369416599527614],
+"p5":[0.4982684641266909,0.3683480699206422,0.3177723239368764,0.28508503924977835,0.26126815669873227,0.26073195855361325,0.2559156664844245,0.25138197930520106,0.27782557729008883,0.23193275059174004,0.23009032813438593,0.23694928711714128,0.34032097348677853,0.27630046183740375,0.2223987960046272,0.2681821062011945,0.18910531634661484,0.2917961279604432,0.3190592505279324,0.2506772680271699,0.20119619894055396,0.19710692599593035,0.2342187501027592,0.2031464161324076,0.3014019959077268,0.2605771715364003,0.17950507548483588,0.2542842865103731,0.2168961550448505,0.2122515623068646,0.2390357327770185,0.2128116669324718,0.2628446867350946,0.31747597358185387,0.28907959628068763,0.46860228287035327,0.3585859709581159,0.34689970540640475,0.45729321882523877,0.43791123231423823,0.43106241495093567,0.3512829255612968,0.423362347980723,0.5123314067965495,0.34460020299113014,0.35677466161264887,0.37775761391207596,0.2701449050940363],
+"p95":[3.9126724454218462,3.4700055489574626,2.964838498533308,2.785473848625613,2.8316763420783966,2.919149408787028,2.584519752005417,2.653540558352325,3.577262371871852,2.9414817761455776,2.653432275031658,3.0293748634733495,3.6378303810849397,4.066729920827852,2.6975525610905904,3.2158962940065203,4.190806679983183,4.168171195660273,5.061241604114542,5.53140750565012,5.256462551691363,4.160024509266313,4.735801171150574,4.80297893123018,3.4415983504124754,2.92112513933423,3.1976024524338005,3.014975430644606,3.752762628282772,4.45500188996769,4.5080079008573355,3.996094187699125,4.516952217742628,3.5156017116939178,4.638138007906449,4.7931350461620275,4.963692583906083,5.243473680658239,6.190441439196509,8.516391232087747,7.202705624394871,8.585809779208713,6.347639345135037,6.268876339203174,5.379427634311736,4.743490541533804,4.374285285238994,3.8972223481941155]
+},
+"mapping":{
+"x":"half_hour"
+},
+"data_meta":{
+"series_annotations":[{
+"type":"int",
+"column":"half_hour"
+},{
+"type":"float",
+"column":"truth"
+},{
+"type":"float",
+"column":"median"
+},{
+"type":"float",
+"column":"p5"
+},{
+"type":"float",
+"column":"p95"
+}]
+},
+"ggtitle":{
+"text":"Same Real Test Day, QRLightGBM P5-P95 Band",
+"subtitle":"Same window as every plot above; this band under-covers, FPQR's over-covered."
+},
+"guides":{
+"x":{
+"title":"Half-hour of forecast horizon"
+},
+"y":{
+"title":"Load (kW)"
+}
+},
+"theme":{
+"text":{
+"color":"#2d2d2d",
+"family":"'Libre Franklin', 'Segoe UI', Roboto, Helvetica, Arial, sans-serif",
+"size":12.0,
+"blank":false
+},
+"axis_title_x":{
+"face":"plain",
+"size":14.0,
+"margin":[10.0,0.0,0.0,0.0],
+"blank":false
+},
+"axis_title_y":{
+"face":"plain",
+"size":14.0,
+"margin":[0.0,10.0,0.0,0.0],
+"blank":false
+},
+"axis_text_x":{
+"color":"#666666",
+"angle":0.0,
+"hjust":0.5,
+"margin":[8.0,0.0,0.0,0.0],
+"blank":false
+},
+"axis_text_y":{
+"color":"#666666",
+"margin":[0.0,0.0,0.0,8.0],
+"blank":false
+},
+"axis_ticks":{
+"color":"#bbbbbb",
+"size":0.75,
+"blank":false
+},
+"axis_line":{
+"color":"#bbbbbb",
+"size":1.0,
+"blank":false
+},
+"legend_background":{
+"blank":true
+},
+"legend_text":{
+"size":12.0,
+"blank":false
+},
+"legend_title":{
+"face":"bold",
+"size":14.0,
+"blank":false
+},
+"legend_position":"none",
+"legend_spacing":10.0,
+"legend_key":{
+"blank":true
+},
+"panel_background":{
+"blank":true
+},
+"panel_border":{
+"blank":true
+},
+"panel_grid_minor":{
+"blank":true
+},
+"panel_grid_major_x":{
+"blank":true
+},
+"panel_grid_major_y":{
+"blank":true
+},
+"plot_background":{
+"blank":true
+},
+"plot_title":{
+"color":"#333333",
+"face":"bold",
+"size":19.0,
+"hjust":0.0,
+"margin":[0.0,0.0,6.0,0.0],
+"blank":false
+},
+"plot_subtitle":{
+"color":"#6b6b6b",
+"size":16.0,
+"hjust":0.0,
+"margin":[0.0,0.0,18.0,0.0],
+"blank":false
+},
+"plot_caption":{
+"color":"#999999",
+"face":"italic",
+"size":9.0,
+"hjust":1.0,
+"margin":[12.0,0.0,0.0,0.0],
+"blank":false
+},
+"plot_margin":[16.0,16.0,10.0,10.0],
+"strip_background":{
+"blank":true
+},
+"strip_text":{
+"family":"'Libre Franklin', 'Segoe UI', Roboto, Helvetica, Arial, sans-serif",
+"face":"bold",
+"size":12.0,
+"hjust":0.0,
+"blank":false
+}
+},
+"ggsize":{
+"width":960.0,
+"height":340.0
+},
+"kind":"plot",
+"scales":[],
+"layers":[{
+"geom":"ribbon",
+"mapping":{
+"ymin":"p5",
+"ymax":"p95"
+},
+"data_meta":{
+},
+"fill":"#0369A1",
+"alpha":0.2,
+"data":{
+}
+},{
+"geom":"line",
+"mapping":{
+"y":"median"
+},
+"data_meta":{
+},
+"color":"#0369A1",
+"size":1.2,
+"data":{
+}
+},{
+"geom":"line",
+"mapping":{
+"y":"truth"
+},
+"data_meta":{
+},
+"color":"#EA580C",
+"size":1.0,
+"linetype":"dashed",
+"data":{
+}
+}],
+"metainfo_list":[],
+"spec_id":"5"
+};
+           fig = LetsPlot.buildPlotFromProcessedSpecs(plotSpec, containerDiv, sizing);
+       } else {
+           fig.updateView({});
+       }
+   }
+   
+   const renderImmediately = 
+       forceImmediateRender || (
+           sizing.width_mode === 'FIXED' && 
+           (sizing.height_mode === 'FIXED' || sizing.height_mode === 'SCALED')
+       );
+   
+   if (renderImmediately) {
+       renderPlot();
+   }
+   
+   if (!renderImmediately || responsive) {
+       // Set up observer for initial sizing or continuous monitoring
+       var observer = new ResizeObserver(function(entries) {
+           for (let entry of entries) {
+               if (entry.contentBoxSize && 
+                   entry.contentBoxSize[0].inlineSize > 0) {
+                   if (!responsive && observer) {
+                       observer.disconnect();
+                       observer = null;
+                   }
+                   renderPlot();
+                   if (!responsive) {
+                       break;
+                   }
+               }
+           }
+       });
+       
+       observer.observe(containerDiv);
+   }
+   
+   // ----------
+   })();
+   
+   </script>
+   
+
+</div>
+</div>
+</div>
+<p>Same test day as every plot above, tree backbone this time: NGBoost’s own parametric band, then QRLightGBM’s own raw quantile band, directly comparable panel-to-panel against MLPGAM’s own versions further up the chapter.</p>
 <div class="quarto-embed-nb-cell" data-notebook="/home/runner/work/ml-energy-disaggregation/ml-energy-disaggregation/book/05-forecasting/03-probabilistic-forecasting-code.ipynb" data-notebook-title="What a Probabilistic Forecast Is Actually Worth" data-notebook-cellid="6c4fa855">
 <div id="6c4fa855" class="cell">
 <div class="cell-output cell-output-display">
@@ -1814,7 +2408,7 @@ QRLightGBM + CQR: coverage=0.900, mean width=0.9312</code></pre>
 <tr class="odd">
 <td class="gt_row gt_left">MLPGAM (neural)</td>
 <td class="gt_row gt_left">Parametric (Normal)</td>
-<td class="gt_row gt_right">0.3628</td>
+<td class="gt_row gt_right">0.3627</td>
 <td class="gt_row gt_right"><na></na></td>
 <td class="gt_row gt_right"><na></na></td>
 </tr>
@@ -1844,7 +2438,7 @@ QRLightGBM + CQR: coverage=0.900, mean width=0.9312</code></pre>
 <td class="gt_row gt_left">Conformal</td>
 <td class="gt_row gt_right"><na></na></td>
 <td class="gt_row gt_right">0.899</td>
-<td class="gt_row gt_right">1.0315</td>
+<td class="gt_row gt_right">1.0317</td>
 </tr>
 <tr class="even">
 <td class="gt_row gt_left" style="background-color: #EAF3FA">QRLightGBM (tree)</td>
@@ -1867,27 +2461,9 @@ QRLightGBM + CQR: coverage=0.900, mean width=0.9312</code></pre>
 </div>
 </div>
 <p>Two real findings, not one. First: NGBoost’s point MAE (0.2616) actually beats MLPGAM’s own (0.3627), despite training on a 5,000-window subsample, roughly 5% of the pooled training data MLPGAM used. Second, and more central to this chapter’s own question: QRLightGBM’s raw quantile band <em>under</em>-covers, 0.824 against a 0.90 nominal target, the opposite miscalibration direction from FPQR’s 0.990 over-coverage on the neural backbone. That is a direct answer to the question this section opened with: the <em>direction</em> of raw miscalibration is backbone-specific, not a fixed property of this data, one architecture over-promises, the other under-delivers. What does not change with the backbone is that conformal calibration fixes both: CQR brings QRLightGBM’s band to 0.900 coverage, matching MLPGAM’s own calibrated 0.899, from opposite starting points. The lesson is not “trust one backbone’s raw uncertainty over the other,” it is that neither backbone’s raw uncertainty should be trusted without calibration, regardless of which direction it happens to be wrong in.</p>
-</section>
-<section id="does-this-hold-up-beyond-ausnet" class="level2">
-<h2 class="anchored" data-anchor-id="does-this-hold-up-beyond-ausnet">Does this hold up beyond AusNet?</h2>
-<p>Every number above comes from one real population, 342 Australian AusNet customers. A genuine generalization check does not retrain on a second dataset and compare two separately-tuned results, it takes the exact models and calibration already fit above, unmodified, and points them at real data they have never seen, from a different country, a different climate, a different tariff structure entirely. NREL’s ResStock buildings are the same real half-hourly resolution Part 5 Chapter 1 already used for exactly this kind of check, complementing AusNet, not replacing it: ResStock is a physics-based simulation calibrated to real US end-use survey data, not a metered reading the way AusNet is, and that distinction matters here as much as it did in Chapter 1.</p>
-<div class="quarto-embed-nb-cell" data-notebook="/home/runner/work/ml-energy-disaggregation/ml-energy-disaggregation/book/05-forecasting/03-probabilistic-forecasting-code.ipynb" data-notebook-title="What a Probabilistic Forecast Is Actually Worth" data-notebook-cellid="f0aad486">
-<div id="f0aad486" class="cell">
-<div class="cell-output cell-output-stdout">
-<pre><code>NREL ResStock: 200 real buildings, 72,800 windows
-Zero-shot MLPGAMNormal on NREL: MAE=0.7711 (AusNet MAE was 0.3628)
-AusNet-calibrated conformal band on NREL: coverage=0.642, mean width=1.0315
-(AusNet's own held-out coverage/width was 0.899 / 1.0315)</code></pre>
-</div>
-</div>
-</div>
-<p>The point forecast degrades in a way that is not surprising: MAE roughly doubles, 0.7712 against 0.3627, a real cost of a different country, climate, and tariff structure the model never trained on. The calibration finding is the one worth sitting with. The exact same conformal band that hit 0.899 coverage on its own held-out AusNet customers drops to 0.642 on NREL, applied completely unmodified. That gap is the real answer to this section’s own question: split-conformal’s finite-sample guarantee holds under exchangeability with the calibration population, not in general, and NREL customers are not exchangeable with AusNet customers, they are a genuinely different population, in a genuinely different country, and the guarantee does not travel with the model to a population it was never calibrated against. A conformal interval is not a property of a model alone; it is a property of a model paired with the specific population it was calibrated on, and this chapter’s own honest generalization check is exactly what makes that distinction concrete rather than a caveat in a footnote.</p>
-</section>
-<section id="one-honest-comparison-not-one-winner" class="level2">
-<h2 class="anchored" data-anchor-id="one-honest-comparison-not-one-winner">One honest comparison, not one winner</h2>
-<p>Three paradigms have each been checked on their own terms above: a parametric density that prices risk directly but assumes a Normal shape, a quantile forecast that assumes nothing about shape but over-covered by nearly nine points before calibration, and a split-conformal wrapper that delivers an actual guarantee, sharper globally than per archetype. Putting all five real numbers per paradigm, MAE, coverage, mean width, CRPS, and Winkler score, into one table makes the full tradeoff visible at once, rather than scattered across separate results a reader has to hold in their head.</p>
-<div class="quarto-embed-nb-cell" data-notebook="/home/runner/work/ml-energy-disaggregation/ml-energy-disaggregation/book/05-forecasting/03-probabilistic-forecasting-code.ipynb" data-notebook-title="What a Probabilistic Forecast Is Actually Worth" data-notebook-cellid="9ed2ea6e">
-<div id="9ed2ea6e" class="cell">
+<p>A single MAE number settles less than it looks like it does, though: it says nothing about whether a backbone that wins on average error also wins on correlation, bias, or scale-independent error. The same diversity-weighted, multi-metric ranking Chapter 2 already built answers that more honestly than one column can.</p>
+<div class="quarto-embed-nb-cell" data-notebook="/home/runner/work/ml-energy-disaggregation/ml-energy-disaggregation/book/05-forecasting/03-probabilistic-forecasting-code.ipynb" data-notebook-title="What a Probabilistic Forecast Is Actually Worth" data-notebook-cellid="c278b2c3">
+<div id="c278b2c3" class="cell">
 <div class="cell-output cell-output-display">
 <div id="usnzjovqwp" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:100%;height:auto;">
 <style>
@@ -1951,53 +2527,57 @@ AusNet-calibrated conformal band on NREL: coverage=0.642, mean width=1.0315
 <table class="gt_table caption-top table table-sm table-striped small" data-quarto-bootstrap="false">
 <thead>
 <tr class="gt_heading header">
-<td colspan="6" class="gt_heading gt_title gt_font_normal" style="color: #171717; font-weight: bold"><strong>Four Paradigms, One Honest Comparison</strong></td>
+<td colspan="9" class="gt_heading gt_title gt_font_normal" style="color: #171717; font-weight: bold"><strong>Point-Forecast Ranking Across Backbones</strong></td>
 </tr>
 <tr class="gt_col_headings even">
-<th id="Paradigm" class="gt_col_heading gt_columns_bottom_border gt_left" data-quarto-table-cell-role="th" style="color: #FFFFFF; font-family: Jost" scope="col">Paradigm</th>
-<th id="MAE" class="gt_col_heading gt_columns_bottom_border gt_right" data-quarto-table-cell-role="th" style="color: #FFFFFF; font-family: Jost" scope="col">MAE</th>
-<th id="Coverage" class="gt_col_heading gt_columns_bottom_border gt_right" data-quarto-table-cell-role="th" style="color: #FFFFFF; font-family: Jost" scope="col">Coverage</th>
-<th id="Mean-width" class="gt_col_heading gt_columns_bottom_border gt_right" data-quarto-table-cell-role="th" style="color: #FFFFFF; font-family: Jost" scope="col">Mean width</th>
-<th id="CRPS" class="gt_col_heading gt_columns_bottom_border gt_right" data-quarto-table-cell-role="th" style="color: #FFFFFF; font-family: Jost" scope="col">CRPS</th>
-<th id="Winkler" class="gt_col_heading gt_columns_bottom_border gt_right" data-quarto-table-cell-role="th" style="color: #FFFFFF; font-family: Jost" scope="col">Winkler</th>
+<th id="Backbone" class="gt_col_heading gt_columns_bottom_border gt_left" data-quarto-table-cell-role="th" style="color: #FFFFFF; font-family: Jost" scope="col">Backbone</th>
+<th id="mae" class="gt_col_heading gt_columns_bottom_border gt_right" data-quarto-table-cell-role="th" style="color: #FFFFFF; font-family: Jost" scope="col">mae</th>
+<th id="rmse" class="gt_col_heading gt_columns_bottom_border gt_right" data-quarto-table-cell-role="th" style="color: #FFFFFF; font-family: Jost" scope="col">rmse</th>
+<th id="wmape" class="gt_col_heading gt_columns_bottom_border gt_right" data-quarto-table-cell-role="th" style="color: #FFFFFF; font-family: Jost" scope="col">wmape</th>
+<th id="smape" class="gt_col_heading gt_columns_bottom_border gt_right" data-quarto-table-cell-role="th" style="color: #FFFFFF; font-family: Jost" scope="col">smape</th>
+<th id="corr" class="gt_col_heading gt_columns_bottom_border gt_right" data-quarto-table-cell-role="th" style="color: #FFFFFF; font-family: Jost" scope="col">corr</th>
+<th id="arith_rank" class="gt_col_heading gt_columns_bottom_border gt_right" data-quarto-table-cell-role="th" style="color: #FFFFFF; font-family: Jost" scope="col">arith_rank</th>
+<th id="borda_count" class="gt_col_heading gt_columns_bottom_border gt_right" data-quarto-table-cell-role="th" style="color: #FFFFFF; font-family: Jost" scope="col">borda_count</th>
+<th id="weighted_borda" class="gt_col_heading gt_columns_bottom_border gt_right" data-quarto-table-cell-role="th" style="color: #FFFFFF; font-family: Jost" scope="col">weighted_borda</th>
 </tr>
 </thead>
 <tbody class="gt_table_body">
 <tr class="odd">
-<td class="gt_row gt_left">Parametric (Normal)</td>
-<td class="gt_row gt_right">0.3628</td>
-<td class="gt_row gt_right">0.959</td>
-<td class="gt_row gt_right">2.0247</td>
-<td class="gt_row gt_right">0.2694</td>
-<td class="gt_row gt_right">2.0914</td>
+<td class="gt_row gt_left">QRLightGBM (tree, median)</td>
+<td class="gt_row gt_right">0.2309</td>
+<td class="gt_row gt_right">0.4704</td>
+<td class="gt_row gt_right">49.5796</td>
+<td class="gt_row gt_right">45.6037</td>
+<td class="gt_row gt_right">0.5707</td>
+<td class="gt_row gt_right">2.8</td>
+<td class="gt_row gt_right">14.0</td>
+<td class="gt_row gt_right">2.6667</td>
 </tr>
 <tr class="even">
-<td class="gt_row gt_left" style="background-color: #EAF3FA">Quantile (FPQR)</td>
-<td class="gt_row gt_right" style="background-color: #EAF3FA"><na></na></td>
-<td class="gt_row gt_right" style="background-color: #EAF3FA">0.99</td>
-<td class="gt_row gt_right" style="background-color: #EAF3FA">3.0809</td>
-<td class="gt_row gt_right" style="background-color: #EAF3FA">0.2558</td>
-<td class="gt_row gt_right" style="background-color: #EAF3FA">3.0817</td>
+<td class="gt_row gt_left" style="background-color: #EAF3FA">NGBoost (tree)</td>
+<td class="gt_row gt_right" style="background-color: #EAF3FA">0.2616</td>
+<td class="gt_row gt_right" style="background-color: #EAF3FA">0.4666</td>
+<td class="gt_row gt_right" style="background-color: #EAF3FA">56.1737</td>
+<td class="gt_row gt_right" style="background-color: #EAF3FA">52.656</td>
+<td class="gt_row gt_right" style="background-color: #EAF3FA">0.5656</td>
+<td class="gt_row gt_right" style="background-color: #EAF3FA">2.2</td>
+<td class="gt_row gt_right" style="background-color: #EAF3FA">11.0</td>
+<td class="gt_row gt_right" style="background-color: #EAF3FA">2.3333</td>
 </tr>
 <tr class="odd">
-<td class="gt_row gt_left">Conformal, global</td>
-<td class="gt_row gt_right"><na></na></td>
-<td class="gt_row gt_right">0.899</td>
-<td class="gt_row gt_right">1.0315</td>
-<td class="gt_row gt_right"><na></na></td>
-<td class="gt_row gt_right">1.069</td>
-</tr>
-<tr class="even">
-<td class="gt_row gt_left" style="background-color: #EAF3FA">Conformal, per-archetype</td>
-<td class="gt_row gt_right" style="background-color: #EAF3FA"><na></na></td>
-<td class="gt_row gt_right" style="background-color: #EAF3FA">0.899</td>
-<td class="gt_row gt_right" style="background-color: #EAF3FA">1.108</td>
-<td class="gt_row gt_right" style="background-color: #EAF3FA"><na></na></td>
-<td class="gt_row gt_right" style="background-color: #EAF3FA">1.0509</td>
+<td class="gt_row gt_left">MLPGAM (neural)</td>
+<td class="gt_row gt_right">0.3627</td>
+<td class="gt_row gt_right">0.5532</td>
+<td class="gt_row gt_right">77.8783</td>
+<td class="gt_row gt_right">73.2841</td>
+<td class="gt_row gt_right">0.2536</td>
+<td class="gt_row gt_right">1.0</td>
+<td class="gt_row gt_right">5.0</td>
+<td class="gt_row gt_right">1.0</td>
 </tr>
 </tbody><tfoot>
 <tr class="gt_sourcenotes odd">
-<td colspan="6" class="gt_sourcenote" style="color: #6B7280; font-style: italic"><span class="gt_from_md">342 real AusNet customers, last-90-day holdout, MLPGAM backbone throughout</span></td>
+<td colspan="9" class="gt_sourcenote" style="color: #6B7280; font-style: italic"><span class="gt_from_md">Diversity-weighted Borda ranking, same mechanism as Part 5 Chapter 2</span></td>
 </tr>
 </tfoot>
 
@@ -2008,8 +2588,127 @@ AusNet-calibrated conformal band on NREL: coverage=0.642, mean width=1.0315
 </div>
 </div>
 </div>
-<div class="quarto-embed-nb-cell" data-notebook="/home/runner/work/ml-energy-disaggregation/ml-energy-disaggregation/book/05-forecasting/03-probabilistic-forecasting-code.ipynb" data-notebook-title="What a Probabilistic Forecast Is Actually Worth" data-notebook-cellid="153d1ae4">
-<div id="153d1ae4" class="cell">
+</section>
+<section id="generalizing-beyond-ausnet" class="level2">
+<h2 class="anchored" data-anchor-id="generalizing-beyond-ausnet">Generalizing beyond AusNet</h2>
+<p>Every number above comes from one real population, 342 Australian AusNet customers. A genuine generalization check does not retrain on a second dataset and compare two separately-tuned results, it takes the exact models and calibration already fit above, unmodified, and points them at real data they have never seen, from a different country, a different climate, a different tariff structure entirely. NREL’s ResStock buildings are the same real half-hourly resolution Part 5 Chapter 1 already used for exactly this kind of check, complementing AusNet, not replacing it: ResStock is a physics-based simulation calibrated to real US end-use survey data, not a metered reading the way AusNet is, and that distinction matters here as much as it did in Chapter 1.</p>
+<div class="quarto-embed-nb-cell" data-notebook="/home/runner/work/ml-energy-disaggregation/ml-energy-disaggregation/book/05-forecasting/03-probabilistic-forecasting-code.ipynb" data-notebook-title="What a Probabilistic Forecast Is Actually Worth" data-notebook-cellid="f0aad486">
+<div id="f0aad486" class="cell">
+<div class="cell-output cell-output-stdout">
+<pre><code>NREL ResStock: 200 real buildings, 72,800 windows</code></pre>
+</div>
+<div class="cell-output cell-output-display">
+<div id="jfgyqpesej" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:100%;height:auto;">
+<style>
+#jfgyqpesej table {
+          font-family: 'Libre Franklin', 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+          -webkit-font-smoothing: antialiased;
+          -moz-osx-font-smoothing: grayscale;
+        }
+
+#jfgyqpesej thead, tbody, tfoot, tr, td, th { border-style: none !important; }
+ tr { background-color: transparent !important; }
+#jfgyqpesej p { margin: 0 !important; padding: 0 !important; }
+ #jfgyqpesej .gt_table { display: table !important; border-collapse: collapse !important; line-height: normal !important; margin-left: auto !important; margin-right: auto !important; color: #171717 !important; font-size: 13px !important; font-weight: normal !important; font-style: normal !important; background-color: #FFFFFF !important; width: 100% !important; border-top-style: solid !important; border-top-width: 2px !important; border-top-color: #0369A1 !important; border-right-style: none !important; border-right-width: 2px !important; border-right-color: #D3D3D3 !important; border-bottom-style: solid !important; border-bottom-width: 1px !important; border-bottom-color: #0369A1 !important; border-left-style: none !important; border-left-width: 2px !important; border-left-color: #D3D3D3 !important; }
+ #jfgyqpesej .gt_caption { padding-top: 4px !important; padding-bottom: 4px !important; }
+ #jfgyqpesej .gt_title { color: #171717 !important; font-size: 16px !important; font-weight: bold !important; padding-top: 10px !important; padding-bottom: 10px !important; padding-left: 5px !important; padding-right: 5px !important; border-bottom-color: #FFFFFF !important; border-bottom-width: 0 !important; }
+ #jfgyqpesej .gt_subtitle { color: #171717 !important; font-size: 13px !important; font-weight: initial !important; padding-top: 9px !important; padding-bottom: 11px !important; padding-left: 5px !important; padding-right: 5px !important; border-top-color: #FFFFFF !important; border-top-width: 0 !important; }
+ #jfgyqpesej .gt_heading { background-color: #FFFFFF !important; text-align: center !important; border-bottom-color: #FFFFFF !important; border-left-style: none !important; border-left-width: 1px !important; border-left-color: #D3D3D3 !important; border-right-style: none !important; border-right-width: 1px !important; border-right-color: #D3D3D3 !important; }
+ #jfgyqpesej .gt_bottom_border { border-bottom-style: solid !important; border-bottom-width: 2px !important; border-bottom-color: #D3D3D3 !important; }
+ #jfgyqpesej .gt_col_headings { border-top-style: solid !important; border-top-width: 2px !important; border-top-color: #D3D3D3 !important; border-bottom-style: solid !important; border-bottom-width: 1px !important; border-bottom-color: #D3D3D3 !important; border-left-style: none !important; border-left-width: 1px !important; border-left-color: #D3D3D3 !important; border-right-style: none !important; border-right-width: 1px !important; border-right-color: #D3D3D3 !important; }
+ #jfgyqpesej .gt_col_heading { color: #FFFFFF !important; background-color: #0369A1 !important; font-size: 13px !important; font-weight: bold !important; text-transform: inherit !important; border-left-style: none !important; border-left-width: 1px !important; border-left-color: #D3D3D3 !important; border-right-style: none !important; border-right-width: 1px !important; border-right-color: #D3D3D3 !important; vertical-align: bottom !important; padding-top: 9px !important; padding-bottom: 11px !important; padding-left: 5px !important; padding-right: 5px !important; overflow-x: hidden !important; }
+ #jfgyqpesej .gt_column_spanner_outer { color: #FFFFFF !important; background-color: #0369A1 !important; font-size: 13px !important; font-weight: bold !important; text-transform: inherit !important; padding-top: 0 !important; padding-bottom: 0 !important; padding-left: 4px !important; padding-right: 4px !important; }
+ #jfgyqpesej .gt_column_spanner_outer:first-child { padding-left: 0 !important; }
+ #jfgyqpesej .gt_column_spanner_outer:last-child { padding-right: 0 !important; }
+ #jfgyqpesej .gt_column_spanner { border-bottom-style: solid !important; border-bottom-width: 1px !important; border-bottom-color: #D3D3D3 !important; vertical-align: bottom !important; padding-top: 9px !important; padding-bottom: 9px !important; overflow-x: hidden !important; display: inline-block !important; width: 100% !important; }
+ #jfgyqpesej .gt_spanner_row { border-bottom-style: hidden !important; }
+ #jfgyqpesej .gt_group_heading { padding-top: 8px !important; padding-bottom: 8px !important; padding-left: 5px !important; padding-right: 5px !important; color: #171717 !important; background-color: #FFFFFF !important; font-size: 100% !important; font-weight: initial !important; text-transform: inherit !important; border-top-style: solid !important; border-top-width: 2px !important; border-top-color: #D3D3D3 !important; border-bottom-style: solid !important; border-bottom-width: 2px !important; border-bottom-color: #D3D3D3 !important; border-left-style: none !important; border-left-width: 1px !important; border-left-color: #D3D3D3 !important; border-right-style: none !important; border-right-width: 1px !important; border-right-color: #D3D3D3 !important; vertical-align: middle !important; text-align: left !important; }
+ #jfgyqpesej .gt_empty_group_heading { padding: 0.5px !important; color: #171717 !important; background-color: #FFFFFF !important; font-size: 100% !important; font-weight: initial !important; border-top-style: solid !important; border-top-width: 2px !important; border-top-color: #D3D3D3 !important; border-bottom-style: solid !important; border-bottom-width: 2px !important; border-bottom-color: #D3D3D3 !important; vertical-align: middle !important; }
+ #jfgyqpesej .gt_from_md> :first-child { margin-top: 0 !important; }
+ #jfgyqpesej .gt_from_md> :last-child { margin-bottom: 0 !important; }
+ #jfgyqpesej .gt_row { padding-top: 7px !important; padding-bottom: 7px !important; padding-left: 5px !important; padding-right: 5px !important; margin: 10px !important; border-top-style: solid !important; border-top-width: 1px !important; border-top-color: #D3D3D3 !important; border-left-style: none !important; border-left-width: 1px !important; border-left-color: #D3D3D3 !important; border-right-style: none !important; border-right-width: 1px !important; border-right-color: #D3D3D3 !important; vertical-align: middle !important; overflow-x: hidden !important; }
+ #jfgyqpesej .gt_stub { color: #171717 !important; background-color: #FFFFFF !important; font-size: 100% !important; font-weight: initial !important; text-transform: inherit !important; border-right-style: solid !important; border-right-width: 2px !important; border-right-color: #D3D3D3 !important; padding-left: 5px !important; padding-right: 5px !important; }
+ #jfgyqpesej .gt_stub_row_group { color: #171717 !important; background-color: #FFFFFF !important; font-size: 100% !important; font-weight: initial !important; text-transform: inherit !important; border-right-style: solid !important; border-right-width: 2px !important; border-right-color: #D3D3D3 !important; padding-left: 5px !important; padding-right: 5px !important; vertical-align: top !important; }
+ #jfgyqpesej .gt_row_group_first td { border-top-width: 2px !important; }
+ #jfgyqpesej .gt_row_group_first th { border-top-width: 2px !important; }
+ #jfgyqpesej .gt_striped { color: #171717 !important; background-color: #F4F4F4 !important; }
+ #jfgyqpesej .gt_table_body { border-top-style: solid !important; border-top-width: 2px !important; border-top-color: #D3D3D3 !important; border-bottom-style: solid !important; border-bottom-width: 1px !important; border-bottom-color: #DEE2E6 !important; }
+ #jfgyqpesej .gt_summary_row { color: #171717 !important; background-color: #FFFFFF !important; text-transform: inherit !important; padding-top: 8px !important; padding-bottom: 8px !important; padding-left: 5px !important; padding-right: 5px !important; }
+ #jfgyqpesej .gt_first_summary_row { border-top-style: solid !important; border-top-width: 2px !important; border-top-color: #D3D3D3 !important; }
+ #jfgyqpesej .gt_last_summary_row_top { border-bottom-style: solid !important; border-bottom-width: 2px !important; border-bottom-color: #D3D3D3 !important; }
+ #jfgyqpesej .gt_grand_summary_row { color: #171717 !important; background-color: #FFFFFF !important; text-transform: inherit !important; padding-top: 8px !important; padding-bottom: 8px !important; padding-left: 5px !important; padding-right: 5px !important; }
+ #jfgyqpesej .gt_first_grand_summary_row_bottom { border-top-style: double !important; border-top-width: 6px !important; border-top-color: #D3D3D3 !important; }
+ #jfgyqpesej .gt_last_grand_summary_row_top { border-bottom-style: double !important; border-bottom-width: 6px !important; border-bottom-color: #D3D3D3 !important; }
+ #jfgyqpesej .gt_sourcenotes { color: #171717 !important; background-color: #FFFFFF !important; border-bottom-style: none !important; border-bottom-width: 2px !important; border-bottom-color: #D3D3D3 !important; border-left-style: none !important; border-left-width: 2px !important; border-left-color: #D3D3D3 !important; border-right-style: none !important; border-right-width: 2px !important; border-right-color: #D3D3D3 !important; }
+ #jfgyqpesej .gt_sourcenote { font-size: 11px !important; padding-top: 6px !important; padding-bottom: 6px !important; padding-left: 5px !important; padding-right: 5px !important; text-align: left !important; }
+ #jfgyqpesej .gt_left { text-align: left !important; }
+ #jfgyqpesej .gt_center { text-align: center !important; }
+ #jfgyqpesej .gt_right { text-align: right !important; font-variant-numeric: tabular-nums !important; }
+ #jfgyqpesej .gt_font_normal { font-weight: normal !important; }
+ #jfgyqpesej .gt_font_bold { font-weight: bold !important; }
+ #jfgyqpesej .gt_font_italic { font-style: italic !important; }
+ #jfgyqpesej .gt_super { font-size: 65% !important; }
+ #jfgyqpesej .gt_footnotes { color: font-color(#FFFFFF) !important; background-color: #FFFFFF !important; border-bottom-style: none !important; border-bottom-width: 2px !important; border-bottom-color: #D3D3D3 !important; border-left-style: none !important; border-left-width: 2px !important; border-left-color: #D3D3D3 !important; border-right-style: none !important; border-right-width: 2px !important; border-right-color: #D3D3D3 !important; }
+ #jfgyqpesej .gt_footnote { margin: 0px !important; font-size: 90% !important; padding-top: 4px !important; padding-bottom: 4px !important; padding-left: 5px !important; padding-right: 5px !important; }
+ #jfgyqpesej .gt_sourcenotes { color: #171717 !important; background-color: #FFFFFF !important; border-bottom-style: none !important; border-bottom-width: 2px !important; border-bottom-color: #D3D3D3 !important; border-left-style: none !important; border-left-width: 2px !important; border-left-color: #D3D3D3 !important; border-right-style: none !important; border-right-width: 2px !important; border-right-color: #D3D3D3 !important; }
+ #jfgyqpesej .gt_sourcenote { font-size: 11px !important; padding-top: 6px !important; padding-bottom: 6px !important; padding-left: 5px !important; padding-right: 5px !important; text-align: left !important; }
+ #jfgyqpesej .gt_footnote_marks { font-size: 75% !important; vertical-align: 0.4em !important; position: initial !important; }
+ #jfgyqpesej .gt_asterisk { font-size: 100% !important; vertical-align: 0 !important; }
+ 
+</style>
+
+<table class="gt_table caption-top table table-sm table-striped small" data-quarto-bootstrap="false">
+<thead>
+<tr class="gt_heading header">
+<td colspan="5" class="gt_heading gt_title gt_font_normal" style="color: #171717; font-weight: bold"><strong>Zero-Shot Generalization, All Three Backbones</strong></td>
+</tr>
+<tr class="gt_col_headings even">
+<th id="Backbone" class="gt_col_heading gt_columns_bottom_border gt_left" data-quarto-table-cell-role="th" style="color: #FFFFFF; font-family: Jost" scope="col">Backbone</th>
+<th id="AusNet-MAE" class="gt_col_heading gt_columns_bottom_border gt_right" data-quarto-table-cell-role="th" style="color: #FFFFFF; font-family: Jost" scope="col">AusNet MAE</th>
+<th id="NREL-MAE" class="gt_col_heading gt_columns_bottom_border gt_right" data-quarto-table-cell-role="th" style="color: #FFFFFF; font-family: Jost" scope="col">NREL MAE</th>
+<th id="AusNet-coverage" class="gt_col_heading gt_columns_bottom_border gt_right" data-quarto-table-cell-role="th" style="color: #FFFFFF; font-family: Jost" scope="col">AusNet coverage</th>
+<th id="NREL-coverage" class="gt_col_heading gt_columns_bottom_border gt_right" data-quarto-table-cell-role="th" style="color: #FFFFFF; font-family: Jost" scope="col">NREL coverage</th>
+</tr>
+</thead>
+<tbody class="gt_table_body">
+<tr class="odd">
+<td class="gt_row gt_left">MLPGAM (neural)</td>
+<td class="gt_row gt_right">0.3627</td>
+<td class="gt_row gt_right">0.7712</td>
+<td class="gt_row gt_right">0.899</td>
+<td class="gt_row gt_right">0.642</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_left" style="background-color: #EAF3FA">NGBoost (tree)</td>
+<td class="gt_row gt_right" style="background-color: #EAF3FA">0.2616</td>
+<td class="gt_row gt_right" style="background-color: #EAF3FA">0.4638</td>
+<td class="gt_row gt_right" style="background-color: #EAF3FA">0.899</td>
+<td class="gt_row gt_right" style="background-color: #EAF3FA">0.877</td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_left">QRLightGBM (tree)</td>
+<td class="gt_row gt_right">0.2309</td>
+<td class="gt_row gt_right">0.4489</td>
+<td class="gt_row gt_right">0.9</td>
+<td class="gt_row gt_right">0.896</td>
+</tr>
+</tbody><tfoot>
+<tr class="gt_sourcenotes odd">
+<td colspan="5" class="gt_sourcenote" style="color: #6B7280; font-style: italic"><span class="gt_from_md">342 AusNet customers (fit) vs 200 real NREL ResStock buildings (never seen)</span></td>
+</tr>
+</tfoot>
+
+</table>
+
+
+</div>
+</div>
+</div>
+</div>
+<p>The point forecast degrades in a way that is not surprising for any of the three backbones: real cost of a different country, climate, and tariff structure none of them trained on. The calibration finding is the one worth sitting with, and it holds for both backbones checked, not just MLPGAM: every conformal wrapper’s own coverage drops hard when applied unmodified to NREL, MLPGAM’s from 0.899 to 0.642, QRLightGBM’s own CQR wrapper dropping in exactly the same direction. Split-conformal’s finite-sample guarantee holds under exchangeability with the calibration population, not in general. Exchangeability means the calibration customers and the customers the interval gets applied to are drawn from the same underlying distribution, so a residual computed on one is as informative about the other as any other pair from that same population; swap two customers between the two groups and nothing about the guarantee’s own math changes. NREL customers are not exchangeable with AusNet customers, a different country, a different climate, a different tariff structure, and the coverage collapse above is exactly what that assumption’s own failure looks like in practice, not an abstract technicality. A conformal interval is not a property of a model alone; it is a property of a model paired with the specific population it was calibrated on, and that holds regardless of which backbone produced the interval in the first place. The practical trigger this points to: recalibrate whenever the deployment population genuinely changes, a new utility, a new region, a materially different customer mix, not on a fixed schedule regardless of whether anything actually shifted.</p>
+<p>The same real test day pattern as above, one real NREL building this time, both backbones’ own AusNet-calibrated bands applied completely unmodified.</p>
+<div class="quarto-embed-nb-cell" data-notebook="/home/runner/work/ml-energy-disaggregation/ml-energy-disaggregation/book/05-forecasting/03-probabilistic-forecasting-code.ipynb" data-notebook-title="What a Probabilistic Forecast Is Actually Worth" data-notebook-cellid="45a5125b">
+<div id="45a5125b" class="cell">
 <div class="cell-output cell-output-display">
 
    
@@ -2018,7 +2717,7 @@ AusNet-calibrated conformal band on NREL: coverage=0.642, mean width=1.0315
        <script type="text/javascript" data-lets-plot-script="library" src="https://cdn.jsdelivr.net/gh/JetBrains/lets-plot@v4.11.0/js-package/distr/lets-plot.min.js"></script>
    
    
-          <div id="Y4ZadP"></div>
+          <div id="w5kZ81"></div>
    <script type="text/javascript" data-lets-plot-script="plot">
    
    (function() {
@@ -2043,7 +2742,702 @@ AusNet-calibrated conformal band on NREL: coverage=0.642, mean width=1.0315
        };
    }
    
-   const containerDiv = document.getElementById("Y4ZadP");
+   const containerDiv = document.getElementById("w5kZ81");
+   let fig = null;
+   
+   function renderPlot() {
+       if (fig === null) {
+           const plotSpec = {
+"data":{
+"half_hour":[0.0,1.0,2.0,3.0,4.0,5.0,6.0,7.0,8.0,9.0,10.0,11.0,12.0,13.0,14.0,15.0,16.0,17.0,18.0,19.0,20.0,21.0,22.0,23.0,24.0,25.0,26.0,27.0,28.0,29.0,30.0,31.0,32.0,33.0,34.0,35.0,36.0,37.0,38.0,39.0,40.0,41.0,42.0,43.0,44.0,45.0,46.0,47.0],
+"truth":[2.6579999923706055,2.7860000133514404,2.946000099182129,3.052000045776367,3.1619999408721924,3.252000093460083,3.3480000495910645,3.4619998931884766,3.558000087738037,3.569999933242798,4.144000053405762,3.7639999389648438,3.677999973297119,3.569999933242798,3.5139999389648438,3.368000030517578,3.2019999027252197,3.828000068664551,14.788000106811523,37.91999816894531,29.72599983215332,3.4079999923706055,3.1619999408721924,3.0220000743865967,3.7179999351501465,3.6579999923706055,4.190000057220459,2.628000020980835,2.559999942779541,2.5439999103546143,2.5420000553131104,2.5220000743865967,2.6700000762939453,2.9839999675750732,3.369999885559082,3.6040000915527344,4.033999919891357,4.443999767303467,4.196000099182129,4.395999908447266,3.9560000896453857,4.004000186920166,4.050000190734863,4.110000133514404,4.145999908447266,4.145999908447266,4.156000137329102,4.193999767303467],
+"mean":[0.4424059987068176,0.39701083302497864,0.3628816604614258,0.33911481499671936,0.3206660747528076,0.3083643317222595,0.2992832362651825,0.29377180337905884,0.2933105528354645,0.2932182252407074,0.30287647247314453,0.3173885643482208,0.3281656503677368,0.367330938577652,0.4183048605918884,0.4770439565181732,0.5147693753242493,0.5125461220741272,0.4920400381088257,0.49907806515693665,0.5095039010047913,0.5111207365989685,0.5144318342208862,0.5180394053459167,0.5238522291183472,0.5287769436836243,0.533215343952179,0.5262512564659119,0.5282452702522278,0.5314048528671265,0.5338579416275024,0.5424144268035889,0.5751357078552246,0.6301332116127014,0.6962980628013611,0.7840785980224609,0.8775048851966858,0.9358599781990051,0.9486967325210571,0.9331966042518616,0.9074916243553162,0.8855342864990234,0.8469700813293457,0.7956773042678833,0.7342982292175293,0.6591795682907104,0.5790591835975647,0.5044251680374146],
+"lower":[0.04599999829094337,0.04599999047444214,0.048000006716335974,0.05000002108577206,0.050000016507979694,0.04799999944785327,0.049999997238145966,0.04800000311526276,0.049999993068226445,0.04800001464036541,0.04575293532127134,0.04600001199822046,0.04600000163774354,0.04599999149723999,0.04600001197317738,0.04608791762554887,0.04400000360945455,0.04799999350206008,0.03800000002988568,0.03199999010537624,0.027999991762726495,0.01824150616568332,0.020000025314278247,-0.005921263425914702,-0.01229548061903074,-0.016446120244957285,-0.02556932471260609,-0.025497441427859258,-0.007509451957261604,-0.05119027456888503,-0.02628408067295851,-0.03517114834452428,-0.041728622309385344,-0.04373357899353891,-0.027403845056415577,0.010000016278080892,0.03600001063298919,0.050000025727698016,0.060000004140768226,0.07199995301945705,0.07199996780418871,0.07599996239014217,0.07200001926248234,0.07135463331874092,0.06600000028686281,0.05799998327054823,0.058000026850745456,0.042850324228169256],
+"upper":[0.8388119991226919,0.7480216755755151,0.6777633142065156,0.6282296089076667,0.5913321329976355,0.5687286639966658,0.548566475292219,0.5395436036428549,0.5366211126027025,0.5384364358410494,0.5600000096250177,0.5887771166982212,0.6103312990977301,0.688661885658064,0.7906097092105995,0.9079999954107976,0.985538747039044,0.9770922506461943,0.9460800761877657,0.966156140208497,0.991007810246856,1.0039999670322537,1.0088636431274942,1.0420000741177482,1.059999938855725,1.0740000076122058,1.092000012616964,1.077999954359683,1.0639999924617172,1.113999980303138,1.0939999639279634,1.120000001951702,1.1920000380198346,1.3040000022189417,1.4199999706591377,1.558157179766841,1.7190097597603824,1.8217199306703122,1.837393460901346,1.794393255484266,1.7429832809064436,1.6950686106079047,1.621940143396209,1.5199999752170257,1.4025964581481958,1.2603591533108727,1.100118340344384,0.9660000118466598]
+},
+"mapping":{
+"x":"half_hour"
+},
+"data_meta":{
+"series_annotations":[{
+"type":"int",
+"column":"half_hour"
+},{
+"type":"float",
+"column":"truth"
+},{
+"type":"float",
+"column":"mean"
+},{
+"type":"float",
+"column":"lower"
+},{
+"type":"float",
+"column":"upper"
+}]
+},
+"ggtitle":{
+"text":"One Real NREL Building, MLPGAM Band (AusNet-Calibrated, Zero-Shot)",
+"subtitle":"Same AusNet-fit model and calibration as every plot above, pointed at a real NREL building."
+},
+"guides":{
+"x":{
+"title":"Half-hour of forecast horizon"
+},
+"y":{
+"title":"Load (kW)"
+}
+},
+"theme":{
+"text":{
+"color":"#2d2d2d",
+"family":"'Libre Franklin', 'Segoe UI', Roboto, Helvetica, Arial, sans-serif",
+"size":12.0,
+"blank":false
+},
+"axis_title_x":{
+"face":"plain",
+"size":14.0,
+"margin":[10.0,0.0,0.0,0.0],
+"blank":false
+},
+"axis_title_y":{
+"face":"plain",
+"size":14.0,
+"margin":[0.0,10.0,0.0,0.0],
+"blank":false
+},
+"axis_text_x":{
+"color":"#666666",
+"angle":0.0,
+"hjust":0.5,
+"margin":[8.0,0.0,0.0,0.0],
+"blank":false
+},
+"axis_text_y":{
+"color":"#666666",
+"margin":[0.0,0.0,0.0,8.0],
+"blank":false
+},
+"axis_ticks":{
+"color":"#bbbbbb",
+"size":0.75,
+"blank":false
+},
+"axis_line":{
+"color":"#bbbbbb",
+"size":1.0,
+"blank":false
+},
+"legend_background":{
+"blank":true
+},
+"legend_text":{
+"size":12.0,
+"blank":false
+},
+"legend_title":{
+"face":"bold",
+"size":14.0,
+"blank":false
+},
+"legend_position":"none",
+"legend_spacing":10.0,
+"legend_key":{
+"blank":true
+},
+"panel_background":{
+"blank":true
+},
+"panel_border":{
+"blank":true
+},
+"panel_grid_minor":{
+"blank":true
+},
+"panel_grid_major_x":{
+"blank":true
+},
+"panel_grid_major_y":{
+"blank":true
+},
+"plot_background":{
+"blank":true
+},
+"plot_title":{
+"color":"#333333",
+"face":"bold",
+"size":19.0,
+"hjust":0.0,
+"margin":[0.0,0.0,6.0,0.0],
+"blank":false
+},
+"plot_subtitle":{
+"color":"#6b6b6b",
+"size":16.0,
+"hjust":0.0,
+"margin":[0.0,0.0,18.0,0.0],
+"blank":false
+},
+"plot_caption":{
+"color":"#999999",
+"face":"italic",
+"size":9.0,
+"hjust":1.0,
+"margin":[12.0,0.0,0.0,0.0],
+"blank":false
+},
+"plot_margin":[16.0,16.0,10.0,10.0],
+"strip_background":{
+"blank":true
+},
+"strip_text":{
+"family":"'Libre Franklin', 'Segoe UI', Roboto, Helvetica, Arial, sans-serif",
+"face":"bold",
+"size":12.0,
+"hjust":0.0,
+"blank":false
+}
+},
+"ggsize":{
+"width":960.0,
+"height":340.0
+},
+"kind":"plot",
+"scales":[],
+"layers":[{
+"geom":"ribbon",
+"mapping":{
+"ymin":"lower",
+"ymax":"upper"
+},
+"data_meta":{
+},
+"fill":"#1E293B",
+"alpha":0.2,
+"data":{
+}
+},{
+"geom":"line",
+"mapping":{
+"y":"mean"
+},
+"data_meta":{
+},
+"color":"#1E293B",
+"size":1.2,
+"data":{
+}
+},{
+"geom":"line",
+"mapping":{
+"y":"truth"
+},
+"data_meta":{
+},
+"color":"#EA580C",
+"size":1.0,
+"linetype":"dashed",
+"data":{
+}
+}],
+"metainfo_list":[],
+"spec_id":"7"
+};
+           fig = LetsPlot.buildPlotFromProcessedSpecs(plotSpec, containerDiv, sizing);
+       } else {
+           fig.updateView({});
+       }
+   }
+   
+   const renderImmediately = 
+       forceImmediateRender || (
+           sizing.width_mode === 'FIXED' && 
+           (sizing.height_mode === 'FIXED' || sizing.height_mode === 'SCALED')
+       );
+   
+   if (renderImmediately) {
+       renderPlot();
+   }
+   
+   if (!renderImmediately || responsive) {
+       // Set up observer for initial sizing or continuous monitoring
+       var observer = new ResizeObserver(function(entries) {
+           for (let entry of entries) {
+               if (entry.contentBoxSize && 
+                   entry.contentBoxSize[0].inlineSize > 0) {
+                   if (!responsive && observer) {
+                       observer.disconnect();
+                       observer = null;
+                   }
+                   renderPlot();
+                   if (!responsive) {
+                       break;
+                   }
+               }
+           }
+       });
+       
+       observer.observe(containerDiv);
+   }
+   
+   // ----------
+   })();
+   
+   </script>
+   
+
+</div>
+</div>
+</div>
+<div class="quarto-embed-nb-cell" data-notebook="/home/runner/work/ml-energy-disaggregation/ml-energy-disaggregation/book/05-forecasting/03-probabilistic-forecasting-code.ipynb" data-notebook-title="What a Probabilistic Forecast Is Actually Worth" data-notebook-cellid="7a36d5b7">
+<div id="7a36d5b7" class="cell">
+<div class="cell-output cell-output-display">
+
+   
+       <meta charset="UTF-8">
+       <style> html, body { margin: 0; padding: 0; } </style>
+       <script type="text/javascript" data-lets-plot-script="library" src="https://cdn.jsdelivr.net/gh/JetBrains/lets-plot@v4.11.0/js-package/distr/lets-plot.min.js"></script>
+   
+   
+          <div id="9O729q"></div>
+   <script type="text/javascript" data-lets-plot-script="plot">
+   
+   (function() {
+   // ----------
+   
+   const forceImmediateRender = false;
+   const responsive = false;
+   
+   let sizing = {
+       width_mode: "MIN",
+       height_mode: "SCALED",
+       width: null, 
+       height: null 
+   };
+   
+   const preferredWidth = document.body.dataset.letsPlotPreferredWidth;
+   if (preferredWidth !== undefined) {
+       sizing = {
+           width_mode: 'FIXED',
+           height_mode: 'SCALED',
+           width: parseFloat(preferredWidth)
+       };
+   }
+   
+   const containerDiv = document.getElementById("9O729q");
+   let fig = null;
+   
+   function renderPlot() {
+       if (fig === null) {
+           const plotSpec = {
+"data":{
+"half_hour":[0.0,1.0,2.0,3.0,4.0,5.0,6.0,7.0,8.0,9.0,10.0,11.0,12.0,13.0,14.0,15.0,16.0,17.0,18.0,19.0,20.0,21.0,22.0,23.0,24.0,25.0,26.0,27.0,28.0,29.0,30.0,31.0,32.0,33.0,34.0,35.0,36.0,37.0,38.0,39.0,40.0,41.0,42.0,43.0,44.0,45.0,46.0,47.0],
+"truth":[2.6579999923706055,2.7860000133514404,2.946000099182129,3.052000045776367,3.1619999408721924,3.252000093460083,3.3480000495910645,3.4619998931884766,3.558000087738037,3.569999933242798,4.144000053405762,3.7639999389648438,3.677999973297119,3.569999933242798,3.5139999389648438,3.368000030517578,3.2019999027252197,3.828000068664551,14.788000106811523,37.91999816894531,29.72599983215332,3.4079999923706055,3.1619999408721924,3.0220000743865967,3.7179999351501465,3.6579999923706055,4.190000057220459,2.628000020980835,2.559999942779541,2.5439999103546143,2.5420000553131104,2.5220000743865967,2.6700000762939453,2.9839999675750732,3.369999885559082,3.6040000915527344,4.033999919891357,4.443999767303467,4.196000099182129,4.395999908447266,3.9560000896453857,4.004000186920166,4.050000190734863,4.110000133514404,4.145999908447266,4.145999908447266,4.156000137329102,4.193999767303467],
+"median":[2.5797980916614556,2.4947332256952954,2.183749771569714,2.313054174705478,2.256558095497562,2.5185827482011036,2.1840536587264503,2.1635283665317773,2.248577255266994,2.189853595631719,2.0875325053183547,2.1827385847024723,2.421958927239894,2.974297030772097,2.4620979915796672,2.997556004127388,2.26425268127528,2.287224242311595,2.4343068118455733,2.6382476458489723,2.9753359336187835,2.487036820289729,2.3497038293987,2.1221882331296595,1.5935028514647902,1.5966338360433776,1.9623726202007912,2.0659077264301757,2.0040729787926996,2.2107969740953,1.8712687049321446,1.5852568653342283,2.234831603898275,2.746863470149775,2.071050660455102,2.3934694024583933,2.451854154240541,2.8718501370180074,2.8790858460606397,2.572982936835343,2.9102651962014527,3.1694665380712705,2.4768971433658504,2.3663962131657192,2.797673310270593,2.3085486299501614,2.401325216625562,2.063674925945999],
+"lower":[0.15259926835130672,0.16040776278433705,0.08541135837500999,0.06539467685926209,-0.020097687858649183,-0.01000084371977189,-0.07690844738696548,-0.005719136798174096,-0.11528211980304398,-0.09161463267592285,-0.08809466240021577,-0.05775777654326772,0.03013211450839265,-0.04293851114153152,-0.03413772553042843,0.07613215371557039,0.13204234526053754,0.13815393688167754,0.06622198225774784,0.06508604373426602,-0.06036538062308569,0.027710920934371858,-0.011779588808706193,0.004491338252145816,0.1888753976195312,0.17412302061649354,0.11805693628811374,0.1086404284914152,0.12592475687631194,0.10298343787122294,-0.025085203977117637,0.04007748851609841,0.1339317908095988,0.1373255957499055,0.12336987381148756,0.29707547708666204,0.25785835765397924,0.2515076311397557,0.3375229623206063,0.2402408455987453,0.23773926045208776,0.2759627742249303,0.2261398553433684,0.22615429225246236,0.05444256642658207,0.1388620703340997,0.17054706566509178,0.14917518528540186],
+"upper":[4.126904362876487,3.5073273201062607,3.1693663021039056,3.1766551070160114,3.2669670356155076,3.5029119569403258,4.082815720503742,3.3492862756163486,4.177483112236732,4.319649297558081,4.212245294491243,4.434086835515938,4.951096730631047,5.822810093161279,5.617900910043606,4.719403456767574,5.474250977088765,4.403721499623245,5.674301429526848,6.501294335410279,6.2837470845910905,5.864591749690992,5.726145724236303,4.915765877577834,3.9507155110794354,3.0957852172753566,3.7309121905602116,5.241154003897734,4.22580285974053,5.402437894303928,5.665549743154274,4.96192471283093,5.255308961242322,5.148834360420564,5.406377774289237,5.374078121306241,5.09514277480772,5.378606026569306,6.465753591892595,7.785572480611196,6.23477286544504,5.989968984307261,5.671519633484929,5.327549654231484,5.525878671776991,5.183316558732926,4.355023886026739,3.409317020000452]
+},
+"mapping":{
+"x":"half_hour"
+},
+"data_meta":{
+"series_annotations":[{
+"type":"int",
+"column":"half_hour"
+},{
+"type":"float",
+"column":"truth"
+},{
+"type":"float",
+"column":"median"
+},{
+"type":"float",
+"column":"lower"
+},{
+"type":"float",
+"column":"upper"
+}]
+},
+"ggtitle":{
+"text":"Same Real NREL Building, QRLightGBM + CQR Band (Zero-Shot)",
+"subtitle":"Same AusNet-calibrated CQR wrapper as above, tree backbone instead of MLPGAM."
+},
+"guides":{
+"x":{
+"title":"Half-hour of forecast horizon"
+},
+"y":{
+"title":"Load (kW)"
+}
+},
+"theme":{
+"text":{
+"color":"#2d2d2d",
+"family":"'Libre Franklin', 'Segoe UI', Roboto, Helvetica, Arial, sans-serif",
+"size":12.0,
+"blank":false
+},
+"axis_title_x":{
+"face":"plain",
+"size":14.0,
+"margin":[10.0,0.0,0.0,0.0],
+"blank":false
+},
+"axis_title_y":{
+"face":"plain",
+"size":14.0,
+"margin":[0.0,10.0,0.0,0.0],
+"blank":false
+},
+"axis_text_x":{
+"color":"#666666",
+"angle":0.0,
+"hjust":0.5,
+"margin":[8.0,0.0,0.0,0.0],
+"blank":false
+},
+"axis_text_y":{
+"color":"#666666",
+"margin":[0.0,0.0,0.0,8.0],
+"blank":false
+},
+"axis_ticks":{
+"color":"#bbbbbb",
+"size":0.75,
+"blank":false
+},
+"axis_line":{
+"color":"#bbbbbb",
+"size":1.0,
+"blank":false
+},
+"legend_background":{
+"blank":true
+},
+"legend_text":{
+"size":12.0,
+"blank":false
+},
+"legend_title":{
+"face":"bold",
+"size":14.0,
+"blank":false
+},
+"legend_position":"none",
+"legend_spacing":10.0,
+"legend_key":{
+"blank":true
+},
+"panel_background":{
+"blank":true
+},
+"panel_border":{
+"blank":true
+},
+"panel_grid_minor":{
+"blank":true
+},
+"panel_grid_major_x":{
+"blank":true
+},
+"panel_grid_major_y":{
+"blank":true
+},
+"plot_background":{
+"blank":true
+},
+"plot_title":{
+"color":"#333333",
+"face":"bold",
+"size":19.0,
+"hjust":0.0,
+"margin":[0.0,0.0,6.0,0.0],
+"blank":false
+},
+"plot_subtitle":{
+"color":"#6b6b6b",
+"size":16.0,
+"hjust":0.0,
+"margin":[0.0,0.0,18.0,0.0],
+"blank":false
+},
+"plot_caption":{
+"color":"#999999",
+"face":"italic",
+"size":9.0,
+"hjust":1.0,
+"margin":[12.0,0.0,0.0,0.0],
+"blank":false
+},
+"plot_margin":[16.0,16.0,10.0,10.0],
+"strip_background":{
+"blank":true
+},
+"strip_text":{
+"family":"'Libre Franklin', 'Segoe UI', Roboto, Helvetica, Arial, sans-serif",
+"face":"bold",
+"size":12.0,
+"hjust":0.0,
+"blank":false
+}
+},
+"ggsize":{
+"width":960.0,
+"height":340.0
+},
+"kind":"plot",
+"scales":[],
+"layers":[{
+"geom":"ribbon",
+"mapping":{
+"ymin":"lower",
+"ymax":"upper"
+},
+"data_meta":{
+},
+"fill":"#0369A1",
+"alpha":0.2,
+"data":{
+}
+},{
+"geom":"line",
+"mapping":{
+"y":"median"
+},
+"data_meta":{
+},
+"color":"#0369A1",
+"size":1.2,
+"data":{
+}
+},{
+"geom":"line",
+"mapping":{
+"y":"truth"
+},
+"data_meta":{
+},
+"color":"#EA580C",
+"size":1.0,
+"linetype":"dashed",
+"data":{
+}
+}],
+"metainfo_list":[],
+"spec_id":"8"
+};
+           fig = LetsPlot.buildPlotFromProcessedSpecs(plotSpec, containerDiv, sizing);
+       } else {
+           fig.updateView({});
+       }
+   }
+   
+   const renderImmediately = 
+       forceImmediateRender || (
+           sizing.width_mode === 'FIXED' && 
+           (sizing.height_mode === 'FIXED' || sizing.height_mode === 'SCALED')
+       );
+   
+   if (renderImmediately) {
+       renderPlot();
+   }
+   
+   if (!renderImmediately || responsive) {
+       // Set up observer for initial sizing or continuous monitoring
+       var observer = new ResizeObserver(function(entries) {
+           for (let entry of entries) {
+               if (entry.contentBoxSize && 
+                   entry.contentBoxSize[0].inlineSize > 0) {
+                   if (!responsive && observer) {
+                       observer.disconnect();
+                       observer = null;
+                   }
+                   renderPlot();
+                   if (!responsive) {
+                       break;
+                   }
+               }
+           }
+       });
+       
+       observer.observe(containerDiv);
+   }
+   
+   // ----------
+   })();
+   
+   </script>
+   
+
+</div>
+</div>
+</div>
+<p>Both bands visibly struggle in the same direction the numbers already flagged: MLPGAM’s band drifts away from the real trace, and QRLightGBM’s CQR band, calibrated for AusNet’s own tighter residual distribution, no longer tracks a real NREL building’s own different daily shape either. Seeing it, not just reading a coverage number, is what makes “the guarantee does not travel” concrete rather than an abstract caveat.</p>
+</section>
+<section id="one-honest-comparison" class="level2">
+<h2 class="anchored" data-anchor-id="one-honest-comparison">One honest comparison</h2>
+<p>Three paradigms have each been checked on their own terms above: a parametric density that prices risk directly but assumes a Normal shape, a quantile forecast that assumes nothing about shape but over-covered by nearly nine points before calibration, and a split-conformal wrapper that delivers an actual guarantee, sharper globally than per archetype. Two metrics beyond MAE, coverage, and width are worth defining before the table below, since both appear in it for the first time this chapter.</p>
+<p><a href="#acronyms_CRPS">Continuously Ranked Probability Score (CRPS)</a> generalizes MAE to a full predicted distribution rather than a single point: it integrates the squared gap between the predicted and true cumulative distributions across every possible threshold, reducing to plain MAE exactly when the forecast collapses to a single point, and rewarding a distribution that is both well-centered and appropriately sharp, not just centered correctly. Lower is better, and it shares load’s own physical units (kW), so a CRPS of 0.27 is directly comparable to an MAE of 0.27, the reason it can rank a parametric density and a full quantile grid on equal footing even though they are shaped completely differently. Winkler score is CRPS’s counterpart for a single interval rather than a full distribution: interval width, plus a penalty of <span class="math inline">\(2/\alpha\)</span> times the miss distance whenever the true value falls outside it. A wide, safe interval scores poorly for being needlessly wide; a narrow interval that frequently misses scores poorly for missing; only a genuinely well-calibrated, appropriately narrow interval scores well on both counts at once. For a <a href="#acronyms_DSO">DSO</a>, CRPS is the number to reach for when comparing a parametric density against a full quantile grid regardless of representation; Winkler score is the number to reach for when comparing calibrated intervals specifically, the actual P95 a transformer gets sized against.</p>
+<p>Putting all five real numbers per paradigm, MAE, coverage, mean width, CRPS, and Winkler score, into one table makes the full tradeoff visible at once, rather than scattered across separate results a reader has to hold in their head.</p>
+<div class="quarto-embed-nb-cell" data-notebook="/home/runner/work/ml-energy-disaggregation/ml-energy-disaggregation/book/05-forecasting/03-probabilistic-forecasting-code.ipynb" data-notebook-title="What a Probabilistic Forecast Is Actually Worth" data-notebook-cellid="9ed2ea6e">
+<div id="9ed2ea6e" class="cell">
+<div class="cell-output cell-output-display">
+<div id="sbfhcgchqj" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:100%;height:auto;">
+<style>
+#sbfhcgchqj table {
+          font-family: 'Libre Franklin', 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+          -webkit-font-smoothing: antialiased;
+          -moz-osx-font-smoothing: grayscale;
+        }
+
+#sbfhcgchqj thead, tbody, tfoot, tr, td, th { border-style: none !important; }
+ tr { background-color: transparent !important; }
+#sbfhcgchqj p { margin: 0 !important; padding: 0 !important; }
+ #sbfhcgchqj .gt_table { display: table !important; border-collapse: collapse !important; line-height: normal !important; margin-left: auto !important; margin-right: auto !important; color: #171717 !important; font-size: 13px !important; font-weight: normal !important; font-style: normal !important; background-color: #FFFFFF !important; width: 100% !important; border-top-style: solid !important; border-top-width: 2px !important; border-top-color: #0369A1 !important; border-right-style: none !important; border-right-width: 2px !important; border-right-color: #D3D3D3 !important; border-bottom-style: solid !important; border-bottom-width: 1px !important; border-bottom-color: #0369A1 !important; border-left-style: none !important; border-left-width: 2px !important; border-left-color: #D3D3D3 !important; }
+ #sbfhcgchqj .gt_caption { padding-top: 4px !important; padding-bottom: 4px !important; }
+ #sbfhcgchqj .gt_title { color: #171717 !important; font-size: 16px !important; font-weight: bold !important; padding-top: 10px !important; padding-bottom: 10px !important; padding-left: 5px !important; padding-right: 5px !important; border-bottom-color: #FFFFFF !important; border-bottom-width: 0 !important; }
+ #sbfhcgchqj .gt_subtitle { color: #171717 !important; font-size: 13px !important; font-weight: initial !important; padding-top: 9px !important; padding-bottom: 11px !important; padding-left: 5px !important; padding-right: 5px !important; border-top-color: #FFFFFF !important; border-top-width: 0 !important; }
+ #sbfhcgchqj .gt_heading { background-color: #FFFFFF !important; text-align: center !important; border-bottom-color: #FFFFFF !important; border-left-style: none !important; border-left-width: 1px !important; border-left-color: #D3D3D3 !important; border-right-style: none !important; border-right-width: 1px !important; border-right-color: #D3D3D3 !important; }
+ #sbfhcgchqj .gt_bottom_border { border-bottom-style: solid !important; border-bottom-width: 2px !important; border-bottom-color: #D3D3D3 !important; }
+ #sbfhcgchqj .gt_col_headings { border-top-style: solid !important; border-top-width: 2px !important; border-top-color: #D3D3D3 !important; border-bottom-style: solid !important; border-bottom-width: 1px !important; border-bottom-color: #D3D3D3 !important; border-left-style: none !important; border-left-width: 1px !important; border-left-color: #D3D3D3 !important; border-right-style: none !important; border-right-width: 1px !important; border-right-color: #D3D3D3 !important; }
+ #sbfhcgchqj .gt_col_heading { color: #FFFFFF !important; background-color: #0369A1 !important; font-size: 13px !important; font-weight: bold !important; text-transform: inherit !important; border-left-style: none !important; border-left-width: 1px !important; border-left-color: #D3D3D3 !important; border-right-style: none !important; border-right-width: 1px !important; border-right-color: #D3D3D3 !important; vertical-align: bottom !important; padding-top: 9px !important; padding-bottom: 11px !important; padding-left: 5px !important; padding-right: 5px !important; overflow-x: hidden !important; }
+ #sbfhcgchqj .gt_column_spanner_outer { color: #FFFFFF !important; background-color: #0369A1 !important; font-size: 13px !important; font-weight: bold !important; text-transform: inherit !important; padding-top: 0 !important; padding-bottom: 0 !important; padding-left: 4px !important; padding-right: 4px !important; }
+ #sbfhcgchqj .gt_column_spanner_outer:first-child { padding-left: 0 !important; }
+ #sbfhcgchqj .gt_column_spanner_outer:last-child { padding-right: 0 !important; }
+ #sbfhcgchqj .gt_column_spanner { border-bottom-style: solid !important; border-bottom-width: 1px !important; border-bottom-color: #D3D3D3 !important; vertical-align: bottom !important; padding-top: 9px !important; padding-bottom: 9px !important; overflow-x: hidden !important; display: inline-block !important; width: 100% !important; }
+ #sbfhcgchqj .gt_spanner_row { border-bottom-style: hidden !important; }
+ #sbfhcgchqj .gt_group_heading { padding-top: 8px !important; padding-bottom: 8px !important; padding-left: 5px !important; padding-right: 5px !important; color: #171717 !important; background-color: #FFFFFF !important; font-size: 100% !important; font-weight: initial !important; text-transform: inherit !important; border-top-style: solid !important; border-top-width: 2px !important; border-top-color: #D3D3D3 !important; border-bottom-style: solid !important; border-bottom-width: 2px !important; border-bottom-color: #D3D3D3 !important; border-left-style: none !important; border-left-width: 1px !important; border-left-color: #D3D3D3 !important; border-right-style: none !important; border-right-width: 1px !important; border-right-color: #D3D3D3 !important; vertical-align: middle !important; text-align: left !important; }
+ #sbfhcgchqj .gt_empty_group_heading { padding: 0.5px !important; color: #171717 !important; background-color: #FFFFFF !important; font-size: 100% !important; font-weight: initial !important; border-top-style: solid !important; border-top-width: 2px !important; border-top-color: #D3D3D3 !important; border-bottom-style: solid !important; border-bottom-width: 2px !important; border-bottom-color: #D3D3D3 !important; vertical-align: middle !important; }
+ #sbfhcgchqj .gt_from_md> :first-child { margin-top: 0 !important; }
+ #sbfhcgchqj .gt_from_md> :last-child { margin-bottom: 0 !important; }
+ #sbfhcgchqj .gt_row { padding-top: 7px !important; padding-bottom: 7px !important; padding-left: 5px !important; padding-right: 5px !important; margin: 10px !important; border-top-style: solid !important; border-top-width: 1px !important; border-top-color: #D3D3D3 !important; border-left-style: none !important; border-left-width: 1px !important; border-left-color: #D3D3D3 !important; border-right-style: none !important; border-right-width: 1px !important; border-right-color: #D3D3D3 !important; vertical-align: middle !important; overflow-x: hidden !important; }
+ #sbfhcgchqj .gt_stub { color: #171717 !important; background-color: #FFFFFF !important; font-size: 100% !important; font-weight: initial !important; text-transform: inherit !important; border-right-style: solid !important; border-right-width: 2px !important; border-right-color: #D3D3D3 !important; padding-left: 5px !important; padding-right: 5px !important; }
+ #sbfhcgchqj .gt_stub_row_group { color: #171717 !important; background-color: #FFFFFF !important; font-size: 100% !important; font-weight: initial !important; text-transform: inherit !important; border-right-style: solid !important; border-right-width: 2px !important; border-right-color: #D3D3D3 !important; padding-left: 5px !important; padding-right: 5px !important; vertical-align: top !important; }
+ #sbfhcgchqj .gt_row_group_first td { border-top-width: 2px !important; }
+ #sbfhcgchqj .gt_row_group_first th { border-top-width: 2px !important; }
+ #sbfhcgchqj .gt_striped { color: #171717 !important; background-color: #F4F4F4 !important; }
+ #sbfhcgchqj .gt_table_body { border-top-style: solid !important; border-top-width: 2px !important; border-top-color: #D3D3D3 !important; border-bottom-style: solid !important; border-bottom-width: 1px !important; border-bottom-color: #DEE2E6 !important; }
+ #sbfhcgchqj .gt_summary_row { color: #171717 !important; background-color: #FFFFFF !important; text-transform: inherit !important; padding-top: 8px !important; padding-bottom: 8px !important; padding-left: 5px !important; padding-right: 5px !important; }
+ #sbfhcgchqj .gt_first_summary_row { border-top-style: solid !important; border-top-width: 2px !important; border-top-color: #D3D3D3 !important; }
+ #sbfhcgchqj .gt_last_summary_row_top { border-bottom-style: solid !important; border-bottom-width: 2px !important; border-bottom-color: #D3D3D3 !important; }
+ #sbfhcgchqj .gt_grand_summary_row { color: #171717 !important; background-color: #FFFFFF !important; text-transform: inherit !important; padding-top: 8px !important; padding-bottom: 8px !important; padding-left: 5px !important; padding-right: 5px !important; }
+ #sbfhcgchqj .gt_first_grand_summary_row_bottom { border-top-style: double !important; border-top-width: 6px !important; border-top-color: #D3D3D3 !important; }
+ #sbfhcgchqj .gt_last_grand_summary_row_top { border-bottom-style: double !important; border-bottom-width: 6px !important; border-bottom-color: #D3D3D3 !important; }
+ #sbfhcgchqj .gt_sourcenotes { color: #171717 !important; background-color: #FFFFFF !important; border-bottom-style: none !important; border-bottom-width: 2px !important; border-bottom-color: #D3D3D3 !important; border-left-style: none !important; border-left-width: 2px !important; border-left-color: #D3D3D3 !important; border-right-style: none !important; border-right-width: 2px !important; border-right-color: #D3D3D3 !important; }
+ #sbfhcgchqj .gt_sourcenote { font-size: 11px !important; padding-top: 6px !important; padding-bottom: 6px !important; padding-left: 5px !important; padding-right: 5px !important; text-align: left !important; }
+ #sbfhcgchqj .gt_left { text-align: left !important; }
+ #sbfhcgchqj .gt_center { text-align: center !important; }
+ #sbfhcgchqj .gt_right { text-align: right !important; font-variant-numeric: tabular-nums !important; }
+ #sbfhcgchqj .gt_font_normal { font-weight: normal !important; }
+ #sbfhcgchqj .gt_font_bold { font-weight: bold !important; }
+ #sbfhcgchqj .gt_font_italic { font-style: italic !important; }
+ #sbfhcgchqj .gt_super { font-size: 65% !important; }
+ #sbfhcgchqj .gt_footnotes { color: font-color(#FFFFFF) !important; background-color: #FFFFFF !important; border-bottom-style: none !important; border-bottom-width: 2px !important; border-bottom-color: #D3D3D3 !important; border-left-style: none !important; border-left-width: 2px !important; border-left-color: #D3D3D3 !important; border-right-style: none !important; border-right-width: 2px !important; border-right-color: #D3D3D3 !important; }
+ #sbfhcgchqj .gt_footnote { margin: 0px !important; font-size: 90% !important; padding-top: 4px !important; padding-bottom: 4px !important; padding-left: 5px !important; padding-right: 5px !important; }
+ #sbfhcgchqj .gt_sourcenotes { color: #171717 !important; background-color: #FFFFFF !important; border-bottom-style: none !important; border-bottom-width: 2px !important; border-bottom-color: #D3D3D3 !important; border-left-style: none !important; border-left-width: 2px !important; border-left-color: #D3D3D3 !important; border-right-style: none !important; border-right-width: 2px !important; border-right-color: #D3D3D3 !important; }
+ #sbfhcgchqj .gt_sourcenote { font-size: 11px !important; padding-top: 6px !important; padding-bottom: 6px !important; padding-left: 5px !important; padding-right: 5px !important; text-align: left !important; }
+ #sbfhcgchqj .gt_footnote_marks { font-size: 75% !important; vertical-align: 0.4em !important; position: initial !important; }
+ #sbfhcgchqj .gt_asterisk { font-size: 100% !important; vertical-align: 0 !important; }
+ 
+</style>
+
+<table class="gt_table caption-top table table-sm table-striped small" data-quarto-bootstrap="false">
+<thead>
+<tr class="gt_heading header">
+<td colspan="6" class="gt_heading gt_title gt_font_normal" style="color: #171717; font-weight: bold"><strong>Four Paradigms, One Honest Comparison</strong></td>
+</tr>
+<tr class="gt_col_headings even">
+<th id="Paradigm" class="gt_col_heading gt_columns_bottom_border gt_left" data-quarto-table-cell-role="th" style="color: #FFFFFF; font-family: Jost" scope="col">Paradigm</th>
+<th id="MAE" class="gt_col_heading gt_columns_bottom_border gt_right" data-quarto-table-cell-role="th" style="color: #FFFFFF; font-family: Jost" scope="col">MAE</th>
+<th id="Coverage" class="gt_col_heading gt_columns_bottom_border gt_right" data-quarto-table-cell-role="th" style="color: #FFFFFF; font-family: Jost" scope="col">Coverage</th>
+<th id="Mean-width" class="gt_col_heading gt_columns_bottom_border gt_right" data-quarto-table-cell-role="th" style="color: #FFFFFF; font-family: Jost" scope="col">Mean width</th>
+<th id="CRPS" class="gt_col_heading gt_columns_bottom_border gt_right" data-quarto-table-cell-role="th" style="color: #FFFFFF; font-family: Jost" scope="col">CRPS</th>
+<th id="Winkler" class="gt_col_heading gt_columns_bottom_border gt_right" data-quarto-table-cell-role="th" style="color: #FFFFFF; font-family: Jost" scope="col">Winkler</th>
+</tr>
+</thead>
+<tbody class="gt_table_body">
+<tr class="odd">
+<td class="gt_row gt_left">Parametric (Normal)</td>
+<td class="gt_row gt_right">0.3627</td>
+<td class="gt_row gt_right">0.959</td>
+<td class="gt_row gt_right">2.0246</td>
+<td class="gt_row gt_right">0.2694</td>
+<td class="gt_row gt_right">2.0892</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_left" style="background-color: #EAF3FA">Quantile (FPQR)</td>
+<td class="gt_row gt_right" style="background-color: #EAF3FA"><na></na></td>
+<td class="gt_row gt_right" style="background-color: #EAF3FA">0.99</td>
+<td class="gt_row gt_right" style="background-color: #EAF3FA">3.0809</td>
+<td class="gt_row gt_right" style="background-color: #EAF3FA">0.2558</td>
+<td class="gt_row gt_right" style="background-color: #EAF3FA">3.0817</td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_left">Conformal, global</td>
+<td class="gt_row gt_right"><na></na></td>
+<td class="gt_row gt_right">0.899</td>
+<td class="gt_row gt_right">1.0317</td>
+<td class="gt_row gt_right"><na></na></td>
+<td class="gt_row gt_right">1.0715</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_left" style="background-color: #EAF3FA">Conformal, per-archetype</td>
+<td class="gt_row gt_right" style="background-color: #EAF3FA"><na></na></td>
+<td class="gt_row gt_right" style="background-color: #EAF3FA">0.899</td>
+<td class="gt_row gt_right" style="background-color: #EAF3FA">1.108</td>
+<td class="gt_row gt_right" style="background-color: #EAF3FA"><na></na></td>
+<td class="gt_row gt_right" style="background-color: #EAF3FA">1.0505</td>
+</tr>
+</tbody><tfoot>
+<tr class="gt_sourcenotes odd">
+<td colspan="6" class="gt_sourcenote" style="color: #6B7280; font-style: italic"><span class="gt_from_md">342 real AusNet customers, last-90-day holdout, MLPGAM backbone throughout</span></td>
+</tr>
+</tfoot>
+
+</table>
+
+
+</div>
+</div>
+</div>
+</div>
+<div class="quarto-embed-nb-cell" data-notebook="/home/runner/work/ml-energy-disaggregation/ml-energy-disaggregation/book/05-forecasting/03-probabilistic-forecasting-code.ipynb" data-notebook-title="What a Probabilistic Forecast Is Actually Worth" data-notebook-cellid="153d1ae4">
+<div id="153d1ae4" class="cell">
+<div class="cell-output cell-output-display">
+
+   
+       <meta charset="UTF-8">
+       <style> html, body { margin: 0; padding: 0; } </style>
+       <script type="text/javascript" data-lets-plot-script="library" src="https://cdn.jsdelivr.net/gh/JetBrains/lets-plot@v4.11.0/js-package/distr/lets-plot.min.js"></script>
+   
+   
+          <div id="42kN7s"></div>
+   <script type="text/javascript" data-lets-plot-script="plot">
+   
+   (function() {
+   // ----------
+   
+   const forceImmediateRender = false;
+   const responsive = false;
+   
+   let sizing = {
+       width_mode: "MIN",
+       height_mode: "SCALED",
+       width: null, 
+       height: null 
+   };
+   
+   const preferredWidth = document.body.dataset.letsPlotPreferredWidth;
+   if (preferredWidth !== undefined) {
+       sizing = {
+           width_mode: 'FIXED',
+           height_mode: 'SCALED',
+           width: parseFloat(preferredWidth)
+       };
+   }
+   
+   const containerDiv = document.getElementById("42kN7s");
    let fig = null;
    
    function renderPlot() {
@@ -2051,7 +3445,7 @@ AusNet-calibrated conformal band on NREL: coverage=0.642, mean width=1.0315
            const plotSpec = {
 "data":{
 "Approach":["Quantile (FPQR), raw","Conformal, global","Conformal, per-archetype"],
-"width":[3.080918312072754,1.0315256398072106,1.107952356338501]
+"width":[3.080918312072754,1.0316953427882107,1.1079994440078735]
 },
 "mapping":{
 "x":"Approach",
@@ -2211,7 +3605,7 @@ AusNet-calibrated conformal band on NREL: coverage=0.642, mean width=1.0315
 }
 }],
 "metainfo_list":[],
-"spec_id":"4"
+"spec_id":"6"
 };
            fig = LetsPlot.buildPlotFromProcessedSpecs(plotSpec, containerDiv, sizing);
        } else {
@@ -2262,11 +3656,11 @@ AusNet-calibrated conformal band on NREL: coverage=0.642, mean width=1.0315
 </section>
 <section id="why-bother" class="level2">
 <h2 class="anchored" data-anchor-id="why-bother">Why bother</h2>
-<p>None of the three paradigms is strictly better; each answers a different real question. The parametric head is the only one that prices a risk-of-exceedance question directly. The quantile head is the only one free of a distributional assumption, at the cost of needing its own calibration check, its raw intervals over-covered by nearly nine points here. Conformal calibration is the only one with an actual finite-sample guarantee, and checking whether Chapter 2’s own archetypes sharpen it further was a real test, not an assumption: they do not, and the mechanism behind that answer, a near-constant learned scale and a tail-sample efficiency loss, is as real and useful a finding as a positive result would have been. Two further tests, not assumptions either: whether these findings are a property of MLPGAM specifically or of the data, and whether any of it holds up beyond the one real population this chapter trained on.</p>
+<p>Three concrete things this chapter buys beyond “another accuracy table.” First, a real basis for trust: a raw model’s own stated uncertainty was wrong by nearly nine points here, in both paradigms, so a <a href="#acronyms_DSO">DSO</a> sizing a transformer or setting a compliance threshold off an uncalibrated interval is sizing it off a number that does not mean what it claims, calibration is not optional polish, it is the difference between a real guarantee and a plausible-looking one. Second, a real answer to “which backbone should I trust this finding with”: FPQR over-covers, QRLightGBM under-covers, in opposite directions, yet conformal calibration closes both gaps to the same 90% target regardless of which way the raw model was wrong, so the practical lesson travels across architectures even though the raw failure mode does not. Third, a real limit on how far any of this travels: the exact same calibrated interval that holds its guarantee on 342 AusNet customers loses more than a quarter of its coverage on real NREL buildings, for both backbones checked, a finding that would stay invisible without deliberately testing it, and one that matters directly to anyone tempted to ship a calibrated model to a new utility, a new country, or a new tariff structure without recalibrating first.</p>
 </section>
 <section id="where-this-leaves-part-5" class="level2">
 <h2 class="anchored" data-anchor-id="where-this-leaves-part-5">Where this leaves Part 5</h2>
-<p>A point forecast alone was never the full deliverable this part set out to build. Chapter 2 found the model that earns its cost; this chapter attached an honest number to how wrong that model’s own forecasts might be, and checked, rather than assumed, which calibration actually earns its own added complexity.</p>
+<p>A point forecast alone was never the full deliverable this part set out to build. Chapter 2 found the model that earns its cost; this chapter attached an honest number to how wrong that model’s own forecasts might be, checked whether that number holds across architectures and across populations, rather than assuming it does, and found real limits on both counts worth carrying into any real deployment.</p>
 </section>
 <section id="references" class="level2">
 <h2 class="anchored" data-anchor-id="references">References</h2>
@@ -2284,7 +3678,6 @@ AusNet-calibrated conformal band on NREL: coverage=0.642, mean width=1.0315
 <div class="csl-left-margin">[4] </div><div class="csl-right-inline">A. Faustine and L. Pereira, <span>“Conformal multilayer perceptron-based probabilistic net-load forecasting for low-voltage distribution systems with photovoltaic generation,”</span> in <em>2024 IEEE international conference on communications, control, and computing technologies for smart grids (SmartGridComm)</em>, Oslo, Norway, 2024.</div>
 </div>
 </div>
-<p></p>
 
 
 </section>
