@@ -87,7 +87,7 @@ One real scope limit, disclosed rather than hidden. The author's own `resources/
 
 ## Where this leaves Part 5
 
-Chapter 4 checked whether a zero-shot forecast fails on the same customers a trained model does. This chapter checked something a point-accuracy number alone cannot answer: whether that same forecast, put to a real network-planning use, changes a real operational decision. It mostly does not move the headline breach point here, and it meaningfully complicates the naive "upper quantile is always worse" assumption a what-if analysis might otherwise lean on unchecked.
+Chapter 4 checked whether a zero-shot forecast fails on the same customers a trained model does. This chapter checked something a point-accuracy number alone cannot answer: whether that same forecast, put to a real network-planning use, changes a real operational decision. It mostly does not move the headline breach point here, and it meaningfully complicates the naive "upper quantile is always worse" assumption a what-if analysis might otherwise lean on unchecked. Chapter 6 turns to a different real gap this chapter's own full-network solve papers over: most real feeders have no such visibility below the substation at all, and checks whether smart-meter readings can genuinely fill that in.
 
 ## References
 

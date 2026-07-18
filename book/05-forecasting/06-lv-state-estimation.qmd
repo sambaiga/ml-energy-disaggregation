@@ -1,0 +1,92 @@
+---
+title: "Part 5 Chapter 6: Can Smart-Meter Readings Fill In What the Grid Cannot See"
+bibliography: ../../references.bib
+---
+
+Every earlier chapter in this part assumed the network's own state was already known. Part 4 solved it directly with OpenDSS; Part 5 Chapter 5 swept it across scenarios. Real low-voltage networks do not hand that over for free. Below the substation, most real feeders have no real-time telemetry at all: a {{< acr DSO >}} often cannot say what a specific customer's own bus voltage is right now without a truck roll. Distribution System State Estimation ({{< acr DSSE >}}) is the established technique for inferring a network's full state from whatever real measurements exist, plus a network model. The real, checkable question this chapter asks: can smart-meter readings, treated honestly as imperfect pseudo-measurements, serve as that missing data, and how much of it is actually needed?
+
+Three chained questions structure what follows:
+
+- Can a {{< acr DSO >}} with only substation-level telemetry, the real, typical starting point below the substation, run state estimation on this feeder at all?
+- Do smart-meter readings, treated as real pseudo-measurements rather than assumed to work, restore that ability, and how much coverage does it actually take?
+- Is a handful of real branch-level sensors a genuine substitute for the last mile of that coverage, or does that assumption need checking too?
+
+## Setup: a second power-flow engine, for one real reason
+
+OpenDSS, this book's own power-flow engine everywhere else, has no real {{< acr WLS >}} state-estimation module of its own; its own documentation says as much directly, only a narrower load-allocation feature exists [@opendss-stateestimation]. `pandapower` does have one, `pandapower.estimation`, real and well-established since Schweppe and Wildes first formalized the problem [@schweppe1970stateestimation], so this chapter adds it as a second, narrowly-scoped dependency, reusing Part 4's own AusNet network model rather than building a new one.
+
+<div class='ark-concept'>
+
+<span class='ark-concept-title'><i class="bi bi-info-circle-fill"></i> Key Concept</span>
+
+Weighted-least-squares state estimation finds the state $x$, voltage magnitude and angle at every bus, that best explains a real, noisy set of measurements $z$, minimizing
+$$
+J(x) = \sum_i \frac{\big(z_i - h_i(x)\big)^2}{\sigma_i^2}
+$$
+where $h_i(x)$ is what measurement $i$ would read given state $x$, computed directly from the same real power-flow equations OpenDSS solves, and $\sigma_i$ is that measurement's own assumed uncertainty, a real substation voltage transformer trusted far more than a periodic smart-meter reading. A real measurement and a pseudo-measurement enter this same objective identically; the only difference is $\sigma_i$, honestly reflecting how much that source is actually worth trusting. This only has a real solution at all when the network is *observable*: at least as many independent measurements as unknown states, $2N - 1$ for $N$ buses (voltage magnitude and angle at every bus but the slack reference, whose own angle is fixed by definition) [@schweppe1970stateestimation], not a fixed absolute count but one this chapter's own network genuinely has to clear.
+
+</div>
+
+![Why smart-meter readings can turn an unobservable feeder into an observable one. Left: a substation with its own real telemetry, and every customer bus downstream genuinely unknown, the real starting point for most real low-voltage feeders. Right: the same one real substation measurement, but every customer's own smart-meter reading now treated as a real pseudo-measurement, turning an unobservable network into one a real WLS estimator can actually solve.](../../assets/pseudo-measurement-observability.svg){#fig-pseudo-measurement-observability}
+
+{{< embed 06-lv-state-estimation-code.ipynb#afc8d171 >}}
+
+## Converting the network, and checking the conversion before trusting it
+
+`from_opendss` builds a balanced, positive-sequence `pandapower` network directly from the same real `LVcircuit-master.txt` Part 4 and Part 5 Chapter 5 both use, no hand-rolled bus-by-bus translation needed. Two real issues surfaced when this was checked directly against OpenDSS's own solve, rather than trusted on faith. First, the converter needs `Set VoltageBases`/`CalcVoltageBases` already applied, the same step this book's own `Circuit.load()` wrapper already runs; without it, every bus loses its voltage base and the transformer gets silently dropped. Second, even with that fixed, the converter assigns the transformer's own secondary rating from the declared system voltage base (0.400 kV) instead of the transformer's own real nameplate rating, confirmed directly from `LVcircuit-transformers.txt`'s own `kVs=[22 0.433]`, an 8% voltage error otherwise.
+
+{{< embed 06-lv-state-estimation-code.ipynb#09040d11 >}}
+
+Both fixes are verified, not assumed: with the network's own nominal placeholder loads (no real customer data applied yet), `pandapower`'s own re-solved voltage matches OpenDSS's own solve to four decimal places.
+
+## Ground truth: what a fully-instrumented network would show
+
+A real customer-to-bus assignment, the same convention Part 5 Chapter 5 already uses, and one real test-day, evening-peak half-hour.
+
+{{< embed 06-lv-state-estimation-code.ipynb#4a4d6fe1 >}}
+
+Solving the converted network with every real load in place gives the one thing a real {{< acr DSO >}} never has directly: the true voltage at every single bus, used below only to check each scenario's own estimate against, never fed to the estimator itself.
+
+## Can a substation-only DSO solve this at all?
+
+`zero_injection` lets the {{< acr WLS >}} solver treat every real junction bus with no customer of its own, confirmed directly from the network's own topology (29 of them here), as an exact constraint rather than an unknown, real structure this network already has, not an assumption. Even with that structure exploited, a {{< acr DSO >}} with only its own substation-level voltage and power telemetry is checked directly against the real observability requirement above rather than assumed to clear it.
+
+{{< embed 06-lv-state-estimation-code.ipynb#336b8f48 >}}
+
+No: this feeder's own real topology needs real information at every one of its 31 real customer buses, or an explicit zero-injection exemption, and a real substation-only {{< acr DSO >}} has neither for any of them. This is not a noisy or imprecise estimate, it is no estimate at all; the {{< acr WLS >}} solver has no way to resolve the state even in principle.
+
+## Smart-meter readings as pseudo-measurements
+
+Each real customer's own smart-meter reading, real active and reactive power consumption, becomes a pseudo-measurement at that customer's own bus, not a voltage reading real household smart meters do not usually report. A real 10% uncertainty band reflects that these are periodic {{< acr AMI >}} readings, not real-time {{< acr SCADA >}}-grade telemetry, a genuinely different, less trustworthy kind of measurement than the substation's own.
+
+{{< embed 06-lv-state-estimation-code.ipynb#d79076cb >}}
+
+Real smart-meter pseudo-measurements, at every real customer bus, do restore observability, and the resulting estimate is genuinely accurate: well within a tenth of a percent of true voltage at every bus. The real, more useful question is how much of that coverage is actually needed, checked directly below rather than assumed to scale smoothly.
+
+## Does partial smart-meter coverage work?
+
+{{< embed 06-lv-state-estimation-code.ipynb#f473a8b2 >}}
+
+Not smoothly: every coverage level below 100% fails to achieve observability, including 90%, a single real customer's own unmeasured, non-zero consumption is enough to leave the system unsolvable, regardless of how many other customers are metered. Full smart-meter rollout is not a nice-to-have here, it is a hard requirement, at least for this specific approach of one pseudo-measurement per customer bus and nothing else.
+
+## A few real sensors, instead of chasing full coverage
+
+A real {{< acr DSO >}} rarely has full smart-meter rollout and nothing else; it is more likely to have partial {{< acr AMI >}} coverage plus a handful of real branch-level power-flow sensors at key points in the feeder, the kind of investment an operator can actually make. Checked directly, and checked honestly: a single random draw per configuration turned out to be genuinely misleading here, since which specific customers happen to be metered and which specific branches happen to carry a sensor both matter, not just how many of each. Every configuration below is repeated across 8 real random draws, reporting how often it actually produces a usable estimate, not just whether one particular draw happened to.
+
+{{< embed 06-lv-state-estimation-code.ipynb#ab78c290 >}}
+
+A real, more sobering finding than a single draw suggested. Only one configuration ever produces a usable estimate at all across 8 real draws, 90% coverage plus 10 real sensors, and even there it only solves a quarter of the time. Every other combination tested, including 90% coverage with 5 sensors, and 70% coverage with as many as 10, never solves once. A handful of real sensors is not a reliable substitute for chasing the last mile of smart-meter coverage on this feeder; at best it is a marginal, inconsistent supplement that only starts to help once coverage is already high. Full {{< acr AMI >}} rollout remains the one lever checked here that reliably works.
+
+## Why bother
+
+A {{< acr DSO >}} without full network telemetry is not a hypothetical, it is the real, typical starting point below the substation, and this chapter checked what that actually means rather than assuming smart meters are an obvious fix. Three real, checked findings: substation-only telemetry is not just inaccurate, it makes {{< acr WLS >}} state estimation impossible outright on this feeder. Smart-meter readings, treated honestly as pseudo-measurements with real {{< acr AMI >}}-grade uncertainty, do fix that, but only once every real customer is covered, not gradually. And a handful of real branch-level sensors, checked across repeated random draws rather than one convenient one, turned out to be a weak, inconsistent supplement at best, not the reliable substitute for full coverage a single lucky draw first suggested, a real result worth reporting exactly as found rather than the more flattering one. None of this was assumed going in; every number above came from running the same real {{< acr WLS >}} estimator against the same real network Part 4 and Part 5 Chapter 5 already built and validated.
+
+## Where this leaves Part 5
+
+Chapter 5 checked whether a zero-shot forecast, put to a real network-planning use, changes a real operational decision. This chapter checked a genuinely different real use for the same data this part has built throughout: not planning for a future scenario, but filling in a network's own current, unmeasured state. Full smart-meter coverage does that reliably; a handful of extra sensors, checked honestly rather than assumed, mostly does not. That is where this book's own real, six-chapter path through smart-meter data, disaggregation, forecasting, and grid-edge value, closes: not with a single model or a single clean answer, but with the same discipline applied throughout, checking every real claim against real data rather than assuming it holds.
+
+## References
+
+::: {#refs}
+:::
+</content>
