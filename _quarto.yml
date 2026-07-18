@@ -69,6 +69,7 @@ book:
         - book/05-forecasting/01-forecastability.qmd
         - book/05-forecasting/02-scaling-archetypes.qmd
         - book/05-forecasting/03-probabilistic-forecasting.qmd
+        - book/05-forecasting/04-foundation-models.qmd
     - about.qmd
     - acronyms.qmd
 

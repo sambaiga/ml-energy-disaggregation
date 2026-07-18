@@ -76,6 +76,10 @@ dev = [
     "optuna>=4.5.0",
     "optuna-integration>=4.5.0",
 ]
+foundational = [
+    "timesfm",
+    "twiga[foundational]>=1.0.0",
+]
 
 [build-system]
 requires = ["hatchling"]
@@ -145,3 +149,6 @@ bump_message = "bump: v$current_version → v$new_version"
 tag_format = "v$version"
 update_changelog_on_bump = true
 version_provider = "pep621"
+
+[tool.uv.sources]
+timesfm = { git = "https://github.com/google-research/timesfm.git" }

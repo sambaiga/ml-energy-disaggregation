@@ -183,7 +183,7 @@ Three concrete things this chapter buys beyond "another accuracy table." First, 
 
 ## Where this leaves Part 5
 
-A point forecast alone was never the full deliverable this part set out to build. Chapter 2 found the model that earns its cost; this chapter attached an honest number to how wrong that model's own forecasts might be, checked whether that number holds across architectures and across populations, rather than assuming it does, and found real limits on both counts worth carrying into any real deployment.
+A point forecast alone was never the full deliverable this part set out to build. Chapter 2 found the model that earns its cost; this chapter attached an honest number to how wrong that model's own forecasts might be, checked whether that number holds across architectures and across populations, rather than assuming it does, and found real limits on both counts worth carrying into any real deployment. Part 5 Chapter 4 checks a different kind of cost: whether a pretrained foundation model, never trained or calibrated on this population at all, still fails on the same customers these trained models do.
 
 ## References
 

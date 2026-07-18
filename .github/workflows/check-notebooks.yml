@@ -54,11 +54,18 @@ jobs:
           # a live OpenDSS power flow across the UK network's 414 real
           # feeders (18,997 loads), several minutes each, too slow to
           # re-run on every CI trigger alongside every other notebook.
-          # All six notebooks' outputs are committed and {{< embed >}}
-          # reads them directly without re-executing the notebook, so the
-          # rendered book is unaffected; only this from-scratch CI
-          # re-execution can't run them.
-          SKIP_LIST="book/03-disaggregation/02-feature-engineering-code.ipynb book/03-disaggregation/03-multi-appliance-recognition-code.ipynb book/03-disaggregation/04-multi-task-low-frequency-code.ipynb book/04-grid-edge/04-customer-feeder-clustering-code.ipynb book/04-grid-edge/05-ranking-recommendation-code.ipynb book/04-grid-edge/06-anomaly-detection-code.ipynb"
+          # book/05-forecasting/04-foundation-models-code.ipynb runs real
+          # zero-shot inference with Chronos-2 and TimesFM against all 342
+          # AusNet customers plus 200 NREL buildings; confirmed to take
+          # about 14 minutes end to end on a local Apple Silicon machine
+          # (TimesFM alone is the bulk of that, ~1.1s/customer, no batching
+          # support), and a real CI run exceeded this job's own 45-minute
+          # timeout on a slower/cold GitHub-hosted runner plus first-time HF
+          # weight downloads. All seven notebooks' outputs are committed and
+          # {{< embed >}} reads them directly without re-executing the
+          # notebook, so the rendered book is unaffected; only this
+          # from-scratch CI re-execution can't run them.
+          SKIP_LIST="book/03-disaggregation/02-feature-engineering-code.ipynb book/03-disaggregation/03-multi-appliance-recognition-code.ipynb book/03-disaggregation/04-multi-task-low-frequency-code.ipynb book/04-grid-edge/04-customer-feeder-clustering-code.ipynb book/04-grid-edge/05-ranking-recommendation-code.ipynb book/04-grid-edge/06-anomaly-detection-code.ipynb book/05-forecasting/04-foundation-models-code.ipynb"
 
           # Helper: find all notebooks, excluding archived ones
           find_notebooks() {
@@ -125,7 +132,7 @@ jobs:
 
       - name: Install dependencies
         if: steps.changed.outputs.notebooks != ''
-        run: uv sync --extra dev --extra modelling --extra test --extra grid
+        run: uv sync --extra dev --extra modelling --extra test --extra grid --extra foundational
 
       - name: Configure nbdime git drivers
         if: steps.changed.outputs.notebooks != ''
