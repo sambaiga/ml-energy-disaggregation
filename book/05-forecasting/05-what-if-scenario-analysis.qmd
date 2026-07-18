@@ -1,0 +1,73 @@
+---
+title: "Part 5 Chapter 5: What the Grid Actually Faces When These Forecasts Come True"
+bibliography: ../../references.bib
+---
+
+Part 4 Chapter 2 already ran a real hosting-capacity study on this exact 342-customer AusNet feeder: sweep {{< acr PV >}} penetration from 0 to 100%, watch the worst-case voltage climb, find the level where it first breaches 1.10 pu. That study is genuinely useful, and it has one real limitation, stated plainly rather than glossed over: every load in it comes from a day that already happened, replayed from the historical record. A {{< acr DSO >}} planning for next year's {{< acr PV >}} applications cannot replay next year's load; the only thing it can do is forecast it.
+
+This chapter closes that gap directly, and it is deliberately integration work, not a new open question. Every mechanism it needs already exists and is already validated: Part 4's own `Circuit` handle on the OpenDSS network, its own rule-based Volt-Watt and Volt-VAr mitigation levers, and Part 5 Chapter 4's own zero-shot Chronos-2 forecast, which needs no fitting step on this population at all. The real, checkable question is narrower and more useful than "does the network model work": does trusting a forecast, instead of a historical replay, change the answer to a real operational question a {{< acr DSO >}} actually asks?
+
+Two chained questions structure what follows:
+
+- At what {{< acr PV >}} penetration level does this feeder first breach its own voltage limit, historical replay against zero-shot forecast, and does the answer move?
+- A forecast's own upper quantile sounds like the obvious worst case to plan against. Is it, for every constraint, at every penetration level, or is that assumption worth checking rather than taking for granted?
+
+## Reusing Part 4's own network, unmodified
+
+`build_ausnet_network()` below is byte-for-byte the same function Part 4 Chapter 2 built: the same `LVcircuit-master.txt`, the same 31 real customer loads, the same 500 kVA transformer.
+
+{{< embed 05-what-if-scenario-analysis-code.ipynb#e5f643fb >}}
+
+## A forecast, not a replay, driving the network
+
+Chapter 4's own Chronos-2, recomputed exactly as that chapter built it, zero-shot, no fitting step on this data. Each customer's own day 362 becomes the context window; day 363, the same sunniest real day Part 4 Chapter 2's own hosting-capacity study already uses, becomes the forecast target. A single forecast call hands back two real scenarios worth keeping separate: the point forecast, and the 0.95 quantile, an upper-demand scenario that sounds like the natural worst case to plan against.
+
+{{< embed 05-what-if-scenario-analysis-code.ipynb#4f95e6c9 >}}
+
+## One sweep function, three real load sources
+
+Reusing Part 4 Chapter 2's own `run_penetration` almost entirely as written. The one change: instead of indexing a fixed historical day out of `load_data`, `run_scenario` takes a `load_source` array directly, one row per customer, so the exact same customer-to-{{< acr PV >}} assignment, {{< acr PV >}} profile, reactive-power synthesis, and mitigation-control logic runs unchanged against a historical, point-forecast, or upper-quantile load.
+
+## Does trusting the forecast change the hosting-capacity answer?
+
+Same network, same {{< acr PV >}} penetration sweep, same customer-to-{{< acr PV >}} assignment (same random seed across scenarios), so any difference below comes from the load source alone.
+
+{{< embed 05-what-if-scenario-analysis-code.ipynb#09c103a9 >}}
+
+{{< embed 05-what-if-scenario-analysis-code.ipynb#2da89eef >}}
+
+{{< embed 05-what-if-scenario-analysis-code.ipynb#b7c6e296 >}}
+
+All three scenarios first breach 1.10 pu at the same 80% penetration level here. The forecast does not move this particular answer, a real, checked result rather than an assumed one, and worth reporting exactly as found: a genuine generalization check does not get to pick the more dramatic-sounding outcome after the fact.
+
+## Does the upper quantile behave like a uniformly worse case?
+
+A second, more useful finding sits underneath that headline number. "P95" sounds like it should mean worse, for every constraint, at every penetration level. Checked directly against transformer utilization, not assumed, it does not.
+
+{{< embed 05-what-if-scenario-analysis-code.ipynb#f384ff5d >}}
+
+No, and the real reason is physical, not statistical. At low {{< acr PV >}} penetration the transformer's own throughput is mostly driven by load itself, so the upper-demand scenario does raise utilization, exactly what "P95 means worse" assumes: 9.30% against 2.81-4.01% at 0-20% penetration. Past roughly 40% penetration, that reverses: a customer with higher local demand consumes more of their own {{< acr PV >}} export before it ever reaches the transformer, so higher demand *lowers* both transformer utilization and worst-case voltage, 17.62% against 22.69-22.82% at 80% penetration. This is the same real compensatory mechanism Part 5 Chapter 1 already found between {{< acr PV >}} and {{< acr EV >}} activity [@fias2025uncertainty], now showing up between forecast demand and {{< acr PV >}} export instead. A {{< acr DSO >}} that reflexively treats a forecast's upper quantile as the universal worst case for every constraint gets this backwards at high {{< acr PV >}} penetration; which quantile is actually the risk depends on which constraint, and how much {{< acr PV >}} is already on the feeder, not on "higher demand" as a blanket rule.
+
+## Does a rule-based mitigation lever fix the real worst case?
+
+Because the upper quantile is not automatically the worst case, this section identifies the *actual* worst-case load source at the shared 80% breach penetration, historical replay, marginally the highest of the three at 1.1047 pu, rather than assuming it is the upper-quantile scenario in advance. Part 4 Chapter 2's own two real inverter-control levers, Volt-Watt and Volt-VAr, apply unchanged.
+
+{{< embed 05-what-if-scenario-analysis-code.ipynb#fab5538d >}}
+
+Both levers fix the real worst case: Volt-Watt brings the feeder to 1.0878 pu, Volt-VAr further still to 1.0710 pu, both back under the 1.10 pu limit with no new customer, no new equipment, no change to the {{< acr PV >}} penetration level itself. The same real finding Part 4 Chapter 2 already reported, now confirmed against a forecast-identified worst case rather than only a historical one.
+
+## Why bother
+
+Two real, checked answers, not one assumed going in. First: at least on this feeder, on this day, trusting a zero-shot forecast instead of a historical replay does not change which {{< acr PV >}} penetration level first breaches the feeder's own voltage limit, a genuine reassurance that Part 4's own hosting-capacity conclusion is not an artifact of using historical rather than forecasted load. Second, and more useful precisely because it was not the expected answer: a forecast's upper quantile is not a universal worst case. It raises transformer utilization at low {{< acr PV >}} penetration and lowers both utilization and worst-case voltage at high penetration, because higher local demand increasingly offsets {{< acr PV >}} export as penetration grows. A {{< acr DSO >}} building a what-if analysis around "always plan for the P95 scenario" would get this backwards on a feeder with real {{< acr PV >}} adoption, exactly the kind of assumption this book's own discipline exists to check rather than take for granted.
+
+One real scope limit, disclosed rather than hidden. The author's own `resources/cvar_flexibility` work explores a further angle, an optimal customer-flexibility dispatch under a {{< acr CVaR >}} risk objective, using a forecast's own uncertainty as the risk input directly rather than only checking a fixed set of scenarios against it. That formulation is not yet vendored in this book's own copy of that work, and no equivalent public methodology could be confirmed against this dataset within this chapter's own scope. Rather than force an unverified optimization into print, this chapter stops at the scenario-comparison result above; a {{< acr CVaR >}}-based dispatch chapter remains a real, open extension, not a solved one.
+
+## Where this leaves Part 5
+
+Chapter 4 checked whether a zero-shot forecast fails on the same customers a trained model does. This chapter checked something a point-accuracy number alone cannot answer: whether that same forecast, put to a real network-planning use, changes a real operational decision. It mostly does not move the headline breach point here, and it meaningfully complicates the naive "upper quantile is always worse" assumption a what-if analysis might otherwise lean on unchecked.
+
+## References
+
+::: {#refs}
+:::
+</content>
