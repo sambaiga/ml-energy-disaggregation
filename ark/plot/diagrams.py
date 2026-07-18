@@ -2298,6 +2298,85 @@ def nilm_softmax_vs_sigmoid_diagram() -> plt.Figure:
     return fig
 
 
+def _tau_ticks(ax: plt.Axes, y: float, taus: list[float], color: str, *, x0: float = 0.0, width: float = 4.0) -> None:
+    """A row of tick marks on a [0, 1] axis at the given tau levels; the shared idiom both panels below use."""
+    ax.plot([x0, x0 + width], [y, y], color=TEXT_MUTED, linewidth=1.2, zorder=1)
+    for tau in taus:
+        ax.plot([x0 + tau * width], [y], marker="|", markersize=14, markeredgewidth=2.2, color=color, zorder=2)
+    ax.text(x0, y - 0.28, "0", fontsize=8, color=TEXT_MUTED, ha="center")
+    ax.text(x0 + width, y - 0.28, "1", fontsize=8, color=TEXT_MUTED, ha="center")
+
+
+def fpqr_vs_standard_qr_diagram() -> plt.Figure:
+    """Draw standard (fixed-tau) quantile regression against FPQR's learned-tau version.
+
+    Left: the common approach, a single Quantile Value Network (QVN) maps a
+    context vector to quantile values at a handful of levels fixed by the
+    user in advance, evenly spaced, chosen by convention rather than learned.
+    Right: FPQR adds a Fraction Proposal Network (FPN) that learns where to
+    place those levels from the same context vector, unevenly spaced,
+    concentrating wherever the conditional distribution's own shape calls
+    for finer resolution, before the QVN maps the learned levels to values.
+
+    Returns:
+        The matplotlib Figure, ready to display in a notebook cell.
+    """
+    fig, axes = plt.subplots(1, 2, figsize=(10.2, 5.4))
+
+    # ---- left panel: standard QR, fixed tau ----
+    ax = axes[0]
+    ax.set_title("Standard QR", fontsize=12, color=PRIMARY, fontweight="bold")
+    _flow_box(ax, (1.0, 3.3), 2.0, 0.65, "Context $\\phi$", color=TEXT_MUTED)
+    _flow_arrow(ax, (2.0, 3.3), (2.0, 2.55), color=INFO)
+    _flow_box(ax, (0.7, 1.85), 2.6, 0.7, "QVN", color=INFO)
+    _flow_arrow(ax, (2.0, 1.85), (2.0, 1.15), color=INFO)
+    _tau_ticks(ax, 0.85, [0.05, 0.25, 0.5, 0.75, 0.95], color=TEXT_MUTED)
+    ax.text(2.0, 0.35, "fixed by the user", fontsize=8.6, color=TEXT_MUTED, style="italic", ha="center")
+    ax.text(
+        2.0,
+        4.35,
+        "one network,\nfixed quantile levels",
+        fontsize=8.8,
+        color=TEXT_MUTED,
+        style="italic",
+        ha="center",
+        va="bottom",
+    )
+
+    # ---- right panel: FPQR, learned tau ----
+    ax = axes[1]
+    ax.set_title("FPQR", fontsize=12, color=WARNING, fontweight="bold")
+    _flow_box(ax, (1.0, 3.3), 2.0, 0.65, "Context $\\phi$", color=TEXT_MUTED)
+    _flow_arrow(ax, (1.55, 3.3), (0.9, 2.55), color=WARNING)
+    _flow_arrow(ax, (2.45, 3.3), (2.9, 2.55), color=INFO)
+    _flow_box(ax, (-0.2, 1.85), 2.2, 0.7, "FPN", color=WARNING)
+    _flow_box(ax, (2.0, 1.85), 2.0, 0.7, "QVN", color=INFO)
+    _flow_arrow(ax, (0.9, 1.85), (2.4, 2.4), color=WARNING)
+    _flow_arrow(ax, (3.0, 1.85), (3.0, 1.15), color=INFO)
+    _tau_ticks(ax, 0.85, [0.04, 0.09, 0.22, 0.55, 0.97], color=WARNING)
+    ax.text(2.9, 0.35, "learned per window", fontsize=8.6, color=WARNING, style="italic", ha="center")
+    ax.text(
+        2.9,
+        4.35,
+        "two networks,\nlearned quantile levels",
+        fontsize=8.8,
+        color=WARNING,
+        style="italic",
+        ha="center",
+        va="bottom",
+    )
+
+    for ax in axes:
+        ax.set_xlim(-0.6, 5.2)
+        ax.set_ylim(0.0, 4.6)
+        ax.set_aspect("equal")
+        ax.axis("off")
+
+    fig.tight_layout()
+    plt.close(fig)
+    return fig
+
+
 def trained_specialist_vs_zero_shot_diagram() -> plt.Figure:
     """Draw the two ways a forecaster can come to know a population.
 

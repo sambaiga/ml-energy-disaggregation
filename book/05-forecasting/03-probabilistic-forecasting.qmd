@@ -16,9 +16,9 @@ Four chained questions, each pushing past what the standard framing can answer:
 
 ## Borrow, do not invent
 
-Every mechanism below already has a real name and a real precedent. `MLPGAMNormal`, the parametric backbone, is the author's own published architecture for net-load forecasting with uncertainty estimates in low-voltage networks [@faustine2024mlpgam]. `MLPGAMFpqr`, the quantile backbone, is FPSeq2Q, fully parameterized sequence-to-quantile regression, the author's own 2022 architecture [@faustine2022fpseq2q]. Split-conformal calibration is Lei, G'Sell, Rinaldo, Tibshirani and Wasserman's 2018 finite-sample guarantee [@lei2018distributionfree], applied here through the author's own Conformal-MLPF implementation for low-voltage net-load forecasting with PV generation [@faustine2024conformalmlpf]. NGBoost and QRLightGBM, the second backbone this chapter checks every finding against, are borrowed as-is from their own established libraries, not reimplemented. Nothing here is invented for this chapter; every mechanism is checked directly against real data, not assumed to work because the name is a real one.
+Every mechanism below already has a real name and a real precedent. `MLPGAMNormal`, the parametric backbone, is the author's own published architecture for net-load forecasting with uncertainty estimates in low-voltage networks [@faustine2024mlpgam]. `MLPGAMFpqr`, the quantile backbone, is FPSeq2Q, fully parameterized sequence-to-quantile regression, the author's own 2022 architecture, first presented in the author's own PhD thesis before being generalized in `twiga` to attach to any neural backbone, not just this one [@faustine2022fpseq2q]. Split-conformal calibration is Lei, G'Sell, Rinaldo, Tibshirani and Wasserman's 2018 finite-sample guarantee [@lei2018distributionfree], applied here through the author's own Conformal-MLPF implementation for low-voltage net-load forecasting with PV generation [@faustine2024conformalmlpf]. NGBoost and QRLightGBM, the second backbone this chapter checks every finding against, are borrowed as-is from their own established libraries, not reimplemented. Nothing here is invented for this chapter; every mechanism is checked directly against real data, not assumed to work because the name is a real one.
 
-## Getting the data, and one backbone, three paradigms
+## The data and the backbone
 
 Same real AusNet pool the whole of Part 5 has used, same last-90-day holdout. Every paradigm below shares one backbone architecture, MLPGAM, so differences in the results come from the probabilistic paradigm itself, not from comparing unrelated architectures.
 
@@ -52,7 +52,7 @@ The first paradigm asks MLPGAM to output two numbers for every half-hour of the 
 
 {{< embed 03-probabilistic-forecasting-code.ipynb#2875a15c >}}
 
-A single test day makes this concrete rather than abstract. The dashed line is the real truth; the shaded band is the model's own claimed 90% interval, mean $\pm$ 1.645 standard deviations, before any calibration at all.
+A single test day makes this concrete rather than abstract, chosen honestly: the real held-out window with the largest true dynamic range, not hand-picked for a nice-looking result. The dashed line is the real truth; the shaded band is the model's own claimed 90% interval, mean $\pm$ 1.645 standard deviations, before any calibration at all.
 
 {{< embed 03-probabilistic-forecasting-code.ipynb#e3301f74 >}}
 
@@ -62,6 +62,23 @@ Checked against the full test set, not just the one day above, this raw band ove
 
 The Normal head above buys a full density, but it buys it by assuming the residuals actually follow a Normal shape, symmetric, thin-tailed, fully described by just a mean and a spread. Real household load does not always oblige that assumption: evening peaks can be sharper on one side than the other, and a handful of unusually large readings can sit well outside anything a Normal curve expects. `MLPGAMFpqr`, the FPSeq2Q architecture, sidesteps the assumption entirely. Rather than fitting one distributional family, it is trained with a pinball loss across several quantile levels at once, each level penalized separately for over- or under-shooting the real outcome, so the model learns the P5, the P50, the P95, and everything between directly from the data's own real shape, whatever that shape turns out to be. The practical payoff is a direct answer to a capacity question a {{< acr DSO >}} actually asks, "what P95 load must a transformer be sized to survive," without ever assuming the underlying noise looks Gaussian.
 
+<div class='ark-concept'>
+
+<span class='ark-concept-title'><i class="bi bi-info-circle-fill"></i> Key Concept</span>
+
+Standard quantile regression fixes the quantile levels $\tau$ in advance, evenly spaced by convention, and learns only the values $Q_\theta(\tau)$ at those fixed levels. `QRLightGBM`, elsewhere in this chapter's own backbone comparison, is exactly that: five fixed levels, $\tau \in \{0.05, 0.25, 0.5, 0.75, 0.95\}$, chosen once and never revisited. FPQR parameterizes both pieces instead, a Fraction Proposal Network ({{< acr FPN >}}) that learns *where* to place the levels, and a Quantile Value Network ({{< acr QVN >}}) that learns the values at those learned levels:
+$$
+\hat\tau_\theta^{1:N} = \text{cumsum}\big(\text{softmax}(\text{FPN}(\phi))\big)
+$$
+$$
+Q_\theta(\hat\tau_\theta) = \text{QVN}(\hat\tau_\theta, \phi)
+$$
+so the model can concentrate quantile levels wherever a customer's own conditional distribution actually needs finer resolution, a sharper tail, a steeper rise, rather than spending five fixed levels evenly whether or not the data calls for it.
+
+</div>
+
+![Standard QR fixes its quantile levels in advance and learns only the values at them. FPQR learns both: a Fraction Proposal Network places the levels, a Quantile Value Network reads values off them, concentrating resolution wherever the real conditional distribution needs it.](../../assets/fpqr-vs-standard-qr.svg){#fig-fpqr-vs-standard-qr}
+
 {{< embed 03-probabilistic-forecasting-code.ipynb#ca8f8a41 >}}
 
 The same real test day as the parametric plot above, now with FPQR's own raw P5-P95 band instead.
@@ -70,10 +87,15 @@ The same real test day as the parametric plot above, now with FPQR's own raw P5-
 
 Look at the real gap between what FPQR's own P5-P95 band claims and what it actually delivers: close to 99% empirical coverage against a nominal 90% target. Nearly one in ten "misses" the model itself was designed to allow for essentially never happens; the interval is far wider than it needs to be, at real operational cost, since a transformer sized to a needlessly inflated P95 is a transformer over-built for the actual risk. A raw, uncalibrated model's own stated uncertainty, in other words, does not automatically mean what it claims to mean, in either the parametric or the quantile paradigm, and that real gap between the claimed and the actual is exactly the problem split-conformal calibration exists to close, next.
 
-## Split-conformal calibration: does it need calibrating at all?
+## Split-conformal calibration
 
 FPQR's own over-coverage above raises an honest question about the parametric head too: MLPGAMNormal already outputs a full $(\mu, \sigma)$ for every forecast, so why not just trust $\sigma$ as a calibrated interval on its own, the way the raw FPQR band was trusted a moment ago, and just proved untrustworthy? The answer is to stop trusting either model's own stated uncertainty at face value and calibrate it instead, using the exact same split-conformal machinery Chapter 2 already built for the archetype confidence gate, reused verbatim here, not reimplemented for a second time. The idea is to hold back a calibration slice of real customers, measure how far their true outcome actually sat from the model's own prediction relative to its own claimed scale, and use the resulting empirical distribution to correct the interval directly:
-$$\tau = \text{Quantile}_{1-\alpha}\Big(\Big\{\, \frac{|y_j - \mu_j|}{\sigma_j} : j \in \text{calibration set} \,\Big\}\Big), \qquad [\mu_i - \tau\sigma_i,\ \mu_i + \tau\sigma_i]$$
+$$
+\tau = \text{Quantile}_{1-\alpha}\Big(\Big\{\, \frac{|y_j - \mu_j|}{\sigma_j} : j \in \text{calibration set} \,\Big\}\Big)
+$$
+$$
+[\mu_i - \tau\sigma_i,\ \mu_i + \tau\sigma_i]
+$$
 This is a scaled non-conformity score, dividing each calibration residual by that same customer's own predicted $\sigma$ rather than using an unscaled residual directly, so a customer the model is already unsure about does not get penalized twice. The resulting guarantee is a real, finite-sample one, not asymptotic and not dependent on the Normal assumption being correct: Lei, G'Sell, Rinaldo, Tibshirani and Wasserman formalized exactly this result in 2018 [@lei2018distributionfree], under exchangeability, at least $1-\alpha$ of a calibration population's own true outcomes fall inside the resulting interval by construction, regardless of whether the underlying model's own distributional assumptions happen to be right.
 
 {{< embed 03-probabilistic-forecasting-code.ipynb#1681db1d >}}
@@ -82,9 +104,18 @@ The exact same test day, one more time: the calibrated band, $\tau$ now rescalin
 
 {{< embed 03-probabilistic-forecasting-code.ipynb#9c356eee >}}
 
-## Does calibrating per Chapter 2's own archetypes sharpen this?
+## Calibrating per archetype
 
-A single global $\tau$ treats every one of the 342 real customers as interchangeable for calibration purposes, which is a strange thing to do in a book that spent an entire chapter arguing customers are not interchangeable. Chapter 2's own real archetypes are already sitting right there, already computed, already validated on this same population, so the natural next question is whether calibrating separately per archetype, rather than once globally, produces a sharper interval at the same 90% guarantee. This is not a new idea invented for this chapter: the author's own exploratory notebook tried exactly this, calibrating per cluster instead of using one global threshold, though it built a fresh {{< acr UMAP >}} and {{< acr GMM >}} clustering pass just to run that check. Reusing Chapter 2's own already-computed archetypes here instead avoids that duplicated clustering effort entirely, and the real question is checked honestly below rather than assumed to come out sharper just because conditioning on more information usually sounds like it should help.
+A single global $\tau$ treats every one of the 342 real customers as interchangeable for calibration purposes, which is a strange thing to do in a book that spent an entire chapter arguing customers are not interchangeable. Chapter 2's own real archetypes are already sitting right there, already computed, already validated on this same population, so the natural next question is whether calibrating separately per archetype, rather than once globally, produces a sharper interval at the same 90% guarantee. This is not a new idea invented for this chapter: the author's own exploratory notebook tried exactly this, calibrating per cluster instead of using one global threshold, though it built a fresh {{< acr UMAP >}} and {{< acr GMM >}} clustering pass just to run that check. Reusing Chapter 2's own already-computed archetypes here instead avoids that duplicated clustering effort entirely.
+
+Concretely, one threshold $\tau_k$ per archetype $k$, calibrated only on that archetype's own calibration customers, applied only to that archetype's own eval customers:
+$$
+\tau_k = \text{Quantile}_{1-\alpha}\Big(\Big\{\, \frac{|y_j - \mu_j|}{\sigma_j} : j \in \text{calibration set},\ \text{archetype}(j) = k \,\Big\}\Big)
+$$
+$$
+[\mu_i - \tau_{k(i)}\sigma_i,\ \mu_i + \tau_{k(i)}\sigma_i]
+$$
+the same global formula above, just restricted to one archetype's own calibration slice at a time, where $k(i)$ is customer $i$'s own archetype. The real question is checked honestly below rather than assumed to come out sharper just because conditioning on more information usually sounds like it should help.
 
 {{< embed 03-probabilistic-forecasting-code.ipynb#bdc08e4d >}}
 
@@ -94,7 +125,7 @@ Both approaches hit the 90% coverage target they were calibrated for, so neither
 
 MLPGAMNormal's own predicted $\sigma$ is essentially constant across every archetype, the model has not learned much real heteroscedasticity by customer type. Real per-archetype differences do show up, but in $\tau$, not $\sigma$: $\tau$ ranges from roughly 0.77 to 1.00 across archetypes against a global 0.82. Calibration only needs the *tail* of a calibration set, the top 10% of scores, to estimate $\tau$ at $\alpha=0.1$; splitting an already-modest calibration set five ways shrinks that effective tail sample per archetype, adding real quantile-estimation noise that outweighs whatever conditioning benefit archetype membership might otherwise offer. The archetypes were built for shape similarity in Chapter 4, not for residual-scale heterogeneity, and here, checked directly, they do not transfer to this different question.
 
-## Does the backbone matter, or just the paradigm?
+## Does the backbone matter?
 
 Every result above shares one architecture, MLPGAM, on purpose: differences in the numbers come from the probabilistic paradigm, not from comparing unrelated models. That is also a real limitation. FPQR's own nine-point over-coverage, the near-constant learned $\sigma$ that made per-archetype calibration backfire, either could be a genuine property of this data, or an artifact of this one neural architecture. The only way to tell the difference honestly is to run the same three paradigms through a completely different kind of model and check whether the same findings hold up.
 
@@ -102,23 +133,45 @@ Every result above shares one architecture, MLPGAM, on purpose: differences in t
 
 {{< embed 03-probabilistic-forecasting-code.ipynb#4c41cd5f >}}
 
+{{< embed 03-probabilistic-forecasting-code.ipynb#a5bfded0 >}}
+
 {{< embed 03-probabilistic-forecasting-code.ipynb#051be53e >}}
+
+{{< embed 03-probabilistic-forecasting-code.ipynb#5d89a3b9 >}}
+
+Same test day as every plot above, tree backbone this time: NGBoost's own parametric band, then QRLightGBM's own raw quantile band, directly comparable panel-to-panel against MLPGAM's own versions further up the chapter.
 
 {{< embed 03-probabilistic-forecasting-code.ipynb#6c4fa855 >}}
 
 Two real findings, not one. First: NGBoost's point MAE (0.2616) actually beats MLPGAM's own (0.3627), despite training on a 5,000-window subsample, roughly 5% of the pooled training data MLPGAM used. Second, and more central to this chapter's own question: QRLightGBM's raw quantile band *under*-covers, 0.824 against a 0.90 nominal target, the opposite miscalibration direction from FPQR's 0.990 over-coverage on the neural backbone. That is a direct answer to the question this section opened with: the *direction* of raw miscalibration is backbone-specific, not a fixed property of this data, one architecture over-promises, the other under-delivers. What does not change with the backbone is that conformal calibration fixes both: CQR brings QRLightGBM's band to 0.900 coverage, matching MLPGAM's own calibrated 0.899, from opposite starting points. The lesson is not "trust one backbone's raw uncertainty over the other," it is that neither backbone's raw uncertainty should be trusted without calibration, regardless of which direction it happens to be wrong in.
 
-## Does this hold up beyond AusNet?
+A single MAE number settles less than it looks like it does, though: it says nothing about whether a backbone that wins on average error also wins on correlation, bias, or scale-independent error. The same diversity-weighted, multi-metric ranking Chapter 2 already built answers that more honestly than one column can.
+
+{{< embed 03-probabilistic-forecasting-code.ipynb#c278b2c3 >}}
+
+## Generalizing beyond AusNet
 
 Every number above comes from one real population, 342 Australian AusNet customers. A genuine generalization check does not retrain on a second dataset and compare two separately-tuned results, it takes the exact models and calibration already fit above, unmodified, and points them at real data they have never seen, from a different country, a different climate, a different tariff structure entirely. NREL's ResStock buildings are the same real half-hourly resolution Part 5 Chapter 1 already used for exactly this kind of check, complementing AusNet, not replacing it: ResStock is a physics-based simulation calibrated to real US end-use survey data, not a metered reading the way AusNet is, and that distinction matters here as much as it did in Chapter 1.
 
 {{< embed 03-probabilistic-forecasting-code.ipynb#f0aad486 >}}
 
-The point forecast degrades in a way that is not surprising: MAE roughly doubles, 0.7712 against 0.3627, a real cost of a different country, climate, and tariff structure the model never trained on. The calibration finding is the one worth sitting with. The exact same conformal band that hit 0.899 coverage on its own held-out AusNet customers drops to 0.642 on NREL, applied completely unmodified. That gap is the real answer to this section's own question: split-conformal's finite-sample guarantee holds under exchangeability with the calibration population, not in general, and NREL customers are not exchangeable with AusNet customers, they are a genuinely different population, in a genuinely different country, and the guarantee does not travel with the model to a population it was never calibrated against. A conformal interval is not a property of a model alone; it is a property of a model paired with the specific population it was calibrated on, and this chapter's own honest generalization check is exactly what makes that distinction concrete rather than a caveat in a footnote.
+The point forecast degrades in a way that is not surprising for any of the three backbones: real cost of a different country, climate, and tariff structure none of them trained on. The calibration finding is the one worth sitting with, and it holds for both backbones checked, not just MLPGAM: every conformal wrapper's own coverage drops hard when applied unmodified to NREL, MLPGAM's from 0.899 to 0.642, QRLightGBM's own CQR wrapper dropping in exactly the same direction. Split-conformal's finite-sample guarantee holds under exchangeability with the calibration population, not in general. Exchangeability means the calibration customers and the customers the interval gets applied to are drawn from the same underlying distribution, so a residual computed on one is as informative about the other as any other pair from that same population; swap two customers between the two groups and nothing about the guarantee's own math changes. NREL customers are not exchangeable with AusNet customers, a different country, a different climate, a different tariff structure, and the coverage collapse above is exactly what that assumption's own failure looks like in practice, not an abstract technicality. A conformal interval is not a property of a model alone; it is a property of a model paired with the specific population it was calibrated on, and that holds regardless of which backbone produced the interval in the first place. The practical trigger this points to: recalibrate whenever the deployment population genuinely changes, a new utility, a new region, a materially different customer mix, not on a fixed schedule regardless of whether anything actually shifted.
 
-## One honest comparison, not one winner
+The same real test day pattern as above, one real NREL building this time, both backbones' own AusNet-calibrated bands applied completely unmodified.
 
-Three paradigms have each been checked on their own terms above: a parametric density that prices risk directly but assumes a Normal shape, a quantile forecast that assumes nothing about shape but over-covered by nearly nine points before calibration, and a split-conformal wrapper that delivers an actual guarantee, sharper globally than per archetype. Putting all five real numbers per paradigm, MAE, coverage, mean width, CRPS, and Winkler score, into one table makes the full tradeoff visible at once, rather than scattered across separate results a reader has to hold in their head.
+{{< embed 03-probabilistic-forecasting-code.ipynb#45a5125b >}}
+
+{{< embed 03-probabilistic-forecasting-code.ipynb#7a36d5b7 >}}
+
+Both bands visibly struggle in the same direction the numbers already flagged: MLPGAM's band drifts away from the real trace, and QRLightGBM's CQR band, calibrated for AusNet's own tighter residual distribution, no longer tracks a real NREL building's own different daily shape either. Seeing it, not just reading a coverage number, is what makes "the guarantee does not travel" concrete rather than an abstract caveat.
+
+## One honest comparison
+
+Three paradigms have each been checked on their own terms above: a parametric density that prices risk directly but assumes a Normal shape, a quantile forecast that assumes nothing about shape but over-covered by nearly nine points before calibration, and a split-conformal wrapper that delivers an actual guarantee, sharper globally than per archetype. Two metrics beyond MAE, coverage, and width are worth defining before the table below, since both appear in it for the first time this chapter.
+
+{{< acr CRPS >}} generalizes MAE to a full predicted distribution rather than a single point: it integrates the squared gap between the predicted and true cumulative distributions across every possible threshold, reducing to plain MAE exactly when the forecast collapses to a single point, and rewarding a distribution that is both well-centered and appropriately sharp, not just centered correctly. Lower is better, and it shares load's own physical units (kW), so a CRPS of 0.27 is directly comparable to an MAE of 0.27, the reason it can rank a parametric density and a full quantile grid on equal footing even though they are shaped completely differently. Winkler score is CRPS's counterpart for a single interval rather than a full distribution: interval width, plus a penalty of $2/\alpha$ times the miss distance whenever the true value falls outside it. A wide, safe interval scores poorly for being needlessly wide; a narrow interval that frequently misses scores poorly for missing; only a genuinely well-calibrated, appropriately narrow interval scores well on both counts at once. For a {{< acr DSO >}}, CRPS is the number to reach for when comparing a parametric density against a full quantile grid regardless of representation; Winkler score is the number to reach for when comparing calibrated intervals specifically, the actual P95 a transformer gets sized against.
+
+Putting all five real numbers per paradigm, MAE, coverage, mean width, CRPS, and Winkler score, into one table makes the full tradeoff visible at once, rather than scattered across separate results a reader has to hold in their head.
 
 {{< embed 03-probabilistic-forecasting-code.ipynb#9ed2ea6e >}}
 
@@ -126,14 +179,13 @@ Three paradigms have each been checked on their own terms above: a parametric de
 
 ## Why bother
 
-None of the three paradigms is strictly better; each answers a different real question. The parametric head is the only one that prices a risk-of-exceedance question directly. The quantile head is the only one free of a distributional assumption, at the cost of needing its own calibration check, its raw intervals over-covered by nearly nine points here. Conformal calibration is the only one with an actual finite-sample guarantee, and checking whether Chapter 2's own archetypes sharpen it further was a real test, not an assumption: they do not, and the mechanism behind that answer, a near-constant learned scale and a tail-sample efficiency loss, is as real and useful a finding as a positive result would have been. Two further tests, not assumptions either: whether these findings are a property of MLPGAM specifically or of the data, and whether any of it holds up beyond the one real population this chapter trained on.
+Three concrete things this chapter buys beyond "another accuracy table." First, a real basis for trust: a raw model's own stated uncertainty was wrong by nearly nine points here, in both paradigms, so a {{< acr DSO >}} sizing a transformer or setting a compliance threshold off an uncalibrated interval is sizing it off a number that does not mean what it claims, calibration is not optional polish, it is the difference between a real guarantee and a plausible-looking one. Second, a real answer to "which backbone should I trust this finding with": FPQR over-covers, QRLightGBM under-covers, in opposite directions, yet conformal calibration closes both gaps to the same 90% target regardless of which way the raw model was wrong, so the practical lesson travels across architectures even though the raw failure mode does not. Third, a real limit on how far any of this travels: the exact same calibrated interval that holds its guarantee on 342 AusNet customers loses more than a quarter of its coverage on real NREL buildings, for both backbones checked, a finding that would stay invisible without deliberately testing it, and one that matters directly to anyone tempted to ship a calibrated model to a new utility, a new country, or a new tariff structure without recalibrating first.
 
 ## Where this leaves Part 5
 
-A point forecast alone was never the full deliverable this part set out to build. Chapter 2 found the model that earns its cost; this chapter attached an honest number to how wrong that model's own forecasts might be, and checked, rather than assumed, which calibration actually earns its own added complexity. Part 5 Chapter 4 checks a different kind of cost: whether a pretrained foundation model, never trained or calibrated on this population at all, still fails on the same customers these trained models do.
+A point forecast alone was never the full deliverable this part set out to build. Chapter 2 found the model that earns its cost; this chapter attached an honest number to how wrong that model's own forecasts might be, checked whether that number holds across architectures and across populations, rather than assuming it does, and found real limits on both counts worth carrying into any real deployment. Part 5 Chapter 4 checks a different kind of cost: whether a pretrained foundation model, never trained or calibrated on this population at all, still fails on the same customers these trained models do.
 
 ## References
 
 ::: {#refs}
 :::
-</content>

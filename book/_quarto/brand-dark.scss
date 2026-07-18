@@ -1007,3 +1007,21 @@ table {
 #refs.csl-bib-body {
   display: block !important;
 }
+
+// See brand.scss: responsive safety net, confirmed via a real mobile-
+// viewport check that a long equation or wide table can otherwise push the
+// whole page wider than the viewport.
+.cell-output-display {
+  overflow-x: auto;
+}
+
+img {
+  max-width: 100%;
+  height: auto;
+}
+
+mjx-container {
+  overflow-x: auto;
+  overflow-y: hidden;
+  max-width: 100%;
+}
