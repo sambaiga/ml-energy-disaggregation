@@ -559,7 +559,7 @@ window.Quarto = {
 <p><span class="ark-concept-title"><i class="bi bi-info-circle-fill"></i> Key Concept</span></p>
 <p>Weighted-least-squares state estimation finds the state <span class="math inline">\(x\)</span>, voltage magnitude and angle at every bus, that best explains a real, noisy set of measurements <span class="math inline">\(z\)</span>, minimizing <span class="math display">\[
 J(x) = \sum_i \frac{\big(z_i - h_i(x)\big)^2}{\sigma_i^2}
-\]</span> where <span class="math inline">\(h_i(x)\)</span> is what measurement <span class="math inline">\(i\)</span> would read given state <span class="math inline">\(x\)</span>, computed directly from the same real power-flow equations OpenDSS solves, and <span class="math inline">\(\sigma_i\)</span> is that measurement’s own assumed uncertainty, a real substation voltage transformer trusted far more than a periodic smart-meter reading. A real measurement and a pseudo-measurement enter this same objective identically; the only difference is <span class="math inline">\(\sigma_i\)</span>, honestly reflecting how much that source is actually worth trusting. This only has a real solution at all when the network is <em>observable</em>: at least as many independent measurements as unknown states, <span class="math inline">\(2N - 1\)</span> for <span class="math inline">\(N\)</span> buses (voltage magnitude and angle at every bus but the slack reference, whose own angle is fixed by definition) <span class="citation" data-cites="schweppe1970stateestimation">[2]</span>, not a fixed absolute count but one this chapter’s own network genuinely has to clear.</p>
+\]</span> where <span class="math inline">\(h_i(x)\)</span> is what measurement <span class="math inline">\(i\)</span> would read given state <span class="math inline">\(x\)</span>, computed directly from the same real power-flow equations OpenDSS solves, and <span class="math inline">\(\sigma_i\)</span> is that measurement’s own assumed uncertainty, a real substation voltage transformer trusted far more than a periodic smart-meter reading. A real measurement and a pseudo-measurement enter this same objective identically; the only difference is <span class="math inline">\(\sigma_i\)</span>, honestly reflecting how much that source is actually worth trusting.</p>
 </div>
 <div id="fig-pseudo-measurement-observability" class="quarto-float quarto-figure quarto-figure-center anchored">
 <figure class="quarto-float quarto-float-fig figure">
@@ -571,8 +571,12 @@ Figure&nbsp;19.1: Why smart-meter readings can turn an unobservable feeder into 
 </figcaption>
 </figure>
 </div>
-<div class="quarto-embed-nb-cell" data-notebook="/home/runner/work/ml-energy-disaggregation/ml-energy-disaggregation/book/05-forecasting/06-lv-state-estimation-code.ipynb" data-notebook-title="Can Smart-Meter Readings Fill In What the Grid Cannot See" data-notebook-cellid="afc8d171">
-<div id="afc8d171" class="cell">
+<p><span class="math inline">\(J(x)\)</span> is nonlinear, since <span class="math inline">\(h(x)\)</span> is the same nonlinear AC power-flow map OpenDSS itself solves, so <code>pandapower.estimation</code> cannot minimize it in one step. It linearizes around the current estimate and repeats, the same Gauss-Newton update every iterative real WLS solver uses: <span class="math display">\[
+x^{(k+1)} = x^{(k)} + \big(H^\top R^{-1} H\big)^{-1} H^\top R^{-1} \big(z - h(x^{(k)})\big)
+\]</span> where <span class="math inline">\(H = \partial h / \partial x\)</span> is the measurement Jacobian, evaluated fresh at each <span class="math inline">\(x^{(k)}\)</span>, and <span class="math inline">\(R = \text{diag}(\sigma_i^2)\)</span> collects every measurement’s own assumed uncertainty into one matrix. The real solvability condition sits inside that update, not just in a raw count: the gain matrix <span class="math inline">\(G = H^\top R^{-1} H\)</span> must be nonsingular, or there is no unique correction to compute at all. <span class="math inline">\(2N - 1\)</span> real, independent measurements for <span class="math inline">\(N\)</span> buses (voltage magnitude and angle everywhere but the slack reference, whose own angle is fixed by definition) is a real, checkable <em>necessary</em> condition for that <span class="citation" data-cites="schweppe1970stateestimation">[2]</span>, counted directly below against this network’s own real topology; it is not automatically <em>sufficient</em>, since measurements clustered on the same few buses can still leave <span class="math inline">\(G\)</span> singular even at a passing count. <code>pandapower.estimation</code> checks the necessary count itself, before ever attempting the update above, and refuses to run at all when it fails, exactly the real behavior the substation-only case below hits.</p>
+<p><strong>Methodology, concretely</strong>: every scenario in this chapter reuses one real evening-peak load (below), builds a fresh copy of the network with a fixed set of real substation measurements (always present) plus whichever smart-meter pseudo-measurements or branch sensors that scenario adds, declares this network’s own real zero-injection buses explicitly rather than via a heuristic, and calls <code>pandapower.estimation.estimate()</code> with <code>init="flat"</code>. A scenario is <em>observable</em> when that real measurement count clears <span class="math inline">\(2N-1\)</span>; it is <em>solved</em> when the iterative update above actually converges to a real, non-empty result, since a network can clear the necessary count and still fail numerically right at that boundary, a real distinction checked explicitly throughout rather than assumed away.</p>
+<div class="quarto-embed-nb-cell" data-notebook="/home/runner/work/ml-energy-disaggregation/ml-energy-disaggregation/book/05-forecasting/06-lv-state-estimation-code.ipynb" data-notebook-title="Can Smart-Meter Readings Fill In What the Grid Cannot See" data-notebook-cellid="54fc5ce5">
+<div id="54fc5ce5" class="cell">
 <div class="cell-output cell-output-stdout">
 <pre><code>load_data: (342, 365, 48) (customers, days, half-hours)</code></pre>
 </div>
@@ -582,8 +586,8 @@ Figure&nbsp;19.1: Why smart-meter readings can turn an unobservable feeder into 
 <section id="converting-the-network-and-checking-the-conversion-before-trusting-it" class="level2">
 <h2 class="anchored" data-anchor-id="converting-the-network-and-checking-the-conversion-before-trusting-it">Converting the network, and checking the conversion before trusting it</h2>
 <p><code>from_opendss</code> builds a balanced, positive-sequence <code>pandapower</code> network directly from the same real <code>LVcircuit-master.txt</code> Part 4 and Part 5 Chapter 5 both use, no hand-rolled bus-by-bus translation needed. Two real issues surfaced when this was checked directly against OpenDSS’s own solve, rather than trusted on faith. First, the converter needs <code>Set VoltageBases</code>/<code>CalcVoltageBases</code> already applied, the same step this book’s own <code>Circuit.load()</code> wrapper already runs; without it, every bus loses its voltage base and the transformer gets silently dropped. Second, even with that fixed, the converter assigns the transformer’s own secondary rating from the declared system voltage base (0.400 kV) instead of the transformer’s own real nameplate rating, confirmed directly from <code>LVcircuit-transformers.txt</code>’s own <code>kVs=[22 0.433]</code>, an 8% voltage error otherwise.</p>
-<div class="quarto-embed-nb-cell" data-notebook="/home/runner/work/ml-energy-disaggregation/ml-energy-disaggregation/book/05-forecasting/06-lv-state-estimation-code.ipynb" data-notebook-title="Can Smart-Meter Readings Fill In What the Grid Cannot See" data-notebook-cellid="09040d11">
-<div id="09040d11" class="cell">
+<div class="quarto-embed-nb-cell" data-notebook="/home/runner/work/ml-energy-disaggregation/ml-energy-disaggregation/book/05-forecasting/06-lv-state-estimation-code.ipynb" data-notebook-title="Can Smart-Meter Readings Fill In What the Grid Cannot See" data-notebook-cellid="064ba08e">
+<div id="064ba08e" class="cell">
 <div class="cell-output cell-output-stdout">
 <pre><code>pandapower vm_pu at bus_mg1_t1: 1.080671
 OpenDSS-solved vm_pu at bus_mg1_t1:  1.080649
@@ -596,8 +600,8 @@ n_bus=61, n_line=59, n_load=31, n_trafo=1</code></pre>
 <section id="ground-truth-what-a-fully-instrumented-network-would-show" class="level2">
 <h2 class="anchored" data-anchor-id="ground-truth-what-a-fully-instrumented-network-would-show">Ground truth: what a fully-instrumented network would show</h2>
 <p>A real customer-to-bus assignment, the same convention Part 5 Chapter 5 already uses, and one real test-day, evening-peak half-hour.</p>
-<div class="quarto-embed-nb-cell" data-notebook="/home/runner/work/ml-energy-disaggregation/ml-energy-disaggregation/book/05-forecasting/06-lv-state-estimation-code.ipynb" data-notebook-title="Can Smart-Meter Readings Fill In What the Grid Cannot See" data-notebook-cellid="4a4d6fe1">
-<div id="4a4d6fe1" class="cell">
+<div class="quarto-embed-nb-cell" data-notebook="/home/runner/work/ml-energy-disaggregation/ml-energy-disaggregation/book/05-forecasting/06-lv-state-estimation-code.ipynb" data-notebook-title="Can Smart-Meter Readings Fill In What the Grid Cannot See" data-notebook-cellid="be0f38ba">
+<div id="be0f38ba" class="cell">
 <div class="cell-output cell-output-stdout">
 <pre><code>real evening-peak load, 31 customers, total 13.2 kW
 true voltage range: 1.0000 - 1.0818 pu</code></pre>
@@ -609,8 +613,8 @@ true voltage range: 1.0000 - 1.0818 pu</code></pre>
 <section id="can-a-substation-only-dso-solve-this-at-all" class="level2">
 <h2 class="anchored" data-anchor-id="can-a-substation-only-dso-solve-this-at-all">Can a substation-only DSO solve this at all?</h2>
 <p><code>zero_injection</code> lets the <a href="#acronyms_WLS">WLS</a> solver treat every real junction bus with no customer of its own, confirmed directly from the network’s own topology (29 of them here), as an exact constraint rather than an unknown, real structure this network already has, not an assumption. Even with that structure exploited, a <a href="#acronyms_DSO">DSO</a> with only its own substation-level voltage and power telemetry is checked directly against the real observability requirement above rather than assumed to clear it.</p>
-<div class="quarto-embed-nb-cell" data-notebook="/home/runner/work/ml-energy-disaggregation/ml-energy-disaggregation/book/05-forecasting/06-lv-state-estimation-code.ipynb" data-notebook-title="Can Smart-Meter Readings Fill In What the Grid Cannot See" data-notebook-cellid="336b8f48">
-<div id="336b8f48" class="cell">
+<div class="quarto-embed-nb-cell" data-notebook="/home/runner/work/ml-energy-disaggregation/ml-energy-disaggregation/book/05-forecasting/06-lv-state-estimation-code.ipynb" data-notebook-title="Can Smart-Meter Readings Fill In What the Grid Cannot See" data-notebook-cellid="dd30b79d">
+<div id="dd30b79d" class="cell">
 <div class="cell-output cell-output-stdout">
 <pre><code>real junction buses with no customer of their own: 29</code></pre>
 </div>
@@ -624,88 +628,355 @@ true voltage range: 1.0000 - 1.0818 pu</code></pre>
 <section id="smart-meter-readings-as-pseudo-measurements" class="level2">
 <h2 class="anchored" data-anchor-id="smart-meter-readings-as-pseudo-measurements">Smart-meter readings as pseudo-measurements</h2>
 <p>Each real customer’s own smart-meter reading, real active and reactive power consumption, becomes a pseudo-measurement at that customer’s own bus, not a voltage reading real household smart meters do not usually report. A real 10% uncertainty band reflects that these are periodic <a href="#acronyms_AMI">Advanced Metering Infrastructure (AMI)</a> readings, not real-time <a href="#acronyms_SCADA">Supervisory Control and Data Acquisition (SCADA)</a>-grade telemetry, a genuinely different, less trustworthy kind of measurement than the substation’s own.</p>
-<div class="quarto-embed-nb-cell" data-notebook="/home/runner/work/ml-energy-disaggregation/ml-energy-disaggregation/book/05-forecasting/06-lv-state-estimation-code.ipynb" data-notebook-title="Can Smart-Meter Readings Fill In What the Grid Cannot See" data-notebook-cellid="d79076cb">
-<div id="d79076cb" class="cell">
+<div class="quarto-embed-nb-cell" data-notebook="/home/runner/work/ml-energy-disaggregation/ml-energy-disaggregation/book/05-forecasting/06-lv-state-estimation-code.ipynb" data-notebook-title="Can Smart-Meter Readings Fill In What the Grid Cannot See" data-notebook-cellid="3f08d774">
+<div id="3f08d774" class="cell">
 <div class="cell-output cell-output-stdout">
 <pre><code>observable with full smart-meter coverage: True
 RMSE against true voltage: 0.0034 pu, max error: 0.0043 pu</code></pre>
 </div>
 </div>
 </div>
-<p>Real smart-meter pseudo-measurements, at every real customer bus, do restore observability, and the resulting estimate is genuinely accurate: well within a tenth of a percent of true voltage at every bus. The real, more useful question is how much of that coverage is actually needed, checked directly below rather than assumed to scale smoothly.</p>
+<p>Real smart-meter pseudo-measurements, at every real customer bus, do restore observability, and the resulting estimate is genuinely accurate: well within a tenth of a percent of true voltage at every bus, shown below at every one of this feeder’s 61 real buses rather than as a single summary number.</p>
+<div class="quarto-embed-nb-cell" data-notebook="/home/runner/work/ml-energy-disaggregation/ml-energy-disaggregation/book/05-forecasting/06-lv-state-estimation-code.ipynb" data-notebook-title="Can Smart-Meter Readings Fill In What the Grid Cannot See" data-notebook-cellid="a989ae07">
+<div id="a989ae07" class="cell">
+<div class="cell-output cell-output-display">
+
+   
+       <meta charset="UTF-8">
+       <style> html, body { margin: 0; padding: 0; } </style>
+       <script type="text/javascript" data-lets-plot-script="library" src="https://cdn.jsdelivr.net/gh/JetBrains/lets-plot@v4.11.0/js-package/distr/lets-plot.min.js"></script>
+   
+   
+          <div id="olFnVM"></div>
+   <script type="text/javascript" data-lets-plot-script="plot">
+   
+   (function() {
+   // ----------
+   
+   const forceImmediateRender = false;
+   const responsive = false;
+   
+   let sizing = {
+       width_mode: "MIN",
+       height_mode: "SCALED",
+       width: null, 
+       height: null 
+   };
+   
+   const preferredWidth = document.body.dataset.letsPlotPreferredWidth;
+   if (preferredWidth !== undefined) {
+       sizing = {
+           width_mode: 'FIXED',
+           height_mode: 'SCALED',
+           width: parseFloat(preferredWidth)
+       };
+   }
+   
+   const containerDiv = document.getElementById("olFnVM");
+   let fig = null;
+   
+   function renderPlot() {
+       if (fig === null) {
+           const plotSpec = {
+"data":{
+"bus_rank":[0.0,1.0,2.0,3.0,4.0,5.0,6.0,7.0,8.0,9.0,10.0,11.0,12.0,13.0,14.0,15.0,16.0,17.0,18.0,19.0,20.0,21.0,22.0,23.0,24.0,25.0,26.0,27.0,28.0,29.0,30.0,31.0,32.0,33.0,34.0,35.0,36.0,37.0,38.0,39.0,40.0,41.0,42.0,43.0,44.0,45.0,46.0,47.0,48.0,49.0,50.0,51.0,52.0,53.0,54.0,55.0,56.0,57.0,58.0,59.0,60.0,0.0,1.0,2.0,3.0,4.0,5.0,6.0,7.0,8.0,9.0,10.0,11.0,12.0,13.0,14.0,15.0,16.0,17.0,18.0,19.0,20.0,21.0,22.0,23.0,24.0,25.0,26.0,27.0,28.0,29.0,30.0,31.0,32.0,33.0,34.0,35.0,36.0,37.0,38.0,39.0,40.0,41.0,42.0,43.0,44.0,45.0,46.0,47.0,48.0,49.0,50.0,51.0,52.0,53.0,54.0,55.0,56.0,57.0,58.0,59.0,60.0],
+"source":["True voltage (pu)","True voltage (pu)","True voltage (pu)","True voltage (pu)","True voltage (pu)","True voltage (pu)","True voltage (pu)","True voltage (pu)","True voltage (pu)","True voltage (pu)","True voltage (pu)","True voltage (pu)","True voltage (pu)","True voltage (pu)","True voltage (pu)","True voltage (pu)","True voltage (pu)","True voltage (pu)","True voltage (pu)","True voltage (pu)","True voltage (pu)","True voltage (pu)","True voltage (pu)","True voltage (pu)","True voltage (pu)","True voltage (pu)","True voltage (pu)","True voltage (pu)","True voltage (pu)","True voltage (pu)","True voltage (pu)","True voltage (pu)","True voltage (pu)","True voltage (pu)","True voltage (pu)","True voltage (pu)","True voltage (pu)","True voltage (pu)","True voltage (pu)","True voltage (pu)","True voltage (pu)","True voltage (pu)","True voltage (pu)","True voltage (pu)","True voltage (pu)","True voltage (pu)","True voltage (pu)","True voltage (pu)","True voltage (pu)","True voltage (pu)","True voltage (pu)","True voltage (pu)","True voltage (pu)","True voltage (pu)","True voltage (pu)","True voltage (pu)","True voltage (pu)","True voltage (pu)","True voltage (pu)","True voltage (pu)","True voltage (pu)","Estimated voltage (pu)","Estimated voltage (pu)","Estimated voltage (pu)","Estimated voltage (pu)","Estimated voltage (pu)","Estimated voltage (pu)","Estimated voltage (pu)","Estimated voltage (pu)","Estimated voltage (pu)","Estimated voltage (pu)","Estimated voltage (pu)","Estimated voltage (pu)","Estimated voltage (pu)","Estimated voltage (pu)","Estimated voltage (pu)","Estimated voltage (pu)","Estimated voltage (pu)","Estimated voltage (pu)","Estimated voltage (pu)","Estimated voltage (pu)","Estimated voltage (pu)","Estimated voltage (pu)","Estimated voltage (pu)","Estimated voltage (pu)","Estimated voltage (pu)","Estimated voltage (pu)","Estimated voltage (pu)","Estimated voltage (pu)","Estimated voltage (pu)","Estimated voltage (pu)","Estimated voltage (pu)","Estimated voltage (pu)","Estimated voltage (pu)","Estimated voltage (pu)","Estimated voltage (pu)","Estimated voltage (pu)","Estimated voltage (pu)","Estimated voltage (pu)","Estimated voltage (pu)","Estimated voltage (pu)","Estimated voltage (pu)","Estimated voltage (pu)","Estimated voltage (pu)","Estimated voltage (pu)","Estimated voltage (pu)","Estimated voltage (pu)","Estimated voltage (pu)","Estimated voltage (pu)","Estimated voltage (pu)","Estimated voltage (pu)","Estimated voltage (pu)","Estimated voltage (pu)","Estimated voltage (pu)","Estimated voltage (pu)","Estimated voltage (pu)","Estimated voltage (pu)","Estimated voltage (pu)","Estimated voltage (pu)","Estimated voltage (pu)","Estimated voltage (pu)","Estimated voltage (pu)"],
+"vm_pu":[1.0,1.0803801878080068,1.0803867717396183,1.080421694498876,1.0804230665800292,1.080430676541051,1.0804312569302363,1.0804339032394117,1.0804359964119647,1.0804389393194913,1.0804406018973982,1.080445749152681,1.080447864677026,1.080447990561847,1.080452333443513,1.0804542041502287,1.080454737773058,1.080456100480452,1.0804574468438228,1.0804659803217838,1.080469671392663,1.0804815174991367,1.0804870709067853,1.0804954075876885,1.080528050405038,1.0805665909535997,1.0805743109389807,1.08061152765079,1.0806179060852141,1.0806218205385618,1.0806709954557254,1.0807068211136914,1.0807150818933564,1.0807287592910109,1.0807448895626999,1.0807684525014591,1.08079228521255,1.0808347021253149,1.0808567733389567,1.0808673346954514,1.080897441341319,1.0809340731219188,1.0809382703299042,1.0809493724576502,1.0810356818971325,1.08105785036631,1.0811443562830616,1.0812170796620366,1.0812670263983313,1.0813477019126652,1.0813977779563617,1.0815308133707717,1.081536632025887,1.0816447677779026,1.081676428784118,1.0818213490416129,1.081832446599502,1.081832446599544,1.081832446599544,1.081832446599544,1.081832446599544,1.0,1.084672422466362,1.0846772150485517,1.0846164963512281,1.0846164681423416,1.0846175703533854,1.084617915304771,1.0846069481819371,1.0846067293788648,1.0846098000984459,1.084598440950604,1.0845954331510248,1.0846005527244438,1.0845932983604667,1.084587088756239,1.0845876082432193,1.0845914141792008,1.0845854208521901,1.084588799325643,1.0845799918184316,1.0845725152430137,1.084561641618518,1.0845562637731303,1.0845469352391812,1.0845135722091772,1.0844747344687713,1.084465468439216,1.084427520088525,1.084406916456379,1.084415849475927,1.0843643590276868,1.0843251052229523,1.0843236440812978,1.0843060131049282,1.084293525051497,1.0842665807667178,1.0842417975099734,1.0841981665502307,1.0841766542022315,1.0841652401579476,1.084145512202024,1.084096150120025,1.0840935249283783,1.0840816654869927,1.0839938950595194,1.0839706601200672,1.0838819287769135,1.0838038864013508,1.0837557619132971,1.0836818276557296,1.083621676513624,1.083483042044178,1.0834778856174752,1.0833656598435628,1.0833333911157115,1.0831837431790923,1.0831722837238693,1.083172283723911,1.083172283723911,1.083172283723911,1.083172283723911]
+},
+"mapping":{
+"x":"bus_rank",
+"y":"vm_pu",
+"color":"source"
+},
+"data_meta":{
+"series_annotations":[{
+"type":"int",
+"column":"bus_rank"
+},{
+"type":"str",
+"column":"source"
+},{
+"type":"float",
+"column":"vm_pu"
+}]
+},
+"ggtitle":{
+"text":"Full Smart-Meter Coverage: Estimated vs True Voltage, Every Bus"
+},
+"guides":{
+"x":{
+"title":"Bus, sorted by true voltage"
+},
+"y":{
+"title":"Voltage (pu)"
+},
+"color":{
+"title":""
+}
+},
+"theme":{
+"text":{
+"color":"#2d2d2d",
+"family":"'Libre Franklin', 'Segoe UI', Roboto, Helvetica, Arial, sans-serif",
+"size":12.0,
+"blank":false
+},
+"axis_title_x":{
+"face":"plain",
+"size":14.0,
+"margin":[10.0,0.0,0.0,0.0],
+"blank":false
+},
+"axis_title_y":{
+"face":"plain",
+"size":14.0,
+"margin":[0.0,10.0,0.0,0.0],
+"blank":false
+},
+"axis_text_x":{
+"color":"#666666",
+"angle":0.0,
+"hjust":0.5,
+"margin":[8.0,0.0,0.0,0.0],
+"blank":false
+},
+"axis_text_y":{
+"color":"#666666",
+"margin":[0.0,0.0,0.0,8.0],
+"blank":false
+},
+"axis_ticks":{
+"color":"#bbbbbb",
+"size":0.75,
+"blank":false
+},
+"axis_line":{
+"color":"#bbbbbb",
+"size":1.0,
+"blank":false
+},
+"legend_background":{
+"blank":true
+},
+"legend_text":{
+"size":12.0,
+"blank":false
+},
+"legend_title":{
+"face":"bold",
+"size":14.0,
+"blank":false
+},
+"legend_position":"top",
+"legend_spacing":10.0,
+"legend_key":{
+"blank":true
+},
+"panel_background":{
+"blank":true
+},
+"panel_border":{
+"blank":true
+},
+"panel_grid_minor":{
+"blank":true
+},
+"panel_grid_major_x":{
+"blank":true
+},
+"panel_grid_major_y":{
+"blank":true
+},
+"plot_background":{
+"blank":true
+},
+"plot_title":{
+"color":"#333333",
+"face":"bold",
+"size":19.0,
+"hjust":0.0,
+"margin":[0.0,0.0,6.0,0.0],
+"blank":false
+},
+"plot_subtitle":{
+"color":"#6b6b6b",
+"size":16.0,
+"hjust":0.0,
+"margin":[0.0,0.0,18.0,0.0],
+"blank":false
+},
+"plot_caption":{
+"color":"#999999",
+"face":"italic",
+"size":9.0,
+"hjust":1.0,
+"margin":[12.0,0.0,0.0,0.0],
+"blank":false
+},
+"plot_margin":[16.0,16.0,10.0,10.0],
+"strip_background":{
+"blank":true
+},
+"strip_text":{
+"family":"'Libre Franklin', 'Segoe UI', Roboto, Helvetica, Arial, sans-serif",
+"face":"bold",
+"size":12.0,
+"hjust":0.0,
+"blank":false
+}
+},
+"ggsize":{
+"width":650.0,
+"height":400.0
+},
+"kind":"plot",
+"scales":[{
+"aesthetic":"color",
+"breaks":["True voltage (pu)","Estimated voltage (pu)"],
+"values":["#1E293B","#059669"]
+}],
+"layers":[{
+"geom":"line",
+"mapping":{
+},
+"data_meta":{
+},
+"data":{
+}
+},{
+"geom":"point",
+"mapping":{
+},
+"data_meta":{
+},
+"size":1.5,
+"data":{
+}
+}],
+"metainfo_list":[],
+"spec_id":"1"
+};
+           fig = LetsPlot.buildPlotFromProcessedSpecs(plotSpec, containerDiv, sizing);
+       } else {
+           fig.updateView({});
+       }
+   }
+   
+   const renderImmediately = 
+       forceImmediateRender || (
+           sizing.width_mode === 'FIXED' && 
+           (sizing.height_mode === 'FIXED' || sizing.height_mode === 'SCALED')
+       );
+   
+   if (renderImmediately) {
+       renderPlot();
+   }
+   
+   if (!renderImmediately || responsive) {
+       // Set up observer for initial sizing or continuous monitoring
+       var observer = new ResizeObserver(function(entries) {
+           for (let entry of entries) {
+               if (entry.contentBoxSize && 
+                   entry.contentBoxSize[0].inlineSize > 0) {
+                   if (!responsive && observer) {
+                       observer.disconnect();
+                       observer = null;
+                   }
+                   renderPlot();
+                   if (!responsive) {
+                       break;
+                   }
+               }
+           }
+       });
+       
+       observer.observe(containerDiv);
+   }
+   
+   // ----------
+   })();
+   
+   </script>
+   
+
+</div>
+</div>
+</div>
+<p>The real, more useful question is how much of that coverage is actually needed, checked directly below rather than assumed to scale smoothly.</p>
 </section>
 <section id="does-partial-smart-meter-coverage-work" class="level2">
 <h2 class="anchored" data-anchor-id="does-partial-smart-meter-coverage-work">Does partial smart-meter coverage work?</h2>
-<div class="quarto-embed-nb-cell" data-notebook="/home/runner/work/ml-energy-disaggregation/ml-energy-disaggregation/book/05-forecasting/06-lv-state-estimation-code.ipynb" data-notebook-title="Can Smart-Meter Readings Fill In What the Grid Cannot See" data-notebook-cellid="f473a8b2">
-<div id="f473a8b2" class="cell">
+<div class="quarto-embed-nb-cell" data-notebook="/home/runner/work/ml-energy-disaggregation/ml-energy-disaggregation/book/05-forecasting/06-lv-state-estimation-code.ipynb" data-notebook-title="Can Smart-Meter Readings Fill In What the Grid Cannot See" data-notebook-cellid="72efbc9d">
+<div id="72efbc9d" class="cell">
 <div class="cell-output cell-output-display">
-<div id="tphccpelzf" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:100%;height:auto;">
+<div id="odqhfiwwsn" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:100%;height:auto;">
 <style>
-#tphccpelzf table {
+#odqhfiwwsn table {
           font-family: 'Libre Franklin', 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
           -webkit-font-smoothing: antialiased;
           -moz-osx-font-smoothing: grayscale;
         }
 
-#tphccpelzf thead, tbody, tfoot, tr, td, th { border-style: none !important; }
+#odqhfiwwsn thead, tbody, tfoot, tr, td, th { border-style: none !important; }
  tr { background-color: transparent !important; }
-#tphccpelzf p { margin: 0 !important; padding: 0 !important; }
- #tphccpelzf .gt_table { display: table !important; border-collapse: collapse !important; line-height: normal !important; margin-left: auto !important; margin-right: auto !important; color: #171717 !important; font-size: 13px !important; font-weight: normal !important; font-style: normal !important; background-color: #FFFFFF !important; width: 100% !important; border-top-style: solid !important; border-top-width: 2px !important; border-top-color: #0369A1 !important; border-right-style: none !important; border-right-width: 2px !important; border-right-color: #D3D3D3 !important; border-bottom-style: solid !important; border-bottom-width: 1px !important; border-bottom-color: #0369A1 !important; border-left-style: none !important; border-left-width: 2px !important; border-left-color: #D3D3D3 !important; }
- #tphccpelzf .gt_caption { padding-top: 4px !important; padding-bottom: 4px !important; }
- #tphccpelzf .gt_title { color: #171717 !important; font-size: 16px !important; font-weight: bold !important; padding-top: 10px !important; padding-bottom: 10px !important; padding-left: 5px !important; padding-right: 5px !important; border-bottom-color: #FFFFFF !important; border-bottom-width: 0 !important; }
- #tphccpelzf .gt_subtitle { color: #171717 !important; font-size: 13px !important; font-weight: initial !important; padding-top: 9px !important; padding-bottom: 11px !important; padding-left: 5px !important; padding-right: 5px !important; border-top-color: #FFFFFF !important; border-top-width: 0 !important; }
- #tphccpelzf .gt_heading { background-color: #FFFFFF !important; text-align: center !important; border-bottom-color: #FFFFFF !important; border-left-style: none !important; border-left-width: 1px !important; border-left-color: #D3D3D3 !important; border-right-style: none !important; border-right-width: 1px !important; border-right-color: #D3D3D3 !important; }
- #tphccpelzf .gt_bottom_border { border-bottom-style: solid !important; border-bottom-width: 2px !important; border-bottom-color: #D3D3D3 !important; }
- #tphccpelzf .gt_col_headings { border-top-style: solid !important; border-top-width: 2px !important; border-top-color: #D3D3D3 !important; border-bottom-style: solid !important; border-bottom-width: 1px !important; border-bottom-color: #D3D3D3 !important; border-left-style: none !important; border-left-width: 1px !important; border-left-color: #D3D3D3 !important; border-right-style: none !important; border-right-width: 1px !important; border-right-color: #D3D3D3 !important; }
- #tphccpelzf .gt_col_heading { color: #FFFFFF !important; background-color: #0369A1 !important; font-size: 13px !important; font-weight: bold !important; text-transform: inherit !important; border-left-style: none !important; border-left-width: 1px !important; border-left-color: #D3D3D3 !important; border-right-style: none !important; border-right-width: 1px !important; border-right-color: #D3D3D3 !important; vertical-align: bottom !important; padding-top: 9px !important; padding-bottom: 11px !important; padding-left: 5px !important; padding-right: 5px !important; overflow-x: hidden !important; }
- #tphccpelzf .gt_column_spanner_outer { color: #FFFFFF !important; background-color: #0369A1 !important; font-size: 13px !important; font-weight: bold !important; text-transform: inherit !important; padding-top: 0 !important; padding-bottom: 0 !important; padding-left: 4px !important; padding-right: 4px !important; }
- #tphccpelzf .gt_column_spanner_outer:first-child { padding-left: 0 !important; }
- #tphccpelzf .gt_column_spanner_outer:last-child { padding-right: 0 !important; }
- #tphccpelzf .gt_column_spanner { border-bottom-style: solid !important; border-bottom-width: 1px !important; border-bottom-color: #D3D3D3 !important; vertical-align: bottom !important; padding-top: 9px !important; padding-bottom: 9px !important; overflow-x: hidden !important; display: inline-block !important; width: 100% !important; }
- #tphccpelzf .gt_spanner_row { border-bottom-style: hidden !important; }
- #tphccpelzf .gt_group_heading { padding-top: 8px !important; padding-bottom: 8px !important; padding-left: 5px !important; padding-right: 5px !important; color: #171717 !important; background-color: #FFFFFF !important; font-size: 100% !important; font-weight: initial !important; text-transform: inherit !important; border-top-style: solid !important; border-top-width: 2px !important; border-top-color: #D3D3D3 !important; border-bottom-style: solid !important; border-bottom-width: 2px !important; border-bottom-color: #D3D3D3 !important; border-left-style: none !important; border-left-width: 1px !important; border-left-color: #D3D3D3 !important; border-right-style: none !important; border-right-width: 1px !important; border-right-color: #D3D3D3 !important; vertical-align: middle !important; text-align: left !important; }
- #tphccpelzf .gt_empty_group_heading { padding: 0.5px !important; color: #171717 !important; background-color: #FFFFFF !important; font-size: 100% !important; font-weight: initial !important; border-top-style: solid !important; border-top-width: 2px !important; border-top-color: #D3D3D3 !important; border-bottom-style: solid !important; border-bottom-width: 2px !important; border-bottom-color: #D3D3D3 !important; vertical-align: middle !important; }
- #tphccpelzf .gt_from_md> :first-child { margin-top: 0 !important; }
- #tphccpelzf .gt_from_md> :last-child { margin-bottom: 0 !important; }
- #tphccpelzf .gt_row { padding-top: 7px !important; padding-bottom: 7px !important; padding-left: 5px !important; padding-right: 5px !important; margin: 10px !important; border-top-style: solid !important; border-top-width: 1px !important; border-top-color: #D3D3D3 !important; border-left-style: none !important; border-left-width: 1px !important; border-left-color: #D3D3D3 !important; border-right-style: none !important; border-right-width: 1px !important; border-right-color: #D3D3D3 !important; vertical-align: middle !important; overflow-x: hidden !important; }
- #tphccpelzf .gt_stub { color: #171717 !important; background-color: #FFFFFF !important; font-size: 100% !important; font-weight: initial !important; text-transform: inherit !important; border-right-style: solid !important; border-right-width: 2px !important; border-right-color: #D3D3D3 !important; padding-left: 5px !important; padding-right: 5px !important; }
- #tphccpelzf .gt_stub_row_group { color: #171717 !important; background-color: #FFFFFF !important; font-size: 100% !important; font-weight: initial !important; text-transform: inherit !important; border-right-style: solid !important; border-right-width: 2px !important; border-right-color: #D3D3D3 !important; padding-left: 5px !important; padding-right: 5px !important; vertical-align: top !important; }
- #tphccpelzf .gt_row_group_first td { border-top-width: 2px !important; }
- #tphccpelzf .gt_row_group_first th { border-top-width: 2px !important; }
- #tphccpelzf .gt_striped { color: #171717 !important; background-color: #F4F4F4 !important; }
- #tphccpelzf .gt_table_body { border-top-style: solid !important; border-top-width: 2px !important; border-top-color: #D3D3D3 !important; border-bottom-style: solid !important; border-bottom-width: 1px !important; border-bottom-color: #DEE2E6 !important; }
- #tphccpelzf .gt_summary_row { color: #171717 !important; background-color: #FFFFFF !important; text-transform: inherit !important; padding-top: 8px !important; padding-bottom: 8px !important; padding-left: 5px !important; padding-right: 5px !important; }
- #tphccpelzf .gt_first_summary_row { border-top-style: solid !important; border-top-width: 2px !important; border-top-color: #D3D3D3 !important; }
- #tphccpelzf .gt_last_summary_row_top { border-bottom-style: solid !important; border-bottom-width: 2px !important; border-bottom-color: #D3D3D3 !important; }
- #tphccpelzf .gt_grand_summary_row { color: #171717 !important; background-color: #FFFFFF !important; text-transform: inherit !important; padding-top: 8px !important; padding-bottom: 8px !important; padding-left: 5px !important; padding-right: 5px !important; }
- #tphccpelzf .gt_first_grand_summary_row_bottom { border-top-style: double !important; border-top-width: 6px !important; border-top-color: #D3D3D3 !important; }
- #tphccpelzf .gt_last_grand_summary_row_top { border-bottom-style: double !important; border-bottom-width: 6px !important; border-bottom-color: #D3D3D3 !important; }
- #tphccpelzf .gt_sourcenotes { color: #171717 !important; background-color: #FFFFFF !important; border-bottom-style: none !important; border-bottom-width: 2px !important; border-bottom-color: #D3D3D3 !important; border-left-style: none !important; border-left-width: 2px !important; border-left-color: #D3D3D3 !important; border-right-style: none !important; border-right-width: 2px !important; border-right-color: #D3D3D3 !important; }
- #tphccpelzf .gt_sourcenote { font-size: 11px !important; padding-top: 6px !important; padding-bottom: 6px !important; padding-left: 5px !important; padding-right: 5px !important; text-align: left !important; }
- #tphccpelzf .gt_left { text-align: left !important; }
- #tphccpelzf .gt_center { text-align: center !important; }
- #tphccpelzf .gt_right { text-align: right !important; font-variant-numeric: tabular-nums !important; }
- #tphccpelzf .gt_font_normal { font-weight: normal !important; }
- #tphccpelzf .gt_font_bold { font-weight: bold !important; }
- #tphccpelzf .gt_font_italic { font-style: italic !important; }
- #tphccpelzf .gt_super { font-size: 65% !important; }
- #tphccpelzf .gt_footnotes { color: font-color(#FFFFFF) !important; background-color: #FFFFFF !important; border-bottom-style: none !important; border-bottom-width: 2px !important; border-bottom-color: #D3D3D3 !important; border-left-style: none !important; border-left-width: 2px !important; border-left-color: #D3D3D3 !important; border-right-style: none !important; border-right-width: 2px !important; border-right-color: #D3D3D3 !important; }
- #tphccpelzf .gt_footnote { margin: 0px !important; font-size: 90% !important; padding-top: 4px !important; padding-bottom: 4px !important; padding-left: 5px !important; padding-right: 5px !important; }
- #tphccpelzf .gt_sourcenotes { color: #171717 !important; background-color: #FFFFFF !important; border-bottom-style: none !important; border-bottom-width: 2px !important; border-bottom-color: #D3D3D3 !important; border-left-style: none !important; border-left-width: 2px !important; border-left-color: #D3D3D3 !important; border-right-style: none !important; border-right-width: 2px !important; border-right-color: #D3D3D3 !important; }
- #tphccpelzf .gt_sourcenote { font-size: 11px !important; padding-top: 6px !important; padding-bottom: 6px !important; padding-left: 5px !important; padding-right: 5px !important; text-align: left !important; }
- #tphccpelzf .gt_footnote_marks { font-size: 75% !important; vertical-align: 0.4em !important; position: initial !important; }
- #tphccpelzf .gt_asterisk { font-size: 100% !important; vertical-align: 0 !important; }
+#odqhfiwwsn p { margin: 0 !important; padding: 0 !important; }
+ #odqhfiwwsn .gt_table { display: table !important; border-collapse: collapse !important; line-height: normal !important; margin-left: auto !important; margin-right: auto !important; color: #171717 !important; font-size: 13px !important; font-weight: normal !important; font-style: normal !important; background-color: #FFFFFF !important; width: 100% !important; border-top-style: solid !important; border-top-width: 2px !important; border-top-color: #0369A1 !important; border-right-style: none !important; border-right-width: 2px !important; border-right-color: #D3D3D3 !important; border-bottom-style: solid !important; border-bottom-width: 1px !important; border-bottom-color: #0369A1 !important; border-left-style: none !important; border-left-width: 2px !important; border-left-color: #D3D3D3 !important; }
+ #odqhfiwwsn .gt_caption { padding-top: 4px !important; padding-bottom: 4px !important; }
+ #odqhfiwwsn .gt_title { color: #171717 !important; font-size: 16px !important; font-weight: bold !important; padding-top: 10px !important; padding-bottom: 10px !important; padding-left: 5px !important; padding-right: 5px !important; border-bottom-color: #FFFFFF !important; border-bottom-width: 0 !important; }
+ #odqhfiwwsn .gt_subtitle { color: #171717 !important; font-size: 13px !important; font-weight: initial !important; padding-top: 9px !important; padding-bottom: 11px !important; padding-left: 5px !important; padding-right: 5px !important; border-top-color: #FFFFFF !important; border-top-width: 0 !important; }
+ #odqhfiwwsn .gt_heading { background-color: #FFFFFF !important; text-align: center !important; border-bottom-color: #FFFFFF !important; border-left-style: none !important; border-left-width: 1px !important; border-left-color: #D3D3D3 !important; border-right-style: none !important; border-right-width: 1px !important; border-right-color: #D3D3D3 !important; }
+ #odqhfiwwsn .gt_bottom_border { border-bottom-style: solid !important; border-bottom-width: 2px !important; border-bottom-color: #D3D3D3 !important; }
+ #odqhfiwwsn .gt_col_headings { border-top-style: solid !important; border-top-width: 2px !important; border-top-color: #D3D3D3 !important; border-bottom-style: solid !important; border-bottom-width: 1px !important; border-bottom-color: #D3D3D3 !important; border-left-style: none !important; border-left-width: 1px !important; border-left-color: #D3D3D3 !important; border-right-style: none !important; border-right-width: 1px !important; border-right-color: #D3D3D3 !important; }
+ #odqhfiwwsn .gt_col_heading { color: #FFFFFF !important; background-color: #0369A1 !important; font-size: 13px !important; font-weight: bold !important; text-transform: inherit !important; border-left-style: none !important; border-left-width: 1px !important; border-left-color: #D3D3D3 !important; border-right-style: none !important; border-right-width: 1px !important; border-right-color: #D3D3D3 !important; vertical-align: bottom !important; padding-top: 9px !important; padding-bottom: 11px !important; padding-left: 5px !important; padding-right: 5px !important; overflow-x: hidden !important; }
+ #odqhfiwwsn .gt_column_spanner_outer { color: #FFFFFF !important; background-color: #0369A1 !important; font-size: 13px !important; font-weight: bold !important; text-transform: inherit !important; padding-top: 0 !important; padding-bottom: 0 !important; padding-left: 4px !important; padding-right: 4px !important; }
+ #odqhfiwwsn .gt_column_spanner_outer:first-child { padding-left: 0 !important; }
+ #odqhfiwwsn .gt_column_spanner_outer:last-child { padding-right: 0 !important; }
+ #odqhfiwwsn .gt_column_spanner { border-bottom-style: solid !important; border-bottom-width: 1px !important; border-bottom-color: #D3D3D3 !important; vertical-align: bottom !important; padding-top: 9px !important; padding-bottom: 9px !important; overflow-x: hidden !important; display: inline-block !important; width: 100% !important; }
+ #odqhfiwwsn .gt_spanner_row { border-bottom-style: hidden !important; }
+ #odqhfiwwsn .gt_group_heading { padding-top: 8px !important; padding-bottom: 8px !important; padding-left: 5px !important; padding-right: 5px !important; color: #171717 !important; background-color: #FFFFFF !important; font-size: 100% !important; font-weight: initial !important; text-transform: inherit !important; border-top-style: solid !important; border-top-width: 2px !important; border-top-color: #D3D3D3 !important; border-bottom-style: solid !important; border-bottom-width: 2px !important; border-bottom-color: #D3D3D3 !important; border-left-style: none !important; border-left-width: 1px !important; border-left-color: #D3D3D3 !important; border-right-style: none !important; border-right-width: 1px !important; border-right-color: #D3D3D3 !important; vertical-align: middle !important; text-align: left !important; }
+ #odqhfiwwsn .gt_empty_group_heading { padding: 0.5px !important; color: #171717 !important; background-color: #FFFFFF !important; font-size: 100% !important; font-weight: initial !important; border-top-style: solid !important; border-top-width: 2px !important; border-top-color: #D3D3D3 !important; border-bottom-style: solid !important; border-bottom-width: 2px !important; border-bottom-color: #D3D3D3 !important; vertical-align: middle !important; }
+ #odqhfiwwsn .gt_from_md> :first-child { margin-top: 0 !important; }
+ #odqhfiwwsn .gt_from_md> :last-child { margin-bottom: 0 !important; }
+ #odqhfiwwsn .gt_row { padding-top: 7px !important; padding-bottom: 7px !important; padding-left: 5px !important; padding-right: 5px !important; margin: 10px !important; border-top-style: solid !important; border-top-width: 1px !important; border-top-color: #D3D3D3 !important; border-left-style: none !important; border-left-width: 1px !important; border-left-color: #D3D3D3 !important; border-right-style: none !important; border-right-width: 1px !important; border-right-color: #D3D3D3 !important; vertical-align: middle !important; overflow-x: hidden !important; }
+ #odqhfiwwsn .gt_stub { color: #171717 !important; background-color: #FFFFFF !important; font-size: 100% !important; font-weight: initial !important; text-transform: inherit !important; border-right-style: solid !important; border-right-width: 2px !important; border-right-color: #D3D3D3 !important; padding-left: 5px !important; padding-right: 5px !important; }
+ #odqhfiwwsn .gt_stub_row_group { color: #171717 !important; background-color: #FFFFFF !important; font-size: 100% !important; font-weight: initial !important; text-transform: inherit !important; border-right-style: solid !important; border-right-width: 2px !important; border-right-color: #D3D3D3 !important; padding-left: 5px !important; padding-right: 5px !important; vertical-align: top !important; }
+ #odqhfiwwsn .gt_row_group_first td { border-top-width: 2px !important; }
+ #odqhfiwwsn .gt_row_group_first th { border-top-width: 2px !important; }
+ #odqhfiwwsn .gt_striped { color: #171717 !important; background-color: #F4F4F4 !important; }
+ #odqhfiwwsn .gt_table_body { border-top-style: solid !important; border-top-width: 2px !important; border-top-color: #D3D3D3 !important; border-bottom-style: solid !important; border-bottom-width: 1px !important; border-bottom-color: #DEE2E6 !important; }
+ #odqhfiwwsn .gt_summary_row { color: #171717 !important; background-color: #FFFFFF !important; text-transform: inherit !important; padding-top: 8px !important; padding-bottom: 8px !important; padding-left: 5px !important; padding-right: 5px !important; }
+ #odqhfiwwsn .gt_first_summary_row { border-top-style: solid !important; border-top-width: 2px !important; border-top-color: #D3D3D3 !important; }
+ #odqhfiwwsn .gt_last_summary_row_top { border-bottom-style: solid !important; border-bottom-width: 2px !important; border-bottom-color: #D3D3D3 !important; }
+ #odqhfiwwsn .gt_grand_summary_row { color: #171717 !important; background-color: #FFFFFF !important; text-transform: inherit !important; padding-top: 8px !important; padding-bottom: 8px !important; padding-left: 5px !important; padding-right: 5px !important; }
+ #odqhfiwwsn .gt_first_grand_summary_row_bottom { border-top-style: double !important; border-top-width: 6px !important; border-top-color: #D3D3D3 !important; }
+ #odqhfiwwsn .gt_last_grand_summary_row_top { border-bottom-style: double !important; border-bottom-width: 6px !important; border-bottom-color: #D3D3D3 !important; }
+ #odqhfiwwsn .gt_sourcenotes { color: #171717 !important; background-color: #FFFFFF !important; border-bottom-style: none !important; border-bottom-width: 2px !important; border-bottom-color: #D3D3D3 !important; border-left-style: none !important; border-left-width: 2px !important; border-left-color: #D3D3D3 !important; border-right-style: none !important; border-right-width: 2px !important; border-right-color: #D3D3D3 !important; }
+ #odqhfiwwsn .gt_sourcenote { font-size: 11px !important; padding-top: 6px !important; padding-bottom: 6px !important; padding-left: 5px !important; padding-right: 5px !important; text-align: left !important; }
+ #odqhfiwwsn .gt_left { text-align: left !important; }
+ #odqhfiwwsn .gt_center { text-align: center !important; }
+ #odqhfiwwsn .gt_right { text-align: right !important; font-variant-numeric: tabular-nums !important; }
+ #odqhfiwwsn .gt_font_normal { font-weight: normal !important; }
+ #odqhfiwwsn .gt_font_bold { font-weight: bold !important; }
+ #odqhfiwwsn .gt_font_italic { font-style: italic !important; }
+ #odqhfiwwsn .gt_super { font-size: 65% !important; }
+ #odqhfiwwsn .gt_footnotes { color: font-color(#FFFFFF) !important; background-color: #FFFFFF !important; border-bottom-style: none !important; border-bottom-width: 2px !important; border-bottom-color: #D3D3D3 !important; border-left-style: none !important; border-left-width: 2px !important; border-left-color: #D3D3D3 !important; border-right-style: none !important; border-right-width: 2px !important; border-right-color: #D3D3D3 !important; }
+ #odqhfiwwsn .gt_footnote { margin: 0px !important; font-size: 90% !important; padding-top: 4px !important; padding-bottom: 4px !important; padding-left: 5px !important; padding-right: 5px !important; }
+ #odqhfiwwsn .gt_sourcenotes { color: #171717 !important; background-color: #FFFFFF !important; border-bottom-style: none !important; border-bottom-width: 2px !important; border-bottom-color: #D3D3D3 !important; border-left-style: none !important; border-left-width: 2px !important; border-left-color: #D3D3D3 !important; border-right-style: none !important; border-right-width: 2px !important; border-right-color: #D3D3D3 !important; }
+ #odqhfiwwsn .gt_sourcenote { font-size: 11px !important; padding-top: 6px !important; padding-bottom: 6px !important; padding-left: 5px !important; padding-right: 5px !important; text-align: left !important; }
+ #odqhfiwwsn .gt_footnote_marks { font-size: 75% !important; vertical-align: 0.4em !important; position: initial !important; }
+ #odqhfiwwsn .gt_asterisk { font-size: 100% !important; vertical-align: 0 !important; }
  
 </style>
 
 <table class="gt_table caption-top table table-sm table-striped small" data-quarto-bootstrap="false">
 <thead>
 <tr class="gt_heading header">
-<td colspan="5" class="gt_heading gt_title gt_font_normal" style="color: #171717; font-weight: bold"><strong>Does Partial Smart-Meter Coverage Achieve Observability?</strong></td>
+<td colspan="6" class="gt_heading gt_title gt_font_normal" style="color: #171717; font-weight: bold"><strong>Does Partial Smart-Meter Coverage Achieve Observability?</strong></td>
 </tr>
 <tr class="gt_col_headings even">
 <th id="Smart-meter-coverage" class="gt_col_heading gt_columns_bottom_border gt_right" data-quarto-table-cell-role="th" style="color: #FFFFFF; font-family: Jost" scope="col">Smart-meter coverage</th>
 <th id="Customers" class="gt_col_heading gt_columns_bottom_border gt_right" data-quarto-table-cell-role="th" style="color: #FFFFFF; font-family: Jost" scope="col">Customers</th>
+<th id="Measurements" class="gt_col_heading gt_columns_bottom_border gt_right" data-quarto-table-cell-role="th" style="color: #FFFFFF; font-family: Jost" scope="col">Measurements</th>
 <th id="Observable" class="gt_col_heading gt_columns_bottom_border gt_center" data-quarto-table-cell-role="th" style="color: #FFFFFF; font-family: Jost" scope="col">Observable</th>
 <th id="Solved" class="gt_col_heading gt_columns_bottom_border gt_center" data-quarto-table-cell-role="th" style="color: #FFFFFF; font-family: Jost" scope="col">Solved</th>
 <th id="RMSE-(pu)" class="gt_col_heading gt_columns_bottom_border gt_right" data-quarto-table-cell-role="th" style="color: #FFFFFF; font-family: Jost" scope="col">RMSE (pu)</th>
@@ -715,6 +986,7 @@ RMSE against true voltage: 0.0034 pu, max error: 0.0043 pu</code></pre>
 <tr class="odd">
 <td class="gt_row gt_right">20%</td>
 <td class="gt_row gt_right">6/31</td>
+<td class="gt_row gt_right">71</td>
 <td class="gt_row gt_center">False</td>
 <td class="gt_row gt_center">False</td>
 <td class="gt_row gt_right"><na></na></td>
@@ -722,6 +994,7 @@ RMSE against true voltage: 0.0034 pu, max error: 0.0043 pu</code></pre>
 <tr class="even">
 <td class="gt_row gt_right" style="background-color: #EAF3FA">30%</td>
 <td class="gt_row gt_right" style="background-color: #EAF3FA">9/31</td>
+<td class="gt_row gt_right" style="background-color: #EAF3FA">77</td>
 <td class="gt_row gt_center" style="background-color: #EAF3FA">False</td>
 <td class="gt_row gt_center" style="background-color: #EAF3FA">False</td>
 <td class="gt_row gt_right" style="background-color: #EAF3FA"><na></na></td>
@@ -729,6 +1002,7 @@ RMSE against true voltage: 0.0034 pu, max error: 0.0043 pu</code></pre>
 <tr class="odd">
 <td class="gt_row gt_right">40%</td>
 <td class="gt_row gt_right">12/31</td>
+<td class="gt_row gt_right">83</td>
 <td class="gt_row gt_center">False</td>
 <td class="gt_row gt_center">False</td>
 <td class="gt_row gt_right"><na></na></td>
@@ -736,6 +1010,7 @@ RMSE against true voltage: 0.0034 pu, max error: 0.0043 pu</code></pre>
 <tr class="even">
 <td class="gt_row gt_right" style="background-color: #EAF3FA">50%</td>
 <td class="gt_row gt_right" style="background-color: #EAF3FA">16/31</td>
+<td class="gt_row gt_right" style="background-color: #EAF3FA">91</td>
 <td class="gt_row gt_center" style="background-color: #EAF3FA">False</td>
 <td class="gt_row gt_center" style="background-color: #EAF3FA">False</td>
 <td class="gt_row gt_right" style="background-color: #EAF3FA"><na></na></td>
@@ -743,6 +1018,7 @@ RMSE against true voltage: 0.0034 pu, max error: 0.0043 pu</code></pre>
 <tr class="odd">
 <td class="gt_row gt_right">60%</td>
 <td class="gt_row gt_right">19/31</td>
+<td class="gt_row gt_right">97</td>
 <td class="gt_row gt_center">False</td>
 <td class="gt_row gt_center">False</td>
 <td class="gt_row gt_right"><na></na></td>
@@ -750,6 +1026,7 @@ RMSE against true voltage: 0.0034 pu, max error: 0.0043 pu</code></pre>
 <tr class="even">
 <td class="gt_row gt_right" style="background-color: #EAF3FA">70%</td>
 <td class="gt_row gt_right" style="background-color: #EAF3FA">22/31</td>
+<td class="gt_row gt_right" style="background-color: #EAF3FA">103</td>
 <td class="gt_row gt_center" style="background-color: #EAF3FA">False</td>
 <td class="gt_row gt_center" style="background-color: #EAF3FA">False</td>
 <td class="gt_row gt_right" style="background-color: #EAF3FA"><na></na></td>
@@ -757,6 +1034,7 @@ RMSE against true voltage: 0.0034 pu, max error: 0.0043 pu</code></pre>
 <tr class="odd">
 <td class="gt_row gt_right">80%</td>
 <td class="gt_row gt_right">25/31</td>
+<td class="gt_row gt_right">109</td>
 <td class="gt_row gt_center">False</td>
 <td class="gt_row gt_center">False</td>
 <td class="gt_row gt_right"><na></na></td>
@@ -764,6 +1042,7 @@ RMSE against true voltage: 0.0034 pu, max error: 0.0043 pu</code></pre>
 <tr class="even">
 <td class="gt_row gt_right" style="background-color: #EAF3FA">90%</td>
 <td class="gt_row gt_right" style="background-color: #EAF3FA">28/31</td>
+<td class="gt_row gt_right" style="background-color: #EAF3FA">115</td>
 <td class="gt_row gt_center" style="background-color: #EAF3FA">False</td>
 <td class="gt_row gt_center" style="background-color: #EAF3FA">False</td>
 <td class="gt_row gt_right" style="background-color: #EAF3FA"><na></na></td>
@@ -771,13 +1050,14 @@ RMSE against true voltage: 0.0034 pu, max error: 0.0043 pu</code></pre>
 <tr class="odd">
 <td class="gt_row gt_right">100%</td>
 <td class="gt_row gt_right">31/31</td>
+<td class="gt_row gt_right">121</td>
 <td class="gt_row gt_center">True</td>
 <td class="gt_row gt_center">True</td>
-<td class="gt_row gt_right">0.0034507551783273245</td>
+<td class="gt_row gt_right">0.0035</td>
 </tr>
 </tbody><tfoot>
 <tr class="gt_sourcenotes odd">
-<td colspan="5" class="gt_sourcenote" style="color: #6B7280; font-style: italic"><span class="gt_from_md">Same real network, same real evening-peak load, coverage swept from 20% to 100%</span></td>
+<td colspan="6" class="gt_sourcenote" style="color: #6B7280; font-style: italic"><span class="gt_from_md">Same real network, same real evening-peak load, coverage swept from 20% to 100%</span></td>
 </tr>
 </tfoot>
 
@@ -788,70 +1068,364 @@ RMSE against true voltage: 0.0034 pu, max error: 0.0043 pu</code></pre>
 </div>
 </div>
 </div>
-<p>Not smoothly: every coverage level below 100% fails to achieve observability, including 90%, a single real customer’s own unmeasured, non-zero consumption is enough to leave the system unsolvable, regardless of how many other customers are metered. Full smart-meter rollout is not a nice-to-have here, it is a hard requirement, at least for this specific approach of one pseudo-measurement per customer bus and nothing else.</p>
+<div class="quarto-embed-nb-cell" data-notebook="/home/runner/work/ml-energy-disaggregation/ml-energy-disaggregation/book/05-forecasting/06-lv-state-estimation-code.ipynb" data-notebook-title="Can Smart-Meter Readings Fill In What the Grid Cannot See" data-notebook-cellid="722c84b2">
+<div id="722c84b2" class="cell">
+<div class="cell-output cell-output-display">
+
+   
+       <meta charset="UTF-8">
+       <style> html, body { margin: 0; padding: 0; } </style>
+       <script type="text/javascript" data-lets-plot-script="library" src="https://cdn.jsdelivr.net/gh/JetBrains/lets-plot@v4.11.0/js-package/distr/lets-plot.min.js"></script>
+   
+   
+          <div id="HPWRLe"></div>
+   <script type="text/javascript" data-lets-plot-script="plot">
+   
+   (function() {
+   // ----------
+   
+   const forceImmediateRender = false;
+   const responsive = false;
+   
+   let sizing = {
+       width_mode: "MIN",
+       height_mode: "SCALED",
+       width: null, 
+       height: null 
+   };
+   
+   const preferredWidth = document.body.dataset.letsPlotPreferredWidth;
+   if (preferredWidth !== undefined) {
+       sizing = {
+           width_mode: 'FIXED',
+           height_mode: 'SCALED',
+           width: parseFloat(preferredWidth)
+       };
+   }
+   
+   const containerDiv = document.getElementById("HPWRLe");
+   let fig = null;
+   
+   function renderPlot() {
+       if (fig === null) {
+           const plotSpec = {
+"data":{
+"Coverage":[0.2,0.3,0.4,0.5,0.6,0.7,0.8,0.9,1.0],
+"Measurements":[71.0,77.0,83.0,91.0,97.0,103.0,109.0,115.0,121.0],
+"Status":["Below required count","Below required count","Below required count","Below required count","Below required count","Below required count","Below required count","Below required count","Solved"]
+},
+"mapping":{
+"x":"Coverage",
+"y":"Measurements"
+},
+"data_meta":{
+"series_annotations":[{
+"type":"float",
+"column":"Coverage"
+},{
+"type":"str",
+"column":"Smart-meter coverage"
+},{
+"type":"str",
+"column":"Customers"
+},{
+"type":"int",
+"column":"Measurements"
+},{
+"type":"bool",
+"column":"Observable"
+},{
+"type":"bool",
+"column":"Solved"
+},{
+"type":"float",
+"column":"RMSE (pu)"
+},{
+"type":"str",
+"column":"Status"
+}]
+},
+"ggtitle":{
+"text":"Why Coverage Below 100% Fails: the Real Count Never Clears 2N-1",
+"subtitle":"Dashed line: the required 121 = 2(61) - 1 for this network"
+},
+"guides":{
+"x":{
+"title":"Smart-meter coverage"
+},
+"y":{
+"title":"Real + pseudo measurement count"
+},
+"color":{
+"title":""
+}
+},
+"theme":{
+"text":{
+"color":"#2d2d2d",
+"family":"'Libre Franklin', 'Segoe UI', Roboto, Helvetica, Arial, sans-serif",
+"size":12.0,
+"blank":false
+},
+"axis_title_x":{
+"face":"plain",
+"size":14.0,
+"margin":[10.0,0.0,0.0,0.0],
+"blank":false
+},
+"axis_title_y":{
+"face":"plain",
+"size":14.0,
+"margin":[0.0,10.0,0.0,0.0],
+"blank":false
+},
+"axis_text_x":{
+"color":"#666666",
+"angle":0.0,
+"hjust":0.5,
+"margin":[8.0,0.0,0.0,0.0],
+"blank":false
+},
+"axis_text_y":{
+"color":"#666666",
+"margin":[0.0,0.0,0.0,8.0],
+"blank":false
+},
+"axis_ticks":{
+"color":"#bbbbbb",
+"size":0.75,
+"blank":false
+},
+"axis_line":{
+"color":"#bbbbbb",
+"size":1.0,
+"blank":false
+},
+"legend_background":{
+"blank":true
+},
+"legend_text":{
+"size":12.0,
+"blank":false
+},
+"legend_title":{
+"face":"bold",
+"size":14.0,
+"blank":false
+},
+"legend_position":"top",
+"legend_spacing":10.0,
+"legend_key":{
+"blank":true
+},
+"panel_background":{
+"blank":true
+},
+"panel_border":{
+"blank":true
+},
+"panel_grid_minor":{
+"blank":true
+},
+"panel_grid_major_x":{
+"blank":true
+},
+"panel_grid_major_y":{
+"blank":true
+},
+"plot_background":{
+"blank":true
+},
+"plot_title":{
+"color":"#333333",
+"face":"bold",
+"size":19.0,
+"hjust":0.0,
+"margin":[0.0,0.0,6.0,0.0],
+"blank":false
+},
+"plot_subtitle":{
+"color":"#6b6b6b",
+"size":16.0,
+"hjust":0.0,
+"margin":[0.0,0.0,18.0,0.0],
+"blank":false
+},
+"plot_caption":{
+"color":"#999999",
+"face":"italic",
+"size":9.0,
+"hjust":1.0,
+"margin":[12.0,0.0,0.0,0.0],
+"blank":false
+},
+"plot_margin":[16.0,16.0,10.0,10.0],
+"strip_background":{
+"blank":true
+},
+"strip_text":{
+"family":"'Libre Franklin', 'Segoe UI', Roboto, Helvetica, Arial, sans-serif",
+"face":"bold",
+"size":12.0,
+"hjust":0.0,
+"blank":false
+}
+},
+"ggsize":{
+"width":650.0,
+"height":400.0
+},
+"kind":"plot",
+"scales":[{
+"aesthetic":"color",
+"breaks":["Solved","Below required count"],
+"values":["#059669","#DC2626"]
+}],
+"layers":[{
+"geom":"hline",
+"mapping":{
+},
+"data_meta":{
+},
+"yintercept":121.0,
+"linetype":"dashed",
+"color":"#EA580C",
+"size":1.0,
+"data":{
+}
+},{
+"geom":"line",
+"mapping":{
+},
+"data_meta":{
+},
+"color":"#0369A1",
+"data":{
+}
+},{
+"geom":"point",
+"mapping":{
+"color":"Status"
+},
+"data_meta":{
+},
+"size":4.0,
+"data":{
+}
+}],
+"metainfo_list":[],
+"spec_id":"2"
+};
+           fig = LetsPlot.buildPlotFromProcessedSpecs(plotSpec, containerDiv, sizing);
+       } else {
+           fig.updateView({});
+       }
+   }
+   
+   const renderImmediately = 
+       forceImmediateRender || (
+           sizing.width_mode === 'FIXED' && 
+           (sizing.height_mode === 'FIXED' || sizing.height_mode === 'SCALED')
+       );
+   
+   if (renderImmediately) {
+       renderPlot();
+   }
+   
+   if (!renderImmediately || responsive) {
+       // Set up observer for initial sizing or continuous monitoring
+       var observer = new ResizeObserver(function(entries) {
+           for (let entry of entries) {
+               if (entry.contentBoxSize && 
+                   entry.contentBoxSize[0].inlineSize > 0) {
+                   if (!responsive && observer) {
+                       observer.disconnect();
+                       observer = null;
+                   }
+                   renderPlot();
+                   if (!responsive) {
+                       break;
+                   }
+               }
+           }
+       });
+       
+       observer.observe(containerDiv);
+   }
+   
+   // ----------
+   })();
+   
+   </script>
+   
+
+</div>
+</div>
+</div>
+<p>Not smoothly: every coverage level below 100% fails to achieve observability, including 90%, a single real customer’s own unmeasured, non-zero consumption is enough to leave the system unsolvable, regardless of how many other customers are metered. The chart above ties that directly to the necessary-count condition from the Key Concept box: this feeder’s real measurement count, substation telemetry plus metered customers plus its 29 real zero-injection buses, never clears the required 121 until every one of the 31 real customers is covered. Full smart-meter rollout is not a nice-to-have here, it is a hard requirement, at least for this specific approach of one pseudo-measurement per customer bus and nothing else.</p>
 </section>
 <section id="a-few-real-sensors-instead-of-chasing-full-coverage" class="level2">
 <h2 class="anchored" data-anchor-id="a-few-real-sensors-instead-of-chasing-full-coverage">A few real sensors, instead of chasing full coverage</h2>
 <p>A real <a href="#acronyms_DSO">DSO</a> rarely has full smart-meter rollout and nothing else; it is more likely to have partial <a href="#acronyms_AMI">AMI</a> coverage plus a handful of real branch-level power-flow sensors at key points in the feeder, the kind of investment an operator can actually make. Checked directly, and checked honestly: a single random draw per configuration turned out to be genuinely misleading here, since which specific customers happen to be metered and which specific branches happen to carry a sensor both matter, not just how many of each. Every configuration below is repeated across 8 real random draws, reporting how often it actually produces a usable estimate, not just whether one particular draw happened to.</p>
-<div class="quarto-embed-nb-cell" data-notebook="/home/runner/work/ml-energy-disaggregation/ml-energy-disaggregation/book/05-forecasting/06-lv-state-estimation-code.ipynb" data-notebook-title="Can Smart-Meter Readings Fill In What the Grid Cannot See" data-notebook-cellid="ab78c290">
-<div id="ab78c290" class="cell">
+<div class="quarto-embed-nb-cell" data-notebook="/home/runner/work/ml-energy-disaggregation/ml-energy-disaggregation/book/05-forecasting/06-lv-state-estimation-code.ipynb" data-notebook-title="Can Smart-Meter Readings Fill In What the Grid Cannot See" data-notebook-cellid="7025e8a1">
+<div id="7025e8a1" class="cell">
 <div class="cell-output cell-output-display">
-<div id="ayoycycbaa" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:100%;height:auto;">
+<div id="fmgntpnsys" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:100%;height:auto;">
 <style>
-#ayoycycbaa table {
+#fmgntpnsys table {
           font-family: 'Libre Franklin', 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
           -webkit-font-smoothing: antialiased;
           -moz-osx-font-smoothing: grayscale;
         }
 
-#ayoycycbaa thead, tbody, tfoot, tr, td, th { border-style: none !important; }
+#fmgntpnsys thead, tbody, tfoot, tr, td, th { border-style: none !important; }
  tr { background-color: transparent !important; }
-#ayoycycbaa p { margin: 0 !important; padding: 0 !important; }
- #ayoycycbaa .gt_table { display: table !important; border-collapse: collapse !important; line-height: normal !important; margin-left: auto !important; margin-right: auto !important; color: #171717 !important; font-size: 13px !important; font-weight: normal !important; font-style: normal !important; background-color: #FFFFFF !important; width: 100% !important; border-top-style: solid !important; border-top-width: 2px !important; border-top-color: #0369A1 !important; border-right-style: none !important; border-right-width: 2px !important; border-right-color: #D3D3D3 !important; border-bottom-style: solid !important; border-bottom-width: 1px !important; border-bottom-color: #0369A1 !important; border-left-style: none !important; border-left-width: 2px !important; border-left-color: #D3D3D3 !important; }
- #ayoycycbaa .gt_caption { padding-top: 4px !important; padding-bottom: 4px !important; }
- #ayoycycbaa .gt_title { color: #171717 !important; font-size: 16px !important; font-weight: bold !important; padding-top: 10px !important; padding-bottom: 10px !important; padding-left: 5px !important; padding-right: 5px !important; border-bottom-color: #FFFFFF !important; border-bottom-width: 0 !important; }
- #ayoycycbaa .gt_subtitle { color: #171717 !important; font-size: 13px !important; font-weight: initial !important; padding-top: 9px !important; padding-bottom: 11px !important; padding-left: 5px !important; padding-right: 5px !important; border-top-color: #FFFFFF !important; border-top-width: 0 !important; }
- #ayoycycbaa .gt_heading { background-color: #FFFFFF !important; text-align: center !important; border-bottom-color: #FFFFFF !important; border-left-style: none !important; border-left-width: 1px !important; border-left-color: #D3D3D3 !important; border-right-style: none !important; border-right-width: 1px !important; border-right-color: #D3D3D3 !important; }
- #ayoycycbaa .gt_bottom_border { border-bottom-style: solid !important; border-bottom-width: 2px !important; border-bottom-color: #D3D3D3 !important; }
- #ayoycycbaa .gt_col_headings { border-top-style: solid !important; border-top-width: 2px !important; border-top-color: #D3D3D3 !important; border-bottom-style: solid !important; border-bottom-width: 1px !important; border-bottom-color: #D3D3D3 !important; border-left-style: none !important; border-left-width: 1px !important; border-left-color: #D3D3D3 !important; border-right-style: none !important; border-right-width: 1px !important; border-right-color: #D3D3D3 !important; }
- #ayoycycbaa .gt_col_heading { color: #FFFFFF !important; background-color: #0369A1 !important; font-size: 13px !important; font-weight: bold !important; text-transform: inherit !important; border-left-style: none !important; border-left-width: 1px !important; border-left-color: #D3D3D3 !important; border-right-style: none !important; border-right-width: 1px !important; border-right-color: #D3D3D3 !important; vertical-align: bottom !important; padding-top: 9px !important; padding-bottom: 11px !important; padding-left: 5px !important; padding-right: 5px !important; overflow-x: hidden !important; }
- #ayoycycbaa .gt_column_spanner_outer { color: #FFFFFF !important; background-color: #0369A1 !important; font-size: 13px !important; font-weight: bold !important; text-transform: inherit !important; padding-top: 0 !important; padding-bottom: 0 !important; padding-left: 4px !important; padding-right: 4px !important; }
- #ayoycycbaa .gt_column_spanner_outer:first-child { padding-left: 0 !important; }
- #ayoycycbaa .gt_column_spanner_outer:last-child { padding-right: 0 !important; }
- #ayoycycbaa .gt_column_spanner { border-bottom-style: solid !important; border-bottom-width: 1px !important; border-bottom-color: #D3D3D3 !important; vertical-align: bottom !important; padding-top: 9px !important; padding-bottom: 9px !important; overflow-x: hidden !important; display: inline-block !important; width: 100% !important; }
- #ayoycycbaa .gt_spanner_row { border-bottom-style: hidden !important; }
- #ayoycycbaa .gt_group_heading { padding-top: 8px !important; padding-bottom: 8px !important; padding-left: 5px !important; padding-right: 5px !important; color: #171717 !important; background-color: #FFFFFF !important; font-size: 100% !important; font-weight: initial !important; text-transform: inherit !important; border-top-style: solid !important; border-top-width: 2px !important; border-top-color: #D3D3D3 !important; border-bottom-style: solid !important; border-bottom-width: 2px !important; border-bottom-color: #D3D3D3 !important; border-left-style: none !important; border-left-width: 1px !important; border-left-color: #D3D3D3 !important; border-right-style: none !important; border-right-width: 1px !important; border-right-color: #D3D3D3 !important; vertical-align: middle !important; text-align: left !important; }
- #ayoycycbaa .gt_empty_group_heading { padding: 0.5px !important; color: #171717 !important; background-color: #FFFFFF !important; font-size: 100% !important; font-weight: initial !important; border-top-style: solid !important; border-top-width: 2px !important; border-top-color: #D3D3D3 !important; border-bottom-style: solid !important; border-bottom-width: 2px !important; border-bottom-color: #D3D3D3 !important; vertical-align: middle !important; }
- #ayoycycbaa .gt_from_md> :first-child { margin-top: 0 !important; }
- #ayoycycbaa .gt_from_md> :last-child { margin-bottom: 0 !important; }
- #ayoycycbaa .gt_row { padding-top: 7px !important; padding-bottom: 7px !important; padding-left: 5px !important; padding-right: 5px !important; margin: 10px !important; border-top-style: solid !important; border-top-width: 1px !important; border-top-color: #D3D3D3 !important; border-left-style: none !important; border-left-width: 1px !important; border-left-color: #D3D3D3 !important; border-right-style: none !important; border-right-width: 1px !important; border-right-color: #D3D3D3 !important; vertical-align: middle !important; overflow-x: hidden !important; }
- #ayoycycbaa .gt_stub { color: #171717 !important; background-color: #FFFFFF !important; font-size: 100% !important; font-weight: initial !important; text-transform: inherit !important; border-right-style: solid !important; border-right-width: 2px !important; border-right-color: #D3D3D3 !important; padding-left: 5px !important; padding-right: 5px !important; }
- #ayoycycbaa .gt_stub_row_group { color: #171717 !important; background-color: #FFFFFF !important; font-size: 100% !important; font-weight: initial !important; text-transform: inherit !important; border-right-style: solid !important; border-right-width: 2px !important; border-right-color: #D3D3D3 !important; padding-left: 5px !important; padding-right: 5px !important; vertical-align: top !important; }
- #ayoycycbaa .gt_row_group_first td { border-top-width: 2px !important; }
- #ayoycycbaa .gt_row_group_first th { border-top-width: 2px !important; }
- #ayoycycbaa .gt_striped { color: #171717 !important; background-color: #F4F4F4 !important; }
- #ayoycycbaa .gt_table_body { border-top-style: solid !important; border-top-width: 2px !important; border-top-color: #D3D3D3 !important; border-bottom-style: solid !important; border-bottom-width: 1px !important; border-bottom-color: #DEE2E6 !important; }
- #ayoycycbaa .gt_summary_row { color: #171717 !important; background-color: #FFFFFF !important; text-transform: inherit !important; padding-top: 8px !important; padding-bottom: 8px !important; padding-left: 5px !important; padding-right: 5px !important; }
- #ayoycycbaa .gt_first_summary_row { border-top-style: solid !important; border-top-width: 2px !important; border-top-color: #D3D3D3 !important; }
- #ayoycycbaa .gt_last_summary_row_top { border-bottom-style: solid !important; border-bottom-width: 2px !important; border-bottom-color: #D3D3D3 !important; }
- #ayoycycbaa .gt_grand_summary_row { color: #171717 !important; background-color: #FFFFFF !important; text-transform: inherit !important; padding-top: 8px !important; padding-bottom: 8px !important; padding-left: 5px !important; padding-right: 5px !important; }
- #ayoycycbaa .gt_first_grand_summary_row_bottom { border-top-style: double !important; border-top-width: 6px !important; border-top-color: #D3D3D3 !important; }
- #ayoycycbaa .gt_last_grand_summary_row_top { border-bottom-style: double !important; border-bottom-width: 6px !important; border-bottom-color: #D3D3D3 !important; }
- #ayoycycbaa .gt_sourcenotes { color: #171717 !important; background-color: #FFFFFF !important; border-bottom-style: none !important; border-bottom-width: 2px !important; border-bottom-color: #D3D3D3 !important; border-left-style: none !important; border-left-width: 2px !important; border-left-color: #D3D3D3 !important; border-right-style: none !important; border-right-width: 2px !important; border-right-color: #D3D3D3 !important; }
- #ayoycycbaa .gt_sourcenote { font-size: 11px !important; padding-top: 6px !important; padding-bottom: 6px !important; padding-left: 5px !important; padding-right: 5px !important; text-align: left !important; }
- #ayoycycbaa .gt_left { text-align: left !important; }
- #ayoycycbaa .gt_center { text-align: center !important; }
- #ayoycycbaa .gt_right { text-align: right !important; font-variant-numeric: tabular-nums !important; }
- #ayoycycbaa .gt_font_normal { font-weight: normal !important; }
- #ayoycycbaa .gt_font_bold { font-weight: bold !important; }
- #ayoycycbaa .gt_font_italic { font-style: italic !important; }
- #ayoycycbaa .gt_super { font-size: 65% !important; }
- #ayoycycbaa .gt_footnotes { color: font-color(#FFFFFF) !important; background-color: #FFFFFF !important; border-bottom-style: none !important; border-bottom-width: 2px !important; border-bottom-color: #D3D3D3 !important; border-left-style: none !important; border-left-width: 2px !important; border-left-color: #D3D3D3 !important; border-right-style: none !important; border-right-width: 2px !important; border-right-color: #D3D3D3 !important; }
- #ayoycycbaa .gt_footnote { margin: 0px !important; font-size: 90% !important; padding-top: 4px !important; padding-bottom: 4px !important; padding-left: 5px !important; padding-right: 5px !important; }
- #ayoycycbaa .gt_sourcenotes { color: #171717 !important; background-color: #FFFFFF !important; border-bottom-style: none !important; border-bottom-width: 2px !important; border-bottom-color: #D3D3D3 !important; border-left-style: none !important; border-left-width: 2px !important; border-left-color: #D3D3D3 !important; border-right-style: none !important; border-right-width: 2px !important; border-right-color: #D3D3D3 !important; }
- #ayoycycbaa .gt_sourcenote { font-size: 11px !important; padding-top: 6px !important; padding-bottom: 6px !important; padding-left: 5px !important; padding-right: 5px !important; text-align: left !important; }
- #ayoycycbaa .gt_footnote_marks { font-size: 75% !important; vertical-align: 0.4em !important; position: initial !important; }
- #ayoycycbaa .gt_asterisk { font-size: 100% !important; vertical-align: 0 !important; }
+#fmgntpnsys p { margin: 0 !important; padding: 0 !important; }
+ #fmgntpnsys .gt_table { display: table !important; border-collapse: collapse !important; line-height: normal !important; margin-left: auto !important; margin-right: auto !important; color: #171717 !important; font-size: 13px !important; font-weight: normal !important; font-style: normal !important; background-color: #FFFFFF !important; width: 100% !important; border-top-style: solid !important; border-top-width: 2px !important; border-top-color: #0369A1 !important; border-right-style: none !important; border-right-width: 2px !important; border-right-color: #D3D3D3 !important; border-bottom-style: solid !important; border-bottom-width: 1px !important; border-bottom-color: #0369A1 !important; border-left-style: none !important; border-left-width: 2px !important; border-left-color: #D3D3D3 !important; }
+ #fmgntpnsys .gt_caption { padding-top: 4px !important; padding-bottom: 4px !important; }
+ #fmgntpnsys .gt_title { color: #171717 !important; font-size: 16px !important; font-weight: bold !important; padding-top: 10px !important; padding-bottom: 10px !important; padding-left: 5px !important; padding-right: 5px !important; border-bottom-color: #FFFFFF !important; border-bottom-width: 0 !important; }
+ #fmgntpnsys .gt_subtitle { color: #171717 !important; font-size: 13px !important; font-weight: initial !important; padding-top: 9px !important; padding-bottom: 11px !important; padding-left: 5px !important; padding-right: 5px !important; border-top-color: #FFFFFF !important; border-top-width: 0 !important; }
+ #fmgntpnsys .gt_heading { background-color: #FFFFFF !important; text-align: center !important; border-bottom-color: #FFFFFF !important; border-left-style: none !important; border-left-width: 1px !important; border-left-color: #D3D3D3 !important; border-right-style: none !important; border-right-width: 1px !important; border-right-color: #D3D3D3 !important; }
+ #fmgntpnsys .gt_bottom_border { border-bottom-style: solid !important; border-bottom-width: 2px !important; border-bottom-color: #D3D3D3 !important; }
+ #fmgntpnsys .gt_col_headings { border-top-style: solid !important; border-top-width: 2px !important; border-top-color: #D3D3D3 !important; border-bottom-style: solid !important; border-bottom-width: 1px !important; border-bottom-color: #D3D3D3 !important; border-left-style: none !important; border-left-width: 1px !important; border-left-color: #D3D3D3 !important; border-right-style: none !important; border-right-width: 1px !important; border-right-color: #D3D3D3 !important; }
+ #fmgntpnsys .gt_col_heading { color: #FFFFFF !important; background-color: #0369A1 !important; font-size: 13px !important; font-weight: bold !important; text-transform: inherit !important; border-left-style: none !important; border-left-width: 1px !important; border-left-color: #D3D3D3 !important; border-right-style: none !important; border-right-width: 1px !important; border-right-color: #D3D3D3 !important; vertical-align: bottom !important; padding-top: 9px !important; padding-bottom: 11px !important; padding-left: 5px !important; padding-right: 5px !important; overflow-x: hidden !important; }
+ #fmgntpnsys .gt_column_spanner_outer { color: #FFFFFF !important; background-color: #0369A1 !important; font-size: 13px !important; font-weight: bold !important; text-transform: inherit !important; padding-top: 0 !important; padding-bottom: 0 !important; padding-left: 4px !important; padding-right: 4px !important; }
+ #fmgntpnsys .gt_column_spanner_outer:first-child { padding-left: 0 !important; }
+ #fmgntpnsys .gt_column_spanner_outer:last-child { padding-right: 0 !important; }
+ #fmgntpnsys .gt_column_spanner { border-bottom-style: solid !important; border-bottom-width: 1px !important; border-bottom-color: #D3D3D3 !important; vertical-align: bottom !important; padding-top: 9px !important; padding-bottom: 9px !important; overflow-x: hidden !important; display: inline-block !important; width: 100% !important; }
+ #fmgntpnsys .gt_spanner_row { border-bottom-style: hidden !important; }
+ #fmgntpnsys .gt_group_heading { padding-top: 8px !important; padding-bottom: 8px !important; padding-left: 5px !important; padding-right: 5px !important; color: #171717 !important; background-color: #FFFFFF !important; font-size: 100% !important; font-weight: initial !important; text-transform: inherit !important; border-top-style: solid !important; border-top-width: 2px !important; border-top-color: #D3D3D3 !important; border-bottom-style: solid !important; border-bottom-width: 2px !important; border-bottom-color: #D3D3D3 !important; border-left-style: none !important; border-left-width: 1px !important; border-left-color: #D3D3D3 !important; border-right-style: none !important; border-right-width: 1px !important; border-right-color: #D3D3D3 !important; vertical-align: middle !important; text-align: left !important; }
+ #fmgntpnsys .gt_empty_group_heading { padding: 0.5px !important; color: #171717 !important; background-color: #FFFFFF !important; font-size: 100% !important; font-weight: initial !important; border-top-style: solid !important; border-top-width: 2px !important; border-top-color: #D3D3D3 !important; border-bottom-style: solid !important; border-bottom-width: 2px !important; border-bottom-color: #D3D3D3 !important; vertical-align: middle !important; }
+ #fmgntpnsys .gt_from_md> :first-child { margin-top: 0 !important; }
+ #fmgntpnsys .gt_from_md> :last-child { margin-bottom: 0 !important; }
+ #fmgntpnsys .gt_row { padding-top: 7px !important; padding-bottom: 7px !important; padding-left: 5px !important; padding-right: 5px !important; margin: 10px !important; border-top-style: solid !important; border-top-width: 1px !important; border-top-color: #D3D3D3 !important; border-left-style: none !important; border-left-width: 1px !important; border-left-color: #D3D3D3 !important; border-right-style: none !important; border-right-width: 1px !important; border-right-color: #D3D3D3 !important; vertical-align: middle !important; overflow-x: hidden !important; }
+ #fmgntpnsys .gt_stub { color: #171717 !important; background-color: #FFFFFF !important; font-size: 100% !important; font-weight: initial !important; text-transform: inherit !important; border-right-style: solid !important; border-right-width: 2px !important; border-right-color: #D3D3D3 !important; padding-left: 5px !important; padding-right: 5px !important; }
+ #fmgntpnsys .gt_stub_row_group { color: #171717 !important; background-color: #FFFFFF !important; font-size: 100% !important; font-weight: initial !important; text-transform: inherit !important; border-right-style: solid !important; border-right-width: 2px !important; border-right-color: #D3D3D3 !important; padding-left: 5px !important; padding-right: 5px !important; vertical-align: top !important; }
+ #fmgntpnsys .gt_row_group_first td { border-top-width: 2px !important; }
+ #fmgntpnsys .gt_row_group_first th { border-top-width: 2px !important; }
+ #fmgntpnsys .gt_striped { color: #171717 !important; background-color: #F4F4F4 !important; }
+ #fmgntpnsys .gt_table_body { border-top-style: solid !important; border-top-width: 2px !important; border-top-color: #D3D3D3 !important; border-bottom-style: solid !important; border-bottom-width: 1px !important; border-bottom-color: #DEE2E6 !important; }
+ #fmgntpnsys .gt_summary_row { color: #171717 !important; background-color: #FFFFFF !important; text-transform: inherit !important; padding-top: 8px !important; padding-bottom: 8px !important; padding-left: 5px !important; padding-right: 5px !important; }
+ #fmgntpnsys .gt_first_summary_row { border-top-style: solid !important; border-top-width: 2px !important; border-top-color: #D3D3D3 !important; }
+ #fmgntpnsys .gt_last_summary_row_top { border-bottom-style: solid !important; border-bottom-width: 2px !important; border-bottom-color: #D3D3D3 !important; }
+ #fmgntpnsys .gt_grand_summary_row { color: #171717 !important; background-color: #FFFFFF !important; text-transform: inherit !important; padding-top: 8px !important; padding-bottom: 8px !important; padding-left: 5px !important; padding-right: 5px !important; }
+ #fmgntpnsys .gt_first_grand_summary_row_bottom { border-top-style: double !important; border-top-width: 6px !important; border-top-color: #D3D3D3 !important; }
+ #fmgntpnsys .gt_last_grand_summary_row_top { border-bottom-style: double !important; border-bottom-width: 6px !important; border-bottom-color: #D3D3D3 !important; }
+ #fmgntpnsys .gt_sourcenotes { color: #171717 !important; background-color: #FFFFFF !important; border-bottom-style: none !important; border-bottom-width: 2px !important; border-bottom-color: #D3D3D3 !important; border-left-style: none !important; border-left-width: 2px !important; border-left-color: #D3D3D3 !important; border-right-style: none !important; border-right-width: 2px !important; border-right-color: #D3D3D3 !important; }
+ #fmgntpnsys .gt_sourcenote { font-size: 11px !important; padding-top: 6px !important; padding-bottom: 6px !important; padding-left: 5px !important; padding-right: 5px !important; text-align: left !important; }
+ #fmgntpnsys .gt_left { text-align: left !important; }
+ #fmgntpnsys .gt_center { text-align: center !important; }
+ #fmgntpnsys .gt_right { text-align: right !important; font-variant-numeric: tabular-nums !important; }
+ #fmgntpnsys .gt_font_normal { font-weight: normal !important; }
+ #fmgntpnsys .gt_font_bold { font-weight: bold !important; }
+ #fmgntpnsys .gt_font_italic { font-style: italic !important; }
+ #fmgntpnsys .gt_super { font-size: 65% !important; }
+ #fmgntpnsys .gt_footnotes { color: font-color(#FFFFFF) !important; background-color: #FFFFFF !important; border-bottom-style: none !important; border-bottom-width: 2px !important; border-bottom-color: #D3D3D3 !important; border-left-style: none !important; border-left-width: 2px !important; border-left-color: #D3D3D3 !important; border-right-style: none !important; border-right-width: 2px !important; border-right-color: #D3D3D3 !important; }
+ #fmgntpnsys .gt_footnote { margin: 0px !important; font-size: 90% !important; padding-top: 4px !important; padding-bottom: 4px !important; padding-left: 5px !important; padding-right: 5px !important; }
+ #fmgntpnsys .gt_sourcenotes { color: #171717 !important; background-color: #FFFFFF !important; border-bottom-style: none !important; border-bottom-width: 2px !important; border-bottom-color: #D3D3D3 !important; border-left-style: none !important; border-left-width: 2px !important; border-left-color: #D3D3D3 !important; border-right-style: none !important; border-right-width: 2px !important; border-right-color: #D3D3D3 !important; }
+ #fmgntpnsys .gt_sourcenote { font-size: 11px !important; padding-top: 6px !important; padding-bottom: 6px !important; padding-left: 5px !important; padding-right: 5px !important; text-align: left !important; }
+ #fmgntpnsys .gt_footnote_marks { font-size: 75% !important; vertical-align: 0.4em !important; position: initial !important; }
+ #fmgntpnsys .gt_asterisk { font-size: 100% !important; vertical-align: 0 !important; }
  
 </style>
 
@@ -938,7 +1512,7 @@ RMSE against true voltage: 0.0034 pu, max error: 0.0043 pu</code></pre>
 <td class="gt_row gt_right" style="background-color: #EAF3FA">90%</td>
 <td class="gt_row gt_right" style="background-color: #EAF3FA">10</td>
 <td class="gt_row gt_right" style="background-color: #EAF3FA">2/8</td>
-<td class="gt_row gt_right" style="background-color: #EAF3FA">0.00026988540128307923</td>
+<td class="gt_row gt_right" style="background-color: #EAF3FA">0.00027</td>
 </tr>
 </tbody><tfoot>
 <tr class="gt_sourcenotes odd">
@@ -953,7 +1527,287 @@ RMSE against true voltage: 0.0034 pu, max error: 0.0043 pu</code></pre>
 </div>
 </div>
 </div>
-<p>A real, more sobering finding than a single draw suggested. Only one configuration ever produces a usable estimate at all across 8 real draws, 90% coverage plus 10 real sensors, and even there it only solves a quarter of the time. Every other combination tested, including 90% coverage with 5 sensors, and 70% coverage with as many as 10, never solves once. A handful of real sensors is not a reliable substitute for chasing the last mile of smart-meter coverage on this feeder; at best it is a marginal, inconsistent supplement that only starts to help once coverage is already high. Full <a href="#acronyms_AMI">AMI</a> rollout remains the one lever checked here that reliably works.</p>
+<div class="quarto-embed-nb-cell" data-notebook="/home/runner/work/ml-energy-disaggregation/ml-energy-disaggregation/book/05-forecasting/06-lv-state-estimation-code.ipynb" data-notebook-title="Can Smart-Meter Readings Fill In What the Grid Cannot See" data-notebook-cellid="21830c27">
+<div id="21830c27" class="cell">
+<div class="cell-output cell-output-display">
+
+   
+       <meta charset="UTF-8">
+       <style> html, body { margin: 0; padding: 0; } </style>
+       <script type="text/javascript" data-lets-plot-script="library" src="https://cdn.jsdelivr.net/gh/JetBrains/lets-plot@v4.11.0/js-package/distr/lets-plot.min.js"></script>
+   
+   
+          <div id="iPIg5O"></div>
+   <script type="text/javascript" data-lets-plot-script="plot">
+   
+   (function() {
+   // ----------
+   
+   const forceImmediateRender = false;
+   const responsive = false;
+   
+   let sizing = {
+       width_mode: "MIN",
+       height_mode: "SCALED",
+       width: null, 
+       height: null 
+   };
+   
+   const preferredWidth = document.body.dataset.letsPlotPreferredWidth;
+   if (preferredWidth !== undefined) {
+       sizing = {
+           width_mode: 'FIXED',
+           height_mode: 'SCALED',
+           width: parseFloat(preferredWidth)
+       };
+   }
+   
+   const containerDiv = document.getElementById("iPIg5O");
+   let fig = null;
+   
+   function renderPlot() {
+       if (fig === null) {
+           const plotSpec = {
+"data":{
+"AMI coverage":["50%","50%","50%","50%","70%","70%","70%","70%","90%","90%","90%","90%"],
+"Real line sensors":[0.0,2.0,5.0,10.0,0.0,2.0,5.0,10.0,0.0,2.0,5.0,10.0],
+"n_solved":[0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,2.0],
+"Solved":["0/8","0/8","0/8","0/8","0/8","0/8","0/8","0/8","0/8","0/8","0/8","2/8"]
+},
+"mapping":{
+"x":"Real line sensors",
+"y":"AMI coverage",
+"fill":"n_solved"
+},
+"data_meta":{
+"series_annotations":[{
+"type":"str",
+"column":"AMI coverage"
+},{
+"type":"int",
+"column":"Real line sensors"
+},{
+"type":"int",
+"column":"n_solved"
+},{
+"type":"str",
+"column":"Solved"
+},{
+"type":"float",
+"column":"Mean RMSE when solved (pu)"
+}]
+},
+"coord":{
+"name":"fixed",
+"ratio":1.0,
+"flip":false
+},
+"ggtitle":{
+"text":"How Often 8 Independent Trials Actually Solve, by Configuration"
+},
+"guides":{
+"x":{
+"title":"Real line sensors added"
+},
+"y":{
+"title":"Smart-meter coverage"
+},
+"fill":{
+"title":"Solved /8"
+}
+},
+"theme":{
+"text":{
+"color":"#2d2d2d",
+"family":"'Libre Franklin', 'Segoe UI', Roboto, Helvetica, Arial, sans-serif",
+"size":12.0,
+"blank":false
+},
+"axis_title_x":{
+"face":"bold",
+"size":14.0,
+"margin":[10.0,0.0,0.0,0.0],
+"blank":false
+},
+"axis_title_y":{
+"face":"bold",
+"size":14.0,
+"margin":[0.0,10.0,0.0,0.0],
+"blank":false
+},
+"axis_text_x":{
+"color":"#666666",
+"angle":0.0,
+"hjust":0.5,
+"margin":[8.0,0.0,0.0,0.0],
+"blank":false
+},
+"axis_text_y":{
+"color":"#666666",
+"margin":[0.0,0.0,0.0,8.0],
+"blank":false
+},
+"axis_ticks":{
+"color":"#bbbbbb",
+"size":0.75,
+"blank":false
+},
+"axis_line":{
+"color":"#bbbbbb",
+"size":1.0,
+"blank":false
+},
+"legend_background":{
+"blank":true
+},
+"legend_text":{
+"size":12.0,
+"blank":false
+},
+"legend_title":{
+"face":"bold",
+"size":14.0,
+"blank":false
+},
+"legend_position":"right",
+"legend_spacing":10.0,
+"legend_key":{
+"blank":true
+},
+"panel_background":{
+"blank":true
+},
+"panel_border":{
+"blank":true
+},
+"panel_grid_minor":{
+"blank":true
+},
+"panel_grid_major_x":{
+"blank":true
+},
+"panel_grid_major_y":{
+"blank":true
+},
+"plot_background":{
+"blank":true
+},
+"plot_title":{
+"color":"#333333",
+"face":"bold",
+"size":19.0,
+"hjust":0.0,
+"margin":[0.0,0.0,6.0,0.0],
+"blank":false
+},
+"plot_subtitle":{
+"color":"#6b6b6b",
+"size":16.0,
+"hjust":0.0,
+"margin":[0.0,0.0,18.0,0.0],
+"blank":false
+},
+"plot_caption":{
+"color":"#999999",
+"face":"italic",
+"size":9.0,
+"hjust":1.0,
+"margin":[12.0,0.0,0.0,0.0],
+"blank":false
+},
+"plot_margin":[16.0,16.0,10.0,10.0],
+"strip_background":{
+"blank":true
+},
+"strip_text":{
+"family":"'Libre Franklin', 'Segoe UI', Roboto, Helvetica, Arial, sans-serif",
+"face":"bold",
+"size":12.0,
+"hjust":0.0,
+"blank":false
+}
+},
+"ggsize":{
+"width":650.0,
+"height":350.0
+},
+"kind":"plot",
+"scales":[{
+"aesthetic":"fill",
+"limits":[0.0,8.0],
+"colors":["#F0F9FF","#E0F2FE","#BAE6FD","#7DD3FC","#38BDF8","#0EA5E9","#0284C7","#0369A1"],
+"scale_mapper_kind":"color_gradientn"
+}],
+"layers":[{
+"geom":"tile",
+"mapping":{
+},
+"data_meta":{
+},
+"data":{
+}
+},{
+"geom":"text",
+"mapping":{
+"label":"Solved"
+},
+"data_meta":{
+},
+"color":"#1E293B",
+"size":7.0,
+"data":{
+}
+}],
+"metainfo_list":[],
+"spec_id":"3"
+};
+           fig = LetsPlot.buildPlotFromProcessedSpecs(plotSpec, containerDiv, sizing);
+       } else {
+           fig.updateView({});
+       }
+   }
+   
+   const renderImmediately = 
+       forceImmediateRender || (
+           sizing.width_mode === 'FIXED' && 
+           (sizing.height_mode === 'FIXED' || sizing.height_mode === 'SCALED')
+       );
+   
+   if (renderImmediately) {
+       renderPlot();
+   }
+   
+   if (!renderImmediately || responsive) {
+       // Set up observer for initial sizing or continuous monitoring
+       var observer = new ResizeObserver(function(entries) {
+           for (let entry of entries) {
+               if (entry.contentBoxSize && 
+                   entry.contentBoxSize[0].inlineSize > 0) {
+                   if (!responsive && observer) {
+                       observer.disconnect();
+                       observer = null;
+                   }
+                   renderPlot();
+                   if (!responsive) {
+                       break;
+                   }
+               }
+           }
+       });
+       
+       observer.observe(containerDiv);
+   }
+   
+   // ----------
+   })();
+   
+   </script>
+   
+
+</div>
+</div>
+</div>
+<p>A real, more sobering finding than a single draw suggested. Only one configuration ever produces a usable estimate at all across 8 real draws, the one non-empty cell in the heatmap above, 90% coverage plus 10 real sensors, and even there it only solves a quarter of the time. Every other combination tested, including 90% coverage with 5 sensors, and 70% coverage with as many as 10, never solves once. A handful of real sensors is not a reliable substitute for chasing the last mile of smart-meter coverage on this feeder; at best it is a marginal, inconsistent supplement that only starts to help once coverage is already high. Full <a href="#acronyms_AMI">AMI</a> rollout remains the one lever checked here that reliably works.</p>
 </section>
 <section id="why-bother" class="level2">
 <h2 class="anchored" data-anchor-id="why-bother">Why bother</h2>
