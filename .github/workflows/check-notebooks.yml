@@ -76,7 +76,18 @@ jobs:
           # scripts/fetch_goiener_data.py, gitignored, plus the zstandard
           # package (not a project dependency, GoiEner is still only under
           # evaluation), neither available in CI.
-          SKIP_LIST="book/03-disaggregation/02-feature-engineering-code.ipynb book/03-disaggregation/03-multi-appliance-recognition-code.ipynb book/03-disaggregation/04-multi-task-low-frequency-code.ipynb book/04-grid-edge/04-customer-feeder-clustering-code.ipynb book/04-grid-edge/05-ranking-recommendation-code.ipynb book/04-grid-edge/06-anomaly-detection-code.ipynb book/05-forecasting/04-foundation-models-code.ipynb book/04-grid-edge/04-customer-feeder-clustering-london-code.ipynb book/04-grid-edge/04-customer-feeder-clustering-goiener-code.ipynb"
+          # book/04-grid-edge/04-customer-feeder-clustering-goiener-tucker-code.ipynb
+          # needs the same gitignored GoiEner archive plus zstandard and
+          # tensorly (neither a project dependency).
+          # book/04-grid-edge/04-customer-feeder-clustering-goiener-chronos-embed-code.ipynb
+          # needs the same gitignored GoiEner archive plus zstandard, and
+          # downloads/runs the real Chronos-2 foundation model (already
+          # skip-listed elsewhere for the same real inference-cost reason
+          # as book/05-forecasting/04-foundation-models-code.ipynb).
+          # book/04-grid-edge/04-customer-feeder-clustering-goiener-diffusion-code.ipynb
+          # rebuilds both embeddings above, so needs the same gitignored
+          # archive, zstandard, tensorly, and Chronos-2 dependencies.
+          SKIP_LIST="book/03-disaggregation/02-feature-engineering-code.ipynb book/03-disaggregation/03-multi-appliance-recognition-code.ipynb book/03-disaggregation/04-multi-task-low-frequency-code.ipynb book/04-grid-edge/04-customer-feeder-clustering-code.ipynb book/04-grid-edge/05-ranking-recommendation-code.ipynb book/04-grid-edge/06-anomaly-detection-code.ipynb book/05-forecasting/04-foundation-models-code.ipynb book/04-grid-edge/04-customer-feeder-clustering-london-code.ipynb book/04-grid-edge/04-customer-feeder-clustering-goiener-code.ipynb book/04-grid-edge/04-customer-feeder-clustering-goiener-tucker-code.ipynb book/04-grid-edge/04-customer-feeder-clustering-goiener-chronos-embed-code.ipynb book/04-grid-edge/04-customer-feeder-clustering-goiener-diffusion-code.ipynb"
 
           # Helper: find all notebooks, excluding archived ones
           find_notebooks() {
