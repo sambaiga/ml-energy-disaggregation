@@ -23,19 +23,27 @@ Weighted-least-squares state estimation finds the state $x$, voltage magnitude a
 $$
 J(x) = \sum_i \frac{\big(z_i - h_i(x)\big)^2}{\sigma_i^2}
 $$
-where $h_i(x)$ is what measurement $i$ would read given state $x$, computed directly from the same real power-flow equations OpenDSS solves, and $\sigma_i$ is that measurement's own assumed uncertainty, a real substation voltage transformer trusted far more than a periodic smart-meter reading. A real measurement and a pseudo-measurement enter this same objective identically; the only difference is $\sigma_i$, honestly reflecting how much that source is actually worth trusting. This only has a real solution at all when the network is *observable*: at least as many independent measurements as unknown states, $2N - 1$ for $N$ buses (voltage magnitude and angle at every bus but the slack reference, whose own angle is fixed by definition) [@schweppe1970stateestimation], not a fixed absolute count but one this chapter's own network genuinely has to clear.
+where $h_i(x)$ is what measurement $i$ would read given state $x$, computed directly from the same real power-flow equations OpenDSS solves, and $\sigma_i$ is that measurement's own assumed uncertainty, a real substation voltage transformer trusted far more than a periodic smart-meter reading. A real measurement and a pseudo-measurement enter this same objective identically; the only difference is $\sigma_i$, honestly reflecting how much that source is actually worth trusting.
 
 </div>
 
 ![Why smart-meter readings can turn an unobservable feeder into an observable one. Left: a substation with its own real telemetry, and every customer bus downstream genuinely unknown, the real starting point for most real low-voltage feeders. Right: the same one real substation measurement, but every customer's own smart-meter reading now treated as a real pseudo-measurement, turning an unobservable network into one a real WLS estimator can actually solve.](../../assets/pseudo-measurement-observability.svg){#fig-pseudo-measurement-observability}
 
-{{< embed 06-lv-state-estimation-code.ipynb#afc8d171 >}}
+$J(x)$ is nonlinear, since $h(x)$ is the same nonlinear AC power-flow map OpenDSS itself solves, so `pandapower.estimation` cannot minimize it in one step. It linearizes around the current estimate and repeats, the same Gauss-Newton update every iterative real WLS solver uses:
+$$
+x^{(k+1)} = x^{(k)} + \big(H^\top R^{-1} H\big)^{-1} H^\top R^{-1} \big(z - h(x^{(k)})\big)
+$$
+where $H = \partial h / \partial x$ is the measurement Jacobian, evaluated fresh at each $x^{(k)}$, and $R = \text{diag}(\sigma_i^2)$ collects every measurement's own assumed uncertainty into one matrix. The real solvability condition sits inside that update, not just in a raw count: the gain matrix $G = H^\top R^{-1} H$ must be nonsingular, or there is no unique correction to compute at all. $2N - 1$ real, independent measurements for $N$ buses (voltage magnitude and angle everywhere but the slack reference, whose own angle is fixed by definition) is a real, checkable *necessary* condition for that [@schweppe1970stateestimation], counted directly below against this network's own real topology; it is not automatically *sufficient*, since measurements clustered on the same few buses can still leave $G$ singular even at a passing count. `pandapower.estimation` checks the necessary count itself, before ever attempting the update above, and refuses to run at all when it fails, exactly the real behavior the substation-only case below hits.
+
+**Methodology, concretely**: every scenario in this chapter reuses one real evening-peak load (below), builds a fresh copy of the network with a fixed set of real substation measurements (always present) plus whichever smart-meter pseudo-measurements or branch sensors that scenario adds, declares this network's own real zero-injection buses explicitly rather than via a heuristic, and calls `pandapower.estimation.estimate()` with `init="flat"`. A scenario is *observable* when that real measurement count clears $2N-1$; it is *solved* when the iterative update above actually converges to a real, non-empty result, since a network can clear the necessary count and still fail numerically right at that boundary, a real distinction checked explicitly throughout rather than assumed away.
+
+{{< embed 06-lv-state-estimation-code.ipynb#54fc5ce5 >}}
 
 ## Converting the network, and checking the conversion before trusting it
 
 `from_opendss` builds a balanced, positive-sequence `pandapower` network directly from the same real `LVcircuit-master.txt` Part 4 and Part 5 Chapter 5 both use, no hand-rolled bus-by-bus translation needed. Two real issues surfaced when this was checked directly against OpenDSS's own solve, rather than trusted on faith. First, the converter needs `Set VoltageBases`/`CalcVoltageBases` already applied, the same step this book's own `Circuit.load()` wrapper already runs; without it, every bus loses its voltage base and the transformer gets silently dropped. Second, even with that fixed, the converter assigns the transformer's own secondary rating from the declared system voltage base (0.400 kV) instead of the transformer's own real nameplate rating, confirmed directly from `LVcircuit-transformers.txt`'s own `kVs=[22 0.433]`, an 8% voltage error otherwise.
 
-{{< embed 06-lv-state-estimation-code.ipynb#09040d11 >}}
+{{< embed 06-lv-state-estimation-code.ipynb#064ba08e >}}
 
 Both fixes are verified, not assumed: with the network's own nominal placeholder loads (no real customer data applied yet), `pandapower`'s own re-solved voltage matches OpenDSS's own solve to four decimal places.
 
@@ -43,7 +51,7 @@ Both fixes are verified, not assumed: with the network's own nominal placeholder
 
 A real customer-to-bus assignment, the same convention Part 5 Chapter 5 already uses, and one real test-day, evening-peak half-hour.
 
-{{< embed 06-lv-state-estimation-code.ipynb#4a4d6fe1 >}}
+{{< embed 06-lv-state-estimation-code.ipynb#be0f38ba >}}
 
 Solving the converted network with every real load in place gives the one thing a real {{< acr DSO >}} never has directly: the true voltage at every single bus, used below only to check each scenario's own estimate against, never fed to the estimator itself.
 
@@ -51,7 +59,7 @@ Solving the converted network with every real load in place gives the one thing 
 
 `zero_injection` lets the {{< acr WLS >}} solver treat every real junction bus with no customer of its own, confirmed directly from the network's own topology (29 of them here), as an exact constraint rather than an unknown, real structure this network already has, not an assumption. Even with that structure exploited, a {{< acr DSO >}} with only its own substation-level voltage and power telemetry is checked directly against the real observability requirement above rather than assumed to clear it.
 
-{{< embed 06-lv-state-estimation-code.ipynb#336b8f48 >}}
+{{< embed 06-lv-state-estimation-code.ipynb#dd30b79d >}}
 
 No: this feeder's own real topology needs real information at every one of its 31 real customer buses, or an explicit zero-injection exemption, and a real substation-only {{< acr DSO >}} has neither for any of them. This is not a noisy or imprecise estimate, it is no estimate at all; the {{< acr WLS >}} solver has no way to resolve the state even in principle.
 
@@ -59,23 +67,31 @@ No: this feeder's own real topology needs real information at every one of its 3
 
 Each real customer's own smart-meter reading, real active and reactive power consumption, becomes a pseudo-measurement at that customer's own bus, not a voltage reading real household smart meters do not usually report. A real 10% uncertainty band reflects that these are periodic {{< acr AMI >}} readings, not real-time {{< acr SCADA >}}-grade telemetry, a genuinely different, less trustworthy kind of measurement than the substation's own.
 
-{{< embed 06-lv-state-estimation-code.ipynb#d79076cb >}}
+{{< embed 06-lv-state-estimation-code.ipynb#3f08d774 >}}
 
-Real smart-meter pseudo-measurements, at every real customer bus, do restore observability, and the resulting estimate is genuinely accurate: well within a tenth of a percent of true voltage at every bus. The real, more useful question is how much of that coverage is actually needed, checked directly below rather than assumed to scale smoothly.
+Real smart-meter pseudo-measurements, at every real customer bus, do restore observability, and the resulting estimate is genuinely accurate: well within a tenth of a percent of true voltage at every bus, shown below at every one of this feeder's 61 real buses rather than as a single summary number.
+
+{{< embed 06-lv-state-estimation-code.ipynb#a989ae07 >}}
+
+The real, more useful question is how much of that coverage is actually needed, checked directly below rather than assumed to scale smoothly.
 
 ## Does partial smart-meter coverage work?
 
-{{< embed 06-lv-state-estimation-code.ipynb#f473a8b2 >}}
+{{< embed 06-lv-state-estimation-code.ipynb#72efbc9d >}}
 
-Not smoothly: every coverage level below 100% fails to achieve observability, including 90%, a single real customer's own unmeasured, non-zero consumption is enough to leave the system unsolvable, regardless of how many other customers are metered. Full smart-meter rollout is not a nice-to-have here, it is a hard requirement, at least for this specific approach of one pseudo-measurement per customer bus and nothing else.
+{{< embed 06-lv-state-estimation-code.ipynb#722c84b2 >}}
+
+Not smoothly: every coverage level below 100% fails to achieve observability, including 90%, a single real customer's own unmeasured, non-zero consumption is enough to leave the system unsolvable, regardless of how many other customers are metered. The chart above ties that directly to the necessary-count condition from the Key Concept box: this feeder's real measurement count, substation telemetry plus metered customers plus its 29 real zero-injection buses, never clears the required 121 until every one of the 31 real customers is covered. Full smart-meter rollout is not a nice-to-have here, it is a hard requirement, at least for this specific approach of one pseudo-measurement per customer bus and nothing else.
 
 ## A few real sensors, instead of chasing full coverage
 
 A real {{< acr DSO >}} rarely has full smart-meter rollout and nothing else; it is more likely to have partial {{< acr AMI >}} coverage plus a handful of real branch-level power-flow sensors at key points in the feeder, the kind of investment an operator can actually make. Checked directly, and checked honestly: a single random draw per configuration turned out to be genuinely misleading here, since which specific customers happen to be metered and which specific branches happen to carry a sensor both matter, not just how many of each. Every configuration below is repeated across 8 real random draws, reporting how often it actually produces a usable estimate, not just whether one particular draw happened to.
 
-{{< embed 06-lv-state-estimation-code.ipynb#ab78c290 >}}
+{{< embed 06-lv-state-estimation-code.ipynb#7025e8a1 >}}
 
-A real, more sobering finding than a single draw suggested. Only one configuration ever produces a usable estimate at all across 8 real draws, 90% coverage plus 10 real sensors, and even there it only solves a quarter of the time. Every other combination tested, including 90% coverage with 5 sensors, and 70% coverage with as many as 10, never solves once. A handful of real sensors is not a reliable substitute for chasing the last mile of smart-meter coverage on this feeder; at best it is a marginal, inconsistent supplement that only starts to help once coverage is already high. Full {{< acr AMI >}} rollout remains the one lever checked here that reliably works.
+{{< embed 06-lv-state-estimation-code.ipynb#21830c27 >}}
+
+A real, more sobering finding than a single draw suggested. Only one configuration ever produces a usable estimate at all across 8 real draws, the one non-empty cell in the heatmap above, 90% coverage plus 10 real sensors, and even there it only solves a quarter of the time. Every other combination tested, including 90% coverage with 5 sensors, and 70% coverage with as many as 10, never solves once. A handful of real sensors is not a reliable substitute for chasing the last mile of smart-meter coverage on this feeder; at best it is a marginal, inconsistent supplement that only starts to help once coverage is already high. Full {{< acr AMI >}} rollout remains the one lever checked here that reliably works.
 
 ## Why bother
 
