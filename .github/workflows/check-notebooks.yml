@@ -65,7 +65,12 @@ jobs:
           # {{< embed >}} reads them directly without re-executing the
           # notebook, so the rendered book is unaffected; only this
           # from-scratch CI re-execution can't run them.
-          SKIP_LIST="book/03-disaggregation/02-feature-engineering-code.ipynb book/03-disaggregation/03-multi-appliance-recognition-code.ipynb book/03-disaggregation/04-multi-task-low-frequency-code.ipynb book/04-grid-edge/04-customer-feeder-clustering-code.ipynb book/04-grid-edge/05-ranking-recommendation-code.ipynb book/04-grid-edge/06-anomaly-detection-code.ipynb book/05-forecasting/04-foundation-models-code.ipynb"
+          # book/04-grid-edge/04-customer-feeder-clustering-london-code.ipynb
+          # is exploratory only, not wired into any chapter: it loads
+          # resources/london-lcl/data/Partitioned LCL Data.zip, fetched
+          # locally via scripts/fetch_london_lcl_data.py (~760MB), gitignored
+          # and not fetched in CI.
+          SKIP_LIST="book/03-disaggregation/02-feature-engineering-code.ipynb book/03-disaggregation/03-multi-appliance-recognition-code.ipynb book/03-disaggregation/04-multi-task-low-frequency-code.ipynb book/04-grid-edge/04-customer-feeder-clustering-code.ipynb book/04-grid-edge/05-ranking-recommendation-code.ipynb book/04-grid-edge/06-anomaly-detection-code.ipynb book/05-forecasting/04-foundation-models-code.ipynb book/04-grid-edge/04-customer-feeder-clustering-london-code.ipynb"
 
           # Helper: find all notebooks, excluding archived ones
           find_notebooks() {
