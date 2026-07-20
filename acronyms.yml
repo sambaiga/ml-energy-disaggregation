@@ -81,4 +81,10 @@ acronyms:
       longname: Quantile Value Network
     - shortname: CVaR
       longname: Conditional Value-at-Risk
+    - shortname: DSSE
+      longname: Distribution System State Estimation
+    - shortname: WLS
+      longname: Weighted Least Squares
+    - shortname: SCADA
+      longname: Supervisory Control and Data Acquisition
 ...
