@@ -1033,3 +1033,13 @@ mjx-container {
   overflow-y: hidden;
   max-width: 100%;
 }
+
+// A cited URL wraps at each "/" on its own (a real browser line-breaking
+// rule), which is enough for most citations in this book. One, confirmed at
+// a real 375px viewport, has no "/" in its final path segment
+// (opendss.epri.com/OpenDSSandStateEstimation.html) and pushed the whole
+// page wider rather than wrap. `anywhere` only kicks in once a run of text
+// has nowhere else to break, so normal citation text is unaffected.
+.csl-entry {
+  overflow-wrap: anywhere;
+}

@@ -1025,3 +1025,9 @@ mjx-container {
   overflow-y: hidden;
   max-width: 100%;
 }
+
+// See brand.scss: a cited URL with no "/" in its final path segment can
+// have nowhere to wrap and pushes the whole page wider on a narrow screen.
+.csl-entry {
+  overflow-wrap: anywhere;
+}
