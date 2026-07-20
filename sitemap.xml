@@ -2,86 +2,86 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
     <loc>https://sambaiga.github.io/ml-energy-disaggregation/index.html</loc>
-    <lastmod>2026-07-20T08:08:29.199Z</lastmod>
+    <lastmod>2026-07-20T08:09:44.481Z</lastmod>
   </url>
   <url>
     <loc>https://sambaiga.github.io/ml-energy-disaggregation/preface.html</loc>
-    <lastmod>2026-07-20T08:08:29.199Z</lastmod>
+    <lastmod>2026-07-20T08:09:44.481Z</lastmod>
   </url>
   <url>
     <loc>https://sambaiga.github.io/ml-energy-disaggregation/how-to-use.html</loc>
-    <lastmod>2026-07-20T08:08:29.199Z</lastmod>
+    <lastmod>2026-07-20T08:09:44.481Z</lastmod>
   </url>
   <url>
     <loc>https://sambaiga.github.io/ml-energy-disaggregation/book/03-disaggregation/01-what-is-nilm.html</loc>
-    <lastmod>2026-07-20T08:08:29.157Z</lastmod>
+    <lastmod>2026-07-20T08:09:44.429Z</lastmod>
   </url>
   <url>
     <loc>https://sambaiga.github.io/ml-energy-disaggregation/book/03-disaggregation/02-feature-engineering.html</loc>
-    <lastmod>2026-07-20T08:08:29.159Z</lastmod>
+    <lastmod>2026-07-20T08:09:44.432Z</lastmod>
   </url>
   <url>
     <loc>https://sambaiga.github.io/ml-energy-disaggregation/book/03-disaggregation/03-multi-appliance-recognition.html</loc>
-    <lastmod>2026-07-20T08:08:29.160Z</lastmod>
+    <lastmod>2026-07-20T08:09:44.433Z</lastmod>
   </url>
   <url>
     <loc>https://sambaiga.github.io/ml-energy-disaggregation/book/03-disaggregation/04-multi-task-low-frequency.html</loc>
-    <lastmod>2026-07-20T08:08:29.161Z</lastmod>
+    <lastmod>2026-07-20T08:09:44.434Z</lastmod>
   </url>
   <url>
     <loc>https://sambaiga.github.io/ml-energy-disaggregation/book/04-grid-edge/01-opendss-lv-modeling.html</loc>
-    <lastmod>2026-07-20T08:08:29.164Z</lastmod>
+    <lastmod>2026-07-20T08:09:44.439Z</lastmod>
   </url>
   <url>
     <loc>https://sambaiga.github.io/ml-energy-disaggregation/book/04-grid-edge/02-timeseries-der-modeling.html</loc>
-    <lastmod>2026-07-20T08:08:29.168Z</lastmod>
+    <lastmod>2026-07-20T08:09:44.443Z</lastmod>
   </url>
   <url>
     <loc>https://sambaiga.github.io/ml-energy-disaggregation/book/04-grid-edge/03-phase-identification.html</loc>
-    <lastmod>2026-07-20T08:08:29.170Z</lastmod>
+    <lastmod>2026-07-20T08:09:44.446Z</lastmod>
   </url>
   <url>
     <loc>https://sambaiga.github.io/ml-energy-disaggregation/book/04-grid-edge/04-customer-feeder-clustering.html</loc>
-    <lastmod>2026-07-20T08:08:29.185Z</lastmod>
+    <lastmod>2026-07-20T08:09:44.464Z</lastmod>
   </url>
   <url>
     <loc>https://sambaiga.github.io/ml-energy-disaggregation/book/04-grid-edge/05-ranking-recommendation.html</loc>
-    <lastmod>2026-07-20T08:08:29.186Z</lastmod>
+    <lastmod>2026-07-20T08:09:44.466Z</lastmod>
   </url>
   <url>
     <loc>https://sambaiga.github.io/ml-energy-disaggregation/book/04-grid-edge/06-anomaly-detection.html</loc>
-    <lastmod>2026-07-20T08:08:29.186Z</lastmod>
+    <lastmod>2026-07-20T08:09:44.466Z</lastmod>
   </url>
   <url>
     <loc>https://sambaiga.github.io/ml-energy-disaggregation/book/05-forecasting/01-forecastability.html</loc>
-    <lastmod>2026-07-20T08:08:29.188Z</lastmod>
+    <lastmod>2026-07-20T08:09:44.468Z</lastmod>
   </url>
   <url>
     <loc>https://sambaiga.github.io/ml-energy-disaggregation/book/05-forecasting/02-scaling-archetypes.html</loc>
-    <lastmod>2026-07-20T08:08:29.188Z</lastmod>
+    <lastmod>2026-07-20T08:09:44.469Z</lastmod>
   </url>
   <url>
     <loc>https://sambaiga.github.io/ml-energy-disaggregation/book/05-forecasting/03-probabilistic-forecasting.html</loc>
-    <lastmod>2026-07-20T08:08:29.197Z</lastmod>
+    <lastmod>2026-07-20T08:09:44.478Z</lastmod>
   </url>
   <url>
     <loc>https://sambaiga.github.io/ml-energy-disaggregation/book/05-forecasting/04-foundation-models.html</loc>
-    <lastmod>2026-07-20T08:08:29.197Z</lastmod>
+    <lastmod>2026-07-20T08:09:44.479Z</lastmod>
   </url>
   <url>
     <loc>https://sambaiga.github.io/ml-energy-disaggregation/book/05-forecasting/05-what-if-scenario-analysis.html</loc>
-    <lastmod>2026-07-20T08:08:29.198Z</lastmod>
+    <lastmod>2026-07-20T08:09:44.479Z</lastmod>
   </url>
   <url>
     <loc>https://sambaiga.github.io/ml-energy-disaggregation/book/05-forecasting/06-lv-state-estimation.html</loc>
-    <lastmod>2026-07-20T08:08:29.198Z</lastmod>
+    <lastmod>2026-07-20T08:09:44.480Z</lastmod>
   </url>
   <url>
     <loc>https://sambaiga.github.io/ml-energy-disaggregation/about.html</loc>
-    <lastmod>2026-07-20T08:08:29.149Z</lastmod>
+    <lastmod>2026-07-20T08:09:44.419Z</lastmod>
   </url>
   <url>
     <loc>https://sambaiga.github.io/ml-energy-disaggregation/acronyms.html</loc>
-    <lastmod>2026-07-20T08:08:29.149Z</lastmod>
+    <lastmod>2026-07-20T08:09:44.419Z</lastmod>
   </url>
 </urlset>
