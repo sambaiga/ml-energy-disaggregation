@@ -1,9 +1,9 @@
 ---
-title: "Part 5 Chapter 4: Do Foundation Models Fail Like Everything Else Does?"
+title: "Part 8 Chapter 4: Do Foundation Models Fail Like Everything Else Does?"
 bibliography: ../../references.bib
 ---
 
-Every chapter in Part 5 so far has trained something on this exact 342-customer AusNet pool, however cheaply: a baseline in Chapter 1, a full LightGBM pipeline in Chapter 2, three probabilistic backbones in Chapter 3. That is the standard framing this whole literature still leans on for a new population: collect its history, engineer its features, fit a model to it, repeat the whole pipeline for the next population. A time-series foundation model claims to break that framing entirely, pretrained once on a huge, unrelated corpus, pointed directly at a customer it has never seen, zero-shot, no fitting step at all.
+Every chapter in Part 8 so far has trained something on this exact 342-customer AusNet pool, however cheaply: a baseline in Chapter 1, a full LightGBM pipeline in Chapter 2, three probabilistic backbones in Chapter 3. That is the standard framing this whole literature still leans on for a new population: collect its history, engineer its features, fit a model to it, repeat the whole pipeline for the next population. A time-series foundation model claims to break that framing entirely, pretrained once on a huge, unrelated corpus, pointed directly at a customer it has never seen, zero-shot, no fitting step at all.
 
 This chapter runs that claim against two real pretrained models, Chronos-2 [@ansari2025chronos2] and TimesFM [@das2024timesfm], on the exact same 342 real AusNet customers Chapters 1 through 3 already know in detail. Neither model has ever seen an AusNet reading. Neither gets a single gradient step on this data. Both are just pointed at a customer's own recent history and asked to forecast the next real day, and both come in more accurate than `unified`, Chapter 2's own trained LightGBM winner, on the exact same real day: 0.2268 and 0.2290 kW mean absolute error against unified's own 0.2418, checked on the identical 342 customers and the identical real test window, not a hand-picked comparison. That result alone does not settle anything, and should not be read as one.
 
@@ -27,7 +27,7 @@ A trained specialist and a zero-shot foundation model answer "how do I know this
 
 </div>
 
-![Two ways to know a population. Left: the trained specialist every earlier chapter in Part 5 builds, a per-population pipeline that has to repeat in full for a new population. Right: a foundation model, pretrained once on a general corpus, consuming any customer's own raw context window directly with no fitting step at all.](../../assets/trained-specialist-vs-zero-shot.svg){#fig-trained-specialist-vs-zero-shot}
+![Two ways to know a population. Left: the trained specialist every earlier chapter in Part 8 builds, a per-population pipeline that has to repeat in full for a new population. Right: a foundation model, pretrained once on a general corpus, consuming any customer's own raw context window directly with no fitting step at all.](../../assets/trained-specialist-vs-zero-shot.svg){#fig-trained-specialist-vs-zero-shot}
 
 ## Setup: the same population, recomputed, not imported
 
@@ -99,9 +99,9 @@ Both models degrade on real NREL data, a different country, climate, and buildin
 
 Neither foundation model was trained on a single AusNet reading, and both beat a model built specifically for this population on the exact same real day, a real result worth taking seriously rather than the surprising, suspicious one this chapter opened by ruling out. The fuller ranking complicates a clean win, though: unified still has the smaller tail error and the better-tracked shape, so "more accurate on average" is not the same as "strictly better." The more useful finding is what happens when each method is wrong. The two foundation models agree with each other about which customers are hard far more than either agrees with unified, 0.755 Jaccard overlap between Chronos-2 and TimesFM against roughly 0.5 between either one and unified, and no single forecastability metric from Chapter 1 strongly explains any method's own error. That divergence is the actual answer to what a foundation model is good for here: not a drop-in substitute for a trained model, since it fails on a meaningfully different set of customers, but a real candidate for an ensemble or a cold-start fallback, precisely because its mistakes do not simply repeat the trained model's own mistakes. And the one advantage a trained model genuinely cannot offer, moving to a new population with no retraining or recalibration step at all, comes at a real cost, roughly doubled error on NREL, but a cost of the same order a trained model itself pays when pushed outside its own population, the same honest, disclosed generalization check Chapter 3 already applied to its own conformal guarantee.
 
-## Where this leaves Part 5
+## Where this leaves Part 8
 
-Chapter 2 found the model that earns its cost; Chapter 3 attached an honest number to how wrong that model's own forecasts might be. This chapter checked a different kind of cost: whether a pretrained foundation model, never trained or calibrated on this population at all, fails on the same customers these trained models do. It mostly does not, a real, checked reason to treat a foundation model as a complementary check rather than a replacement. Part 5's closing chapters put these forecasts to work directly: running a forecasted load trajectory through Part 4's own network model to check grid health before a violation happens, not after.
+Chapter 2 found the model that earns its cost; Chapter 3 attached an honest number to how wrong that model's own forecasts might be. This chapter checked a different kind of cost: whether a pretrained foundation model, never trained or calibrated on this population at all, fails on the same customers these trained models do. It mostly does not, a real, checked reason to treat a foundation model as a complementary check rather than a replacement. Part 8's closing chapters put these forecasts to work directly: running a forecasted load trajectory through Part 4's own network model to check grid health before a violation happens, not after.
 
 ## References
 

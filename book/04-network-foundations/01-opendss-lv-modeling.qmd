@@ -113,7 +113,7 @@ picks up directly. Combine that meter data with the network's topology, the
 impedance of every line, the phase each customer connects to, none of which
 any meter reports, and solving the network answers the harder question.
 That combination, real meter data plus real topology, is the mechanism
-behind every thread the rest of Part 4 follows.
+the rest of Part 4 reuses.
 
 ::: {.ark-concept}
 <span class="ark-concept-title"><i class="bi bi-info-circle-fill"></i> Key Concept</span>
@@ -301,19 +301,18 @@ a real year of smart-meter data driving a real time-series simulation,
 plus how {{< acr PV >}}, storage, and inverter controls like Volt-Watt
 change the answer.
 
-From there, Part 4 follows four threads, each building on the last:
+Chapter 3 completes this part's own foundation, recovering which phase a
+customer is actually connected to from nothing but voltage patterns, a
+real, common gap in utility records.
 
-1. **Phase detection**, recovering which phase a customer is actually
-   connected to from nothing but voltage patterns, a real, common gap in
-   utility records.
-2. **Customer and feeder clustering**, grouping customers and feeders by
-   how they actually behave, not just how they are labeled.
-3. **Voltage-violation and power-quality anomaly detection**, catching a
-   compliance problem, or a meter reporting bad data, as it happens rather
-   than after a complaint call.
-4. **Grid health under forecasted {{< acr DER >}} growth**, where Part 3's
-   forecasts become the input to exactly the kind of power-flow check this
-   chapter just ran, and mitigation strategies get evaluated against it.
+This network model is what every later part in this book builds on: Part
+5 groups customers and feeders by how they actually behave, not just how
+they are labeled; Part 6 turns that grouping into a real ranking and
+recommendation problem; Part 7 catches a compliance problem, or a meter
+reporting bad data, as it happens rather than after a complaint call; and
+Part 8's own forecasts eventually become the input to exactly the kind of
+power-flow check this chapter just ran, testing grid health under
+forecasted {{< acr DER >}} growth rather than today's snapshot.
 
 Each one runs on the same tools introduced here: `ark.dss.Circuit` to
 build, solve, and read a network, and the same per-unit, three-constraint

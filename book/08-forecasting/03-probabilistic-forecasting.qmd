@@ -20,7 +20,7 @@ Every mechanism below already has a real name and a real precedent. `MLPGAMNorma
 
 ## The data and the backbone
 
-Same real AusNet pool the whole of Part 5 has used, same last-90-day holdout. Every paradigm below shares one backbone architecture, MLPGAM, so differences in the results come from the probabilistic paradigm itself, not from comparing unrelated architectures.
+Same real AusNet pool the whole of Part 8 has used, same last-90-day holdout. Every paradigm below shares one backbone architecture, MLPGAM, so differences in the results come from the probabilistic paradigm itself, not from comparing unrelated architectures.
 
 <div class='ark-concept'>
 
@@ -151,7 +151,7 @@ A single MAE number settles less than it looks like it does, though: it says not
 
 ## Generalizing beyond AusNet
 
-Every number above comes from one real population, 342 Australian AusNet customers. A genuine generalization check does not retrain on a second dataset and compare two separately-tuned results, it takes the exact models and calibration already fit above, unmodified, and points them at real data they have never seen, from a different country, a different climate, a different tariff structure entirely. NREL's ResStock buildings are the same real half-hourly resolution Part 5 Chapter 1 already used for exactly this kind of check, complementing AusNet, not replacing it: ResStock is a physics-based simulation calibrated to real US end-use survey data, not a metered reading the way AusNet is, and that distinction matters here as much as it did in Chapter 1.
+Every number above comes from one real population, 342 Australian AusNet customers. A genuine generalization check does not retrain on a second dataset and compare two separately-tuned results, it takes the exact models and calibration already fit above, unmodified, and points them at real data they have never seen, from a different country, a different climate, a different tariff structure entirely. NREL's ResStock buildings are the same real half-hourly resolution Part 8 Chapter 1 already used for exactly this kind of check, complementing AusNet, not replacing it: ResStock is a physics-based simulation calibrated to real US end-use survey data, not a metered reading the way AusNet is, and that distinction matters here as much as it did in Chapter 1.
 
 {{< embed 03-probabilistic-forecasting-code.ipynb#f0aad486 >}}
 
@@ -181,9 +181,9 @@ Putting all five real numbers per paradigm, MAE, coverage, mean width, CRPS, and
 
 Three concrete things this chapter buys beyond "another accuracy table." First, a real basis for trust: a raw model's own stated uncertainty was wrong by nearly nine points here, in both paradigms, so a {{< acr DSO >}} sizing a transformer or setting a compliance threshold off an uncalibrated interval is sizing it off a number that does not mean what it claims, calibration is not optional polish, it is the difference between a real guarantee and a plausible-looking one. Second, a real answer to "which backbone should I trust this finding with": FPQR over-covers, QRLightGBM under-covers, in opposite directions, yet conformal calibration closes both gaps to the same 90% target regardless of which way the raw model was wrong, so the practical lesson travels across architectures even though the raw failure mode does not. Third, a real limit on how far any of this travels: the exact same calibrated interval that holds its guarantee on 342 AusNet customers loses more than a quarter of its coverage on real NREL buildings, for both backbones checked, a finding that would stay invisible without deliberately testing it, and one that matters directly to anyone tempted to ship a calibrated model to a new utility, a new country, or a new tariff structure without recalibrating first.
 
-## Where this leaves Part 5
+## Where this leaves Part 8
 
-A point forecast alone was never the full deliverable this part set out to build. Chapter 2 found the model that earns its cost; this chapter attached an honest number to how wrong that model's own forecasts might be, checked whether that number holds across architectures and across populations, rather than assuming it does, and found real limits on both counts worth carrying into any real deployment. Part 5 Chapter 4 checks a different kind of cost: whether a pretrained foundation model, never trained or calibrated on this population at all, still fails on the same customers these trained models do.
+A point forecast alone was never the full deliverable this part set out to build. Chapter 2 found the model that earns its cost; this chapter attached an honest number to how wrong that model's own forecasts might be, checked whether that number holds across architectures and across populations, rather than assuming it does, and found real limits on both counts worth carrying into any real deployment. Part 8 Chapter 4 checks a different kind of cost: whether a pretrained foundation model, never trained or calibrated on this population at all, still fails on the same customers these trained models do.
 
 ## References
 

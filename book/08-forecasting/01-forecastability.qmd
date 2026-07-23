@@ -3,7 +3,7 @@ title: "Chapter 1: Household Smart-Meter Forecastability"
 bibliography: ../../references.bib
 ---
 
-A DSO forecasting a single feeder gets one smooth curve: thousands of households averaging out each other's quirks into a predictable evening peak. A DSO forecasting one household gets something else entirely: a customer who works nights, a customer with an empty house half the year, a customer whose evening spikes exactly when the sun sets on their new rooftop panels. Part 5 forecasts at that second, harder scale, hundreds of individual AusNet customers, not one aggregate, using the same real smart-meter readings a utility already collects: load, and the {{< acr PV >}} and {{< acr EV >}} signals hiding inside it. Before reaching for a model, this chapter asks the question every later chapter in this part depends on: how forecastable is a real household's own signal, does that forecastability vary from one house to the next, and what does it say about which approach is actually worth using on them?
+A DSO forecasting a single feeder gets one smooth curve: thousands of households averaging out each other's quirks into a predictable evening peak. A DSO forecasting one household gets something else entirely: a customer who works nights, a customer with an empty house half the year, a customer whose evening spikes exactly when the sun sets on their new rooftop panels. Part 8 forecasts at that second, harder scale, hundreds of individual AusNet customers, not one aggregate, using the same real smart-meter readings a utility already collects: load, and the {{< acr PV >}} and {{< acr EV >}} signals hiding inside it. Before reaching for a model, this chapter asks the question every later chapter in this part depends on: how forecastable is a real household's own signal, does that forecastability vary from one house to the next, and what does it say about which approach is actually worth using on them?
 
 ## Why forecastability
 
@@ -33,7 +33,7 @@ This chapter reuses the same real AusNet smart-meter pool Part 4 already vendore
 uv run python scripts/fetch_part4_ausnet_data.py
 ```
 
-The generalization check later in this chapter reuses the same real {{< acr NREL >}} sample Part 4 Chapter 4 fetched, 760 real US buildings, restricted here to the 200 real ResStock homes:
+The generalization check later in this chapter reuses the same real {{< acr NREL >}} sample Part 4 Chapter 5 fetched, 760 real US buildings, restricted here to the 200 real ResStock homes:
 
 ```bash
 uv run python scripts/fetch_part5_nrel_buildstock_data.py
@@ -213,7 +213,7 @@ The window-average method consistently outperforms other approaches across all m
 
 ## Does forecastability itself generalize beyond AusNet?
 
-Everything in this chapter is checked against one specific real population: 342 real Australian households, one country, one climate, one utility's own metering program. Part 4 Chapter 4 already asked a version of this question for clustering, whether shape-based archetypes recover real ground-truth building categories, and found a real, honest limit once the population changed. This chapter's own two headline findings, how forecastable a real household's signal actually is, and which baseline actually wins once Corr is checked alongside MAE, deserve the same honest check: are they a property of load forecasting in general, or a property of AusNet's own 342 customers specifically?
+Everything in this chapter is checked against one specific real population: 342 real Australian households, one country, one climate, one utility's own metering program. Part 4 Chapter 5 already asked a version of this question for clustering, whether shape-based archetypes recover real ground-truth building categories, and found a real, honest limit once the population changed. This chapter's own two headline findings, how forecastable a real household's signal actually is, and which baseline actually wins once Corr is checked alongside MAE, deserve the same honest check: are they a property of load forecasting in general, or a property of AusNet's own 342 customers specifically?
 
 {{< embed 01-forecastability-code.ipynb#5ff3cd14 >}}
 
@@ -239,7 +239,7 @@ From the customer’s perspective, this transparent approach ensures fairness. C
 
 These counterintuitive findings are significant for both utilities and customers. Incorporating a known {{< acr PV >}} component increased the forecastability of net load, while the diversified {{< acr EV >}} construction appeared as the most forecastable signal, though this does not reflect the unpredictability of individual vehicle behaviour. Interpreting these results without careful analysis could lead to the mistaken belief that 'more {{< acr DER >}} means more predictable,' precisely the type of false confidence that De Bortoli et al.'s confidence-set framework cautions against. Direct empirical evaluation, rather than assumption, underpins the integrity of this chapter’s recommendations.
 
-## Where this leaves Part 5
+## Where this leaves Part 8
 
 Forecastability varies substantially across individual customers, and a simple window-average baseline is effective for most, regardless of regime. The addition of a known {{< acr PV >}} component increases, rather than decreases, the persistence of net load. The diversified {{< acr EV >}} construction achieves a level of forecastability that is unattainable from any single vehicle’s actual charging behaviour. This chapter adopts a confidence-set approach, providing a nuanced framework for subsequent analysis rather than a single, overconfident recommendation.
 

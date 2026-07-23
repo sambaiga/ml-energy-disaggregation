@@ -56,22 +56,29 @@ book:
         - book/03-disaggregation/02-feature-engineering.qmd
         - book/03-disaggregation/03-multi-appliance-recognition.qmd
         - book/03-disaggregation/04-multi-task-low-frequency.qmd
-    - part: "Part 4: Grid-Edge Value"
+    - part: "Part 4: LV Network and Topology Foundations"
       chapters:
-        - book/04-grid-edge/01-opendss-lv-modeling.qmd
-        - book/04-grid-edge/02-timeseries-der-modeling.qmd
-        - book/04-grid-edge/03-phase-identification.qmd
-        - book/04-grid-edge/04-customer-feeder-clustering.qmd
-        - book/04-grid-edge/05-ranking-recommendation.qmd
-        - book/04-grid-edge/06-anomaly-detection.qmd
-    - part: "Part 5: Forecasting"
+        - book/04-network-foundations/01-opendss-lv-modeling.qmd
+        - book/04-network-foundations/02-timeseries-der-modeling.qmd
+        - book/04-network-foundations/03-phase-identification.qmd
+    - part: "Part 5: Customer and Feeder Clustering"
       chapters:
-        - book/05-forecasting/01-forecastability.qmd
-        - book/05-forecasting/02-scaling-archetypes.qmd
-        - book/05-forecasting/03-probabilistic-forecasting.qmd
-        - book/05-forecasting/04-foundation-models.qmd
-        - book/05-forecasting/05-what-if-scenario-analysis.qmd
-        - book/05-forecasting/06-lv-state-estimation.qmd
+        - book/05-clustering/01-clustering-foundations.qmd
+        - book/05-clustering/02-customer-feeder-clustering.qmd
+    - part: "Part 6: Ranking and Recommendation"
+      chapters:
+        - book/06-ranking-recommendation/01-ranking-recommendation.qmd
+    - part: "Part 7: Anomaly Detection"
+      chapters:
+        - book/07-anomaly-detection/01-anomaly-detection.qmd
+    - part: "Part 8: Forecasting"
+      chapters:
+        - book/08-forecasting/01-forecastability.qmd
+        - book/08-forecasting/02-scaling-archetypes.qmd
+        - book/08-forecasting/03-probabilistic-forecasting.qmd
+        - book/08-forecasting/04-foundation-models.qmd
+        - book/08-forecasting/05-what-if-scenario-analysis.qmd
+        - book/08-forecasting/06-lv-state-estimation.qmd
     - about.qmd
     - acronyms.qmd
 

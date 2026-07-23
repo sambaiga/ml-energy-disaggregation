@@ -1,17 +1,17 @@
 ---
-title: "Chapter 5: Ranking and Recommendation under DER"
+title: "Chapter 1: Ranking and Recommendation under DER"
 bibliography: ../../references.bib
 ---
 
 A rooftop-solar application lands in a {{< acr DSO >}}'s connection queue.
-The archetype lookup Chapter 4 built says this customer belongs to
+The archetype lookup Part 5 Chapter 2 built says this customer belongs to
 Archetype 3, the same bucket 63 other applicants this quarter also landed
 in. Nine of those 64 turned out, on inspection, to be genuine voltage
 risks. Fifty-five did not. The archetype label is real, and it is also
 useless for the one decision actually sitting in front of someone right
 now: not "how does this bucket of 64 people behave on average," but
 "should this one customer's application go through today, and if not,
-what fixes it." Chapter 4 sorted the crowd. This chapter has to answer
+what fixes it." Part 5 Chapter 2 sorted the crowd. This chapter has to answer
 for the individual standing at the counter.
 
 Three chained questions carry that individual decision the rest of the
@@ -97,7 +97,7 @@ Germany, explicitly motivated by low-voltage overload risk, the closest
 existing precedent to this chapter's own ranking section
 [@duran2025pvadoption]. Luo and colleagues built a recommender system on
 top of non-intrusive load monitoring back in 2017, a real bridge between
-this book's own Part 2 and Part 4 [@luo2017nilmrecommender].
+this book's own Part 3 and Part 6 [@luo2017nilmrecommender].
 
 Two more recent, general-domain ideas earn a place here too. Parvez, Hu,
 and Chen rank similar historical alarm-flood sequences in real time for
@@ -116,12 +116,13 @@ graph structure, and a real {{< acr LV >}} feeder genuinely is a graph
 [@he2020lightgcn]. That is a real, checkable extension for later, not a
 stretch, but it would add real complexity this chapter's own small,
 structured data does not need to earn back right now, the same lesson
-Chapter 4 already drew from {{< acr IDEC >}}.
+Part 5 Chapter 2 already drew from {{< acr IDEC >}}.
 
 ## Getting the data
 
-This chapter reuses the same real AusNet smart-meter pool Chapters 1
-through 4 already vendored, no new fetch step needed:
+This chapter reuses the same real AusNet smart-meter pool Part 4
+Chapters 1 through 3 and Part 5 Chapter 1 already vendored, no new fetch
+step needed:
 
 ```bash
 uv run python scripts/fetch_part4_ausnet_data.py
@@ -134,22 +135,22 @@ network, fetched separately:
 uv run python scripts/fetch_part4_uk_mvlv_data.py
 ```
 
-The generalization check later in this chapter reuses Chapter 4's own
-{{< acr NREL >}} sample, a stratified 760 real US buildings, fetched the
+The generalization check later in this chapter reuses Part 5 Chapter 2's
+own {{< acr NREL >}} sample, a stratified 760 real US buildings, fetched the
 same way:
 
 ```bash
 uv run python scripts/fetch_part5_nrel_buildstock_data.py
 ```
 
-Chapter 4's own embedding, a peak-normalized, season-mean load shape per
-customer, and its k-means archetype labels, are recomputed here exactly
+Part 5 Chapter 2's own embedding, a peak-normalized, season-mean load
+shape per customer, and its k-means archetype labels, are recomputed here exactly
 as that chapter built them, not loaded from a saved file, so this chapter
 stays reproducible on its own.
 
 ## Building a real labeled risk set
 
-Chapter 4's own `per_customer_pv_voltage_risk()` and
+Part 5 Chapter 2's own `per_customer_pv_voltage_risk()` and
 `per_customer_ev_thermal_contribution()` are real, working simulators, and
 each call only labels 31 customers, one per physical bus on AusNet's real
 feeder, sampled by a seed from the 342-customer pool. A single seed is not
@@ -172,9 +173,9 @@ positions. That repetition is exactly what the shape-versus-position
 question needs: the same customer, different electrical locations,
 different seeds.
 
-{{< embed 05-ranking-recommendation-code.ipynb#cb75bfe2 >}}
+{{< embed 01-ranking-recommendation-code.ipynb#cb75bfe2 >}}
 
-{{< embed 05-ranking-recommendation-code.ipynb#5ce1a81b >}}
+{{< embed 01-ranking-recommendation-code.ipynb#5ce1a81b >}}
 
 ::: {.ark-concept}
 <span class="ark-concept-title"><i class="bi bi-info-circle-fill"></i> Key Concept</span>
@@ -209,13 +210,13 @@ whose real load shape looks most like this one, and use their
 already-simulated risk as a fast, defensible stand-in.
 
 The real test is not whether this technique runs. It is whether it beats
-what Chapter 4 already offers for free: the coarser, five-bucket
+what Part 5 Chapter 2 already offers for free: the coarser, five-bucket
 archetype mean. If retrieval cannot beat that simpler baseline, it has
 not earned the extra machinery, the same discipline this book applied to
 {{< acr IDEC >}}.
 
 A bare MAE comparison already answered this once in this book, and got it
-wrong: Chapter 1 of Part 5 found window-average posting the lowest MAE of
+wrong: Chapter 1 of Part 8 found window-average posting the lowest MAE of
 four baselines while barely tracking the real signal at all. The same
 risk applies here, so each candidate is scored on both MAE and Spearman
 rank correlation between its predictions and the real outcome, since a
@@ -238,9 +239,9 @@ $$
 where $\rho_S$ is Spearman rank correlation, computed across the
 candidates' own scores on each metric pair.
 
-{{< embed 05-ranking-recommendation-code.ipynb#49862434 >}}
+{{< embed 01-ranking-recommendation-code.ipynb#49862434 >}}
 
-{{< embed 05-ranking-recommendation-code.ipynb#cc65c357 >}}
+{{< embed 01-ranking-recommendation-code.ipynb#cc65c357 >}}
 
 ::: {.ark-mistake}
 <span class="ark-mistake-title"><i class="bi bi-bug-fill"></i> Common Mistake</span>
@@ -270,10 +271,10 @@ actual mistake to avoid here.
 
 ### How much can a retrieved neighbor actually be trusted?
 
-A predicted value alone says nothing about how confident it is. Chapter 3
-built a split-conformal confidence set around cluster membership using
-distance to a centroid; Chapter 4 reused the same idea for archetype
-confidence. The same machinery generalizes directly here: instead of
+A predicted value alone says nothing about how confident it is. Part 4
+Chapter 3 built a split-conformal confidence set around cluster
+membership using distance to a centroid; Part 5 Chapter 2 reused the
+same idea for archetype confidence. The same machinery generalizes directly here: instead of
 distance to a cluster's own centroid, use distance to a query customer's
 single nearest labeled neighbor. A customer with a close real neighbor
 gets a trustworthy prediction. A customer sitting far from anyone already
@@ -302,9 +303,9 @@ customer whose nearest neighbor sits farther away than that gets flagged
 instead, an honest "no confident match nearby" rather than a number
 dressed up to look like one.
 
-{{< embed 05-ranking-recommendation-code.ipynb#fe2589ef >}}
+{{< embed 01-ranking-recommendation-code.ipynb#fe2589ef >}}
 
-{{< embed 05-ranking-recommendation-code.ipynb#59315268 >}}
+{{< embed 01-ranking-recommendation-code.ipynb#59315268 >}}
 
 ::: {.ark-concept}
 <span class="ark-concept-title"><i class="bi bi-info-circle-fill"></i> Key Concept</span>
@@ -312,7 +313,7 @@ dressed up to look like one.
 Eight customers, 2.7% of the labeled pool, get flagged: real households
 whose nearest labeled neighbor sits farther away than 90% of a held-back
 calibration set ever needed to travel to find its own match. That is a
-similar rate to Chapter 4's own archetype-membership finding, where 6% of
+similar rate to Part 5 Chapter 2's own archetype-membership finding, where 6% of
 the full 342-customer pool got an empty prediction set. Two different
 conformal mechanisms, on two different questions, land on a similar
 honest answer: a real minority of customers do not resemble anyone else
@@ -330,12 +331,12 @@ planner deciding where to spend reinforcement budget needs locations
 ranked. Same underlying risk data, two different units of analysis, both
 real and both useful.
 
-{{< embed 05-ranking-recommendation-code.ipynb#d8a1fbda >}}
+{{< embed 01-ranking-recommendation-code.ipynb#d8a1fbda >}}
 
-{{< embed 05-ranking-recommendation-code.ipynb#8bf39dff >}}
+{{< embed 01-ranking-recommendation-code.ipynb#8bf39dff >}}
 
 The combined score deliberately takes the worse of the two normalized
-risks, not their average. Chapter 4 already found that different
+risks, not their average. Part 5 Chapter 2 already found that different
 archetypes lead different {{< acr DER >}} risks, the same customer rarely
 tops both lists at once, and averaging away that distinction would hide
 exactly the finding worth keeping visible. This is a simple, transparent
@@ -371,13 +372,13 @@ this kind of asset-level ranking, a different granularity from
 customer-level ranking and a different audience, a network planner rather
 than a connection-queue processor [@hardowar2017restoration].
 
-{{< embed 05-ranking-recommendation-code.ipynb#80fa269d >}}
+{{< embed 01-ranking-recommendation-code.ipynb#80fa269d >}}
 
-{{< embed 05-ranking-recommendation-code.ipynb#95c1a4ef >}}
+{{< embed 01-ranking-recommendation-code.ipynb#95c1a4ef >}}
 
 The voltage-risk leader and the thermal-risk leader are different bus
 positions, the same "different risk, different location" finding
-Chapter 4 made at the archetype level, now visible at the
+Part 5 Chapter 2 made at the archetype level, now visible at the
 physical-location level a network planner actually acts on. A
 reinforcement plan built around a single "worst bus" number would miss
 that half the risk on this feeder sits somewhere else entirely.
@@ -399,16 +400,16 @@ roughly 5% high priority, 15% medium, 80% low, on the reasoning that an
 operator can only act on a small number of genuinely urgent events at
 once. None of that is power-specific. It borrows directly.
 
-{{< embed 05-ranking-recommendation-code.ipynb#5f80fd9e >}}
+{{< embed 01-ranking-recommendation-code.ipynb#5f80fd9e >}}
 
-{{< embed 05-ranking-recommendation-code.ipynb#3c799ce0 >}}
+{{< embed 01-ranking-recommendation-code.ipynb#3c799ce0 >}}
 
 Fourteen real loads violate at some point during this stress day, out of
 31, each with a real severity and a real first-violation step, an
 operator's actual triage list rather than an undifferentiated flood of 23
 individual bus-step alarms. This feeder does not produce a large flood
 even at full {{< acr PV >}} penetration, itself a real, useful finding:
-Chapter 2's own hosting-capacity work already showed this feeder handles
+Part 4 Chapter 2's own hosting-capacity work already showed this feeder handles
 substantial {{< acr PV >}} before things get severe, and this ranked list
 is the same result seen from an operator's vantage point instead of a
 planner's.
@@ -416,7 +417,7 @@ planner's.
 ## Recommendation: which lever actually fixes this customer's violation?
 
 Knowing a customer is at risk is not the same as knowing what to do about
-it. Chapter 2 built three real levers, Volt-Watt, real-power curtailment
+it. Part 4 Chapter 2 built three real levers, Volt-Watt, real-power curtailment
 as local voltage rises, and Volt-VAr, reactive-power support as local
 voltage rises, both applied feeder-wide through an inverter control. This
 chapter adds a fourth, storage, and a fifth option worth naming honestly:
@@ -430,9 +431,9 @@ simulation, whether that recommendation actually fixes this specific
 customer's own violation, the revise step, not assumed to work just
 because it worked for someone else.
 
-{{< embed 05-ranking-recommendation-code.ipynb#84e380db >}}
+{{< embed 01-ranking-recommendation-code.ipynb#84e380db >}}
 
-{{< embed 05-ranking-recommendation-code.ipynb#227f7eb5 >}}
+{{< embed 01-ranking-recommendation-code.ipynb#227f7eb5 >}}
 
 Volt-Watt and Volt-VAr both fix this customer's own violation. A 3kW,
 10kWh battery on a fixed midday charging schedule barely moves the number
@@ -467,9 +468,9 @@ transformer's headroom, a real, defensible line, not an arbitrary one.
 
 :::
 
-{{< embed 05-ranking-recommendation-code.ipynb#34d3f4a0 >}}
+{{< embed 01-ranking-recommendation-code.ipynb#34d3f4a0 >}}
 
-{{< embed 05-ranking-recommendation-code.ipynb#cf6b6827 >}}
+{{< embed 01-ranking-recommendation-code.ipynb#cf6b6827 >}}
 
 Thirteen real at-risk cases, and genuine diversity this time, not a
 single lever winning by default. Eleven voltage cases favor Volt-VAr, the
@@ -482,13 +483,13 @@ outcome rather than assumed.
 A recommendation still has to respect which levers are even physically
 possible for a given violation. Retrieval is restricted to past cases of
 the same violation type as the query, the same real-world constraint a
-{{< acr DSO >}} already applies: Chapter 2's own PV-versus-EV finding
+{{< acr DSO >}} already applies: Part 4 Chapter 2's own PV-versus-EV finding
 already tells a DSO which constraint a given {{< acr DER >}} scenario is
 testing before this recommender ever runs, so filtering retrieval by
 violation type is not circular, it is exactly the
 information a real deployment already has in hand.
 
-{{< embed 05-ranking-recommendation-code.ipynb#7f7c34d3 >}}
+{{< embed 01-ranking-recommendation-code.ipynb#7f7c34d3 >}}
 
 ::: {.ark-mistake}
 <span class="ark-mistake-title"><i class="bi bi-bug-fill"></i> Common Mistake</span>
@@ -506,7 +507,7 @@ that far past their fair share; a bigger unit or a smarter schedule is a
 real, separate question this chapter leaves open rather than quietly
 resolves. Retrieval, restricted to cases of the same violation type,
 still routes each customer to the right lever family using nothing but
-Chapter 4's own ordinary load-shape embedding, never told directly
+Part 5 Chapter 2's own ordinary load-shape embedding, never told directly
 whether a given case is voltage- or thermal-driven, the real payoff of
 content-based retrieval here.
 
@@ -527,7 +528,7 @@ out of the labeled risk set entirely, never assigned a bus position,
 never simulated. That is a real, ready-made pool of genuinely unseen
 customers, not a synthetic one.
 
-{{< embed 05-ranking-recommendation-code.ipynb#165fa687 >}}
+{{< embed 01-ranking-recommendation-code.ipynb#165fa687 >}}
 
 Five new adopters are drawn from that pool: one deliberately chosen, the
 customer with the highest real demand during the {{< acr EV >}} charging
@@ -538,9 +539,9 @@ other real customers, all charging an {{< acr EV >}} at once, the same
 100%-adoption scenario already used to build the original labeled risk
 set, run for a customer never simulated before.
 
-{{< embed 05-ranking-recommendation-code.ipynb#bba5b652 >}}
+{{< embed 01-ranking-recommendation-code.ipynb#bba5b652 >}}
 
-{{< embed 05-ranking-recommendation-code.ipynb#b69f846f >}}
+{{< embed 01-ranking-recommendation-code.ipynb#b69f846f >}}
 
 ::: {.ark-concept}
 <span class="ark-concept-title"><i class="bi bi-info-circle-fill"></i> Key Concept</span>
@@ -557,7 +558,7 @@ from the same pool the method was built and tuned against.
 
 Where do these five land in the priority queue that already exists?
 
-{{< embed 05-ranking-recommendation-code.ipynb#5fdbfbb1 >}}
+{{< embed 01-ranking-recommendation-code.ipynb#5fdbfbb1 >}}
 
 All five land in the middle of a 299-customer priority list, real,
 moderate thermal risk, not the top of the queue and not the bottom
@@ -577,7 +578,7 @@ this particular batch, an honest result rather than a manufactured one.
 
 ## Does retrieval generalize to a genuinely different real population?
 
-Chapter 4 already asked a version of this question at the archetype
+Part 5 Chapter 2 already asked a version of this question at the archetype
 level: does shape-based clustering, run on 760 real {{< acr NREL >}}
 ResStock and ComStock buildings, recover a genuinely different
 population's own real ground-truth building types? It found a real,
@@ -607,7 +608,8 @@ $$
 \hat{y}(x) = \frac{1}{k}\sum_{i \in N_k(x)} y_i
 $$
 where $N_k(x)$ is the k closest labeled points to a query $x$ by Euclidean
-distance in the same peak-normalized shape embedding Chapter 4 built. The
+distance in the same peak-normalized shape embedding Part 5 Chapter 2
+built. The
 technique's whole assumption is that nearby points in that embedding
 space share similar real outcomes. Nothing about that assumption
 requires the neighbors to come from the same country, climate, or
@@ -616,15 +618,15 @@ not.
 
 </div>
 
-{{< embed 05-ranking-recommendation-code.ipynb#e85bb3ae >}}
+{{< embed 01-ranking-recommendation-code.ipynb#e85bb3ae >}}
 
-{{< embed 05-ranking-recommendation-code.ipynb#8805af2d >}}
+{{< embed 01-ranking-recommendation-code.ipynb#8805af2d >}}
 
 Retrieval, trained purely on 342 real AusNet customers, does not beat a
 plain population-mean baseline here, and its predictions carry a
 slightly negative rank correlation with these real US buildings' own
 actual evening peaks. That is not a bug in the k-nearest-neighbor code,
-it is the same honest limit Chapter 4 already found at the clustering
+it is the same honest limit Part 5 Chapter 2 already found at the clustering
 level, now visible one level sharper: a real, different population's own
 relationship between daily shape and peak demand, driven by a different
 climate and a different heating and cooling technology mix, is not
@@ -633,7 +635,7 @@ retrieval model to predict. Population mean is not a stronger method
 here, it is simply not misled by neighbors that were never truly
 comparable to begin with.
 
-{{< embed 05-ranking-recommendation-code.ipynb#b7507084 >}}
+{{< embed 01-ranking-recommendation-code.ipynb#b7507084 >}}
 
 The same split-conformal threshold {{< acr DSO >}}s already trust for
 flagging an unusual AusNet customer generalizes correctly here without
@@ -660,7 +662,7 @@ lever this chapter cannot verify.
 ## Feeder-level ranking on a real second network
 
 Everything above runs on AusNet's own real 31-customer feeder, the
-network every chapter since Chapter 1 has used. One feeder cannot answer
+network every chapter since Part 4 Chapter 1 has used. One feeder cannot answer
 a feeder-level question, though: which of many real feeders should a
 {{< acr DSO >}} look at first. That needs more than one feeder, and it
 needs to stay real, not fall back on a synthetic benchmark network for
@@ -674,16 +676,16 @@ backbone [@deakin2021hybridmvlv]. It is not a small
 demonstration network: 112,887 buses, 19,072 loads, 414 real feeders,
 already checked directly before this chapter was built, solves cleanly,
 no structural defect. Every load in it is still a static placeholder,
-though, the same state AusNet's own network was in before Chapter 1
+though, the same state AusNet's own network was in before Part 4 Chapter 1
 assigned it real smart-meter readings. This section borrows AusNet's own
 real customer shapes onto this network's real bus positions, the same
 reuse pattern already used throughout this book. No license file ships
 with this network; the README asks only for citation, disclosed here
 plainly rather than implied as a formal open license.
 
-{{< embed 05-ranking-recommendation-code.ipynb#5e04b32d >}}
+{{< embed 01-ranking-recommendation-code.ipynb#5e04b32d >}}
 
-{{< embed 05-ranking-recommendation-code.ipynb#d8c57fae >}}
+{{< embed 01-ranking-recommendation-code.ipynb#d8c57fae >}}
 
 Borrowing AusNet's own real shapes means scaling them, not replacing this
 network's own real customer sizing wholesale. Each of this network's
@@ -692,13 +694,13 @@ normalized shape is scaled to match that rating, so a load originally
 sized for 3kW gets a realistically-scaled real household's rhythm, not a
 flat substitute.
 
-{{< embed 05-ranking-recommendation-code.ipynb#99820009 >}}
+{{< embed 01-ranking-recommendation-code.ipynb#99820009 >}}
 
-{{< embed 05-ranking-recommendation-code.ipynb#45e6da09 >}}
+{{< embed 01-ranking-recommendation-code.ipynb#45e6da09 >}}
 
-{{< embed 05-ranking-recommendation-code.ipynb#83e258f0 >}}
+{{< embed 01-ranking-recommendation-code.ipynb#83e258f0 >}}
 
-{{< embed 05-ranking-recommendation-code.ipynb#6db1af66 >}}
+{{< embed 01-ranking-recommendation-code.ipynb#6db1af66 >}}
 
 Real AusNet behavior, replayed onto a genuinely different real network
 topology, produces a plausible, well-behaved risk range across 334 real
@@ -715,11 +717,11 @@ feeder's own real, cheap-to-know features, how many real customers it
 carries and what share of them have {{< acr PV >}}, predict its own
 worst-case voltage well enough to skip a full simulation?
 
-{{< embed 05-ranking-recommendation-code.ipynb#6c41170d >}}
+{{< embed 01-ranking-recommendation-code.ipynb#6c41170d >}}
 
-{{< embed 05-ranking-recommendation-code.ipynb#0f543043 >}}
+{{< embed 01-ranking-recommendation-code.ipynb#0f543043 >}}
 
-{{< embed 05-ranking-recommendation-code.ipynb#b0b73dc3 >}}
+{{< embed 01-ranking-recommendation-code.ipynb#b0b73dc3 >}}
 
 ::: {.ark-mistake}
 <span class="ark-mistake-title"><i class="bi bi-bug-fill"></i> Common Mistake</span>
@@ -744,9 +746,9 @@ The same bootstrap rank-interval used for customers above applies here
 with no new code, just a bigger candidate pool: 334 real feeders instead
 of 294 real customers.
 
-{{< embed 05-ranking-recommendation-code.ipynb#ccfc8a22 >}}
+{{< embed 01-ranking-recommendation-code.ipynb#ccfc8a22 >}}
 
-{{< embed 05-ranking-recommendation-code.ipynb#744af72c >}}
+{{< embed 01-ranking-recommendation-code.ipynb#744af72c >}}
 
 Rank 1's own interval is tighter here, width 2, than the single
 customer-level top rank's own width of 3, but the pattern past the top
@@ -765,7 +767,7 @@ case in this chapter's own case library: does network-wide Volt-VAr still
 work applied to thousands of real inverters at once, not just one
 customer's own {{< acr PV >}} system?
 
-{{< embed 05-ranking-recommendation-code.ipynb#ee509f52 >}}
+{{< embed 01-ranking-recommendation-code.ipynb#ee509f52 >}}
 
 ::: {.ark-mistake}
 <span class="ark-mistake-title"><i class="bi bi-bug-fill"></i> Common Mistake</span>
@@ -787,7 +789,7 @@ working everywhere.
 
 ## Why bother
 
-Chapter 1 named three ways {{< acr DER >}} strains a feeder: fluctuation,
+Part 4 Chapter 1 named three ways {{< acr DER >}} strains a feeder: fluctuation,
 load growth, and constraint violations. This chapter turns each into a
 checkable, per-decision tool, not a coarse warning.
 
@@ -834,7 +836,7 @@ a real violation exists to check it against, and honestly has nothing to
 say where one does not.
 The one place this chapter's own results stop generalizing, network-wide
 Volt-VAr control, is disclosed as plainly as everywhere it does, the same
-discipline this book has followed since Chapter 1. A second place joins
+discipline this book has followed since Part 4 Chapter 1. A second place joins
 it here: retrieval trained on 342 real Australian customers does not
 transfer to real US buildings from a genuinely different climate, and
 the calibrated confidence threshold built to catch AusNet's own unusual
@@ -845,19 +847,25 @@ silently extrapolating.
 
 Every technique above is checked against real, simulated outcomes on two real networks, AusNet's own 31-customer feeder and a second country's real 334-feeder topology. Naming what that real data still cannot settle is the same discipline this chapter has applied to every one of its own findings.
 
-**The embedding's own assumption is stated, not proven for every case.** Retrieval and ranking both work in the peak-normalized shape space Chapter 4 built, on the assumption that customers close in that space share close real outcomes. The variance-decomposition check earlier in this chapter already found where that assumption holds, thermal risk, and where it does not, voltage risk depends on bus position too, a real, physical reason, not a defect in the embedding itself. What that check cannot say is whether a *different* similarity metric, one that also encoded electrical distance or phase, would close the voltage-risk gap. That is a real, concrete extension, not attempted here because this chapter's own smart-meter-only scope has no electrical-distance feature to add.
+**The embedding's own assumption is stated, not proven for every case.** Retrieval and ranking both work in the peak-normalized shape space
+Part 5 Chapter 2 built, on the assumption that customers close in that space share close real outcomes. The variance-decomposition check earlier in this chapter already found where that assumption holds, thermal risk, and where it does not, voltage risk depends on bus position too, a real, physical reason, not a defect in the embedding itself. What that check cannot say is whether a *different* similarity metric, one that also encoded electrical distance or phase, would close the voltage-risk gap. That is a real, concrete extension, not attempted here because this chapter's own smart-meter-only scope has no electrical-distance feature to add.
 
-**Hyperparameters here are chosen for consistency with earlier chapters, not independently tuned against a held-out objective.** $k=5$ for retrieval matches the same neighbor count Chapter 4 used for its own archetype work, reused rather than re-tuned; $\alpha=0.1$ for every conformal threshold in this book fixes coverage at the same 90% used throughout, and Section 1 of Chapter 6 later makes that exact tradeoff, coverage against flagging rate, fully explicit rather than assuming one value is universally right. The bootstrap rank interval's 200 resamples was not swept against a smaller count to check where the interval stabilizes, an honest gap, not a claim of having checked it. None of these were grid-searched against a held-out objective, because this chapter's own real labeled pool, a few hundred customers, is not large enough to tune hyperparameters and validate the tuning independently at the same time; a real utility deployment with a genuinely large labeled pool could do both.
+**Hyperparameters here are chosen for consistency with earlier chapters, not independently tuned against a held-out objective.** $k=5$ for retrieval matches the same neighbor count Part 5 Chapter 2
+used for its own archetype work, reused rather than re-tuned; $\alpha=0.1$ for every conformal threshold in this book fixes coverage at the same 90% used throughout, and Section 1 of Part 7 Chapter 1 later makes that exact tradeoff,
+coverage against flagging rate, fully explicit rather than assuming one
+value is universally right. The bootstrap rank interval's 200 resamples was not swept against a smaller count to check where the interval stabilizes, an honest gap, not a claim of having checked it. None of these were grid-searched against a held-out objective, because this chapter's own real labeled pool, a few hundred customers, is not large enough to tune hyperparameters and validate the tuning independently at the same time; a real utility deployment with a genuinely large labeled pool could do both.
 
-**Scalability is answerable directly, the same way Chapter 3 answered it for phase identification.** Retrieval costs $O(n \log n)$ to build the nearest-neighbor index and $O(\log n)$ per query with a standard tree structure, cheap at any real utility scale. Ranking a candidate pool of size $n$ costs $O(n \log n)$ to sort, and the bootstrap confidence interval multiplies that by 200 resamples, still trivial into the tens of thousands of candidates. Recommendation's own case-based retrieval scales the same way as customer-level retrieval. Nothing in this chapter's own machinery is the bottleneck at scale; the real constraint is the same one Chapter 3 named, how many real, OpenDSS-simulated labels exist to retrieve from or rank in the first place, which grows with simulation budget, not with this chapter's own algorithms.
+**Scalability is answerable directly, the same way Part 4 Chapter 3
+answered it for phase identification.** Retrieval costs $O(n \log n)$ to build the nearest-neighbor index and $O(\log n)$ per query with a standard tree structure, cheap at any real utility scale. Ranking a candidate pool of size $n$ costs $O(n \log n)$ to sort, and the bootstrap confidence interval multiplies that by 200 resamples, still trivial into the tens of thousands of candidates. Recommendation's own case-based retrieval scales the same way as customer-level retrieval. Nothing in this chapter's own machinery is the bottleneck at scale; the real constraint is the same one Part 4 Chapter 3 named, how many real, OpenDSS-simulated labels exist to retrieve from or rank in the first place, which grows with simulation budget, not with this chapter's own algorithms.
 
-**Deployment is a real, statable sequence.** A {{< acr DSO >}} adopting this needs, in order: each customer's own smart-meter history (already collected for billing); Chapter 4's own archetype embedding recomputed on the utility's real population; a labeled risk set built the same way this chapter built one, real OpenDSS runs across enough seeds to cover the customer base at least once; and the same conformal calibration this chapter uses throughout to decide, honestly, which retrieved predictions to trust. Validating this before a real rollout means exactly what this chapter itself did: check retrieval and ranking against genuinely held-out real cases, the five new adopters and the 334 UK feeders here, before trusting either on a customer or a network the method was never checked against.
+**Deployment is a real, statable sequence.** A {{< acr DSO >}} adopting this needs, in order: each customer's own smart-meter history (already collected for billing); Part 5 Chapter 2's own archetype embedding recomputed on the utility's real population; a labeled risk set built the same way this chapter built one, real OpenDSS runs across enough seeds to cover the customer base at least once; and the same conformal calibration this chapter uses throughout to decide, honestly, which retrieved predictions to trust. Validating this before a real rollout means exactly what this chapter itself did: check retrieval and ranking against genuinely held-out real cases, the five new adopters and the 334 UK feeders here, before trusting either on a customer or a network the method was never checked against.
 
-**What to do when retrieval or ranking fails is already answered here for the case this chapter found, not for every possible one.** The honest answer for voltage risk is not "use retrieval anyway," it is "route back to Chapter 4's own coarser archetype mean, or fall back to a full network study," exactly what the calibrated confidence gate already does for a customer whose nearest neighbor sits too far away. A genuinely new failure mode, one this chapter's own real data has not produced, would need the same honest diagnosis this chapter modeled: check the variance decomposition first, do not assume a fix before finding the real cause.
+**What to do when retrieval or ranking fails is already answered here for the case this chapter found, not for every possible one.** The honest answer for voltage risk is not "use retrieval anyway," it is "route back to Part 5 Chapter 2's own coarser archetype mean,
+or fall back to a full network study," exactly what the calibrated confidence gate already does for a customer whose nearest neighbor sits too far away. A genuinely new failure mode, one this chapter's own real data has not produced, would need the same honest diagnosis this chapter modeled: check the variance decomposition first, do not assume a fix before finding the real cause.
 
-## Where this leaves Part 4
+## Where this leaves Part 6
 
-Chapter 4 sorted 342 real customers into five archetypes. This chapter
+Part 5 Chapter 2 sorted 342 real customers into five archetypes. This chapter
 sharpened that signal to the level a real decision actually needs, and
 then checked how far that signal actually travels. Retrieval predicts a
 new customer's thermal risk well and is honest about not predicting their
@@ -896,8 +904,8 @@ the real, simulated ground truth this book has already built, and pushed
 past that ground truth to genuinely new customers and a genuinely
 different network to see where it still holds.
 
-Part 4 still has two threads ahead of it: catching a voltage or
-power-quality violation as it happens in real time, and testing
+Part 7 picks up catching a voltage or power-quality violation as it
+happens in real time, and Part 8's own what-if scenario analysis tests
 mitigation strategies against forecasted {{< acr DER >}}-growth scenarios
 rather than today's snapshot. Both inherit what this chapter built. A
 violation caught in real time still needs the same triage this chapter's

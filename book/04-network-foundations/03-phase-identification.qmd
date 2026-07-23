@@ -161,8 +161,8 @@ anything more careful, and checking it honestly against the real answer
 already in hand, rather than assuming a plausible-sounding method works.
 
 Every result below is checked against that real answer with the
-{{< acr ARI >}}, the same chance-corrected agreement measure Part 4
-Chapter 4 uses later in this book to check a discovered clustering
+{{< acr ARI >}}, the same chance-corrected agreement measure Part 5
+Chapter 2 uses later in this book to check a discovered clustering
 against a genuine ground-truth label:
 $$
 \text{ARI} = \frac{\sum_{ij}\binom{n_{ij}}{2} - \left[\sum_i \binom{a_i}{2}\sum_j \binom{b_j}{2}\right]\big/\binom{n}{2}}{\frac{1}{2}\left[\sum_i \binom{a_i}{2} + \sum_j \binom{b_j}{2}\right] - \left[\sum_i \binom{a_i}{2}\sum_j \binom{b_j}{2}\right]\big/\binom{n}{2}}
@@ -459,7 +459,7 @@ gap.** This chapter stress-tested window length (down to 2 hours) and
 meter density (down to a handful of customers), and found mutual
 information and {{< acr PPS >}} more robust than correlation once the
 window gets short. It did not inject the kind of data-quality fault
-Chapter 6 later builds and tests explicitly, a stuck reading, a
+Part 7 Chapter 1 later builds and tests explicitly, a stuck reading, a
 communication dropout, a calibration drift, into this chapter's own
 phase-identification pipeline. Whether a stuck or drifting meter quietly
 corrupts a customer's own correlation with its true phase group, or gets
@@ -506,10 +506,12 @@ that naming tells a utility exactly which assignments to trust and which
 to send a field crew to check first, a statistically grounded answer none
 of this chapter's own references provide.
 
-Part 4 continues with the second of its four threads: customer and
-feeder clustering, grouping customers by how they actually behave rather
-than how they are labeled, reusing the `ark.plot.clustering` tools this
-chapter introduced.
+Part 4's own foundation is now complete: a real, solvable network, a real
+time-series simulation of how it behaves under {{< acr DER >}} growth, and
+now real, checked phase labels rather than assumed ones. Part 5 groups
+customers and feeders by how they actually behave rather than how they
+are labeled, reusing the `ark.plot.clustering` tools this chapter
+introduced.
 
 ## References
 

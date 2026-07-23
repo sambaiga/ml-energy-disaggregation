@@ -459,22 +459,20 @@ Every section in this chapter ran on one real feeder: honest customer
 diversity, a full week of demand, a real violation at 80%
 {{< acr PV >}} penetration, and two working fixes for it, then a second,
 genuinely different violation from {{< acr EV >}} charging that neither
-fix could touch. Part 4 now follows four threads, each building on the
-same `ark.dss.Circuit` this chapter just extended:
+fix could touch. Chapter 3 completes this part's own foundation next, recovering which
+phase a customer is actually connected to from nothing but voltage
+patterns, a real, common gap in utility records, reusing the same
+`ark.dss.Circuit` this chapter just extended.
 
-1. **Phase detection**, recovering which phase a customer is actually
-   connected to from nothing but voltage patterns, a real, common gap in
-   utility records.
-2. **Customer and feeder clustering**, grouping customers and feeders by
-   how they actually behave, not just how they are labeled.
-3. **Voltage-violation and power-quality anomaly detection**, catching a
-   compliance problem, or a meter reporting bad data, as it happens rather
-   than after a complaint call.
-4. **Grid health under forecasted {{< acr DER >}} growth**, where Part 3's
-   forecasts become the scenario driver for exactly the kind of
-   hosting-capacity study this chapter just ran, and mitigation strategies
-   like Volt-Watt, Volt-VAr, and storage get evaluated against it
-   directly.
+This network model is what every later part in this book builds on: Part
+5 groups customers and feeders by how they actually behave, not just how
+they are labeled; Part 6 turns that grouping into a real ranking and
+recommendation problem; Part 7 catches a compliance problem, or a meter
+reporting bad data, as it happens rather than after a complaint call; and
+Part 8's own forecasts eventually become the scenario driver for exactly
+the kind of hosting-capacity study this chapter just ran, testing
+mitigation strategies like Volt-Watt, Volt-VAr, and storage against
+forecasted {{< acr DER >}} growth rather than today's snapshot.
 
 ## References
 

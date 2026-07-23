@@ -1,11 +1,11 @@
 ---
-title: "Part 5 Chapter 5: What the Grid Actually Faces When These Forecasts Come True"
+title: "Part 8 Chapter 5: What the Grid Actually Faces When These Forecasts Come True"
 bibliography: ../../references.bib
 ---
 
 Part 4 Chapter 2 already ran a real hosting-capacity study on this exact 342-customer AusNet feeder: sweep {{< acr PV >}} penetration from 0 to 100%, watch the worst-case voltage climb, find the level where it first breaches 1.10 pu. That study is genuinely useful, and it has one real limitation, stated plainly rather than glossed over: every load in it comes from a day that already happened, replayed from the historical record. A {{< acr DSO >}} planning for next year's {{< acr PV >}} applications cannot replay next year's load; the only thing it can do is forecast it.
 
-This chapter closes that gap directly, and it is deliberately integration work, not a new open question. Every mechanism it needs already exists and is already validated: Part 4's own `Circuit` handle on the OpenDSS network, its own rule-based Volt-Watt and Volt-VAr mitigation levers, and Part 5 Chapter 4's own zero-shot Chronos-2 forecast, which needs no fitting step on this population at all. The real, checkable question is narrower and more useful than "does the network model work": does trusting a forecast, instead of a historical replay, change the answer to a real operational question a {{< acr DSO >}} actually asks?
+This chapter closes that gap directly, and it is deliberately integration work, not a new open question. Every mechanism it needs already exists and is already validated: Part 4's own `Circuit` handle on the OpenDSS network, its own rule-based Volt-Watt and Volt-VAr mitigation levers, and Part 8 Chapter 4's own zero-shot Chronos-2 forecast, which needs no fitting step on this population at all. The real, checkable question is narrower and more useful than "does the network model work": does trusting a forecast, instead of a historical replay, change the answer to a real operational question a {{< acr DSO >}} actually asks?
 
 Two chained questions structure what follows:
 
@@ -48,7 +48,7 @@ A second, more useful finding sits underneath that headline number. "P95" sounds
 
 {{< embed 05-what-if-scenario-analysis-code.ipynb#0f8c4a5e >}}
 
-No, and the real reason is physical, not statistical. At low {{< acr PV >}} penetration the transformer's own throughput is mostly driven by load itself, so the upper-demand scenario does raise utilization, exactly what "P95 means worse" assumes: 9.30% against 2.81-4.01% at 0-20% penetration. Past roughly 40% penetration, that reverses: a customer with higher local demand consumes more of their own {{< acr PV >}} export before it ever reaches the transformer, so higher demand *lowers* both transformer utilization and worst-case voltage, 17.62% against 22.69-22.82% at 80% penetration. This is the same real compensatory mechanism Part 5 Chapter 1 already found between {{< acr PV >}} and {{< acr EV >}} activity [@fias2025uncertainty], now showing up between forecast demand and {{< acr PV >}} export instead.
+No, and the real reason is physical, not statistical. At low {{< acr PV >}} penetration the transformer's own throughput is mostly driven by load itself, so the upper-demand scenario does raise utilization, exactly what "P95 means worse" assumes: 9.30% against 2.81-4.01% at 0-20% penetration. Past roughly 40% penetration, that reverses: a customer with higher local demand consumes more of their own {{< acr PV >}} export before it ever reaches the transformer, so higher demand *lowers* both transformer utilization and worst-case voltage, 17.62% against 22.69-22.82% at 80% penetration. This is the same real compensatory mechanism Part 8 Chapter 1 already found between {{< acr PV >}} and {{< acr EV >}} activity [@fias2025uncertainty], now showing up between forecast demand and {{< acr PV >}} export instead.
 
 <div class='ark-concept'>
 
@@ -85,7 +85,7 @@ Two real, checked answers, not one assumed going in. First: at least on this fee
 
 One real scope limit, disclosed rather than hidden. The author's own `resources/cvar_flexibility` work explores a further angle, an optimal customer-flexibility dispatch under a {{< acr CVaR >}} risk objective, using a forecast's own uncertainty as the risk input directly rather than only checking a fixed set of scenarios against it. That formulation is not yet vendored in this book's own copy of that work, and no equivalent public methodology could be confirmed against this dataset within this chapter's own scope. Rather than force an unverified optimization into print, this chapter stops at the scenario-comparison result above; a {{< acr CVaR >}}-based dispatch chapter remains a real, open extension, not a solved one.
 
-## Where this leaves Part 5
+## Where this leaves Part 8
 
 Chapter 4 checked whether a zero-shot forecast fails on the same customers a trained model does. This chapter checked something a point-accuracy number alone cannot answer: whether that same forecast, put to a real network-planning use, changes a real operational decision. It mostly does not move the headline breach point here, and it meaningfully complicates the naive "upper quantile is always worse" assumption a what-if analysis might otherwise lean on unchecked. Chapter 6 turns to a different real gap this chapter's own full-network solve papers over: most real feeders have no such visibility below the substation at all, and checks whether smart-meter readings can genuinely fill that in.
 

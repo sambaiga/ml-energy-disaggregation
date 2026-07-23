@@ -1,5 +1,5 @@
 ---
-title: "Chapter 6: Anomaly Detection Beyond the Meter"
+title: "Chapter 1: Anomaly Detection Beyond the Meter"
 bibliography: ../../references.bib
 ---
 
@@ -16,8 +16,8 @@ actually builds and tests the anomaly-detection paradigm every paper in
 this space still uses: one meter, one baseline, decide if today's reading
 deviates from it. That framing quietly assumes two things that are
 becoming false as {{< acr LV >}} networks evolve. It assumes a customer's
-own "normal" stays fixed once established, and Chapter 4 already found
-real archetype drift within a single year that says otherwise. And it
+own "normal" stays fixed once established, and Part 5 Chapter 2 already
+found real archetype drift within a single year that says otherwise. And it
 assumes an anomaly lives inside one customer's own meter, when real
 {{< acr DER >}} adoption clusters and synchronizes, so a real anomaly can
 live in how several individually normal customers coincide instead.
@@ -65,8 +65,8 @@ Kirsch, and Preisach made exactly that point in early 2026: anomaly
 detection systems typically output a score, not a calibrated decision,
 leaving practitioners to pick a threshold heuristically
 [@hennhofer2026conformal]. This chapter answers that the same way
-Chapters 3 through 5 already have, three times: split-conformal
-calibration, not a guessed percentile. A fourth application of the same
+Part 4 Chapter 3 and both of Part 5's chapters already have, three
+times: split-conformal calibration, not a guessed percentile. A fourth application of the same
 tool, not a new one.
 
 Oguntola, AbdulQoyum, Madehin, and Adetoro published a hybrid
@@ -81,15 +81,16 @@ method Lundberg and Lee published in 2017 [@lundberg2017shap].
 
 ## Getting the data
 
-This chapter reuses the same real AusNet smart-meter pool Chapters 1
-through 5 already vendored, no new fetch step needed:
+This chapter reuses the same real AusNet smart-meter pool Part 4
+Chapters 1 through 3 and Part 5 Chapters 1 and 2 already vendored, no
+new fetch step needed:
 
 ```bash
 uv run python scripts/fetch_part4_ausnet_data.py
 ```
 
-Section 2 also extends across Chapter 5's own second real network,
-fetched separately:
+Section 2 also extends across Part 6 Chapter 1's own second real
+network, fetched separately:
 
 ```bash
 uv run python scripts/fetch_part4_uk_mvlv_data.py
@@ -108,19 +109,19 @@ kind of question entirely.
 
 A bare instantaneous voltage, current, or power reading throws away the
 shape information that actually separates a real anomaly from ordinary
-diurnal variation, the same lesson Part 2 of this book already spent a
-full chapter on for a different signal: Chapter 2's own Feature
+diurnal variation, the same lesson Part 3 of this book already spent a
+full chapter on for a different signal: Part 3 Chapter 2's own Feature
 Engineering found that raw current alone underperforms a real feature
 representation, the WRG/AWRG pipeline turning a
 window into a distance-matrix image carrying far more identifying signal
 than any single reading. The same lesson applies here, on a different
 signal, at a different frequency: every detector in this section runs on
 each customer's own peak-normalized daily shape, the same representation
-Chapters 4 and 5 already cluster and retrieve on, plus rolling statistics
+Part 5 Chapters 1 and 2 already cluster and retrieve on, plus rolling statistics
 and FFT-magnitude features carrying the moment-to-moment
 structure a pure shape embedding would miss.
 
-{{< embed 06-anomaly-detection-code.ipynb#43157a97 >}}
+{{< embed 01-anomaly-detection-code.ipynb#43157a97 >}}
 
 ### A real self-baseline, not a population comparison
 
@@ -135,14 +136,14 @@ detectors, a block to calibrate the threshold, and a separate block to
 check the false-positive rate before testing with any injected
 anomalies.
 
-{{< embed 06-anomaly-detection-code.ipynb#5370b992 >}}
+{{< embed 01-anomaly-detection-code.ipynb#5370b992 >}}
 
 ### Injecting known anomalies, honestly
 
 No real, publicly labeled stuck-meter or communication-dropout data
-exists for this feeder. Matching the exact discipline Chapter 4 used for
-its {{< acr EV >}}-injection test and Chapter 5 used for its new-adopter
-validation: inject known, realistic anomalies onto real customer data, so
+exists for this feeder. Matching the exact discipline Part 5 Chapter 2 used for
+its {{< acr EV >}}-injection test and Part 6 Chapter 1 used for its
+new-adopter validation: inject known, realistic anomalies onto real customer data, so
 detection is checked against ground truth this chapter actually knows,
 not assumed. Three real failure modes, each grounded in the real
 literature on smart-meter data quality: a stuck reading held constant for
@@ -160,16 +161,16 @@ features. If it cannot beat that simpler baseline, it has not earned the
 extra machinery, the same discipline this book applied to {{< acr IDEC >}}
 and to the learned ranker.
 
-{{< embed 06-anomaly-detection-code.ipynb#cb2ca443 >}}
+{{< embed 01-anomaly-detection-code.ipynb#cb2ca443 >}}
 
 ::: {.ark-concept}
 <span class="ark-concept-title"><i class="bi bi-info-circle-fill"></i> Key Concept</span>
 
 The feature-engineered representation beats the raw reading, a real,
-modest, honest margin, not a dramatic one, matching Part 2's own lesson
+modest, honest margin, not a dramatic one, matching Part 3's own lesson
 for a different signal at a smaller scale here than there: 0.608 mean
 AUC-ROC against 0.589, both real numbers checked on the same 40
-customers, the same injected faults. Part 2's own high-frequency lesson
+customers, the same injected faults. Part 3's own high-frequency lesson
 does not transfer cleanly to this chapter's low-frequency signal either
 way: a WRG-style pairwise distance-matrix embedding,
 reimplemented for a 30-minute AMI profile and tested
@@ -197,7 +198,7 @@ from a Minimum Covariance Determinant fit, kernel density), three
 non-parametric (Isolation Forest, Local Outlier Factor, ECOD), without
 ever asking whether either family alone would do as well.
 
-{{< embed 06-anomaly-detection-code.ipynb#b33b65cc >}}
+{{< embed 01-anomaly-detection-code.ipynb#b33b65cc >}}
 
 No clean winner, though the threshold-independent number does give
 non-parametric a real, if modest, edge: mean AUC-ROC of 0.594 for the
@@ -247,7 +248,7 @@ one-line `numpy` reductions. Implemented directly in
 `ark.anomaly.detectors` instead, verified byte-identical to `combo`'s own
 algorithm given the same detector shuffle order.
 
-{{< embed 06-anomaly-detection-code.ipynb#fa6620e5 >}}
+{{< embed 01-anomaly-detection-code.ipynb#fa6620e5 >}}
 
 The threshold-independent number complicates the literature's own
 recommendation rather than simply confirming it: mean AUC-ROC of 0.618
@@ -279,7 +280,7 @@ detectors together. The more basic question neither answers: does the
 five-detector ensemble actually beat the single best individual detector,
 run alone, with no blending at all?
 
-{{< embed 06-anomaly-detection-code.ipynb#6bbeed8d >}}
+{{< embed 01-anomaly-detection-code.ipynb#6bbeed8d >}}
 
 No, not cleanly, and here the threshold-independent number actually
 sharpens the answer rather than softening it. ECOD run alone has the
@@ -324,14 +325,14 @@ a customer-day flagged only once its own score $z > \tau$. This is the
 same finite-sample, distribution-free guarantee behind every other
 split-conformal threshold in this book [@lei2018distributionfree], the
 guarantee itself unchanged, only the nonconformity score's own meaning:
-a distance to a centroid in Chapter 3 or Chapter 4, an anomaly score
-here. Every earlier chapter that used split-conformal calibration set a
+a distance to a centroid in Part 4 Chapter 3 or Part 5 Chapter 2, an
+anomaly score here. Every earlier chapter that used split-conformal calibration set a
 single confidence level and moved on; this section makes the tradeoff
 itself visible instead, calibrating the same real pipeline at three
 different miscoverage rates $\alpha$.
 
-{{< embed 06-anomaly-detection-code.ipynb#64ec8589 >}}
-{{< embed 06-anomaly-detection-code.ipynb#0e53d324 >}}
+{{< embed 01-anomaly-detection-code.ipynb#64ec8589 >}}
+{{< embed 01-anomaly-detection-code.ipynb#0e53d324 >}}
 
 There is no free lunch here, and the conformal calibration makes that
 honest instead of hiding it behind a single, unexplained threshold.
@@ -353,9 +354,9 @@ component, the one detector here with a fast, exact Shapley explainer
 [@lundberg2017shap]; the other four detectors do not have that property,
 an honest scope limit stated up front rather than glossed over.
 
-{{< embed 06-anomaly-detection-code.ipynb#eb75323f >}}
-{{< embed 06-anomaly-detection-code.ipynb#ec739a8d >}}
-{{< embed 06-anomaly-detection-code.ipynb#3a813378 >}}
+{{< embed 01-anomaly-detection-code.ipynb#eb75323f >}}
+{{< embed 01-anomaly-detection-code.ipynb#ec739a8d >}}
+{{< embed 01-anomaly-detection-code.ipynb#3a813378 >}}
 
 ::: {.ark-mistake}
 <span class="ark-mistake-title"><i class="bi bi-bug-fill"></i> Common Mistake</span>
@@ -400,15 +401,15 @@ it against the feeder head's own real power flow. No label needed, a
 physics-based conservation check, not a classifier trained on labeled
 fraud.
 
-{{< embed 06-anomaly-detection-code.ipynb#7b3992c7 >}}
+{{< embed 01-anomaly-detection-code.ipynb#7b3992c7 >}}
 
 That real, small, consistent gap between the feeder head and the sum of
 real customer meters is technical loss, line impedance doing exactly what
 it should. It is the baseline this section calibrates against, not a
 discrepancy in itself.
 
-{{< embed 06-anomaly-detection-code.ipynb#4556964c >}}
-{{< embed 06-anomaly-detection-code.ipynb#09e33512 >}}
+{{< embed 01-anomaly-detection-code.ipynb#4556964c >}}
+{{< embed 01-anomaly-detection-code.ipynb#09e33512 >}}
 
 A real, checkable shift, and an honestly modest one: one customer
 under-reporting half their real consumption moves the whole feeder's own
@@ -428,7 +429,7 @@ not a z-score against one day's own within-day step-to-step variability,
 a different and less appropriate baseline than the real across-day
 distribution this section now calibrates against.
 
-{{< embed 06-anomaly-detection-code.ipynb#32b7b78a >}}
+{{< embed 01-anomaly-detection-code.ipynb#32b7b78a >}}
 
 A real, systematic test tells a stronger story than the single
 illustrative example above: at the same 90% coverage this chapter uses
@@ -460,7 +461,7 @@ limitation cannot answer.
 
 ## Section 2: The anomaly no single meter can see
 
-Chapter 5's own alarm-triage scenario already found real voltage
+Part 6 Chapter 1's own alarm-triage scenario already found real voltage
 violations on this exact feeder once every customer exports {{< acr PV >}}
 at once: full penetration, one real high-irradiance day, and the network
 trips the same 0.94-1.10 per-unit limits used throughout this book. That
@@ -487,9 +488,9 @@ their own {{< acr PV >}} export.
 
 :::
 
-{{< embed 06-anomaly-detection-code.ipynb#afc86dee >}}
-{{< embed 06-anomaly-detection-code.ipynb#c101bedd >}}
-{{< embed 06-anomaly-detection-code.ipynb#75aa892b >}}
+{{< embed 01-anomaly-detection-code.ipynb#afc86dee >}}
+{{< embed 01-anomaly-detection-code.ipynb#c101bedd >}}
+{{< embed 01-anomaly-detection-code.ipynb#75aa892b >}}
 
 Five of thirty-one, sixteen percent, close to the ten percent
 false-positive rate the conformal threshold was already calibrated to
@@ -497,8 +498,8 @@ tolerate. By design, almost nothing here: each customer's own real
 history already contains real sunny days like this one, a regular,
 unremarkable day to a detector that only ever sees one meter at a time.
 
-{{< embed 06-anomaly-detection-code.ipynb#922fae7b >}}
-{{< embed 06-anomaly-detection-code.ipynb#07419172 >}}
+{{< embed 01-anomaly-detection-code.ipynb#922fae7b >}}
+{{< embed 01-anomaly-detection-code.ipynb#07419172 >}}
 
 Twenty-nine real violations, on the same real day Section 1's own
 detector flagged for barely a sixth of these same customers. Not a
@@ -514,13 +515,13 @@ does.
 ### Does this hold at scale, or is one feeder a coincidence?
 
 One feeder, one real event, is not enough to call this a structural
-pattern. Chapter 5's own second real network, 414 real feeders from a UK
+pattern. Part 6 Chapter 1's own second real network, 414 real feeders from a UK
 distribution network operator's low-carbon-networks trial, already
 carrying AusNet's own real customer shapes, checks whether this is
 general or a quirk of AusNet's own topology.
 
-{{< embed 06-anomaly-detection-code.ipynb#edebceda >}}
-{{< embed 06-anomaly-detection-code.ipynb#9158593a >}}
+{{< embed 01-anomaly-detection-code.ipynb#edebceda >}}
+{{< embed 01-anomaly-detection-code.ipynb#9158593a >}}
 
 Forty-one percent of the network's own real feeders, not one lucky case.
 Every {{< acr PV >}}-equipped customer on every one of those feeders
@@ -545,7 +546,7 @@ feeder is a single transformer serving thirty-one customers, a star, not
 a multi-hop graph. The UK network's 414 real feeders are each still a
 modest, shallow topology, the same reason this book keeps finding added
 model complexity does not earn its keep at this scale, {{< acr IDEC >}}
-in Chapter 3, the learned ranker in Chapter 5. A topology-aware check
+in Part 5 Chapter 2, the learned ranker in Part 6 Chapter 1. A topology-aware check
 here does not need a learned model at all: knowing which customers share
 a transformer, and summing their real simultaneous export, catches what
 Section 1's per-customer pipeline cannot see by construction.
@@ -565,8 +566,8 @@ rating. This runs in the time it takes to add 31 real numbers together,
 no OpenDSS solve required, exactly the kind of check a {{< acr DSO >}}
 could run in real time on every transformer in a real feeder.
 
-{{< embed 06-anomaly-detection-code.ipynb#9748259d >}}
-{{< embed 06-anomaly-detection-code.ipynb#f1d0454d >}}
+{{< embed 01-anomaly-detection-code.ipynb#9748259d >}}
+{{< embed 01-anomaly-detection-code.ipynb#f1d0454d >}}
 
 A real, honest borderline, not a clean catch. At the same 90% coverage
 this chapter has used throughout, the coincidence detector flags zero of
@@ -591,7 +592,7 @@ OpenDSS ground-truth check already asked at scale applies just as
 directly here: does this lightweight, no-power-flow coincidence check
 generalize across the UK network's own real feeders?
 
-{{< embed 06-anomaly-detection-code.ipynb#40117ea3 >}}
+{{< embed 01-anomaly-detection-code.ipynb#40117ea3 >}}
 
 The same real, construction-driven boundary shows up again, not a quirk
 of one feeder. At 90% coverage, only 8.1% of real UK feeders flag the
@@ -614,21 +615,21 @@ first two: not whether a detector works today, but whether it keeps
 working as the population it watches changes underneath it. Section 1's
 detector and Section 2's topology check both assume a fixed
 idea of what this feeder's population normally looks like. That
-assumption has an expiration date. Chapter 4 already found real
+assumption has an expiration date. Part 5 Chapter 2 already found real
 archetype drift within a single year, real customers really do change
 their own behavior as they adopt {{< acr PV >}}, an {{< acr EV >}}, or
 storage. A confidence threshold calibrated once and never revisited will
 quietly go stale as that adoption climbs. This section builds the KPI
-that catches it happening, reusing Chapter 5's own conformal
+that catches it happening, reusing Part 6 Chapter 1's own conformal
 retrieval-confidence machinery unchanged, no new algorithm.
 
-{{< embed 06-anomaly-detection-code.ipynb#7ecf477d >}}
+{{< embed 01-anomaly-detection-code.ipynb#7ecf477d >}}
 
 ### A false start, kept honest
 
 The first version of this test gave every adopter the exact same
-injected {{< acr EV >}} shape, matching Chapter 4's own new-adopter test
-cell for cell. Trust went up as adoption climbed, not down, the opposite
+injected {{< acr EV >}} shape, matching Part 5 Chapter 2's own new-adopter
+test cell for cell. Trust went up as adoption climbed, not down, the opposite
 of the point this section is trying to make. The reason, checked directly
 rather than shrugged off: when every adopter's shape shifts identically,
 they become each other's own real nearest neighbors, a growing cluster of
@@ -640,19 +641,19 @@ charging, Level 2 {{< acr EV >}} charging, rooftop {{< acr PV >}} export
 at a randomly sized real system, or both together, matching how adoption
 actually looks on a real feeder.
 
-{{< embed 06-anomaly-detection-code.ipynb#00fc8c87 >}}
-{{< embed 06-anomaly-detection-code.ipynb#3a2b06c4 >}}
+{{< embed 01-anomaly-detection-code.ipynb#00fc8c87 >}}
+{{< embed 01-anomaly-detection-code.ipynb#3a2b06c4 >}}
 
 A real, monotonic decline, not a cliff: ninety-seven percent trusted with
 no new adoption, falling to fifty-nine percent once eighty percent of the
 population has adopted some real, heterogeneous mix of {{< acr PV >}},
 Level 1 {{< acr EV >}}, Level 2 {{< acr EV >}}, or both. Nothing about
-Chapter 5's own retrieval model changed, and nothing about the ten
+Part 6 Chapter 1's own retrieval model changed, and nothing about the ten
 percent miscoverage rate it was calibrated to changed either. What
 changed is the population underneath it. This is the forward-looking KPI
 Section 1 and Section 2 both assumed away: a real, checkable number a
-{{< acr DSO >}} can track over time, and a real trigger for when Chapter
-5's own archetype and retrieval models need refitting.
+{{< acr DSO >}} can track over time, and a real trigger for when Part 5
+Chapter 2's own archetype and retrieval models need refitting.
 
 ## Section 4: Is magnitude even the right question?
 
@@ -667,7 +668,7 @@ can be a genuine, actionable signal, a fault, a metering irregularity, a
 changed household routine, even when every individual reading stays
 inside a normal magnitude range.
 
-{{< embed 06-anomaly-detection-code.ipynb#ada72033 >}}
+{{< embed 01-anomaly-detection-code.ipynb#ada72033 >}}
 
 ### Injecting real behavioral faults, honestly
 
@@ -690,7 +691,7 @@ uses, fit, calibrate, check, now run twice on the same 31 real
 1's own magnitude-based feature vector, once on the event-based
 behavioral features above, nothing else different.
 
-{{< embed 06-anomaly-detection-code.ipynb#f79d278e >}}
+{{< embed 01-anomaly-detection-code.ipynb#f79d278e >}}
 
 ::: {.ark-concept}
 <span class="ark-concept-title"><i class="bi bi-info-circle-fill"></i> Key Concept</span>
@@ -743,8 +744,8 @@ export pushes voltage up, concentrated demand pulls it down, so the
 direction and timing of a real violation event is itself a real
 diagnostic clue, not just a yes/no flag.
 
-{{< embed 06-anomaly-detection-code.ipynb#b6eb494a >}}
-{{< embed 06-anomaly-detection-code.ipynb#b3456a54 >}}
+{{< embed 01-anomaly-detection-code.ipynb#b6eb494a >}}
+{{< embed 01-anomaly-detection-code.ipynb#b3456a54 >}}
 
 ::: {.ark-mistake}
 <span class="ark-mistake-title"><i class="bi bi-bug-fill"></i> Common Mistake</span>
@@ -833,7 +834,7 @@ sits behind it, and the same real, checkable cost customers pay in
 either direction: a missed fault that could have been caught, or a
 crew sent to a customer's door for nothing.
 
-## Where this leaves Part 4
+## Where this leaves Part 7
 
 Four questions, two genuinely new answers. Section 1 found that the
 standard paradigm, tested honestly rather than assumed, works, at a
@@ -849,17 +850,18 @@ a behavioral question, occurrence, severity, timing instead of
 magnitude, that catches a real fault the standard paradigm misses more
 than half the time, while also confirming, on a real voltage violation,
 that some structural blind spots survive any feature choice. Section 3
-turns Chapter 4's own archetype drift into a forward-looking KPI, so a
+turns Part 5 Chapter 2's own archetype drift into a forward-looking KPI, so a
 {{< acr DSO >}} learns a model has gone stale from a real number, not a
 rising complaint count.
 
-Part 4 still has one thread genuinely ahead of it: testing mitigation
-strategies against forecasted {{< acr DER >}}-growth scenarios rather
-than today's snapshot, the natural next step once Part 3's own
-forecasting work exists to drive it. Everything built across Chapters 3
-through 6 is already ready for it: archetypes to group by, retrieval and
-ranking to prioritize by, and now a detector that knows honestly both
-what it can see and what it structurally cannot.
+One piece of this book's original grid-edge agenda is still ahead:
+testing mitigation strategies against forecasted {{< acr DER >}}-growth
+scenarios rather than today's snapshot, the natural next step once
+Part 8's own forecasting work exists to drive it. Everything built
+across Part 4 Chapter 3, both of Part 5's chapters, and Part 6 is
+already ready for it: archetypes to group by, retrieval and ranking to
+prioritize by, and now a detector that knows honestly both what it can
+see and what it structurally cannot.
 
 ## References
 
