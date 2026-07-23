@@ -3104,45 +3104,112 @@ def trust_gated_composite_score_diagram() -> plt.Figure:
     return fig
 
 
-def staged_search_pipeline_diagram() -> plt.Figure:
-    """Draw the cheap-search, expensive-audit funnel this chapter's Optuna study follows.
+def same_blind_spot_diagram() -> plt.Figure:
+    """Draw why silhouette, Davies-Bouldin, and Calinski-Harabasz all miss the same failure.
 
-    A single-column funnel, not two contrasting panels: 400 trials
-    evaluated on three cheap, live objectives (silhouette, balance-entropy,
-    a single-split stability proxy) narrow, by Pareto dominance alone, to
-    a much smaller genuinely non-dominated front. `composite_trustworthy_
-    score` then shortlists the front's own top candidates, and only that
-    shortlist receives the expensive, well-powered audit (many-split
-    prediction strength, hundred-bootstrap cluster stability). Every
-    narrowing step is real: nothing downstream re-opens a question an
-    earlier, cheaper step already answered.
+    Two scatters, deliberately unlabelled on the axes since neither is a
+    real feature space, just illustrative points. Left: a real two-way
+    split, evenly sized, well separated, silhouette 0.78. Right: the
+    MAC000037 pattern this chapter opens with, one dominant group plus two
+    isolated points, silhouette 0.99, the higher score of the two despite
+    representing almost no one. Both numbers come from formulas built from
+    the same two ingredients, within-cluster compactness and between-
+    cluster separation; population share, the one thing that would tell
+    these two scatters apart, appears in neither formula.
 
     Returns:
         The matplotlib Figure, ready to display in a notebook cell.
     """
-    stages = [
-        ("400 trials\n3 cheap live objectives", INFO, 3.4),
-        ("~20 on the Pareto front\n(dominance alone)", INFO, 2.6),
-        ("Top 5 by composite score\n(cheap trust factor)", WARNING, 1.9),
-        ("Full resampling audit\n(expensive trust factor)", WARNING, 1.9),
-        ("1 settled recipe", SUCCESS, 1.4),
-    ]
+    rng = np.random.default_rng(3)
 
-    fig, ax = plt.subplots(figsize=(5.6, 8.4))
-    box_h = 1.0
-    gap = 0.55
-    top = 8.6
-    for i, (label, color, width) in enumerate(stages):
-        box_top = top - i * (box_h + gap)
-        box_bottom = box_top - box_h
-        _flow_box(ax, (-width / 2, box_bottom), width, box_h, label, color=color)
-        if i < len(stages) - 1:
-            _flow_arrow(ax, (0, box_bottom), (0, box_bottom - gap), color=TEXT_MUTED)
+    fig, axes = plt.subplots(1, 2, figsize=(9.4, 4.4))
 
-    ax.set_xlim(-2.2, 2.2)
-    ax.set_ylim(top - len(stages) * (box_h + gap) - 0.2, top + 0.2)
-    ax.set_aspect("equal")
-    ax.axis("off")
+    ax = axes[0]
+    ax.set_title("A real split", fontsize=11.5, color=PRIMARY, fontweight="bold")
+    group_a = rng.normal(loc=(-1.4, 0.0), scale=0.35, size=(40, 2))
+    group_b = rng.normal(loc=(1.4, 0.0), scale=0.35, size=(40, 2))
+    ax.scatter(*group_a.T, s=26, color=SUCCESS, alpha=0.85, edgecolor="none")
+    ax.scatter(*group_b.T, s=26, color=INFO, alpha=0.85, edgecolor="none")
+    ax.text(0, -1.7, "silhouette 0.78 · 50% / 50%", fontsize=9.5, color=TEXT_MUTED, ha="center")
+
+    ax = axes[1]
+    ax.set_title("`MAC000037`'s split", fontsize=11.5, color=PRIMARY, fontweight="bold")
+    main_group = rng.normal(loc=(0.0, 0.0), scale=0.5, size=(78, 2))
+    ax.scatter(*main_group.T, s=22, color=INFO, alpha=0.75, edgecolor="none")
+    outliers = np.array([[2.7, 1.8], [2.9, -2.0]])
+    ax.scatter(*outliers.T, s=90, color=DANGER, edgecolor="white", linewidth=1.2, zorder=3)
+    ax.text(0, -3.0, "silhouette 0.99 · 98.7% / 1.3%", fontsize=9.5, color=TEXT_MUTED, ha="center")
+
+    for ax in axes:
+        ax.set_xlim(-3.0, 3.6)
+        ax.set_ylim(-3.6, 3.0)
+        ax.set_aspect("equal")
+        ax.axis("off")
+
+    fig.text(
+        0.5,
+        0.03,
+        "Same formulas, same blind spot: the higher score belongs to the fake split",
+        fontsize=10.5,
+        color=TEXT_MUTED,
+        ha="center",
+    )
+    fig.tight_layout(rect=(0, 0.11, 1, 1))
+    plt.close(fig)
+    return fig
+
+
+def resampling_validity_diagram() -> plt.Figure:
+    """Draw the two resampling mechanisms this chapter checks a clustering against.
+
+    Left: Tibshirani and Walther's prediction strength. The data is split
+    into two random halves; centroids fit on half A predict half B's own
+    membership; the check is whether pairs half B's own clustering keeps
+    together are still predicted together. Right: Hennig's cluster-wise
+    stability. The whole dataset is bootstrap-resampled with replacement,
+    re-clustered, and each original cluster is scored by its best Jaccard
+    match in the resampled clustering. Different mechanics, the same real
+    question underneath: does this structure survive data that came out
+    slightly differently, not just a repeated run on the same fixed rows.
+
+    Returns:
+        The matplotlib Figure, ready to display in a notebook cell.
+    """
+    fig, axes = plt.subplots(1, 2, figsize=(10.2, 5.2))
+
+    ax = axes[0]
+    ax.set_title("Prediction strength", fontsize=12, color=PRIMARY, fontweight="bold")
+    _flow_box(ax, (0.9, 4.3), 2.2, 0.6, "Full data", color=PRIMARY)
+    _flow_box(ax, (-0.35, 3.0), 2.0, 0.6, "Half A", color=INFO)
+    _flow_box(ax, (2.35, 3.0), 2.0, 0.6, "Half B", color=INFO)
+    _flow_arrow(ax, (1.6, 4.3), (0.65, 3.6), color=PRIMARY)
+    _flow_arrow(ax, (2.4, 4.3), (3.35, 3.6), color=PRIMARY)
+    _flow_box(ax, (-0.35, 1.7), 2.0, 0.6, "Cluster + centroids", color=SUCCESS)
+    _flow_arrow(ax, (0.65, 3.0), (0.65, 2.3), color=INFO)
+    _flow_arrow(ax, (1.65, 2.0), (3.35, 3.0), color=SUCCESS)
+    ax.text(2.5, 2.35, "predict", fontsize=8.3, color=SUCCESS, fontweight="bold", ha="center")
+    ax.scatter([3.35], [1.5], s=1100, marker="D", facecolor="white", edgecolor=PRIMARY, linewidth=1.5, zorder=3)
+    ax.text(
+        3.35, 1.5, "do B's\npairs\nagree?", fontsize=6.6, color=PRIMARY, fontweight="bold", ha="center", va="center"
+    )
+    _flow_arrow(ax, (3.35, 3.0), (3.35, 1.85), color=TEXT_MUTED)
+
+    ax = axes[1]
+    ax.set_title("Cluster-wise stability", fontsize=12, color=PRIMARY, fontweight="bold")
+    _flow_box(ax, (0.9, 4.3), 2.2, 0.6, "Full data", color=PRIMARY)
+    _flow_box(ax, (0.9, 3.0), 2.2, 0.6, "Bootstrap resample", color=WARNING)
+    _flow_arrow(ax, (2.0, 4.3), (2.0, 3.6), color=PRIMARY)
+    ax.text(2.7, 3.75, "with\nreplacement", fontsize=7.2, color=TEXT_MUTED, ha="left", va="center")
+    _flow_box(ax, (0.9, 1.7), 2.2, 0.6, "Re-cluster", color=SUCCESS)
+    _flow_arrow(ax, (2.0, 3.0), (2.0, 2.3), color=WARNING)
+    _flow_box(ax, (0.9, 0.4), 2.2, 0.6, "Jaccard vs.\noriginal cluster $C$", color=AI_ACCENT)
+    _flow_arrow(ax, (2.0, 1.7), (2.0, 1.0), color=SUCCESS)
+
+    for ax in axes:
+        ax.set_xlim(-0.9, 5.0)
+        ax.set_ylim(0.1, 5.0)
+        ax.set_aspect("equal")
+        ax.axis("off")
 
     fig.tight_layout()
     plt.close(fig)
