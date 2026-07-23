@@ -2640,6 +2640,96 @@ def _dsse_feeder_panel(ax: plt.Axes, title: str, customer_measured: list[bool]) 
     ax.axis("off")
 
 
+def clustering_paradigm_landscape_diagram() -> plt.Figure:
+    """Draw where this chapter's five clustering methods sit relative to each other.
+
+    Two axes, neither one a strict contrast: the horizontal axis is how a
+    load curve gets represented before anything is clustered, a hand-
+    engineered shape feature on the left, a learned embedding on the
+    right; the vertical axis is the structure-discovery mechanism applied
+    to that representation, a flat partition at the bottom, a
+    hierarchical or two-stage grouping in the middle, a spectral or
+    manifold view at the top. Shape-KMeans, this book's own established
+    baseline, sits at the hand-engineered, partition corner. CROCS moves
+    up the mechanism axis without changing representation, a two-stage
+    grouping over the same kind of engineered daily-behavior features.
+    Tucker decomposition and Chronos-2 embeddings both move right, a
+    learned multi-way factorization and a learned foundation-model
+    embedding respectively, each still clustered by a flat partition.
+    Diffusion maps moves up instead, a nonlinear manifold view applied on
+    top of whichever representation feeds it. No method in this chapter
+    occupies more than one point in this space alone; the real question
+    later sections ask is whether different points in this space agree
+    on what counts as real structure.
+
+    Returns:
+        The matplotlib Figure, ready to display in a notebook cell.
+    """
+    methods = [
+        ("Shape k-means", 0.12, 0.14, PRIMARY),
+        ("CROCS\n(RLS + WSMD)", 0.24, 0.56, INFO),
+        ("Tucker\ndecomposition", 0.62, 0.20, SUCCESS),
+        ("Chronos-2\nembeddings", 0.90, 0.26, AI_ACCENT),
+        ("Diffusion maps", 0.66, 0.90, WARNING),
+    ]
+
+    fig, ax = plt.subplots(figsize=(7.4, 6.0))
+
+    ax.add_patch(FancyArrowPatch((0, 0), (1.05, 0), arrowstyle="-|>", mutation_scale=14, color=TEXT_MUTED, lw=1.2))
+    ax.add_patch(FancyArrowPatch((0, 0), (0, 1.05), arrowstyle="-|>", mutation_scale=14, color=TEXT_MUTED, lw=1.2))
+
+    ax.text(0.0, -0.08, "Hand-engineered\nfeature", fontsize=9, color=TEXT_MUTED, ha="left", va="top")
+    ax.text(1.05, -0.08, "Learned\nembedding", fontsize=9, color=TEXT_MUTED, ha="right", va="top")
+    ax.text(
+        -0.06,
+        0.0,
+        "Partition",
+        fontsize=9,
+        color=TEXT_MUTED,
+        ha="right",
+        va="bottom",
+        rotation=90,
+    )
+    ax.text(
+        -0.06,
+        1.05,
+        "Spectral / manifold",
+        fontsize=9,
+        color=TEXT_MUTED,
+        ha="right",
+        va="top",
+        rotation=90,
+    )
+    ax.text(
+        -0.06, 0.55, "Hierarchical /\ntwo-stage", fontsize=8.5, color=TEXT_MUTED, ha="right", va="center", rotation=90
+    )
+
+    for label, x, y, color in methods:
+        ax.add_patch(Circle((x, y), 0.028, facecolor=color, edgecolor="white", linewidth=1.2, zorder=3))
+        label_dy = 0.11 if y < 0.8 else -0.11
+        va = "bottom" if y < 0.8 else "top"
+        ax.annotate(
+            label,
+            xy=(x, y),
+            xytext=(x, y + label_dy),
+            fontsize=9,
+            color=color,
+            fontweight="bold",
+            ha="center",
+            va=va,
+        )
+
+    ax.set_title("Where this chapter's five methods sit", fontsize=12.5, color=PRIMARY, fontweight="bold", pad=14)
+    ax.set_xlim(-0.32, 1.18)
+    ax.set_ylim(-0.22, 1.28)
+    ax.set_aspect("equal")
+    ax.axis("off")
+
+    fig.tight_layout()
+    plt.close(fig)
+    return fig
+
+
 def pseudo_measurement_observability_diagram() -> plt.Figure:
     """Draw why smart-meter readings can turn an unobservable feeder into an observable one.
 
@@ -2658,6 +2748,265 @@ def pseudo_measurement_observability_diagram() -> plt.Figure:
 
     _dsse_feeder_panel(axes[0], "Substation telemetry only", [False, False, False, False, False])
     _dsse_feeder_panel(axes[1], "Smart-meter pseudo-measurements", [True, True, True, True, True])
+
+    fig.tight_layout()
+    plt.close(fig)
+    return fig
+
+
+def clustering_objective_families_diagram() -> plt.Figure:
+    """Draw what each of the four clustering objective families actually sees.
+
+    Four small panels, the same kind of question, four different answers.
+    Partition: k-means finds three round blobs by distance to a centroid,
+    marked with a star, and cannot represent a shape a centroid does not
+    describe well. Hierarchical: the same points merge pairwise into a
+    tree, a dendrogram, read at whatever height gives the number of
+    groups wanted, not fixed in advance. Density-connectivity: DBSCAN
+    finds two interleaved crescents no centroid could separate, plus a
+    few real noise points it refuses to force into either one. Spectral:
+    a similarity graph gets cut into two groups by removing the fewest,
+    lightest edges, a global graph property no local distance rule sees.
+
+    Returns:
+        The matplotlib Figure, ready to display in a notebook cell.
+    """
+    rng = np.random.default_rng(3)
+    fig, axes = plt.subplots(2, 2, figsize=(8.4, 7.2))
+
+    # Partition: three round blobs, centroid marked
+    ax = axes[0, 0]
+    centers = [(-1.1, 0.7), (1.1, 0.6), (0.0, -1.1)]
+    colors = [PRIMARY, INFO, SUCCESS]
+    for (cx, cy), color in zip(centers, colors, strict=True):
+        pts = rng.normal(loc=(cx, cy), scale=0.24, size=(22, 2))
+        ax.scatter(pts[:, 0], pts[:, 1], s=18, color=color, alpha=0.75, edgecolor="none")
+        ax.scatter([cx], [cy], marker="*", s=180, color=color, edgecolor="white", linewidth=0.8, zorder=5)
+    ax.set_title("Partition (k-means)", fontsize=10.5, color=PRIMARY, fontweight="bold")
+
+    # Hierarchical: a small dendrogram
+    ax = axes[0, 1]
+    leaf_x = [0, 1, 2, 3, 4]
+    leaf_y = 0.0
+    for x in leaf_x:
+        ax.plot([x, x], [leaf_y, 0.35], color=TEXT_MUTED, linewidth=1.3)
+    merges = [((0, 1), 0.35, 0.6), ((3, 4), 0.35, 0.75), ((0.5, 2), 0.6, 1.15), ((1.25, 3.5), 1.15, 1.6)]
+    for (a, b), y0, y1 in merges:
+        ax.plot([a, a], [y0, y1], color=WARNING, linewidth=1.6)
+        ax.plot([b, b], [y0, y1], color=WARNING, linewidth=1.6)
+        ax.plot([a, b], [y1, y1], color=WARNING, linewidth=1.6)
+    ax.axhline(0.9, color=TEXT_MUTED, linestyle="--", linewidth=1.0)
+    ax.text(4.15, 1.0, "cut height", fontsize=7.5, color=TEXT_MUTED, va="bottom")
+    ax.set_xlim(-0.5, 5.3)
+    ax.set_ylim(-0.1, 1.85)
+    ax.set_title("Hierarchical (linkage)", fontsize=10.5, color=PRIMARY, fontweight="bold")
+
+    # Density-connectivity: two interleaved crescents plus noise
+    ax = axes[1, 0]
+    theta1 = rng.uniform(0.1, np.pi - 0.1, 60)
+    moon1 = np.column_stack([np.cos(theta1), np.sin(theta1)]) + rng.normal(scale=0.04, size=(60, 2))
+    theta2 = rng.uniform(0.1, np.pi - 0.1, 60)
+    moon2 = np.column_stack([1 - np.cos(theta2), 1 - np.sin(theta2) - 0.5]) + rng.normal(scale=0.04, size=(60, 2))
+    noise = rng.uniform([-0.8, -1.0], [1.8, 1.3], size=(6, 2))
+    ax.scatter(moon1[:, 0], moon1[:, 1], s=14, color=PRIMARY, alpha=0.75, edgecolor="none")
+    ax.scatter(moon2[:, 0], moon2[:, 1], s=14, color=INFO, alpha=0.75, edgecolor="none")
+    ax.scatter(noise[:, 0], noise[:, 1], s=30, color=DANGER, linewidth=1.3, marker="x")
+    ax.set_title("Density-connectivity (DBSCAN)", fontsize=10.5, color=PRIMARY, fontweight="bold")
+
+    # Spectral: a small graph cut into two groups
+    ax = axes[1, 1]
+    left_nodes = [(-1.1, 0.5), (-1.4, -0.2), (-0.6, -0.5)]
+    right_nodes = [(0.9, 0.4), (1.3, -0.2), (0.7, -0.6)]
+    within_edges = [(0, 1), (1, 2), (0, 2)]
+    for a, b in within_edges:
+        ax.plot(*zip(left_nodes[a], left_nodes[b], strict=True), color=PRIMARY, linewidth=1.3, zorder=1)
+        ax.plot(*zip(right_nodes[a], right_nodes[b], strict=True), color=INFO, linewidth=1.3, zorder=1)
+    cut_edges = [(left_nodes[2], right_nodes[2]), (left_nodes[0], right_nodes[0])]
+    for p1, p2 in cut_edges:
+        ax.plot(*zip(p1, p2, strict=True), color=DANGER, linewidth=1.2, linestyle=":", zorder=1)
+    for x, y in left_nodes:
+        ax.add_patch(Circle((x, y), 0.09, facecolor=PRIMARY, edgecolor="white", linewidth=0.8, zorder=3))
+    for x, y in right_nodes:
+        ax.add_patch(Circle((x, y), 0.09, facecolor=INFO, edgecolor="white", linewidth=0.8, zorder=3))
+    ax.text(0, 0.95, "cut here", fontsize=7.5, color=DANGER, ha="center")
+    ax.set_title("Graph / spectral (Ncut)", fontsize=10.5, color=PRIMARY, fontweight="bold")
+
+    for ax in axes.flat:
+        ax.set_aspect("equal")
+        ax.axis("off")
+
+    fig.tight_layout()
+    plt.close(fig)
+    return fig
+
+
+def choosing_k_diagram() -> plt.Figure:
+    """Draw why an elbow curve and a silhouette curve do not read the same way.
+
+    Left: distortion (within-cluster distance) against K, decreasing
+    monotonically by construction, with a real elbow near K=3 that is
+    faint enough to miss entirely. Right: the silhouette score for the
+    same clustering runs, peaking sharply and unambiguously at the same
+    K=3, the more reliable of the two signals for exactly the reason the
+    left panel is easy to misread.
+
+    Returns:
+        The matplotlib Figure, ready to display in a notebook cell.
+    """
+    k = np.arange(2, 9)
+    distortion = 8.0 / k + 0.35 * np.log(k)
+    silhouette = np.array([0.42, 0.71, 0.55, 0.46, 0.41, 0.37, 0.33])
+
+    fig, axes = plt.subplots(1, 2, figsize=(9.0, 3.8))
+
+    ax = axes[0]
+    ax.plot(k, distortion, marker="o", color=PRIMARY, linewidth=1.8, markersize=5)
+    ax.axvline(3, color=TEXT_MUTED, linestyle="--", linewidth=1.0)
+    ax.annotate(
+        "elbow here,\neasy to miss",
+        xy=(3, distortion[1]),
+        xytext=(5.0, distortion[1] + 0.9),
+        fontsize=8.5,
+        color=WARNING,
+        arrowprops={"arrowstyle": "-", "color": WARNING, "linewidth": 0.9},
+    )
+    ax.set_xlabel("K", fontsize=9)
+    ax.set_ylabel("distortion", fontsize=9)
+    ax.set_title("Distortion vs K", fontsize=11, color=PRIMARY, fontweight="bold")
+
+    ax = axes[1]
+    ax.plot(k, silhouette, marker="o", color=SUCCESS, linewidth=1.8, markersize=5)
+    ax.axvline(3, color=TEXT_MUTED, linestyle="--", linewidth=1.0)
+    ax.annotate(
+        "clear, unambiguous\npeak",
+        xy=(3, silhouette[1]),
+        xytext=(5.2, silhouette[1] - 0.08),
+        fontsize=8.5,
+        color=SUCCESS,
+        arrowprops={"arrowstyle": "-", "color": SUCCESS, "linewidth": 0.9},
+    )
+    ax.set_xlabel("K", fontsize=9)
+    ax.set_ylabel("silhouette score", fontsize=9)
+    ax.set_title("Silhouette vs K", fontsize=11, color=PRIMARY, fontweight="bold")
+
+    for ax in axes:
+        ax.spines["top"].set_visible(False)
+        ax.spines["right"].set_visible(False)
+
+    fig.tight_layout()
+    plt.close(fig)
+    return fig
+
+
+def dtw_vs_euclidean_diagram() -> plt.Figure:
+    """Draw why a shifted-but-similar routine needs more than Euclidean distance.
+
+    Left: two evening-routine-shaped curves, one a few time steps later
+    than the other, compared point by point. The straight vertical
+    matching lines connect a peak on one curve to a trough on the other,
+    exactly the false mismatch Euclidean distance reports. Right: the
+    same two curves compared by dynamic time warping, whose matching
+    lines bend to align each real peak and trough regardless of the
+    time shift, reporting the low distance the shared shape deserves.
+
+    Returns:
+        The matplotlib Figure, ready to display in a notebook cell.
+    """
+    t = np.linspace(0, 10, 60)
+    curve_a = np.exp(-((t - 5.0) ** 2) / 3.0) + 0.15 * np.exp(-((t - 1.5) ** 2) / 1.0)
+    curve_b = np.exp(-((t - 6.2) ** 2) / 3.0) + 0.15 * np.exp(-((t - 2.7) ** 2) / 1.0)
+
+    fig, axes = plt.subplots(1, 2, figsize=(9.2, 4.0))
+
+    ax = axes[0]
+    ax.plot(t, curve_a, color=PRIMARY, linewidth=1.8, label="Customer A")
+    ax.plot(t, curve_b, color=INFO, linewidth=1.8, label="Customer B")
+    for i in range(0, 60, 6):
+        ax.plot([t[i], t[i]], [curve_a[i], curve_b[i]], color=DANGER, linewidth=0.8, alpha=0.8, zorder=1)
+    ax.set_title("Euclidean: point by point", fontsize=11, color=PRIMARY, fontweight="bold")
+    ax.legend(loc="upper left", fontsize=8, frameon=False)
+
+    ax = axes[1]
+    ax.plot(t, curve_a, color=PRIMARY, linewidth=1.8)
+    ax.plot(t, curve_b, color=INFO, linewidth=1.8)
+    shift_steps = 7
+    for i in range(0, 60, 6):
+        j = min(max(i + shift_steps, 0), 59)
+        ax.plot([t[i], t[j]], [curve_a[i], curve_b[j]], color=SUCCESS, linewidth=0.8, alpha=0.8, zorder=1)
+    ax.set_title("DTW: warped alignment", fontsize=11, color=PRIMARY, fontweight="bold")
+
+    for ax in axes:
+        ax.set_xlabel("time of day", fontsize=9)
+        ax.set_yticks([])
+        ax.spines["top"].set_visible(False)
+        ax.spines["right"].set_visible(False)
+        ax.spines["left"].set_visible(False)
+
+    fig.tight_layout()
+    plt.close(fig)
+    return fig
+
+
+def must_link_cannot_link_diagram() -> plt.Figure:
+    """Draw how background knowledge overrides a distance function alone.
+
+    A single population where distance alone would draw the cluster
+    boundary right through two customers known, from real network
+    topology, to share one physical feeder. A must-link constraint
+    forces them together regardless of their own distance; a
+    cannot-link constraint, drawn between two nearby points known to sit
+    on different feeders, forbids the opposite mistake.
+
+    Returns:
+        The matplotlib Figure, ready to display in a notebook cell.
+    """
+    rng = np.random.default_rng(11)
+    group_a = rng.normal(loc=(-0.5, 0.25), scale=0.3, size=(14, 2))
+    group_b = rng.normal(loc=(0.5, -0.25), scale=0.3, size=(14, 2))
+
+    fig, ax = plt.subplots(figsize=(6.4, 5.0))
+    ax.scatter(group_a[:, 0], group_a[:, 1], s=34, color=PRIMARY, alpha=0.8, edgecolor="none", label="Feeder A")
+    ax.scatter(group_b[:, 0], group_b[:, 1], s=34, color=INFO, alpha=0.8, edgecolor="none", label="Feeder B")
+
+    # must-link: the two farthest-apart points within the same real feeder,
+    # exactly the pair a distance function alone would be tempted to split.
+    dist_within_a = np.linalg.norm(group_a[:, None, :] - group_a[None, :, :], axis=-1)
+    i_a, j_a = np.unravel_index(np.argmax(dist_within_a), dist_within_a.shape)
+    must_link = (group_a[i_a], group_a[j_a])
+    ax.plot(*zip(must_link[0], must_link[1], strict=True), color=SUCCESS, linewidth=2.2, zorder=4)
+    mid_must = (must_link[0] + must_link[1]) / 2
+    ax.annotate(
+        "must-link\n(same real feeder)",
+        xy=tuple(mid_must),
+        xytext=(mid_must[0] - 0.1, mid_must[1] + 0.75),
+        fontsize=8.5,
+        color=SUCCESS,
+        ha="center",
+        arrowprops={"arrowstyle": "-", "color": SUCCESS, "linewidth": 0.9},
+    )
+
+    # cannot-link: the closest cross-feeder pair, exactly what a distance
+    # function alone would be tempted to merge.
+    dist_cross = np.linalg.norm(group_a[:, None, :] - group_b[None, :, :], axis=-1)
+    i_b, j_b = np.unravel_index(np.argmin(dist_cross), dist_cross.shape)
+    cannot_link = (group_a[i_b], group_b[j_b])
+    ax.plot(*zip(cannot_link[0], cannot_link[1], strict=True), color=DANGER, linewidth=2.0, linestyle="--", zorder=4)
+    mid_cannot = (cannot_link[0] + cannot_link[1]) / 2
+    ax.annotate(
+        "cannot-link\n(different real feeders)",
+        xy=tuple(mid_cannot),
+        xytext=(mid_cannot[0] + 0.15, mid_cannot[1] - 0.7),
+        fontsize=8.5,
+        color=DANGER,
+        ha="center",
+        arrowprops={"arrowstyle": "-", "color": DANGER, "linewidth": 0.9},
+    )
+
+    ax.legend(loc="upper right", fontsize=8.5, frameon=False)
+    ax.set_xlim(-1.4, 1.4)
+    ax.set_ylim(-1.3, 1.3)
+    ax.set_aspect("equal")
+    ax.axis("off")
 
     fig.tight_layout()
     plt.close(fig)

@@ -53,6 +53,8 @@ acronyms:
       longname: Adjusted Rand Index
     - shortname: NMI
       longname: Normalized Mutual Information
+    - shortname: DTW
+      longname: Dynamic Time Warping
     - shortname: NREL
       longname: National Renewable Energy Laboratory
     - shortname: CBR
