@@ -8,7 +8,7 @@
 
 <meta name="description" content="A structured, project-based path through smart meter data: disaggregation, forecasting, anomaly detection, and grid-edge value, from raw signal to business insight.">
 
-<title>Chapter 5: Ranking and Recommendation under DER – Machine Learning for Smart Meter Data</title>
+<title>Chapter 1: Ranking and Recommendation under DER – Machine Learning for Smart Meter Data</title>
 <style>
 /* Default styles provided by pandoc.
 ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
@@ -89,8 +89,8 @@ div.csl-indent {
 <script src="../../site_libs/quarto-search/fuse.min.js"></script>
 <script src="../../site_libs/quarto-search/quarto-search.js"></script>
 <meta name="quarto:offset" content="../../">
-<link href="../../book/04-grid-edge/06-anomaly-detection.html" rel="next">
-<link href="../../book/04-grid-edge/04-customer-feeder-clustering.html" rel="prev">
+<link href="../../book/07-anomaly-detection/01-anomaly-detection.html" rel="next">
+<link href="../../book/05-clustering/03-customer-feeder-clustering.html" rel="prev">
 <link href="../../assets/favicon.svg" rel="icon" type="image/svg+xml">
 <script src="../../site_libs/quarto-html/quarto.js" type="module"></script>
 <script src="../../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
@@ -103,9 +103,9 @@ div.csl-indent {
 <link href="../../site_libs/quarto-html/quarto-syntax-highlighting-de63f62b328812d8e578a4d74e282472.css" rel="stylesheet" class="quarto-color-scheme-extra" id="quarto-text-highlighting-styles">
 <script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="../../site_libs/bootstrap/bootstrap-9661ac00a33b6c2a7ffb2cb4cb9f2155.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
-<link href="../../site_libs/bootstrap/bootstrap-dark-9b208294319f478b9205897e46a7db35.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="dark">
-<link href="../../site_libs/bootstrap/bootstrap-9661ac00a33b6c2a7ffb2cb4cb9f2155.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme-extra" id="quarto-bootstrap" data-mode="light">
+<link href="../../site_libs/bootstrap/bootstrap-84b0f63d2b22afb69d3c32ede53d2fe2.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
+<link href="../../site_libs/bootstrap/bootstrap-dark-86bd388472066654720eaf2de8d3b778.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="dark">
+<link href="../../site_libs/bootstrap/bootstrap-84b0f63d2b22afb69d3c32ede53d2fe2.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme-extra" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -167,11 +167,11 @@ window.Quarto = {
 };
 </script>
 
-<meta property="og:title" content="Chapter 5: Ranking and Recommendation under DER – Machine Learning for Smart Meter Data">
+<meta property="og:title" content="Chapter 1: Ranking and Recommendation under DER – Machine Learning for Smart Meter Data">
 <meta property="og:description" content="A structured, project-based path through smart meter data: disaggregation, forecasting, anomaly detection, and grid-edge value, from raw signal to business insight.">
 <meta property="og:image" content="https://sambaiga.github.io/ml-energy-disaggregation/assets/voltage-vs-thermal-position.svg">
 <meta property="og:site_name" content="Machine Learning for Smart Meter Data">
-<meta name="twitter:title" content="Chapter 5: Ranking and Recommendation under DER – Machine Learning for Smart Meter Data">
+<meta name="twitter:title" content="Chapter 1: Ranking and Recommendation under DER – Machine Learning for Smart Meter Data">
 <meta name="twitter:description" content="A structured, project-based path through smart meter data: disaggregation, forecasting, anomaly detection, and grid-edge value, from raw signal to business insight.">
 <meta name="twitter:image" content="https://sambaiga.github.io/ml-energy-disaggregation/assets/voltage-vs-thermal-position.svg">
 <meta name="twitter:card" content="summary_large_image">
@@ -385,7 +385,7 @@ window.Quarto = {
         <i class="bi bi-layout-text-sidebar-reverse"></i>
       </button>
         <a class="flex-grow-1 no-decor" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
-          <h1 class="quarto-secondary-nav-title"><span class="chapter-title">Chapter 5: Ranking and Recommendation under DER</span></h1>
+          <h1 class="quarto-secondary-nav-title"><span class="chapter-title">Chapter 1: Ranking and Recommendation under DER</span></h1>
         </a>     
     </div>
   </nav>
@@ -444,41 +444,26 @@ window.Quarto = {
   </li>
         <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
-            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true">
- <span class="menu-text">Part 4: Grid-Edge Value</span></a>
-          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="false">
+ <span class="menu-text">Part 4: LV Network and Topology Foundations</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="false" aria-label="Toggle section">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
       </div>
-      <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth1 show">  
+      <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth1 ">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../../book/04-grid-edge/01-opendss-lv-modeling.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">Chapter 1: Modeling the Low-Voltage Network</span></a>
+  <a href="../../book/04-network-foundations/01-opendss-lv-modeling.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">Chapter 1: Modeling the Low-Voltage Network</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../../book/04-grid-edge/02-timeseries-der-modeling.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">Chapter 2: Time-Series Simulation and DER Modeling</span></a>
+  <a href="../../book/04-network-foundations/02-timeseries-der-modeling.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">Chapter 2: Time-Series Simulation and DER Modeling</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../../book/04-grid-edge/03-phase-identification.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">Chapter 3: Phase Identification from Smart-Meter Data</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../../book/04-grid-edge/04-customer-feeder-clustering.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">Chapter 4: Customer and Feeder Clustering</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../../book/04-grid-edge/05-ranking-recommendation.html" class="sidebar-item-text sidebar-link active"><span class="chapter-title">Chapter 5: Ranking and Recommendation under DER</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../../book/04-grid-edge/06-anomaly-detection.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">Chapter 6: Anomaly Detection Beyond the Meter</span></a>
+  <a href="../../book/04-network-foundations/03-phase-identification.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">Chapter 3: Phase Identification from Smart-Meter Data</span></a>
   </div>
 </li>
       </ul>
@@ -486,7 +471,7 @@ window.Quarto = {
         <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
             <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="false">
- <span class="menu-text">Part 5: Forecasting</span></a>
+ <span class="menu-text">Part 5: Clustering</span></a>
           <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="false" aria-label="Toggle section">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
@@ -494,32 +479,90 @@ window.Quarto = {
       <ul id="quarto-sidebar-section-3" class="collapse list-unstyled sidebar-section depth1 ">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../../book/05-forecasting/01-forecastability.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">Chapter 1: Household Smart-Meter Forecastability</span></a>
+  <a href="../../book/05-clustering/01-clustering-foundations.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">Chapter 1: Clustering Foundations</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../../book/05-forecasting/02-scaling-archetypes.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">Chapter 2: Scaling to Hundreds of Meters</span></a>
+  <a href="../../book/05-clustering/02-clustering-methodology.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">Chapter 2: Clustering Methodology</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../../book/05-forecasting/03-probabilistic-forecasting.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">Chapter 3: What a Probabilistic Forecast Is Actually Worth</span></a>
+  <a href="../../book/05-clustering/03-customer-feeder-clustering.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">Chapter 3: Customer and Feeder Clustering</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" role="navigation" aria-expanded="true">
+ <span class="menu-text">Part 6: Ranking and Recommendation</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-4" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../book/06-ranking-recommendation/01-ranking-recommendation.html" class="sidebar-item-text sidebar-link active"><span class="chapter-title">Chapter 1: Ranking and Recommendation under DER</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-5" role="navigation" aria-expanded="false">
+ <span class="menu-text">Part 7: Anomaly Detection</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-5" role="navigation" aria-expanded="false" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-5" class="collapse list-unstyled sidebar-section depth1 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../book/07-anomaly-detection/01-anomaly-detection.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">Chapter 1: Anomaly Detection Beyond the Meter</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-6" role="navigation" aria-expanded="false">
+ <span class="menu-text">Part 8: Forecasting</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-6" role="navigation" aria-expanded="false" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-6" class="collapse list-unstyled sidebar-section depth1 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../book/08-forecasting/01-forecastability.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">Chapter 1: Household Smart-Meter Forecastability</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../../book/05-forecasting/04-foundation-models.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">Part 5 Chapter 4: Do Foundation Models Fail Like Everything Else Does?</span></a>
+  <a href="../../book/08-forecasting/02-scaling-archetypes.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">Chapter 2: Scaling to Hundreds of Meters</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../../book/05-forecasting/05-what-if-scenario-analysis.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">Part 5 Chapter 5: What the Grid Actually Faces When These Forecasts Come True</span></a>
+  <a href="../../book/08-forecasting/03-probabilistic-forecasting.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">Chapter 3: What a Probabilistic Forecast Is Actually Worth</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../../book/05-forecasting/06-lv-state-estimation.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">Part 5 Chapter 6: Can Smart-Meter Readings Fill In What the Grid Cannot See</span></a>
+  <a href="../../book/08-forecasting/04-foundation-models.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">Part 8 Chapter 4: Do Foundation Models Fail Like Everything Else Does?</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../book/08-forecasting/05-what-if-scenario-analysis.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">Part 8 Chapter 5: What the Grid Actually Faces When These Forecasts Come True</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../book/08-forecasting/06-lv-state-estimation.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">Part 8 Chapter 6: Can Smart-Meter Readings Fill In What the Grid Cannot See</span></a>
   </div>
 </li>
       </ul>
@@ -567,10 +610,10 @@ window.Quarto = {
   </ul></li>
   <li><a href="#why-bother" id="toc-why-bother" class="nav-link" data-scroll-target="#why-bother">Why bother</a></li>
   <li><a href="#what-this-chapters-own-real-data-cannot-answer" id="toc-what-this-chapters-own-real-data-cannot-answer" class="nav-link" data-scroll-target="#what-this-chapters-own-real-data-cannot-answer">What this chapter’s own real data cannot answer</a></li>
-  <li><a href="#where-this-leaves-part-4" id="toc-where-this-leaves-part-4" class="nav-link" data-scroll-target="#where-this-leaves-part-4">Where this leaves Part 4</a></li>
+  <li><a href="#where-this-leaves-part-6" id="toc-where-this-leaves-part-6" class="nav-link" data-scroll-target="#where-this-leaves-part-6">Where this leaves Part 6</a></li>
   <li><a href="#references" id="toc-references" class="nav-link" data-scroll-target="#references">References</a></li>
   </ul>
-<div class="toc-actions"><ul><li><a href="https://github.com/sambaiga/ml-energy-disaggregation/edit/main/book/04-grid-edge/05-ranking-recommendation.qmd" class="toc-action"><i class="bi bi-github"></i>Edit this page</a></li><li><a href="https://github.com/sambaiga/ml-energy-disaggregation/issues/new" class="toc-action"><i class="bi empty"></i>Report an issue</a></li><li><a href="https://github.com/sambaiga/ml-energy-disaggregation/blob/main/book/04-grid-edge/05-ranking-recommendation.qmd" class="toc-action"><i class="bi empty"></i>View source</a></li></ul></div></nav>
+<div class="toc-actions"><ul><li><a href="https://github.com/sambaiga/ml-energy-disaggregation/edit/main/book/06-ranking-recommendation/01-ranking-recommendation.qmd" class="toc-action"><i class="bi bi-github"></i>Edit this page</a></li><li><a href="https://github.com/sambaiga/ml-energy-disaggregation/issues/new" class="toc-action"><i class="bi empty"></i>Report an issue</a></li><li><a href="https://github.com/sambaiga/ml-energy-disaggregation/blob/main/book/06-ranking-recommendation/01-ranking-recommendation.qmd" class="toc-action"><i class="bi empty"></i>View source</a></li></ul></div></nav>
     </div>
 <!-- main -->
 <main class="content" id="quarto-document-content">
@@ -578,7 +621,7 @@ window.Quarto = {
 
 <header id="title-block-header" class="quarto-title-block default">
 <div class="quarto-title">
-<h1 class="title d-none d-lg-block"><span class="chapter-title">Chapter 5: Ranking and Recommendation under DER</span></h1>
+<h1 class="title d-none d-lg-block"><span class="chapter-title">Chapter 1: Ranking and Recommendation under DER</span></h1>
 </div>
 
 
@@ -595,7 +638,7 @@ window.Quarto = {
 </header>
 
 
-<p>A rooftop-solar application lands in a <a href="#acronyms_DSO">Distribution System Operator (DSO)</a>’s connection queue. The archetype lookup Chapter 4 built says this customer belongs to Archetype 3, the same bucket 63 other applicants this quarter also landed in. Nine of those 64 turned out, on inspection, to be genuine voltage risks. Fifty-five did not. The archetype label is real, and it is also useless for the one decision actually sitting in front of someone right now: not “how does this bucket of 64 people behave on average,” but “should this one customer’s application go through today, and if not, what fixes it.” Chapter 4 sorted the crowd. This chapter has to answer for the individual standing at the counter.</p>
+<p>A rooftop-solar application lands in a <a href="#acronyms_DSO">Distribution System Operator (DSO)</a>’s connection queue. The archetype lookup Part 5 Chapter 2 built says this customer belongs to Archetype 3, the same bucket 63 other applicants this quarter also landed in. Nine of those 64 turned out, on inspection, to be genuine voltage risks. Fifty-five did not. The archetype label is real, and it is also useless for the one decision actually sitting in front of someone right now: not “how does this bucket of 64 people behave on average,” but “should this one customer’s application go through today, and if not, what fixes it.” Part 5 Chapter 2 sorted the crowd. This chapter has to answer for the individual standing at the counter.</p>
 <p>Three chained questions carry that individual decision the rest of the way, none of them answered by an archetype label alone:</p>
 <ul>
 <li>Who is this customer most like, among people already checked, and what does that tell us about their <a href="#acronyms_DER">Distributed Energy Resources (DER)</a> risk before a single circuit is even solved?</li>
@@ -610,26 +653,26 @@ window.Quarto = {
 <p>Recommender systems split into three families. Collaborative filtering learns from a sparse matrix of many users rating many items. Content-based filtering matches an item to a user’s own features directly. Hybrid approaches mix both. Adomavicius and Tuzhilin’s 2005 survey is still the standard reference for that split <span class="citation" data-cites="adomavicius2005recommender">[2]</span>. Collaborative filtering needs the sparse interaction matrix to have something to factor, many users, many items, real overlap between them. This chapter has 342 real customers and four or five mitigation levers. There is no sparse matrix here, no meaningful pattern of “which customers picked which lever” to learn from. Content-based retrieval, matching a customer to similar customers by their own real features, is the technique that actually fits this problem’s shape, and it is what this chapter uses throughout.</p>
 <p>Learning to rank comes from information retrieval, not recommendation. Liu’s 2009 survey lays out the standard taxonomy, pointwise, pairwise, and listwise approaches to sorting a list by relevance <span class="citation" data-cites="liu2009learningtorank">[3]</span>. This chapter’s own ranking sections borrow that framing directly: rank real customers, real bus positions, and real feeders by risk, the same kind of problem a search engine solves for query results.</p>
 <p>The cold-start problem is borrowed from e-commerce. A new customer, like a new shopper with no purchase history, has no simulated risk of their own to check against. Bernardi and colleagues wrote up exactly this problem for online retail in 2015 <span class="citation" data-cites="bernardi2015coldstart">[4]</span>. The fix there and here is the same: retrieve similar existing cases and use their outcomes as a stand-in, until real data of your own accumulates.</p>
-<p>None of these four ideas are new. What is new, or at least not yet published anywhere this search could find, is applying all three, retrieval, ranking, and case-based recommendation, against real, OpenDSS-simulated per-customer voltage and thermal outcomes, the way this book already builds them. A handful of energy-domain papers have started down this road. Qammar and colleagues cluster 503 real Finnish low-voltage feeders and fit a regression per cluster, finding that feeders in the same cluster share similar hosting capacity, the closest existing precedent to this chapter’s own retrieval section, at feeder rather than customer granularity <span class="citation" data-cites="qammar2024hostingcapacity">[5]</span>. Andagoya-Alba and colleagues estimate hosting capacity straight from smart-meter data at a single node, confirming that skipping the full network model is a real, active idea, though not yet extended to retrieval across many nodes <span class="citation" data-cites="andagoya2024modelfree">[6]</span>. Gangwar and Shaik combine k-medoids clustering with a weighted <a href="#acronyms_kNN">k-Nearest Neighbors (kNN)</a> scheme for distribution-network protection under renewable-energy integration, real, current precedent for the retrieval technique family in exactly this domain, a different application from risk or lever recommendation <span class="citation" data-cites="gangwar2023knnprotection">[7]</span>. Duran and Monti build a hierarchical- clustering recommendation system for solar rooftop adoption likelihood in Germany, explicitly motivated by low-voltage overload risk, the closest existing precedent to this chapter’s own ranking section <span class="citation" data-cites="duran2025pvadoption">[8]</span>. Luo and colleagues built a recommender system on top of non-intrusive load monitoring back in 2017, a real bridge between this book’s own Part 2 and Part 4 <span class="citation" data-cites="luo2017nilmrecommender">[9]</span>.</p>
+<p>None of these four ideas are new. What is new, or at least not yet published anywhere this search could find, is applying all three, retrieval, ranking, and case-based recommendation, against real, OpenDSS-simulated per-customer voltage and thermal outcomes, the way this book already builds them. A handful of energy-domain papers have started down this road. Qammar and colleagues cluster 503 real Finnish low-voltage feeders and fit a regression per cluster, finding that feeders in the same cluster share similar hosting capacity, the closest existing precedent to this chapter’s own retrieval section, at feeder rather than customer granularity <span class="citation" data-cites="qammar2024hostingcapacity">[5]</span>. Andagoya-Alba and colleagues estimate hosting capacity straight from smart-meter data at a single node, confirming that skipping the full network model is a real, active idea, though not yet extended to retrieval across many nodes <span class="citation" data-cites="andagoya2024modelfree">[6]</span>. Gangwar and Shaik combine k-medoids clustering with a weighted <a href="#acronyms_kNN">k-Nearest Neighbors (kNN)</a> scheme for distribution-network protection under renewable-energy integration, real, current precedent for the retrieval technique family in exactly this domain, a different application from risk or lever recommendation <span class="citation" data-cites="gangwar2023knnprotection">[7]</span>. Duran and Monti build a hierarchical- clustering recommendation system for solar rooftop adoption likelihood in Germany, explicitly motivated by low-voltage overload risk, the closest existing precedent to this chapter’s own ranking section <span class="citation" data-cites="duran2025pvadoption">[8]</span>. Luo and colleagues built a recommender system on top of non-intrusive load monitoring back in 2017, a real bridge between this book’s own Part 3 and Part 6 <span class="citation" data-cites="luo2017nilmrecommender">[9]</span>.</p>
 <p>Two more recent, general-domain ideas earn a place here too. Parvez, Hu, and Chen rank similar historical alarm-flood sequences in real time for industrial process operators, a completely different domain, process control rather than power, that turns out to describe exactly what this chapter’s own real-time violation-ranking section needs <span class="citation" data-cites="parvez2022alarmfloods">[10]</span>. Liao and colleagues published a genuinely new conformal-ranking method in January 2026, building confidence sets around a ranked list’s actual rank positions rather than a bare point estimate, and this chapter’s own customer-ranking section uses a simpler, bootstrap-based version of that same idea <span class="citation" data-cites="liao2026conformalranking">[11]</span>.</p>
-<p>One family was checked and deliberately left out. Graph neural networks, LightGCN and its 2023 and 2024 successors, learn recommendations from a graph structure, and a real <a href="#acronyms_LV">Low Voltage (LV)</a> feeder genuinely is a graph <span class="citation" data-cites="he2020lightgcn">[12]</span>. That is a real, checkable extension for later, not a stretch, but it would add real complexity this chapter’s own small, structured data does not need to earn back right now, the same lesson Chapter 4 already drew from <a href="#acronyms_IDEC">Improved Deep Embedded Clustering (IDEC)</a>.</p>
+<p>One family was checked and deliberately left out. Graph neural networks, LightGCN and its 2023 and 2024 successors, learn recommendations from a graph structure, and a real <a href="#acronyms_LV">Low Voltage (LV)</a> feeder genuinely is a graph <span class="citation" data-cites="he2020lightgcn">[12]</span>. That is a real, checkable extension for later, not a stretch, but it would add real complexity this chapter’s own small, structured data does not need to earn back right now, the same lesson Part 5 Chapter 2 already drew from <a href="#acronyms_IDEC">Improved Deep Embedded Clustering (IDEC)</a>.</p>
 </section>
 <section id="getting-the-data" class="level2">
 <h2 class="anchored" data-anchor-id="getting-the-data">Getting the data</h2>
-<p>This chapter reuses the same real AusNet smart-meter pool Chapters 1 through 4 already vendored, no new fetch step needed:</p>
+<p>This chapter reuses the same real AusNet smart-meter pool Part 4 Chapters 1 through 3 and Part 5 Chapter 1 already vendored, no new fetch step needed:</p>
 <div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb1"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="ex">uv</span> run python scripts/fetch_part4_ausnet_data.py</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <p>The feeder-level section later in this chapter also uses a real UK network, fetched separately:</p>
 <div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb2"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="ex">uv</span> run python scripts/fetch_part4_uk_mvlv_data.py</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-<p>The generalization check later in this chapter reuses Chapter 4’s own <a href="#acronyms_NREL">National Renewable Energy Laboratory (NREL)</a> sample, a stratified 760 real US buildings, fetched the same way:</p>
+<p>The generalization check later in this chapter reuses Part 5 Chapter 2’s own <a href="#acronyms_NREL">National Renewable Energy Laboratory (NREL)</a> sample, a stratified 760 real US buildings, fetched the same way:</p>
 <div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb3"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="ex">uv</span> run python scripts/fetch_part5_nrel_buildstock_data.py</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-<p>Chapter 4’s own embedding, a peak-normalized, season-mean load shape per customer, and its k-means archetype labels, are recomputed here exactly as that chapter built them, not loaded from a saved file, so this chapter stays reproducible on its own.</p>
+<p>Part 5 Chapter 2’s own embedding, a peak-normalized, season-mean load shape per customer, and its k-means archetype labels, are recomputed here exactly as that chapter built them, not loaded from a saved file, so this chapter stays reproducible on its own.</p>
 </section>
 <section id="building-a-real-labeled-risk-set" class="level2">
 <h2 class="anchored" data-anchor-id="building-a-real-labeled-risk-set">Building a real labeled risk set</h2>
-<p>Chapter 4’s own <code>per_customer_pv_voltage_risk()</code> and <code>per_customer_ev_thermal_contribution()</code> are real, working simulators, and each call only labels 31 customers, one per physical bus on AusNet’s real feeder, sampled by a seed from the 342-customer pool. A single seed is not enough data to check a retrieval or ranking method against. Calling both across many seeds builds a real labeled set of several hundred (customer, risk) pairs instead, some customers landing on different bus positions across different seeds.</p>
+<p>Part 5 Chapter 2’s own <code>per_customer_pv_voltage_risk()</code> and <code>per_customer_ev_thermal_contribution()</code> are real, working simulators, and each call only labels 31 customers, one per physical bus on AusNet’s real feeder, sampled by a seed from the 342-customer pool. A single seed is not enough data to check a retrieval or ranking method against. Calling both across many seeds builds a real labeled set of several hundred (customer, risk) pairs instead, some customers landing on different bus positions across different seeds.</p>
 <p>That resampling opens a real question worth checking before trusting anything built on top of it. A customer’s simulated risk could depend on their own load shape alone, or it could depend on which bus they happen to be connected to as well. If bus position matters just as much as shape, retrieval from shape alone has no real chance of predicting risk well, and that needs to be known honestly before building a retrieval section on top of it, not discovered afterward.</p>
 <p>294 unique customers out of 342, labeled across 620 (customer, bus position, seed) draws, 198 of them seen at two or more different bus positions. That repetition is exactly what the shape-versus-position question needs: the same customer, different electrical locations, different seeds.</p>
-<div class="quarto-embed-nb-cell" data-notebook="/home/runner/work/ml-energy-disaggregation/ml-energy-disaggregation/book/04-grid-edge/05-ranking-recommendation-code.ipynb" data-notebook-title="Ranking and Recommendation for LV Management under DER" data-notebook-cellid="cb75bfe2">
+<div class="quarto-embed-nb-cell" data-notebook="/home/runner/work/ml-energy-disaggregation/ml-energy-disaggregation/book/06-ranking-recommendation/01-ranking-recommendation-code.ipynb" data-notebook-title="Ranking and Recommendation for LV Management under DER" data-notebook-cellid="cb75bfe2">
 <div id="cb75bfe2" class="cell">
 <div class="cell-output cell-output-display">
 <div id="xzjejihtsp" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:100%;height:auto;">
@@ -721,7 +764,7 @@ window.Quarto = {
 </div>
 </div>
 </div>
-<div class="quarto-embed-nb-cell" data-notebook="/home/runner/work/ml-energy-disaggregation/ml-energy-disaggregation/book/04-grid-edge/05-ranking-recommendation-code.ipynb" data-notebook-title="Ranking and Recommendation for LV Management under DER" data-notebook-cellid="5ce1a81b">
+<div class="quarto-embed-nb-cell" data-notebook="/home/runner/work/ml-energy-disaggregation/ml-energy-disaggregation/book/06-ranking-recommendation/01-ranking-recommendation-code.ipynb" data-notebook-title="Ranking and Recommendation for LV Management under DER" data-notebook-cellid="5ce1a81b">
 <div id="5ce1a81b" class="cell">
 <div class="cell-output cell-output-display">
 
@@ -1004,7 +1047,7 @@ window.Quarto = {
 <img src="../../assets/voltage-vs-thermal-position.svg" class="img-fluid figure-img">
 </div>
 <figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-voltage-vs-thermal-position-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Figure&nbsp;12.1: Two customers share the exact same real smart-meter shape, only their distance from the transformer differs. Voltage rise depends on line impedance between customer and source, so the far customer sees a real, different outcome. Thermal loading at the transformer only sums instantaneous power, so position adds nothing once shape is known.
+Figure&nbsp;14.1: Two customers share the exact same real smart-meter shape, only their distance from the transformer differs. Voltage rise depends on line impedance between customer and source, so the far customer sees a real, different outcome. Thermal loading at the transformer only sums instantaneous power, so position adds nothing once shape is known.
 </figcaption>
 </figure>
 </div>
@@ -1012,15 +1055,15 @@ Figure&nbsp;12.1: Two customers share the exact same real smart-meter shape, onl
 <section id="retrieval-predicting-risk-for-a-customer-with-no-simulation-of-their-own" class="level2">
 <h2 class="anchored" data-anchor-id="retrieval-predicting-risk-for-a-customer-with-no-simulation-of-their-own">Retrieval: predicting risk for a customer with no simulation of their own</h2>
 <p>A new customer applying for a solar or <a href="#acronyms_EV">Electric Vehicle (EV)</a> connection has a smart-meter history and nothing else, no OpenDSS run of their own. Retrieval answers the cold-start question directly: find the k customers whose real load shape looks most like this one, and use their already-simulated risk as a fast, defensible stand-in.</p>
-<p>The real test is not whether this technique runs. It is whether it beats what Chapter 4 already offers for free: the coarser, five-bucket archetype mean. If retrieval cannot beat that simpler baseline, it has not earned the extra machinery, the same discipline this book applied to <a href="#acronyms_IDEC">IDEC</a>.</p>
-<p>A bare MAE comparison already answered this once in this book, and got it wrong: Chapter 1 of Part 5 found window-average posting the lowest MAE of four baselines while barely tracking the real signal at all. The same risk applies here, so each candidate is scored on both MAE and Spearman rank correlation between its predictions and the real outcome, since a method whose predictions do not even move in the right direction should not win just because its average error looks small, then combined with the same diversity-weighted Borda ranking used throughout this book’s own multi-metric comparisons: rank each candidate on every metric, down-weight a metric by how much it already agrees with the others, and sum the weighted ranks. With metrics <span class="math inline">\(M_1, \dots, M_J\)</span> (MAE, Corr, and so on): <span class="math display">\[
+<p>The real test is not whether this technique runs. It is whether it beats what Part 5 Chapter 2 already offers for free: the coarser, five-bucket archetype mean. If retrieval cannot beat that simpler baseline, it has not earned the extra machinery, the same discipline this book applied to <a href="#acronyms_IDEC">IDEC</a>.</p>
+<p>A bare MAE comparison already answered this once in this book, and got it wrong: Chapter 1 of Part 8 found window-average posting the lowest MAE of four baselines while barely tracking the real signal at all. The same risk applies here, so each candidate is scored on both MAE and Spearman rank correlation between its predictions and the real outcome, since a method whose predictions do not even move in the right direction should not win just because its average error looks small, then combined with the same diversity-weighted Borda ranking used throughout this book’s own multi-metric comparisons: rank each candidate on every metric, down-weight a metric by how much it already agrees with the others, and sum the weighted ranks. With metrics <span class="math inline">\(M_1, \dots, M_J\)</span> (MAE, Corr, and so on): <span class="math display">\[
 u_j = 1 - \frac{1}{J-1}\sum_{j' \neq j} \left|\rho_S(M_j, M_{j'})\right|
 \]</span> <span class="math display">\[
 w_j = \frac{u_j}{\sum_{j'=1}^{J} u_{j'}}
 \]</span> <span class="math display">\[
 \text{score}(m) = \sum_{j=1}^{J} w_j \cdot \text{rank}_j(m)
 \]</span> where <span class="math inline">\(\rho_S\)</span> is Spearman rank correlation, computed across the candidates’ own scores on each metric pair.</p>
-<div class="quarto-embed-nb-cell" data-notebook="/home/runner/work/ml-energy-disaggregation/ml-energy-disaggregation/book/04-grid-edge/05-ranking-recommendation-code.ipynb" data-notebook-title="Ranking and Recommendation for LV Management under DER" data-notebook-cellid="49862434">
+<div class="quarto-embed-nb-cell" data-notebook="/home/runner/work/ml-energy-disaggregation/ml-energy-disaggregation/book/06-ranking-recommendation/01-ranking-recommendation-code.ipynb" data-notebook-title="Ranking and Recommendation for LV Management under DER" data-notebook-cellid="49862434">
 <div id="49862434" class="cell">
 <div class="cell-output cell-output-display">
 <div id="yrnpzqjmwc" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:100%;height:auto;">
@@ -1126,7 +1169,7 @@ w_j = \frac{u_j}{\sum_{j'=1}^{J} u_{j'}}
 </div>
 </div>
 </div>
-<div class="quarto-embed-nb-cell" data-notebook="/home/runner/work/ml-energy-disaggregation/ml-energy-disaggregation/book/04-grid-edge/05-ranking-recommendation-code.ipynb" data-notebook-title="Ranking and Recommendation for LV Management under DER" data-notebook-cellid="cc65c357">
+<div class="quarto-embed-nb-cell" data-notebook="/home/runner/work/ml-energy-disaggregation/ml-energy-disaggregation/book/06-ranking-recommendation/01-ranking-recommendation-code.ipynb" data-notebook-title="Ranking and Recommendation for LV Management under DER" data-notebook-cellid="cc65c357">
 <div id="cc65c357" class="cell">
 <div class="cell-output cell-output-display">
 <div id="cdjicntckc" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:100%;height:auto;">
@@ -1238,11 +1281,11 @@ w_j = \frac{u_j}{\sum_{j'=1}^{J} u_{j'}}
 </div>
 <section id="how-much-can-a-retrieved-neighbor-actually-be-trusted" class="level3">
 <h3 class="anchored" data-anchor-id="how-much-can-a-retrieved-neighbor-actually-be-trusted">How much can a retrieved neighbor actually be trusted?</h3>
-<p>A predicted value alone says nothing about how confident it is. Chapter 3 built a split-conformal confidence set around cluster membership using distance to a centroid; Chapter 4 reused the same idea for archetype confidence. The same machinery generalizes directly here: instead of distance to a cluster’s own centroid, use distance to a query customer’s single nearest labeled neighbor. A customer with a close real neighbor gets a trustworthy prediction. A customer sitting far from anyone already labeled gets flagged honestly, not silently given a number anyway.</p>
+<p>A predicted value alone says nothing about how confident it is. Part 4 Chapter 3 built a split-conformal confidence set around cluster membership using distance to a centroid; Part 5 Chapter 2 reused the same idea for archetype confidence. The same machinery generalizes directly here: instead of distance to a cluster’s own centroid, use distance to a query customer’s single nearest labeled neighbor. A customer with a close real neighbor gets a trustworthy prediction. A customer sitting far from anyone already labeled gets flagged honestly, not silently given a number anyway.</p>
 <p>A non-conformal version of this same retrieval would stop at the prediction itself: average the k nearest neighbors’ risk, hand back a number, and say nothing about how much to trust it. Every customer gets an equally confident-looking answer, whether their nearest real match sits right next door in the embedding space or nowhere near it at all. Conformal calibration adds the piece that is missing, a split-conformal threshold with the same finite-sample, distribution-free guarantee Lei and colleagues formalized for conformal prediction sets generally <span class="citation" data-cites="lei2018distributionfree">[13]</span>. Split a held-back calibration set of <span class="math inline">\(n\)</span> labeled customers off from the training set, compute each one’s own nonconformity score, its distance to its single nearest labeled training neighbor, <span class="math inline">\(r_i = \min_{j \in \text{train}} \lVert x_i - x_j \rVert_2\)</span>, and take tau as the <span class="math inline">\(\lceil (n+1)(1-\alpha) \rceil / n\)</span> empirical quantile of those <span class="math inline">\(n\)</span> real scores: <span class="math display">\[
 \tau = \text{Quantile}_{\lceil (n+1)(1-\alpha)/n \rceil}\left(\{r_i\}_{i=1}^{n}\right)
 \]</span> with <span class="math inline">\(\alpha = 0.1\)</span> for 90% coverage. A customer whose nearest labeled neighbor sits within tau gets a prediction backed by real precedent. A customer whose nearest neighbor sits farther away than that gets flagged instead, an honest “no confident match nearby” rather than a number dressed up to look like one.</p>
-<div class="quarto-embed-nb-cell" data-notebook="/home/runner/work/ml-energy-disaggregation/ml-energy-disaggregation/book/04-grid-edge/05-ranking-recommendation-code.ipynb" data-notebook-title="Ranking and Recommendation for LV Management under DER" data-notebook-cellid="fe2589ef">
+<div class="quarto-embed-nb-cell" data-notebook="/home/runner/work/ml-energy-disaggregation/ml-energy-disaggregation/book/06-ranking-recommendation/01-ranking-recommendation-code.ipynb" data-notebook-title="Ranking and Recommendation for LV Management under DER" data-notebook-cellid="fe2589ef">
 <div id="fe2589ef" class="cell">
 <div class="cell-output cell-output-display">
 <div id="ctzgtppams" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:100%;height:auto;">
@@ -1352,7 +1395,7 @@ w_j = \frac{u_j}{\sum_{j'=1}^{J} u_{j'}}
 </div>
 </div>
 </div>
-<div class="quarto-embed-nb-cell" data-notebook="/home/runner/work/ml-energy-disaggregation/ml-energy-disaggregation/book/04-grid-edge/05-ranking-recommendation-code.ipynb" data-notebook-title="Ranking and Recommendation for LV Management under DER" data-notebook-cellid="59315268">
+<div class="quarto-embed-nb-cell" data-notebook="/home/runner/work/ml-energy-disaggregation/ml-energy-disaggregation/book/06-ranking-recommendation/01-ranking-recommendation-code.ipynb" data-notebook-title="Ranking and Recommendation for LV Management under DER" data-notebook-cellid="59315268">
 <div id="59315268" class="cell">
 <div class="cell-output cell-output-display">
 
@@ -1625,14 +1668,14 @@ w_j = \frac{u_j}{\sum_{j'=1}^{J} u_{j'}}
 </div>
 <div class="ark-concept">
 <p><span class="ark-concept-title"><i class="bi bi-info-circle-fill"></i> Key Concept</span></p>
-<p>Eight customers, 2.7% of the labeled pool, get flagged: real households whose nearest labeled neighbor sits farther away than 90% of a held-back calibration set ever needed to travel to find its own match. That is a similar rate to Chapter 4’s own archetype-membership finding, where 6% of the full 342-customer pool got an empty prediction set. Two different conformal mechanisms, on two different questions, land on a similar honest answer: a real minority of customers do not resemble anyone else already on file, and both methods say so directly instead of guessing.</p>
+<p>Eight customers, 2.7% of the labeled pool, get flagged: real households whose nearest labeled neighbor sits farther away than 90% of a held-back calibration set ever needed to travel to find its own match. That is a similar rate to Part 5 Chapter 2’s own archetype-membership finding, where 6% of the full 342-customer pool got an empty prediction set. Two different conformal mechanisms, on two different questions, land on a similar honest answer: a real minority of customers do not resemble anyone else already on file, and both methods say so directly instead of guessing.</p>
 </div>
 </section>
 </section>
 <section id="ranking-two-real-audiences" class="level2">
 <h2 class="anchored" data-anchor-id="ranking-two-real-audiences">Ranking, two real audiences</h2>
 <p>A predicted risk number is not yet a decision. Someone still has to decide who gets looked at first. That is a genuinely different question from prediction, and it has two real, different audiences on a real feeder. A connection-queue processor needs customers ranked. A network planner deciding where to spend reinforcement budget needs locations ranked. Same underlying risk data, two different units of analysis, both real and both useful.</p>
-<div class="quarto-embed-nb-cell" data-notebook="/home/runner/work/ml-energy-disaggregation/ml-energy-disaggregation/book/04-grid-edge/05-ranking-recommendation-code.ipynb" data-notebook-title="Ranking and Recommendation for LV Management under DER" data-notebook-cellid="d8a1fbda">
+<div class="quarto-embed-nb-cell" data-notebook="/home/runner/work/ml-energy-disaggregation/ml-energy-disaggregation/book/06-ranking-recommendation/01-ranking-recommendation-code.ipynb" data-notebook-title="Ranking and Recommendation for LV Management under DER" data-notebook-cellid="d8a1fbda">
 <div id="d8a1fbda" class="cell">
 <div class="cell-output cell-output-display">
 <div id="dnmnthezaw" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:100%;height:auto;">
@@ -1816,7 +1859,7 @@ w_j = \frac{u_j}{\sum_{j'=1}^{J} u_{j'}}
 </div>
 </div>
 </div>
-<div class="quarto-embed-nb-cell" data-notebook="/home/runner/work/ml-energy-disaggregation/ml-energy-disaggregation/book/04-grid-edge/05-ranking-recommendation-code.ipynb" data-notebook-title="Ranking and Recommendation for LV Management under DER" data-notebook-cellid="8bf39dff">
+<div class="quarto-embed-nb-cell" data-notebook="/home/runner/work/ml-energy-disaggregation/ml-energy-disaggregation/book/06-ranking-recommendation/01-ranking-recommendation-code.ipynb" data-notebook-title="Ranking and Recommendation for LV Management under DER" data-notebook-cellid="8bf39dff">
 <div id="8bf39dff" class="cell">
 <div class="cell-output cell-output-display">
 
@@ -2096,7 +2139,7 @@ w_j = \frac{u_j}{\sum_{j'=1}^{J} u_{j'}}
 </div>
 </div>
 </div>
-<p>The combined score deliberately takes the worse of the two normalized risks, not their average. Chapter 4 already found that different archetypes lead different <a href="#acronyms_DER">DER</a> risks, the same customer rarely tops both lists at once, and averaging away that distinction would hide exactly the finding worth keeping visible. This is a simple, transparent multi-criteria score on purpose, not a learned ranker. With a labeled set this small, a learned model has little complexity to earn back, the same lesson already drawn twice in this chapter.</p>
+<p>The combined score deliberately takes the worse of the two normalized risks, not their average. Part 5 Chapter 2 already found that different archetypes lead different <a href="#acronyms_DER">DER</a> risks, the same customer rarely tops both lists at once, and averaging away that distinction would hide exactly the finding worth keeping visible. This is a simple, transparent multi-criteria score on purpose, not a learned ranker. With a labeled set this small, a learned model has little complexity to earn back, the same lesson already drawn twice in this chapter.</p>
 <div class="ark-concept">
 <p><span class="ark-concept-title"><i class="bi bi-info-circle-fill"></i> Key Concept</span></p>
 <p>The rank interval matters as much as the rank itself. It comes from resampling the labeled set 200 times and re-ranking each time, a real, bootstrap measure of how much sampling noise alone could move a customer up or down the list. The very top of the list is genuinely stable. Further down, the interval widens quickly, an honest signal that exact ordering in the middle of a triage queue deserves less confidence than the top few positions do. A bare rank position hides that difference; the interval is what actually tells a <a href="#acronyms_DSO">DSO</a> how much to trust it.</p>
@@ -2104,7 +2147,7 @@ w_j = \frac{u_j}{\sum_{j'=1}^{J} u_{j'}}
 <section id="ranking-real-locations-not-just-customers" class="level3">
 <h3 class="anchored" data-anchor-id="ranking-real-locations-not-just-customers">Ranking real locations, not just customers</h3>
 <p>A network planner does not decide per customer. They decide where on the physical feeder to spend reinforcement budget. Every seed draw above already places customers at real bus positions, so the same labeled data answers a second, genuinely different question: which of AusNet’s own 31 real bus positions carries the most aggregate constraint risk, aggregated across every customer who has ever landed there. Hardowar and colleagues ranked real distribution transformers by a loading-and-reliability index for restoration priority in 2017, the direct energy-domain precedent for this kind of asset-level ranking, a different granularity from customer-level ranking and a different audience, a network planner rather than a connection-queue processor <span class="citation" data-cites="hardowar2017restoration">[14]</span>.</p>
-<div class="quarto-embed-nb-cell" data-notebook="/home/runner/work/ml-energy-disaggregation/ml-energy-disaggregation/book/04-grid-edge/05-ranking-recommendation-code.ipynb" data-notebook-title="Ranking and Recommendation for LV Management under DER" data-notebook-cellid="80fa269d">
+<div class="quarto-embed-nb-cell" data-notebook="/home/runner/work/ml-energy-disaggregation/ml-energy-disaggregation/book/06-ranking-recommendation/01-ranking-recommendation-code.ipynb" data-notebook-title="Ranking and Recommendation for LV Management under DER" data-notebook-cellid="80fa269d">
 <div id="80fa269d" class="cell">
 <div class="cell-output cell-output-display">
 <div id="jcovttyffh" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:100%;height:auto;">
@@ -2266,7 +2309,7 @@ w_j = \frac{u_j}{\sum_{j'=1}^{J} u_{j'}}
 </div>
 </div>
 </div>
-<div class="quarto-embed-nb-cell" data-notebook="/home/runner/work/ml-energy-disaggregation/ml-energy-disaggregation/book/04-grid-edge/05-ranking-recommendation-code.ipynb" data-notebook-title="Ranking and Recommendation for LV Management under DER" data-notebook-cellid="95c1a4ef">
+<div class="quarto-embed-nb-cell" data-notebook="/home/runner/work/ml-energy-disaggregation/ml-energy-disaggregation/book/06-ranking-recommendation/01-ranking-recommendation-code.ipynb" data-notebook-title="Ranking and Recommendation for LV Management under DER" data-notebook-cellid="95c1a4ef">
 <div id="95c1a4ef" class="cell">
 <div class="cell-output cell-output-display">
 
@@ -2541,13 +2584,13 @@ w_j = \frac{u_j}{\sum_{j'=1}^{J} u_{j'}}
 </div>
 </div>
 </div>
-<p>The voltage-risk leader and the thermal-risk leader are different bus positions, the same “different risk, different location” finding Chapter 4 made at the archetype level, now visible at the physical-location level a network planner actually acts on. A reinforcement plan built around a single “worst bus” number would miss that half the risk on this feeder sits somewhere else entirely.</p>
+<p>The voltage-risk leader and the thermal-risk leader are different bus positions, the same “different risk, different location” finding Part 5 Chapter 2 made at the archetype level, now visible at the physical-location level a network planner actually acts on. A reinforcement plan built around a single “worst bus” number would miss that half the risk on this feeder sits somewhere else entirely.</p>
 </section>
 </section>
 <section id="real-time-violation-severity-ranking" class="level2">
 <h2 class="anchored" data-anchor-id="real-time-violation-severity-ranking">Real-time violation-severity ranking</h2>
 <p>Everything above ranks candidates for a planning-stage queue, a study that has not started yet. An operator watching a feeder during a genuine stress event faces a different moment entirely: several real violations happening at once, and a real question of which one to act on first. That is not a new problem this book invented an answer to. Industrial process control has managed exactly this for decades, alarm rationalization, the discipline of triaging an alarm flood instead of treating every alarm as equally urgent. Parvez, Hu, and Chen’s own 2022 method ranks live alarm-flood sequences against historical ones for early operator warning <span class="citation" data-cites="parvez2022alarmfloods">[10]</span>; the named industry standards ISA-18.2 and EEMUA 191 set the field’s own target priority distribution, roughly 5% high priority, 15% medium, 80% low, on the reasoning that an operator can only act on a small number of genuinely urgent events at once. None of that is power-specific. It borrows directly.</p>
-<div class="quarto-embed-nb-cell" data-notebook="/home/runner/work/ml-energy-disaggregation/ml-energy-disaggregation/book/04-grid-edge/05-ranking-recommendation-code.ipynb" data-notebook-title="Ranking and Recommendation for LV Management under DER" data-notebook-cellid="5f80fd9e">
+<div class="quarto-embed-nb-cell" data-notebook="/home/runner/work/ml-energy-disaggregation/ml-energy-disaggregation/book/06-ranking-recommendation/01-ranking-recommendation-code.ipynb" data-notebook-title="Ranking and Recommendation for LV Management under DER" data-notebook-cellid="5f80fd9e">
 <div id="5f80fd9e" class="cell">
 <div class="cell-output cell-output-display">
 <div id="twprvuubwt" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:100%;height:auto;">
@@ -2726,7 +2769,7 @@ w_j = \frac{u_j}{\sum_{j'=1}^{J} u_{j'}}
 </div>
 </div>
 </div>
-<div class="quarto-embed-nb-cell" data-notebook="/home/runner/work/ml-energy-disaggregation/ml-energy-disaggregation/book/04-grid-edge/05-ranking-recommendation-code.ipynb" data-notebook-title="Ranking and Recommendation for LV Management under DER" data-notebook-cellid="3c799ce0">
+<div class="quarto-embed-nb-cell" data-notebook="/home/runner/work/ml-energy-disaggregation/ml-energy-disaggregation/book/06-ranking-recommendation/01-ranking-recommendation-code.ipynb" data-notebook-title="Ranking and Recommendation for LV Management under DER" data-notebook-cellid="3c799ce0">
 <div id="3c799ce0" class="cell">
 <div class="cell-output cell-output-display">
 
@@ -2991,13 +3034,13 @@ w_j = \frac{u_j}{\sum_{j'=1}^{J} u_{j'}}
 </div>
 </div>
 </div>
-<p>Fourteen real loads violate at some point during this stress day, out of 31, each with a real severity and a real first-violation step, an operator’s actual triage list rather than an undifferentiated flood of 23 individual bus-step alarms. This feeder does not produce a large flood even at full <a href="#acronyms_PV">Photovoltaic (PV)</a> penetration, itself a real, useful finding: Chapter 2’s own hosting-capacity work already showed this feeder handles substantial <a href="#acronyms_PV">PV</a> before things get severe, and this ranked list is the same result seen from an operator’s vantage point instead of a planner’s.</p>
+<p>Fourteen real loads violate at some point during this stress day, out of 31, each with a real severity and a real first-violation step, an operator’s actual triage list rather than an undifferentiated flood of 23 individual bus-step alarms. This feeder does not produce a large flood even at full <a href="#acronyms_PV">Photovoltaic (PV)</a> penetration, itself a real, useful finding: Part 4 Chapter 2’s own hosting-capacity work already showed this feeder handles substantial <a href="#acronyms_PV">PV</a> before things get severe, and this ranked list is the same result seen from an operator’s vantage point instead of a planner’s.</p>
 </section>
 <section id="recommendation-which-lever-actually-fixes-this-customers-violation" class="level2">
 <h2 class="anchored" data-anchor-id="recommendation-which-lever-actually-fixes-this-customers-violation">Recommendation: which lever actually fixes this customer’s violation?</h2>
-<p>Knowing a customer is at risk is not the same as knowing what to do about it. Chapter 2 built three real levers, Volt-Watt, real-power curtailment as local voltage rises, and Volt-VAr, reactive-power support as local voltage rises, both applied feeder-wide through an inverter control. This chapter adds a fourth, storage, and a fifth option worth naming honestly: no action at all, the real baseline every recommendation has to beat.</p>
+<p>Knowing a customer is at risk is not the same as knowing what to do about it. Part 4 Chapter 2 built three real levers, Volt-Watt, real-power curtailment as local voltage rises, and Volt-VAr, reactive-power support as local voltage rises, both applied feeder-wide through an inverter control. This chapter adds a fourth, storage, and a fifth option worth naming honestly: no action at all, the real baseline every recommendation has to beat.</p>
 <p>Case-based reasoning, Aamodt and Plaza’s own retrieve-reuse-revise-retain cycle <span class="citation" data-cites="aamodt1994casebased">[1]</span>, is the right technique for choosing between them. Retrieve real past cases similar to this customer. Reuse whichever lever worked most often for those similar cases. Then check, in simulation, whether that recommendation actually fixes this specific customer’s own violation, the revise step, not assumed to work just because it worked for someone else.</p>
-<div class="quarto-embed-nb-cell" data-notebook="/home/runner/work/ml-energy-disaggregation/ml-energy-disaggregation/book/04-grid-edge/05-ranking-recommendation-code.ipynb" data-notebook-title="Ranking and Recommendation for LV Management under DER" data-notebook-cellid="84e380db">
+<div class="quarto-embed-nb-cell" data-notebook="/home/runner/work/ml-energy-disaggregation/ml-energy-disaggregation/book/06-ranking-recommendation/01-ranking-recommendation-code.ipynb" data-notebook-title="Ranking and Recommendation for LV Management under DER" data-notebook-cellid="84e380db">
 <div id="84e380db" class="cell">
 <div class="cell-output cell-output-display">
 <div id="pgbmgawngy" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:100%;height:auto;">
@@ -3091,7 +3134,7 @@ w_j = \frac{u_j}{\sum_{j'=1}^{J} u_{j'}}
 </div>
 </div>
 </div>
-<div class="quarto-embed-nb-cell" data-notebook="/home/runner/work/ml-energy-disaggregation/ml-energy-disaggregation/book/04-grid-edge/05-ranking-recommendation-code.ipynb" data-notebook-title="Ranking and Recommendation for LV Management under DER" data-notebook-cellid="227f7eb5">
+<div class="quarto-embed-nb-cell" data-notebook="/home/runner/work/ml-energy-disaggregation/ml-energy-disaggregation/book/06-ranking-recommendation/01-ranking-recommendation-code.ipynb" data-notebook-title="Ranking and Recommendation for LV Management under DER" data-notebook-cellid="227f7eb5">
 <div id="227f7eb5" class="cell">
 <div class="cell-output cell-output-display">
 
@@ -3371,7 +3414,7 @@ w_j = \frac{u_j}{\sum_{j'=1}^{J} u_{j'}}
 <img src="../../assets/lever-applicability-by-violation-type.svg" class="img-fluid figure-img">
 </div>
 <figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-lever-applicability-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Figure&nbsp;12.2: Volt-Watt and Volt-VAr both act on a <code>PVSystem</code> element, so both are available for a voltage violation. A thermal violation from EV charging has no PVSystem for either lever to control, so only storage and no action remain on the table.
+Figure&nbsp;14.2: Volt-Watt and Volt-VAr both act on a <code>PVSystem</code> element, so both are available for a voltage violation. A thermal violation from EV charging has no PVSystem for either lever to control, so only storage and no action remain on the table.
 </figcaption>
 </figure>
 </div>
@@ -3379,7 +3422,7 @@ Figure&nbsp;12.2: Volt-Watt and Volt-VAr both act on a <code>PVSystem</code> ele
 <p><span class="ark-concept-title"><i class="bi bi-info-circle-fill"></i> Key Concept</span></p>
 <p>A real case library needs both violation types, or the recommendation degenerates to always picking whichever lever wins the one type of case it was ever shown. A real, checkable threshold for thermal risk falls straight out of the transformer’s own rating already used throughout this book: 500kVA shared across 31 real customers is a fair share of roughly 16.1kW each at the feeder’s own peak-loading instant. A customer contributing more than that is drawing more than their share of the transformer’s headroom, a real, defensible line, not an arbitrary one.</p>
 </div>
-<div class="quarto-embed-nb-cell" data-notebook="/home/runner/work/ml-energy-disaggregation/ml-energy-disaggregation/book/04-grid-edge/05-ranking-recommendation-code.ipynb" data-notebook-title="Ranking and Recommendation for LV Management under DER" data-notebook-cellid="34d3f4a0">
+<div class="quarto-embed-nb-cell" data-notebook="/home/runner/work/ml-energy-disaggregation/ml-energy-disaggregation/book/06-ranking-recommendation/01-ranking-recommendation-code.ipynb" data-notebook-title="Ranking and Recommendation for LV Management under DER" data-notebook-cellid="34d3f4a0">
 <div id="34d3f4a0" class="cell">
 <div class="cell-output cell-output-stdout">
 <pre><code>13 real at-risk cases in the library</code></pre>
@@ -3476,7 +3519,7 @@ Figure&nbsp;12.2: Volt-Watt and Volt-VAr both act on a <code>PVSystem</code> ele
 </div>
 </div>
 </div>
-<div class="quarto-embed-nb-cell" data-notebook="/home/runner/work/ml-energy-disaggregation/ml-energy-disaggregation/book/04-grid-edge/05-ranking-recommendation-code.ipynb" data-notebook-title="Ranking and Recommendation for LV Management under DER" data-notebook-cellid="cf6b6827">
+<div class="quarto-embed-nb-cell" data-notebook="/home/runner/work/ml-energy-disaggregation/ml-energy-disaggregation/book/06-ranking-recommendation/01-ranking-recommendation-code.ipynb" data-notebook-title="Ranking and Recommendation for LV Management under DER" data-notebook-cellid="cf6b6827">
 <div id="cf6b6827" class="cell">
 <div class="cell-output cell-output-display">
 
@@ -3740,8 +3783,8 @@ Figure&nbsp;12.2: Volt-Watt and Volt-VAr both act on a <code>PVSystem</code> ele
 </div>
 </div>
 <p>Thirteen real at-risk cases, and genuine diversity this time, not a single lever winning by default. Eleven voltage cases favor Volt-VAr, the same result seen above on the single worst customer. The two thermal cases split between storage and no action, since Volt-Watt and Volt-VAr have nothing to control there at all, and storage does not always earn its place even when it is the only real option, an honest, checkable outcome rather than assumed.</p>
-<p>A recommendation still has to respect which levers are even physically possible for a given violation. Retrieval is restricted to past cases of the same violation type as the query, the same real-world constraint a <a href="#acronyms_DSO">DSO</a> already applies: Chapter 2’s own PV-versus-EV finding already tells a DSO which constraint a given <a href="#acronyms_DER">DER</a> scenario is testing before this recommender ever runs, so filtering retrieval by violation type is not circular, it is exactly the information a real deployment already has in hand.</p>
-<div class="quarto-embed-nb-cell" data-notebook="/home/runner/work/ml-energy-disaggregation/ml-energy-disaggregation/book/04-grid-edge/05-ranking-recommendation-code.ipynb" data-notebook-title="Ranking and Recommendation for LV Management under DER" data-notebook-cellid="7f7c34d3">
+<p>A recommendation still has to respect which levers are even physically possible for a given violation. Retrieval is restricted to past cases of the same violation type as the query, the same real-world constraint a <a href="#acronyms_DSO">DSO</a> already applies: Part 4 Chapter 2’s own PV-versus-EV finding already tells a DSO which constraint a given <a href="#acronyms_DER">DER</a> scenario is testing before this recommender ever runs, so filtering retrieval by violation type is not circular, it is exactly the information a real deployment already has in hand.</p>
+<div class="quarto-embed-nb-cell" data-notebook="/home/runner/work/ml-energy-disaggregation/ml-energy-disaggregation/book/06-ranking-recommendation/01-ranking-recommendation-code.ipynb" data-notebook-title="Ranking and Recommendation for LV Management under DER" data-notebook-cellid="7f7c34d3">
 <div id="7f7c34d3" class="cell">
 <div class="cell-output cell-output-display">
 <div id="hoskznaewi" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:100%;height:auto;">
@@ -3847,14 +3890,14 @@ Figure&nbsp;12.2: Volt-Watt and Volt-VAr both act on a <code>PVSystem</code> ele
 </div>
 <div class="ark-mistake">
 <p><span class="ark-mistake-title"><i class="bi bi-bug-fill"></i> Common Mistake</span></p>
-<p><strong>Three of the four held-out recommendations fix the violation outright, all three voltage cases routed correctly to Volt-VAr. The fourth does not, and that is the more instructive result.</strong> The held-out thermal case is the customer with the single highest thermal contribution found anywhere in this chapter’s own labeled risk set, over 20kW at the transformer’s own peak-loading instant. Storage is correctly recommended, the only real lever that could ever apply, and it genuinely does not fully fix this specific customer’s violation. A 3kW battery on a fixed schedule was never going to be enough for a customer already drawing that far past their fair share; a bigger unit or a smarter schedule is a real, separate question this chapter leaves open rather than quietly resolves. Retrieval, restricted to cases of the same violation type, still routes each customer to the right lever family using nothing but Chapter 4’s own ordinary load-shape embedding, never told directly whether a given case is voltage- or thermal-driven, the real payoff of content-based retrieval here.</p>
+<p><strong>Three of the four held-out recommendations fix the violation outright, all three voltage cases routed correctly to Volt-VAr. The fourth does not, and that is the more instructive result.</strong> The held-out thermal case is the customer with the single highest thermal contribution found anywhere in this chapter’s own labeled risk set, over 20kW at the transformer’s own peak-loading instant. Storage is correctly recommended, the only real lever that could ever apply, and it genuinely does not fully fix this specific customer’s violation. A 3kW battery on a fixed schedule was never going to be enough for a customer already drawing that far past their fair share; a bigger unit or a smarter schedule is a real, separate question this chapter leaves open rather than quietly resolves. Retrieval, restricted to cases of the same violation type, still routes each customer to the right lever family using nothing but Part 5 Chapter 2’s own ordinary load-shape embedding, never told directly whether a given case is voltage- or thermal-driven, the real payoff of content-based retrieval here.</p>
 </div>
 </section>
 <section id="a-genuinely-new-scenario-customers-this-chapter-has-never-labeled" class="level2">
 <h2 class="anchored" data-anchor-id="a-genuinely-new-scenario-customers-this-chapter-has-never-labeled">A genuinely new scenario: customers this chapter has never labeled</h2>
 <p>Every check so far validates against customers already folded into the labeled risk set in some form, held out from a fold or a case split, but drawn from the same 294-customer pool the whole pipeline was built on. A real <a href="#acronyms_DSO">DSO</a>’s actual question is sharper: a brand new <a href="#acronyms_EV">EV</a> connection request lands on a customer this chapter has never simulated at all. Does retrieval, ranking, and recommendation still work on someone genuinely new?</p>
 <p>Twenty seeds of resampling still left 48 of AusNet’s 342 real customers out of the labeled risk set entirely, never assigned a bus position, never simulated. That is a real, ready-made pool of genuinely unseen customers, not a synthetic one.</p>
-<div class="quarto-embed-nb-cell" data-notebook="/home/runner/work/ml-energy-disaggregation/ml-energy-disaggregation/book/04-grid-edge/05-ranking-recommendation-code.ipynb" data-notebook-title="Ranking and Recommendation for LV Management under DER" data-notebook-cellid="165fa687">
+<div class="quarto-embed-nb-cell" data-notebook="/home/runner/work/ml-energy-disaggregation/ml-energy-disaggregation/book/06-ranking-recommendation/01-ranking-recommendation-code.ipynb" data-notebook-title="Ranking and Recommendation for LV Management under DER" data-notebook-cellid="165fa687">
 <div id="165fa687" class="cell">
 <div class="cell-output cell-output-stdout">
 <pre><code>48 real customers never appear in the labeled risk set</code></pre>
@@ -3862,7 +3905,7 @@ Figure&nbsp;12.2: Volt-Watt and Volt-VAr both act on a <code>PVSystem</code> ele
 </div>
 </div>
 <p>Five new adopters are drawn from that pool: one deliberately chosen, the customer with the highest real demand during the <a href="#acronyms_EV">EV</a> charging window itself among the 48, the same pre-simulation targeting already used to build the thermal case library above, and four drawn at random. Each is placed at a real bus position on AusNet’s own feeder alongside 30 other real customers, all charging an <a href="#acronyms_EV">EV</a> at once, the same 100%-adoption scenario already used to build the original labeled risk set, run for a customer never simulated before.</p>
-<div class="quarto-embed-nb-cell" data-notebook="/home/runner/work/ml-energy-disaggregation/ml-energy-disaggregation/book/04-grid-edge/05-ranking-recommendation-code.ipynb" data-notebook-title="Ranking and Recommendation for LV Management under DER" data-notebook-cellid="bba5b652">
+<div class="quarto-embed-nb-cell" data-notebook="/home/runner/work/ml-energy-disaggregation/ml-energy-disaggregation/book/06-ranking-recommendation/01-ranking-recommendation-code.ipynb" data-notebook-title="Ranking and Recommendation for LV Management under DER" data-notebook-cellid="bba5b652">
 <div id="bba5b652" class="cell">
 <div class="cell-output cell-output-display">
 <div id="lsnxmmnoie" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:100%;height:auto;">
@@ -3990,7 +4033,7 @@ Figure&nbsp;12.2: Volt-Watt and Volt-VAr both act on a <code>PVSystem</code> ele
 </div>
 </div>
 </div>
-<div class="quarto-embed-nb-cell" data-notebook="/home/runner/work/ml-energy-disaggregation/ml-energy-disaggregation/book/04-grid-edge/05-ranking-recommendation-code.ipynb" data-notebook-title="Ranking and Recommendation for LV Management under DER" data-notebook-cellid="b69f846f">
+<div class="quarto-embed-nb-cell" data-notebook="/home/runner/work/ml-energy-disaggregation/ml-energy-disaggregation/book/06-ranking-recommendation/01-ranking-recommendation-code.ipynb" data-notebook-title="Ranking and Recommendation for LV Management under DER" data-notebook-cellid="b69f846f">
 <div id="b69f846f" class="cell">
 <div class="cell-output cell-output-stdout">
 <pre><code>retrieval mean absolute error on 5 genuinely new customers: 1.428
@@ -4003,7 +4046,7 @@ population-mean baseline error on the same 5 customers: 2.249</code></pre>
 <p>Retrieval, trained on nothing but the existing 294-customer labeled set, beats a plain population-mean baseline on five customers it has never seen in any form, real evidence this generalizes past the specific customers used to build and validate it, not just within them. That is a stronger claim than either the cross-validation split earlier in this chapter or the held-out case check above, since both of those still drew from the same pool the method was built and tuned against.</p>
 </div>
 <p>Where do these five land in the priority queue that already exists?</p>
-<div class="quarto-embed-nb-cell" data-notebook="/home/runner/work/ml-energy-disaggregation/ml-energy-disaggregation/book/04-grid-edge/05-ranking-recommendation-code.ipynb" data-notebook-title="Ranking and Recommendation for LV Management under DER" data-notebook-cellid="5fdbfbb1">
+<div class="quarto-embed-nb-cell" data-notebook="/home/runner/work/ml-energy-disaggregation/ml-energy-disaggregation/book/06-ranking-recommendation/01-ranking-recommendation-code.ipynb" data-notebook-title="Ranking and Recommendation for LV Management under DER" data-notebook-cellid="5fdbfbb1">
 <div id="5fdbfbb1" class="cell">
 <div class="cell-output cell-output-display">
 <div id="uchlzuwgdn" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:100%;height:auto;">
@@ -4111,22 +4154,22 @@ population-mean baseline error on the same 5 customers: 2.249</code></pre>
 </section>
 <section id="does-retrieval-generalize-to-a-genuinely-different-real-population" class="level2">
 <h2 class="anchored" data-anchor-id="does-retrieval-generalize-to-a-genuinely-different-real-population">Does retrieval generalize to a genuinely different real population?</h2>
-<p>Chapter 4 already asked a version of this question at the archetype level: does shape-based clustering, run on 760 real <a href="#acronyms_NREL">NREL</a> ResStock and ComStock buildings, recover a genuinely different population’s own real ground-truth building types? It found a real, honest limit there, low but non-random agreement, shape alone does not cleanly separate a population this diverse. Retrieval sits one level sharper than clustering, a single predicted number instead of a bucket label, and it deserves the same honest check, not an assumption that a technique validated on 342 real Australian customers simply carries over to a real, different country’s own housing stock.</p>
+<p>Part 5 Chapter 2 already asked a version of this question at the archetype level: does shape-based clustering, run on 760 real <a href="#acronyms_NREL">NREL</a> ResStock and ComStock buildings, recover a genuinely different population’s own real ground-truth building types? It found a real, honest limit there, low but non-random agreement, shape alone does not cleanly separate a population this diverse. Retrieval sits one level sharper than clustering, a single predicted number instead of a bucket label, and it deserves the same honest check, not an assumption that a technique validated on 342 real Australian customers simply carries over to a real, different country’s own housing stock.</p>
 <p>Every retrieval check so far in this chapter needed an <a href="#acronyms_LV">LV</a> simulation to get a real risk label, and <a href="#acronyms_NREL">NREL</a>’s own buildings have no equivalent OpenDSS model. This section restricts itself to what a smart meter alone can answer: each real customer’s own maximum real demand during a real evening window, 18:00 to 21:00, read directly off their own recorded series, no network model, no synthetic scenario, the same coarse but genuinely real screening signal a <a href="#acronyms_DSO">DSO</a> already has before commissioning any study at all.</p>
 <div class="ark-concept">
 <p><span class="ark-concept-title"><i class="bi bi-info-circle-fill"></i> Key Concept</span></p>
 <p>Retrieval’s own prediction is a k-nearest-neighbor mean in shape-embedding space: <span class="math display">\[
 \hat{y}(x) = \frac{1}{k}\sum_{i \in N_k(x)} y_i
-\]</span> where <span class="math inline">\(N_k(x)\)</span> is the k closest labeled points to a query <span class="math inline">\(x\)</span> by Euclidean distance in the same peak-normalized shape embedding Chapter 4 built. The technique’s whole assumption is that nearby points in that embedding space share similar real outcomes. Nothing about that assumption requires the neighbors to come from the same country, climate, or appliance mix as the query, and nothing guarantees it holds when they do not.</p>
+\]</span> where <span class="math inline">\(N_k(x)\)</span> is the k closest labeled points to a query <span class="math inline">\(x\)</span> by Euclidean distance in the same peak-normalized shape embedding Part 5 Chapter 2 built. The technique’s whole assumption is that nearby points in that embedding space share similar real outcomes. Nothing about that assumption requires the neighbors to come from the same country, climate, or appliance mix as the query, and nothing guarantees it holds when they do not.</p>
 </div>
-<div class="quarto-embed-nb-cell" data-notebook="/home/runner/work/ml-energy-disaggregation/ml-energy-disaggregation/book/04-grid-edge/05-ranking-recommendation-code.ipynb" data-notebook-title="Ranking and Recommendation for LV Management under DER" data-notebook-cellid="e85bb3ae">
+<div class="quarto-embed-nb-cell" data-notebook="/home/runner/work/ml-energy-disaggregation/ml-energy-disaggregation/book/06-ranking-recommendation/01-ranking-recommendation-code.ipynb" data-notebook-title="Ranking and Recommendation for LV Management under DER" data-notebook-cellid="e85bb3ae">
 <div id="e85bb3ae" class="cell">
 <div class="cell-output cell-output-stdout">
 <pre><code>200 real NREL ResStock buildings, evening-peak kW range 0.16-36.27</code></pre>
 </div>
 </div>
 </div>
-<div class="quarto-embed-nb-cell" data-notebook="/home/runner/work/ml-energy-disaggregation/ml-energy-disaggregation/book/04-grid-edge/05-ranking-recommendation-code.ipynb" data-notebook-title="Ranking and Recommendation for LV Management under DER" data-notebook-cellid="8805af2d">
+<div class="quarto-embed-nb-cell" data-notebook="/home/runner/work/ml-energy-disaggregation/ml-energy-disaggregation/book/06-ranking-recommendation/01-ranking-recommendation-code.ipynb" data-notebook-title="Ranking and Recommendation for LV Management under DER" data-notebook-cellid="8805af2d">
 <div id="8805af2d" class="cell">
 <div class="cell-output cell-output-display">
 <div id="ggelaadbpm" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:100%;height:auto;">
@@ -4224,8 +4267,8 @@ population-mean baseline error on the same 5 customers: 2.249</code></pre>
 </div>
 </div>
 </div>
-<p>Retrieval, trained purely on 342 real AusNet customers, does not beat a plain population-mean baseline here, and its predictions carry a slightly negative rank correlation with these real US buildings’ own actual evening peaks. That is not a bug in the k-nearest-neighbor code, it is the same honest limit Chapter 4 already found at the clustering level, now visible one level sharper: a real, different population’s own relationship between daily shape and peak demand, driven by a different climate and a different heating and cooling technology mix, is not something 342 Australian customers’ own real history can teach a retrieval model to predict. Population mean is not a stronger method here, it is simply not misled by neighbors that were never truly comparable to begin with.</p>
-<div class="quarto-embed-nb-cell" data-notebook="/home/runner/work/ml-energy-disaggregation/ml-energy-disaggregation/book/04-grid-edge/05-ranking-recommendation-code.ipynb" data-notebook-title="Ranking and Recommendation for LV Management under DER" data-notebook-cellid="b7507084">
+<p>Retrieval, trained purely on 342 real AusNet customers, does not beat a plain population-mean baseline here, and its predictions carry a slightly negative rank correlation with these real US buildings’ own actual evening peaks. That is not a bug in the k-nearest-neighbor code, it is the same honest limit Part 5 Chapter 2 already found at the clustering level, now visible one level sharper: a real, different population’s own relationship between daily shape and peak demand, driven by a different climate and a different heating and cooling technology mix, is not something 342 Australian customers’ own real history can teach a retrieval model to predict. Population mean is not a stronger method here, it is simply not misled by neighbors that were never truly comparable to begin with.</p>
+<div class="quarto-embed-nb-cell" data-notebook="/home/runner/work/ml-energy-disaggregation/ml-energy-disaggregation/book/06-ranking-recommendation/01-ranking-recommendation-code.ipynb" data-notebook-title="Ranking and Recommendation for LV Management under DER" data-notebook-cellid="b7507084">
 <div id="b7507084" class="cell">
 <div class="cell-output cell-output-stdout">
 <pre><code>tau=0.822 (calibrated on AusNet alone, same recipe as earlier in this chapter)
@@ -4241,7 +4284,7 @@ NREL buildings within tau: 52% (105/200)</code></pre>
 <img src="../../assets/cross-population-retrieval-trust.svg" class="img-fluid figure-img">
 </div>
 <figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-cross-population-retrieval-trust-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Figure&nbsp;12.3: The same calibrated trust radius, unmoved, checked against a population it never saw during calibration. A real US home whose own shape happens to resemble an AusNet household still falls inside tau; one reflecting a genuinely different climate or appliance mix falls outside it, flagged honestly rather than silently extrapolated.
+Figure&nbsp;14.3: The same calibrated trust radius, unmoved, checked against a population it never saw during calibration. A real US home whose own shape happens to resemble an AusNet household still falls inside tau; one reflecting a genuinely different climate or appliance mix falls outside it, flagged honestly rather than silently extrapolated.
 </figcaption>
 </figure>
 </div>
@@ -4249,16 +4292,16 @@ Figure&nbsp;12.3: The same calibrated trust radius, unmoved, checked against a p
 </section>
 <section id="feeder-level-ranking-on-a-real-second-network" class="level2">
 <h2 class="anchored" data-anchor-id="feeder-level-ranking-on-a-real-second-network">Feeder-level ranking on a real second network</h2>
-<p>Everything above runs on AusNet’s own real 31-customer feeder, the network every chapter since Chapter 1 has used. One feeder cannot answer a feeder-level question, though: which of many real feeders should a <a href="#acronyms_DSO">DSO</a> look at first. That needs more than one feeder, and it needs to stay real, not fall back on a synthetic benchmark network for convenience.</p>
-<p>Deakin and colleagues’ <code>HV_UG_full</code> model is a genuinely real second network, real Low Voltage Network Solutions (LVNS) circuits from Electricity North West’s own low-carbon-networks-fund trial, allocated onto a real UK Generic Distribution System (UKGDS) medium-voltage backbone <span class="citation" data-cites="deakin2021hybridmvlv">[15]</span>. It is not a small demonstration network: 112,887 buses, 19,072 loads, 414 real feeders, already checked directly before this chapter was built, solves cleanly, no structural defect. Every load in it is still a static placeholder, though, the same state AusNet’s own network was in before Chapter 1 assigned it real smart-meter readings. This section borrows AusNet’s own real customer shapes onto this network’s real bus positions, the same reuse pattern already used throughout this book. No license file ships with this network; the README asks only for citation, disclosed here plainly rather than implied as a formal open license.</p>
-<div class="quarto-embed-nb-cell" data-notebook="/home/runner/work/ml-energy-disaggregation/ml-energy-disaggregation/book/04-grid-edge/05-ranking-recommendation-code.ipynb" data-notebook-title="Ranking and Recommendation for LV Management under DER" data-notebook-cellid="5e04b32d">
+<p>Everything above runs on AusNet’s own real 31-customer feeder, the network every chapter since Part 4 Chapter 1 has used. One feeder cannot answer a feeder-level question, though: which of many real feeders should a <a href="#acronyms_DSO">DSO</a> look at first. That needs more than one feeder, and it needs to stay real, not fall back on a synthetic benchmark network for convenience.</p>
+<p>Deakin and colleagues’ <code>HV_UG_full</code> model is a genuinely real second network, real Low Voltage Network Solutions (LVNS) circuits from Electricity North West’s own low-carbon-networks-fund trial, allocated onto a real UK Generic Distribution System (UKGDS) medium-voltage backbone <span class="citation" data-cites="deakin2021hybridmvlv">[15]</span>. It is not a small demonstration network: 112,887 buses, 19,072 loads, 414 real feeders, already checked directly before this chapter was built, solves cleanly, no structural defect. Every load in it is still a static placeholder, though, the same state AusNet’s own network was in before Part 4 Chapter 1 assigned it real smart-meter readings. This section borrows AusNet’s own real customer shapes onto this network’s real bus positions, the same reuse pattern already used throughout this book. No license file ships with this network; the README asks only for citation, disclosed here plainly rather than implied as a formal open license.</p>
+<div class="quarto-embed-nb-cell" data-notebook="/home/runner/work/ml-energy-disaggregation/ml-energy-disaggregation/book/06-ranking-recommendation/01-ranking-recommendation-code.ipynb" data-notebook-title="Ranking and Recommendation for LV Management under DER" data-notebook-cellid="5e04b32d">
 <div id="5e04b32d" class="cell">
 <div class="cell-output cell-output-stdout">
 <pre><code>18997 real loads on this real UK network</code></pre>
 </div>
 </div>
 </div>
-<div class="quarto-embed-nb-cell" data-notebook="/home/runner/work/ml-energy-disaggregation/ml-energy-disaggregation/book/04-grid-edge/05-ranking-recommendation-code.ipynb" data-notebook-title="Ranking and Recommendation for LV Management under DER" data-notebook-cellid="d8c57fae">
+<div class="quarto-embed-nb-cell" data-notebook="/home/runner/work/ml-energy-disaggregation/ml-energy-disaggregation/book/06-ranking-recommendation/01-ranking-recommendation-code.ipynb" data-notebook-title="Ranking and Recommendation for LV Management under DER" data-notebook-cellid="d8c57fae">
 <div id="d8c57fae" class="cell">
 <div class="cell-output cell-output-stdout">
 <pre><code>27760 real loads mapped to 414 real feeders</code></pre>
@@ -4266,14 +4309,14 @@ Figure&nbsp;12.3: The same calibrated trust radius, unmoved, checked against a p
 </div>
 </div>
 <p>Borrowing AusNet’s own real shapes means scaling them, not replacing this network’s own real customer sizing wholesale. Each of this network’s loads keeps its own real kW rating; a real AusNet customer’s own normalized shape is scaled to match that rating, so a load originally sized for 3kW gets a realistically-scaled real household’s rhythm, not a flat substitute.</p>
-<div class="quarto-embed-nb-cell" data-notebook="/home/runner/work/ml-energy-disaggregation/ml-energy-disaggregation/book/04-grid-edge/05-ranking-recommendation-code.ipynb" data-notebook-title="Ranking and Recommendation for LV Management under DER" data-notebook-cellid="99820009">
+<div class="quarto-embed-nb-cell" data-notebook="/home/runner/work/ml-energy-disaggregation/ml-energy-disaggregation/book/06-ranking-recommendation/01-ranking-recommendation-code.ipynb" data-notebook-title="Ranking and Recommendation for LV Management under DER" data-notebook-cellid="99820009">
 <div id="99820009" class="cell">
 <div class="cell-output cell-output-stdout">
 <pre><code>solved, converged=True</code></pre>
 </div>
 </div>
 </div>
-<div class="quarto-embed-nb-cell" data-notebook="/home/runner/work/ml-energy-disaggregation/ml-energy-disaggregation/book/04-grid-edge/05-ranking-recommendation-code.ipynb" data-notebook-title="Ranking and Recommendation for LV Management under DER" data-notebook-cellid="45e6da09">
+<div class="quarto-embed-nb-cell" data-notebook="/home/runner/work/ml-energy-disaggregation/ml-energy-disaggregation/book/06-ranking-recommendation/01-ranking-recommendation-code.ipynb" data-notebook-title="Ranking and Recommendation for LV Management under DER" data-notebook-cellid="45e6da09">
 <div id="45e6da09" class="cell">
 <div class="cell-output cell-output-stdout">
 <pre><code>334 real feeders ranked</code></pre>
@@ -4427,7 +4470,7 @@ Figure&nbsp;12.3: The same calibrated trust radius, unmoved, checked against a p
 </div>
 </div>
 </div>
-<div class="quarto-embed-nb-cell" data-notebook="/home/runner/work/ml-energy-disaggregation/ml-energy-disaggregation/book/04-grid-edge/05-ranking-recommendation-code.ipynb" data-notebook-title="Ranking and Recommendation for LV Management under DER" data-notebook-cellid="83e258f0">
+<div class="quarto-embed-nb-cell" data-notebook="/home/runner/work/ml-energy-disaggregation/ml-energy-disaggregation/book/06-ranking-recommendation/01-ranking-recommendation-code.ipynb" data-notebook-title="Ranking and Recommendation for LV Management under DER" data-notebook-cellid="83e258f0">
 <div id="83e258f0" class="cell">
 <div class="cell-output cell-output-display">
 
@@ -4693,7 +4736,7 @@ Figure&nbsp;12.3: The same calibrated trust radius, unmoved, checked against a p
 </div>
 </div>
 </div>
-<div class="quarto-embed-nb-cell" data-notebook="/home/runner/work/ml-energy-disaggregation/ml-energy-disaggregation/book/04-grid-edge/05-ranking-recommendation-code.ipynb" data-notebook-title="Ranking and Recommendation for LV Management under DER" data-notebook-cellid="6db1af66">
+<div class="quarto-embed-nb-cell" data-notebook="/home/runner/work/ml-energy-disaggregation/ml-energy-disaggregation/book/06-ranking-recommendation/01-ranking-recommendation-code.ipynb" data-notebook-title="Ranking and Recommendation for LV Management under DER" data-notebook-cellid="6db1af66">
 <div id="6db1af66" class="cell">
 <div class="cell-output cell-output-display">
 
@@ -4962,7 +5005,7 @@ Figure&nbsp;12.3: The same calibrated trust radius, unmoved, checked against a p
 <section id="does-retrieval-earn-its-complexity-at-feeder-scale-too" class="level3">
 <h3 class="anchored" data-anchor-id="does-retrieval-earn-its-complexity-at-feeder-scale-too">Does retrieval earn its complexity at feeder scale too?</h3>
 <p>Every customer-level retrieval check above asks whether a customer’s own shape predicts their risk. The same question applies one level up: does a feeder’s own real, cheap-to-know features, how many real customers it carries and what share of them have <a href="#acronyms_PV">PV</a>, predict its own worst-case voltage well enough to skip a full simulation?</p>
-<div class="quarto-embed-nb-cell" data-notebook="/home/runner/work/ml-energy-disaggregation/ml-energy-disaggregation/book/04-grid-edge/05-ranking-recommendation-code.ipynb" data-notebook-title="Ranking and Recommendation for LV Management under DER" data-notebook-cellid="6c41170d">
+<div class="quarto-embed-nb-cell" data-notebook="/home/runner/work/ml-energy-disaggregation/ml-energy-disaggregation/book/06-ranking-recommendation/01-ranking-recommendation-code.ipynb" data-notebook-title="Ranking and Recommendation for LV Management under DER" data-notebook-cellid="6c41170d">
 <div id="6c41170d" class="cell">
 <div class="cell-output cell-output-stdout">
 <pre><code>n_customers    0.166594
@@ -4972,7 +5015,7 @@ Name: max_vmax, dtype: float64</code></pre>
 </div>
 </div>
 </div>
-<div class="quarto-embed-nb-cell" data-notebook="/home/runner/work/ml-energy-disaggregation/ml-energy-disaggregation/book/04-grid-edge/05-ranking-recommendation-code.ipynb" data-notebook-title="Ranking and Recommendation for LV Management under DER" data-notebook-cellid="0f543043">
+<div class="quarto-embed-nb-cell" data-notebook="/home/runner/work/ml-energy-disaggregation/ml-energy-disaggregation/book/06-ranking-recommendation/01-ranking-recommendation-code.ipynb" data-notebook-title="Ranking and Recommendation for LV Management under DER" data-notebook-cellid="0f543043">
 <div id="0f543043" class="cell">
 <div class="cell-output cell-output-display">
 <div id="wbltrdwwfy" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:100%;height:auto;">
@@ -5058,7 +5101,7 @@ Name: max_vmax, dtype: float64</code></pre>
 </div>
 </div>
 </div>
-<div class="quarto-embed-nb-cell" data-notebook="/home/runner/work/ml-energy-disaggregation/ml-energy-disaggregation/book/04-grid-edge/05-ranking-recommendation-code.ipynb" data-notebook-title="Ranking and Recommendation for LV Management under DER" data-notebook-cellid="b0b73dc3">
+<div class="quarto-embed-nb-cell" data-notebook="/home/runner/work/ml-energy-disaggregation/ml-energy-disaggregation/book/06-ranking-recommendation/01-ranking-recommendation-code.ipynb" data-notebook-title="Ranking and Recommendation for LV Management under DER" data-notebook-cellid="b0b73dc3">
 <div id="b0b73dc3" class="cell">
 <div class="cell-output cell-output-display">
 
@@ -5317,7 +5360,7 @@ Name: max_vmax, dtype: float64</code></pre>
 <section id="ranking-with-confidence-at-334-feeders-instead-of-294-customers" class="level3">
 <h3 class="anchored" data-anchor-id="ranking-with-confidence-at-334-feeders-instead-of-294-customers">Ranking with confidence, at 334 feeders instead of 294 customers</h3>
 <p>The same bootstrap rank-interval used for customers above applies here with no new code, just a bigger candidate pool: 334 real feeders instead of 294 real customers.</p>
-<div class="quarto-embed-nb-cell" data-notebook="/home/runner/work/ml-energy-disaggregation/ml-energy-disaggregation/book/04-grid-edge/05-ranking-recommendation-code.ipynb" data-notebook-title="Ranking and Recommendation for LV Management under DER" data-notebook-cellid="ccfc8a22">
+<div class="quarto-embed-nb-cell" data-notebook="/home/runner/work/ml-energy-disaggregation/ml-energy-disaggregation/book/06-ranking-recommendation/01-ranking-recommendation-code.ipynb" data-notebook-title="Ranking and Recommendation for LV Management under DER" data-notebook-cellid="ccfc8a22">
 <div id="ccfc8a22" class="cell">
 <div class="cell-output cell-output-display">
 <div id="mpyklwqjdh" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:100%;height:auto;">
@@ -5479,7 +5522,7 @@ Name: max_vmax, dtype: float64</code></pre>
 </div>
 </div>
 </div>
-<div class="quarto-embed-nb-cell" data-notebook="/home/runner/work/ml-energy-disaggregation/ml-energy-disaggregation/book/04-grid-edge/05-ranking-recommendation-code.ipynb" data-notebook-title="Ranking and Recommendation for LV Management under DER" data-notebook-cellid="744af72c">
+<div class="quarto-embed-nb-cell" data-notebook="/home/runner/work/ml-energy-disaggregation/ml-energy-disaggregation/book/06-ranking-recommendation/01-ranking-recommendation-code.ipynb" data-notebook-title="Ranking and Recommendation for LV Management under DER" data-notebook-cellid="744af72c">
 <div id="744af72c" class="cell">
 <div class="cell-output cell-output-display">
 
@@ -5757,7 +5800,7 @@ Name: max_vmax, dtype: float64</code></pre>
 <section id="recommendation-at-network-scale-does-the-same-lever-still-work" class="level3">
 <h3 class="anchored" data-anchor-id="recommendation-at-network-scale-does-the-same-lever-still-work">Recommendation at network scale: does the same lever still work?</h3>
 <p>None of these 334 real feeders cross the hard 1.10 pu violation line under this scenario, the worst sits at 1.0964. Before treating that as reassuring, it is worth testing the lever that fixed every real voltage case in this chapter’s own case library: does network-wide Volt-VAr still work applied to thousands of real inverters at once, not just one customer’s own <a href="#acronyms_PV">PV</a> system?</p>
-<div class="quarto-embed-nb-cell" data-notebook="/home/runner/work/ml-energy-disaggregation/ml-energy-disaggregation/book/04-grid-edge/05-ranking-recommendation-code.ipynb" data-notebook-title="Ranking and Recommendation for LV Management under DER" data-notebook-cellid="ee509f52">
+<div class="quarto-embed-nb-cell" data-notebook="/home/runner/work/ml-energy-disaggregation/ml-energy-disaggregation/book/06-ranking-recommendation/01-ranking-recommendation-code.ipynb" data-notebook-title="Ranking and Recommendation for LV Management under DER" data-notebook-cellid="ee509f52">
 <div id="ee509f52" class="cell">
 <div class="cell-output cell-output-stdout">
 <pre><code>network-wide Volt-VAr failed to converge: (#485) Warning Max Control Iterations Exceeded.
@@ -5773,26 +5816,26 @@ Tip: Show Eventlog to debug control settings.</code></pre>
 </section>
 <section id="why-bother" class="level2">
 <h2 class="anchored" data-anchor-id="why-bother">Why bother</h2>
-<p>Chapter 1 named three ways <a href="#acronyms_DER">DER</a> strains a feeder: fluctuation, load growth, and constraint violations. This chapter turns each into a checkable, per-decision tool, not a coarse warning.</p>
+<p>Part 4 Chapter 1 named three ways <a href="#acronyms_DER">DER</a> strains a feeder: fluctuation, load growth, and constraint violations. This chapter turns each into a checkable, per-decision tool, not a coarse warning.</p>
 <p><strong>On the utility side</strong>, retrieval answers the fluctuation and load-growth questions before a single circuit is simulated: a new connection request gets a real, checkable thermal-risk estimate from customers already on file, at the cost of nothing more than that customer’s own smart-meter history, honestly flagged when no real precedent exists nearby rather than guessed at. Ranking turns constraint-violation triage into three concrete, re-runnable lists: which customers to review first in the connection queue, which physical bus positions deserve reinforcement budget first, and which live violations an operator should act on first during a genuine stress event, each with a confidence interval attached, not a bare position a planner has to take on faith. Recommendation closes the loop with a lever that is checked against whether it actually fixes the specific violation in front of it, not applied by rule of thumb, and honestly refused credit when it does not, the 3kW battery that does not fully fix the worst thermal case on record. The feeder-level extension adds a genuine caution a utility scaling any of this needs before it acts: a lever proven on one customer does not automatically hold across an entire real network, and this chapter found that out by actually testing it, not by assuming a customer-level result would simply scale.</p>
 <p><strong>On the customer side</strong>, the same three techniques cut the other way. A low-risk customer gets a fast, defensible answer from retrieval instead of waiting in a queue for a full hosting-capacity study that would have told them the same thing. A genuinely at-risk customer gets a specific, checked mitigation, storage bundled with a connection, say, instead of a one-size-fits-all rule or a surprise curtailment discovered months later. And a customer this chapter has never even seen before, the five new adopters drawn from AusNet’s own unlabeled pool, still gets a real answer grounded in real precedent, not a guess dressed up as one.</p>
-<p><strong>The generalization finding closes the loop.</strong> Every technique in this chapter was built and validated against the same 294-customer labeled pool. The real test of whether any of it is worth deploying is whether it holds up past that pool, on customers and networks it never saw during construction. Retrieval does, on five genuinely new customers and on 334 real feeders it was never tuned against. Ranking does too, still producing a real confidence interval on 334 real feeders instead of the 31 real bus positions it was built on. Recommendation does as well, where a real violation exists to check it against, and honestly has nothing to say where one does not. The one place this chapter’s own results stop generalizing, network-wide Volt-VAr control, is disclosed as plainly as everywhere it does, the same discipline this book has followed since Chapter 1. A second place joins it here: retrieval trained on 342 real Australian customers does not transfer to real US buildings from a genuinely different climate, and the calibrated confidence threshold built to catch AusNet’s own unusual customers correctly flags roughly half of them as unfamiliar rather than silently extrapolating.</p>
+<p><strong>The generalization finding closes the loop.</strong> Every technique in this chapter was built and validated against the same 294-customer labeled pool. The real test of whether any of it is worth deploying is whether it holds up past that pool, on customers and networks it never saw during construction. Retrieval does, on five genuinely new customers and on 334 real feeders it was never tuned against. Ranking does too, still producing a real confidence interval on 334 real feeders instead of the 31 real bus positions it was built on. Recommendation does as well, where a real violation exists to check it against, and honestly has nothing to say where one does not. The one place this chapter’s own results stop generalizing, network-wide Volt-VAr control, is disclosed as plainly as everywhere it does, the same discipline this book has followed since Part 4 Chapter 1. A second place joins it here: retrieval trained on 342 real Australian customers does not transfer to real US buildings from a genuinely different climate, and the calibrated confidence threshold built to catch AusNet’s own unusual customers correctly flags roughly half of them as unfamiliar rather than silently extrapolating.</p>
 </section>
 <section id="what-this-chapters-own-real-data-cannot-answer" class="level2">
 <h2 class="anchored" data-anchor-id="what-this-chapters-own-real-data-cannot-answer">What this chapter’s own real data cannot answer</h2>
 <p>Every technique above is checked against real, simulated outcomes on two real networks, AusNet’s own 31-customer feeder and a second country’s real 334-feeder topology. Naming what that real data still cannot settle is the same discipline this chapter has applied to every one of its own findings.</p>
-<p><strong>The embedding’s own assumption is stated, not proven for every case.</strong> Retrieval and ranking both work in the peak-normalized shape space Chapter 4 built, on the assumption that customers close in that space share close real outcomes. The variance-decomposition check earlier in this chapter already found where that assumption holds, thermal risk, and where it does not, voltage risk depends on bus position too, a real, physical reason, not a defect in the embedding itself. What that check cannot say is whether a <em>different</em> similarity metric, one that also encoded electrical distance or phase, would close the voltage-risk gap. That is a real, concrete extension, not attempted here because this chapter’s own smart-meter-only scope has no electrical-distance feature to add.</p>
-<p><strong>Hyperparameters here are chosen for consistency with earlier chapters, not independently tuned against a held-out objective.</strong> <span class="math inline">\(k=5\)</span> for retrieval matches the same neighbor count Chapter 4 used for its own archetype work, reused rather than re-tuned; <span class="math inline">\(\alpha=0.1\)</span> for every conformal threshold in this book fixes coverage at the same 90% used throughout, and Section 1 of Chapter 6 later makes that exact tradeoff, coverage against flagging rate, fully explicit rather than assuming one value is universally right. The bootstrap rank interval’s 200 resamples was not swept against a smaller count to check where the interval stabilizes, an honest gap, not a claim of having checked it. None of these were grid-searched against a held-out objective, because this chapter’s own real labeled pool, a few hundred customers, is not large enough to tune hyperparameters and validate the tuning independently at the same time; a real utility deployment with a genuinely large labeled pool could do both.</p>
-<p><strong>Scalability is answerable directly, the same way Chapter 3 answered it for phase identification.</strong> Retrieval costs <span class="math inline">\(O(n \log n)\)</span> to build the nearest-neighbor index and <span class="math inline">\(O(\log n)\)</span> per query with a standard tree structure, cheap at any real utility scale. Ranking a candidate pool of size <span class="math inline">\(n\)</span> costs <span class="math inline">\(O(n \log n)\)</span> to sort, and the bootstrap confidence interval multiplies that by 200 resamples, still trivial into the tens of thousands of candidates. Recommendation’s own case-based retrieval scales the same way as customer-level retrieval. Nothing in this chapter’s own machinery is the bottleneck at scale; the real constraint is the same one Chapter 3 named, how many real, OpenDSS-simulated labels exist to retrieve from or rank in the first place, which grows with simulation budget, not with this chapter’s own algorithms.</p>
-<p><strong>Deployment is a real, statable sequence.</strong> A <a href="#acronyms_DSO">DSO</a> adopting this needs, in order: each customer’s own smart-meter history (already collected for billing); Chapter 4’s own archetype embedding recomputed on the utility’s real population; a labeled risk set built the same way this chapter built one, real OpenDSS runs across enough seeds to cover the customer base at least once; and the same conformal calibration this chapter uses throughout to decide, honestly, which retrieved predictions to trust. Validating this before a real rollout means exactly what this chapter itself did: check retrieval and ranking against genuinely held-out real cases, the five new adopters and the 334 UK feeders here, before trusting either on a customer or a network the method was never checked against.</p>
-<p><strong>What to do when retrieval or ranking fails is already answered here for the case this chapter found, not for every possible one.</strong> The honest answer for voltage risk is not “use retrieval anyway,” it is “route back to Chapter 4’s own coarser archetype mean, or fall back to a full network study,” exactly what the calibrated confidence gate already does for a customer whose nearest neighbor sits too far away. A genuinely new failure mode, one this chapter’s own real data has not produced, would need the same honest diagnosis this chapter modeled: check the variance decomposition first, do not assume a fix before finding the real cause.</p>
+<p><strong>The embedding’s own assumption is stated, not proven for every case.</strong> Retrieval and ranking both work in the peak-normalized shape space Part 5 Chapter 2 built, on the assumption that customers close in that space share close real outcomes. The variance-decomposition check earlier in this chapter already found where that assumption holds, thermal risk, and where it does not, voltage risk depends on bus position too, a real, physical reason, not a defect in the embedding itself. What that check cannot say is whether a <em>different</em> similarity metric, one that also encoded electrical distance or phase, would close the voltage-risk gap. That is a real, concrete extension, not attempted here because this chapter’s own smart-meter-only scope has no electrical-distance feature to add.</p>
+<p><strong>Hyperparameters here are chosen for consistency with earlier chapters, not independently tuned against a held-out objective.</strong> <span class="math inline">\(k=5\)</span> for retrieval matches the same neighbor count Part 5 Chapter 2 used for its own archetype work, reused rather than re-tuned; <span class="math inline">\(\alpha=0.1\)</span> for every conformal threshold in this book fixes coverage at the same 90% used throughout, and Section 1 of Part 7 Chapter 1 later makes that exact tradeoff, coverage against flagging rate, fully explicit rather than assuming one value is universally right. The bootstrap rank interval’s 200 resamples was not swept against a smaller count to check where the interval stabilizes, an honest gap, not a claim of having checked it. None of these were grid-searched against a held-out objective, because this chapter’s own real labeled pool, a few hundred customers, is not large enough to tune hyperparameters and validate the tuning independently at the same time; a real utility deployment with a genuinely large labeled pool could do both.</p>
+<p><strong>Scalability is answerable directly, the same way Part 4 Chapter 3 answered it for phase identification.</strong> Retrieval costs <span class="math inline">\(O(n \log n)\)</span> to build the nearest-neighbor index and <span class="math inline">\(O(\log n)\)</span> per query with a standard tree structure, cheap at any real utility scale. Ranking a candidate pool of size <span class="math inline">\(n\)</span> costs <span class="math inline">\(O(n \log n)\)</span> to sort, and the bootstrap confidence interval multiplies that by 200 resamples, still trivial into the tens of thousands of candidates. Recommendation’s own case-based retrieval scales the same way as customer-level retrieval. Nothing in this chapter’s own machinery is the bottleneck at scale; the real constraint is the same one Part 4 Chapter 3 named, how many real, OpenDSS-simulated labels exist to retrieve from or rank in the first place, which grows with simulation budget, not with this chapter’s own algorithms.</p>
+<p><strong>Deployment is a real, statable sequence.</strong> A <a href="#acronyms_DSO">DSO</a> adopting this needs, in order: each customer’s own smart-meter history (already collected for billing); Part 5 Chapter 2’s own archetype embedding recomputed on the utility’s real population; a labeled risk set built the same way this chapter built one, real OpenDSS runs across enough seeds to cover the customer base at least once; and the same conformal calibration this chapter uses throughout to decide, honestly, which retrieved predictions to trust. Validating this before a real rollout means exactly what this chapter itself did: check retrieval and ranking against genuinely held-out real cases, the five new adopters and the 334 UK feeders here, before trusting either on a customer or a network the method was never checked against.</p>
+<p><strong>What to do when retrieval or ranking fails is already answered here for the case this chapter found, not for every possible one.</strong> The honest answer for voltage risk is not “use retrieval anyway,” it is “route back to Part 5 Chapter 2’s own coarser archetype mean, or fall back to a full network study,” exactly what the calibrated confidence gate already does for a customer whose nearest neighbor sits too far away. A genuinely new failure mode, one this chapter’s own real data has not produced, would need the same honest diagnosis this chapter modeled: check the variance decomposition first, do not assume a fix before finding the real cause.</p>
 </section>
-<section id="where-this-leaves-part-4" class="level2">
-<h2 class="anchored" data-anchor-id="where-this-leaves-part-4">Where this leaves Part 4</h2>
-<p>Chapter 4 sorted 342 real customers into five archetypes. This chapter sharpened that signal to the level a real decision actually needs, and then checked how far that signal actually travels. Retrieval predicts a new customer’s thermal risk well and is honest about not predicting their voltage risk well, a real, physical reason found and reported, not assumed away, and the confidence set built on top of it flags the real minority of customers no retrieval should be trusted for at all. Ranking gives a <a href="#acronyms_DSO">DSO</a> three real, distinct priority lists, customers for connection-queue triage, bus positions for reinforcement spend, and live violations for an operator’s own attention, each with a confidence interval, not a bare position. Recommendation retrieves similar real past cases and proposes a lever checked against whether it actually fixes a held-out customer’s own violation, correctly routing voltage cases toward Volt-VAr and thermal cases toward storage, the only lever that ever could reach them.</p>
+<section id="where-this-leaves-part-6" class="level2">
+<h2 class="anchored" data-anchor-id="where-this-leaves-part-6">Where this leaves Part 6</h2>
+<p>Part 5 Chapter 2 sorted 342 real customers into five archetypes. This chapter sharpened that signal to the level a real decision actually needs, and then checked how far that signal actually travels. Retrieval predicts a new customer’s thermal risk well and is honest about not predicting their voltage risk well, a real, physical reason found and reported, not assumed away, and the confidence set built on top of it flags the real minority of customers no retrieval should be trusted for at all. Ranking gives a <a href="#acronyms_DSO">DSO</a> three real, distinct priority lists, customers for connection-queue triage, bus positions for reinforcement spend, and live violations for an operator’s own attention, each with a confidence interval, not a bare position. Recommendation retrieves similar real past cases and proposes a lever checked against whether it actually fixes a held-out customer’s own violation, correctly routing voltage cases toward Volt-VAr and thermal cases toward storage, the only lever that ever could reach them.</p>
 <p>None of that stayed confined to the customers and the single feeder it was built on. Five customers this chapter had never labeled in any form still got a better retrieval prediction than a plain population average, real evidence this generalizes past its own training pool. A second real network, a real UK distribution topology carrying AusNet’s own real customer behavior, extends the same retrieval and ranking machinery to 334 real feeders, honestly reporting where it holds up, ranking, and where it does not, retrieval, since a feeder’s own size and <a href="#acronyms_PV">PV</a> share carry far less signal than a customer’s own shape does. And the one lever that fixed every real voltage case at customer scale does not converge at all applied network-wide across thousands of real inverters at once, a genuinely different, physically real limit this chapter found by actually trying it, not by assuming a customer-level result would simply scale.</p>
 <p>None of the three core techniques were invented for this book. Case-based reasoning, content-based retrieval, and learning to rank all came from elsewhere, information retrieval, e-commerce, industrial process control, applied here honestly, at the granularity and against the real, simulated ground truth this book has already built, and pushed past that ground truth to genuinely new customers and a genuinely different network to see where it still holds.</p>
-<p>Part 4 still has two threads ahead of it: catching a voltage or power-quality violation as it happens in real time, and testing mitigation strategies against forecasted <a href="#acronyms_DER">DER</a>-growth scenarios rather than today’s snapshot. Both inherit what this chapter built. A violation caught in real time still needs the same triage this chapter’s own alarm-ranking section already demonstrated. A growth scenario still needs the same lever recommendation this chapter’s own case library already validated, just replayed against tomorrow’s customers instead of today’s, and this chapter’s own network-scale convergence finding is a real, early warning that a growth scenario spanning many feeders at once may need more than the same lever repeated everywhere.</p>
+<p>Part 7 picks up catching a voltage or power-quality violation as it happens in real time, and Part 8’s own what-if scenario analysis tests mitigation strategies against forecasted <a href="#acronyms_DER">DER</a>-growth scenarios rather than today’s snapshot. Both inherit what this chapter built. A violation caught in real time still needs the same triage this chapter’s own alarm-ranking section already demonstrated. A growth scenario still needs the same lever recommendation this chapter’s own case library already validated, just replayed against tomorrow’s customers instead of today’s, and this chapter’s own network-scale convergence finding is a real, early warning that a growth scenario spanning many feeders at once may need more than the same lever repeated everywhere.</p>
 </section>
 <section id="references" class="level2">
 <h2 class="anchored" data-anchor-id="references">References</h2>
@@ -6263,13 +6306,13 @@ Tip: Show Eventlog to debug control settings.</code></pre>
   </script>
 <nav class="page-navigation">
   <div class="nav-page nav-page-previous">
-      <a href="../../book/04-grid-edge/04-customer-feeder-clustering.html" class="pagination-link" aria-label="Chapter 4: Customer and Feeder Clustering">
-        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text"><span class="chapter-title">Chapter 4: Customer and Feeder Clustering</span></span>
+      <a href="../../book/05-clustering/03-customer-feeder-clustering.html" class="pagination-link" aria-label="Chapter 3: Customer and Feeder Clustering">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text"><span class="chapter-title">Chapter 3: Customer and Feeder Clustering</span></span>
       </a>          
   </div>
   <div class="nav-page nav-page-next">
-      <a href="../../book/04-grid-edge/06-anomaly-detection.html" class="pagination-link" aria-label="Chapter 6: Anomaly Detection Beyond the Meter">
-        <span class="nav-page-text"><span class="chapter-title">Chapter 6: Anomaly Detection Beyond the Meter</span></span> <i class="bi bi-arrow-right-short"></i>
+      <a href="../../book/07-anomaly-detection/01-anomaly-detection.html" class="pagination-link" aria-label="Chapter 1: Anomaly Detection Beyond the Meter">
+        <span class="nav-page-text"><span class="chapter-title">Chapter 1: Anomaly Detection Beyond the Meter</span></span> <i class="bi bi-arrow-right-short"></i>
       </a>
   </div>
 </nav>
@@ -6283,7 +6326,7 @@ Tip: Show Eventlog to debug control settings.</code></pre>
 <div class="footer-social">
 <p><a href="mailto:sambaiga@gmail.com" title="Email"><i class="bi bi-envelope-at-fill"></i></a> <a href="https://github.com/sambaiga" title="GitHub"><i class="bi bi-github"></i></a> <a href="https://www.linkedin.com/in/sambaiga" title="LinkedIn"><i class="bi bi-linkedin"></i></a></p>
 </div>
-<div class="toc-actions d-sm-block d-md-none"><ul><li><a href="https://github.com/sambaiga/ml-energy-disaggregation/edit/main/book/04-grid-edge/05-ranking-recommendation.qmd" class="toc-action"><i class="bi bi-github"></i>Edit this page</a></li><li><a href="https://github.com/sambaiga/ml-energy-disaggregation/issues/new" class="toc-action"><i class="bi empty"></i>Report an issue</a></li><li><a href="https://github.com/sambaiga/ml-energy-disaggregation/blob/main/book/04-grid-edge/05-ranking-recommendation.qmd" class="toc-action"><i class="bi empty"></i>View source</a></li></ul></div></div>
+<div class="toc-actions d-sm-block d-md-none"><ul><li><a href="https://github.com/sambaiga/ml-energy-disaggregation/edit/main/book/06-ranking-recommendation/01-ranking-recommendation.qmd" class="toc-action"><i class="bi bi-github"></i>Edit this page</a></li><li><a href="https://github.com/sambaiga/ml-energy-disaggregation/issues/new" class="toc-action"><i class="bi empty"></i>Report an issue</a></li><li><a href="https://github.com/sambaiga/ml-energy-disaggregation/blob/main/book/06-ranking-recommendation/01-ranking-recommendation.qmd" class="toc-action"><i class="bi empty"></i>View source</a></li></ul></div></div>
     <div class="nav-footer-right">
 <p><span class="faux-block">Made with <a href="https://quarto.org">Quarto</a></span> <span class="faux-block"><a href="https://github.com/sambaiga/ml-energy-disaggregation"><i class="bi bi-github"></i> View source</a></span></p>
 </div>

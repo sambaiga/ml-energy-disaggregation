@@ -1,0 +1,1267 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.9.38">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="description" content="A structured, project-based path through smart meter data: disaggregation, forecasting, anomaly detection, and grid-edge value, from raw signal to business insight.">
+
+<title>Chapter 1: Clustering Foundations – Machine Learning for Smart Meter Data</title>
+<style>
+/* Default styles provided by pandoc.
+** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+*/
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for citations */
+div.csl-bib-body { }
+div.csl-entry {
+  clear: both;
+  margin-bottom: 0em;
+}
+.hanging-indent div.csl-entry {
+  margin-left:2em;
+  text-indent:-2em;
+}
+div.csl-left-margin {
+  min-width:2em;
+  float:left;
+}
+div.csl-right-inline {
+  margin-left:2em;
+  padding-left:1em;
+}
+div.csl-indent {
+  margin-left: 2em;
+}</style>
+
+
+<script src="../../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../../">
+<link href="../../book/05-clustering/02-clustering-methodology.html" rel="next">
+<link href="../../book/04-network-foundations/03-phase-identification.html" rel="prev">
+<link href="../../assets/favicon.svg" rel="icon" type="image/svg+xml">
+<script src="../../site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="../../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="../../site_libs/quarto-html/popper.min.js"></script>
+<script src="../../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-de63f62b328812d8e578a4d74e282472.css" rel="stylesheet" class="quarto-color-scheme" id="quarto-text-highlighting-styles">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-dark-6b6957c917596b414ec0b78690761e87.css" rel="stylesheet" class="quarto-color-scheme quarto-color-alternate" id="quarto-text-highlighting-styles">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-de63f62b328812d8e578a4d74e282472.css" rel="stylesheet" class="quarto-color-scheme-extra" id="quarto-text-highlighting-styles">
+<script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../../site_libs/bootstrap/bootstrap-84b0f63d2b22afb69d3c32ede53d2fe2.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
+<link href="../../site_libs/bootstrap/bootstrap-dark-86bd388472066654720eaf2de8d3b778.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="dark">
+<link href="../../site_libs/bootstrap/bootstrap-84b0f63d2b22afb69d3c32ede53d2fe2.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme-extra" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script defer="" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN" && texText && texText.data) {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+<meta property="og:title" content="Chapter 1: Clustering Foundations – Machine Learning for Smart Meter Data">
+<meta property="og:description" content="A structured, project-based path through smart meter data: disaggregation, forecasting, anomaly detection, and grid-edge value, from raw signal to business insight.">
+<meta property="og:image" content="https://sambaiga.github.io/ml-energy-disaggregation/assets/clustering-paradigm-landscape.svg">
+<meta property="og:site_name" content="Machine Learning for Smart Meter Data">
+<meta name="twitter:title" content="Chapter 1: Clustering Foundations – Machine Learning for Smart Meter Data">
+<meta name="twitter:description" content="A structured, project-based path through smart meter data: disaggregation, forecasting, anomaly detection, and grid-edge value, from raw signal to business insight.">
+<meta name="twitter:image" content="https://sambaiga.github.io/ml-energy-disaggregation/assets/clustering-paradigm-landscape.svg">
+<meta name="twitter:card" content="summary_large_image">
+</head>
+
+<body class="nav-sidebar floating nav-fixed quarto-light"><script id="quarto-html-before-body" type="application/javascript">
+    const toggleBodyColorMode = (bsSheetEl) => {
+      const mode = bsSheetEl.getAttribute("data-mode");
+      const bodyEl = window.document.querySelector("body");
+      if (mode === "dark") {
+        bodyEl.classList.add("quarto-dark");
+        bodyEl.classList.remove("quarto-light");
+      } else {
+        bodyEl.classList.add("quarto-light");
+        bodyEl.classList.remove("quarto-dark");
+      }
+    }
+    const toggleBodyColorPrimary = () => {
+      const bsSheetEl = window.document.querySelector("link#quarto-bootstrap:not([rel=disabled-stylesheet])");
+      if (bsSheetEl) {
+        toggleBodyColorMode(bsSheetEl);
+      }
+    }
+    const setColorSchemeToggle = (alternate) => {
+      const toggles = window.document.querySelectorAll('.quarto-color-scheme-toggle');
+      for (let i=0; i < toggles.length; i++) {
+        const toggle = toggles[i];
+        if (toggle) {
+          if (alternate) {
+            toggle.classList.add("alternate");
+          } else {
+            toggle.classList.remove("alternate");
+          }
+        }
+      }
+    };
+    const toggleColorMode = (alternate) => {
+      // Switch the stylesheets
+      const primaryStylesheets = window.document.querySelectorAll('link.quarto-color-scheme:not(.quarto-color-alternate)');
+      const alternateStylesheets = window.document.querySelectorAll('link.quarto-color-scheme.quarto-color-alternate');
+      manageTransitions('#quarto-margin-sidebar .nav-link', false);
+      if (alternate) {
+        // note: dark is layered on light, we don't disable primary!
+        enableStylesheet(alternateStylesheets);
+        for (const sheetNode of alternateStylesheets) {
+          if (sheetNode.id === "quarto-bootstrap") {
+            toggleBodyColorMode(sheetNode);
+          }
+        }
+      } else {
+        disableStylesheet(alternateStylesheets);
+        enableStylesheet(primaryStylesheets)
+        toggleBodyColorPrimary();
+      }
+      manageTransitions('#quarto-margin-sidebar .nav-link', true);
+      // Switch the toggles
+      setColorSchemeToggle(alternate)
+      // Hack to workaround the fact that safari doesn't
+      // properly recolor the scrollbar when toggling (#1455)
+      if (navigator.userAgent.indexOf('Safari') > 0 && navigator.userAgent.indexOf('Chrome') == -1) {
+        manageTransitions("body", false);
+        window.scrollTo(0, 1);
+        setTimeout(() => {
+          window.scrollTo(0, 0);
+          manageTransitions("body", true);
+        }, 40);
+      }
+    }
+    const disableStylesheet = (stylesheets) => {
+      for (let i=0; i < stylesheets.length; i++) {
+        const stylesheet = stylesheets[i];
+        stylesheet.rel = 'disabled-stylesheet';
+      }
+    }
+    const enableStylesheet = (stylesheets) => {
+      for (let i=0; i < stylesheets.length; i++) {
+        const stylesheet = stylesheets[i];
+        if(stylesheet.rel !== 'stylesheet') { // for Chrome, which will still FOUC without this check
+          stylesheet.rel = 'stylesheet';
+        }
+      }
+    }
+    const manageTransitions = (selector, allowTransitions) => {
+      const els = window.document.querySelectorAll(selector);
+      for (let i=0; i < els.length; i++) {
+        const el = els[i];
+        if (allowTransitions) {
+          el.classList.remove('notransition');
+        } else {
+          el.classList.add('notransition');
+        }
+      }
+    }
+    const isFileUrl = () => {
+      return window.location.protocol === 'file:';
+    }
+    const hasAlternateSentinel = () => {
+      let styleSentinel = getColorSchemeSentinel();
+      if (styleSentinel !== null) {
+        return styleSentinel === "alternate";
+      } else {
+        return false;
+      }
+    }
+    const setStyleSentinel = (alternate) => {
+      const value = alternate ? "alternate" : "default";
+      if (!isFileUrl()) {
+        window.localStorage.setItem("quarto-color-scheme", value);
+      } else {
+        localAlternateSentinel = value;
+      }
+    }
+    const getColorSchemeSentinel = () => {
+      if (!isFileUrl()) {
+        const storageValue = window.localStorage.getItem("quarto-color-scheme");
+        return storageValue != null ? storageValue : localAlternateSentinel;
+      } else {
+        return localAlternateSentinel;
+      }
+    }
+    const toggleGiscusIfUsed = (isAlternate, darkModeDefault) => {
+      const baseTheme = document.querySelector('#giscus-base-theme')?.value ?? 'light';
+      const alternateTheme = document.querySelector('#giscus-alt-theme')?.value ?? 'dark';
+      let newTheme = '';
+      if(authorPrefersDark) {
+        newTheme = isAlternate ? baseTheme : alternateTheme;
+      } else {
+        newTheme = isAlternate ? alternateTheme : baseTheme;
+      }
+      const changeGiscusTheme = () => {
+        // From: https://github.com/giscus/giscus/issues/336
+        const sendMessage = (message) => {
+          const iframe = document.querySelector('iframe.giscus-frame');
+          if (!iframe) return;
+          iframe.contentWindow.postMessage({ giscus: message }, 'https://giscus.app');
+        }
+        sendMessage({
+          setConfig: {
+            theme: newTheme
+          }
+        });
+      }
+      const isGiscussLoaded = window.document.querySelector('iframe.giscus-frame') !== null;
+      if (isGiscussLoaded) {
+        changeGiscusTheme();
+      }
+    };
+    const authorPrefersDark = false;
+    const darkModeDefault = authorPrefersDark;
+      document.querySelector('link#quarto-text-highlighting-styles.quarto-color-scheme-extra').rel = 'disabled-stylesheet';
+      document.querySelector('link#quarto-bootstrap.quarto-color-scheme-extra').rel = 'disabled-stylesheet';
+    let localAlternateSentinel = darkModeDefault ? 'alternate' : 'default';
+    // Dark / light mode switch
+    window.quartoToggleColorScheme = () => {
+      // Read the current dark / light value
+      let toAlternate = !hasAlternateSentinel();
+      toggleColorMode(toAlternate);
+      setStyleSentinel(toAlternate);
+      toggleGiscusIfUsed(toAlternate, darkModeDefault);
+      window.dispatchEvent(new Event('resize'));
+    };
+    // Switch to dark mode if need be
+    if (hasAlternateSentinel()) {
+      toggleColorMode(true);
+    } else {
+      toggleColorMode(false);
+    }
+  </script>
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+    <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container mx-auto">
+    <a class="navbar-brand" href="../../index.html">
+    <span class="navbar-title">Machine Learning for Smart Meter Data</span>
+    </a>
+  </div>
+            <div id="quarto-search" class="" title="Search"></div>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" role="menu" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav navbar-nav-scroll ms-auto">
+  <li class="nav-item compact">
+    <a class="nav-link" href="mailto:sambaiga@gmail.com"> <i class="bi bi-envelope-at" role="img" aria-label="Email Anthony Faustine">
+</i> 
+<span class="menu-text"></span></a>
+  </li>  
+  <li class="nav-item compact">
+    <a class="nav-link" href="https://www.linkedin.com/in/sambaiga"> <i class="bi bi-linkedin" role="img" aria-label="LinkedIn">
+</i> 
+<span class="menu-text"></span></a>
+  </li>  
+  <li class="nav-item compact">
+    <a class="nav-link" href="https://github.com/sambaiga/ml-energy-disaggregation"> <i class="bi bi-github" role="img" aria-label="View source on GitHub">
+</i> 
+<span class="menu-text"></span></a>
+  </li>  
+</ul>
+          </div> <!-- /navcollapse -->
+            <div class="quarto-navbar-tools">
+    <a href="https://github.com/sambaiga/ml-energy-disaggregation" title="Source Code" class="quarto-navigation-tool px-1" aria-label="Source Code"><i class="bi bi-github"></i></a>
+  <a href="" class="quarto-color-scheme-toggle quarto-navigation-tool  px-1" onclick="window.quartoToggleColorScheme(); return false;" title="Toggle dark mode"><i class="bi"></i></a>
+</div>
+      </div> <!-- /container-fluid -->
+    </nav>
+  <nav class="quarto-secondary-nav">
+    <div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
+      </button>
+        <a class="flex-grow-1 no-decor" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+          <h1 class="quarto-secondary-nav-title"><span class="chapter-title">Chapter 1: Clustering Foundations</span></h1>
+        </a>     
+    </div>
+  </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation floating overflow-auto">
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../index.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">Welcome</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../preface.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">Preface</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../how-to-use.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">How to Use This Book</span></a>
+  </div>
+</li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="false">
+ <span class="menu-text">Part 3: Disaggregation</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="false" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../book/03-disaggregation/01-what-is-nilm.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">Chapter 1: Non-Intrusive Load Monitoring</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../book/03-disaggregation/02-feature-engineering.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">Chapter 2: Appliance Recognition</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../book/03-disaggregation/03-multi-appliance-recognition.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">Chapter 3: Multi-Appliance Recognition</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../book/03-disaggregation/04-multi-task-low-frequency.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">Chapter 4: Multi-Task Deep Learning at Low Frequency</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="false">
+ <span class="menu-text">Part 4: LV Network and Topology Foundations</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="false" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth1 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../book/04-network-foundations/01-opendss-lv-modeling.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">Chapter 1: Modeling the Low-Voltage Network</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../book/04-network-foundations/02-timeseries-der-modeling.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">Chapter 2: Time-Series Simulation and DER Modeling</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../book/04-network-foundations/03-phase-identification.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">Chapter 3: Phase Identification from Smart-Meter Data</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="true">
+ <span class="menu-text">Part 5: Clustering</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-3" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../book/05-clustering/01-clustering-foundations.html" class="sidebar-item-text sidebar-link active"><span class="chapter-title">Chapter 1: Clustering Foundations</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../book/05-clustering/02-clustering-methodology.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">Chapter 2: Clustering Methodology</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../book/05-clustering/03-customer-feeder-clustering.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">Chapter 3: Customer and Feeder Clustering</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" role="navigation" aria-expanded="false">
+ <span class="menu-text">Part 6: Ranking and Recommendation</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" role="navigation" aria-expanded="false" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-4" class="collapse list-unstyled sidebar-section depth1 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../book/06-ranking-recommendation/01-ranking-recommendation.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">Chapter 1: Ranking and Recommendation under DER</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-5" role="navigation" aria-expanded="false">
+ <span class="menu-text">Part 7: Anomaly Detection</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-5" role="navigation" aria-expanded="false" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-5" class="collapse list-unstyled sidebar-section depth1 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../book/07-anomaly-detection/01-anomaly-detection.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">Chapter 1: Anomaly Detection Beyond the Meter</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-6" role="navigation" aria-expanded="false">
+ <span class="menu-text">Part 8: Forecasting</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-6" role="navigation" aria-expanded="false" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-6" class="collapse list-unstyled sidebar-section depth1 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../book/08-forecasting/01-forecastability.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">Chapter 1: Household Smart-Meter Forecastability</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../book/08-forecasting/02-scaling-archetypes.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">Chapter 2: Scaling to Hundreds of Meters</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../book/08-forecasting/03-probabilistic-forecasting.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">Chapter 3: What a Probabilistic Forecast Is Actually Worth</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../book/08-forecasting/04-foundation-models.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">Part 8 Chapter 4: Do Foundation Models Fail Like Everything Else Does?</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../book/08-forecasting/05-what-if-scenario-analysis.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">Part 8 Chapter 5: What the Grid Actually Faces When These Forecasts Come True</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../book/08-forecasting/06-lv-state-estimation.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">Part 8 Chapter 6: Can Smart-Meter Readings Fill In What the Grid Cannot See</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../about.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">About the Author</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../acronyms.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">List of Acronyms</span></a>
+  </div>
+</li>
+    </ul>
+    </div>
+</nav>
+<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">In this chapter</h2>
+   
+  <ul>
+  <li><a href="#four-ways-to-define-a-cluster" id="toc-four-ways-to-define-a-cluster" class="nav-link active" data-scroll-target="#four-ways-to-define-a-cluster">Four ways to define a cluster</a></li>
+  <li><a href="#distance-and-representation" id="toc-distance-and-representation" class="nav-link" data-scroll-target="#distance-and-representation">Distance and representation</a></li>
+  <li><a href="#clustering-under-constraints" id="toc-clustering-under-constraints" class="nav-link" data-scroll-target="#clustering-under-constraints">Clustering under constraints</a></li>
+  <li><a href="#the-state-of-the-art" id="toc-the-state-of-the-art" class="nav-link" data-scroll-target="#the-state-of-the-art">The state of the art</a></li>
+  <li><a href="#evaluating-a-clustering" id="toc-evaluating-a-clustering" class="nav-link" data-scroll-target="#evaluating-a-clustering">Evaluating a clustering</a></li>
+  <li><a href="#choosing-k" id="toc-choosing-k" class="nav-link" data-scroll-target="#choosing-k">Choosing K</a></li>
+  <li><a href="#checking-stability" id="toc-checking-stability" class="nav-link" data-scroll-target="#checking-stability">Checking stability</a></li>
+  <li><a href="#validating-against-reality" id="toc-validating-against-reality" class="nav-link" data-scroll-target="#validating-against-reality">Validating against reality</a></li>
+  <li><a href="#where-this-leads" id="toc-where-this-leads" class="nav-link" data-scroll-target="#where-this-leads">Where this leads</a></li>
+  <li><a href="#references" id="toc-references" class="nav-link" data-scroll-target="#references">References</a></li>
+  </ul>
+<div class="toc-actions"><ul><li><a href="https://github.com/sambaiga/ml-energy-disaggregation/edit/main/book/05-clustering/01-clustering-foundations.qmd" class="toc-action"><i class="bi bi-github"></i>Edit this page</a></li><li><a href="https://github.com/sambaiga/ml-energy-disaggregation/issues/new" class="toc-action"><i class="bi empty"></i>Report an issue</a></li><li><a href="https://github.com/sambaiga/ml-energy-disaggregation/blob/main/book/05-clustering/01-clustering-foundations.qmd" class="toc-action"><i class="bi empty"></i>View source</a></li></ul></div></nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title d-none d-lg-block"><span class="chapter-title">Chapter 1: Clustering Foundations</span></h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<p>The primary bottleneck in the energy transition is not generation capacity, but rather the low-voltage network, which was constructed decades before bidirectional power flows were anticipated. Technologies such as rooftop solar, home batteries, and <a href="#acronyms_EV">Electric Vehicle (EV)</a> chargers are integrated incrementally at the property level, often remaining undetected by a <a href="#acronyms_DSO">Distribution System Operator (DSO)</a> until operational failures, such as feeder trips or transformer overheating, occur. This scenario mirrors the failure experienced by the opening feeder in Part 4 Chapter 1. While a <a href="#acronyms_DSO">DSO</a> serving a few hundred customers can feasibly monitor each individually, this approach becomes unfeasible at the scale required for a comprehensive energy transition. According to Wang, Chen, Hong, and Kang, clustering is identified as one of the three core pillars of smart meter analytics, alongside forecasting and load management <span class="citation" data-cites="wang2019smartmeterreview">[1]</span>. Transforming a vast number of individual customers into a manageable set of recurring patterns is necessary for maintaining the tractability of <a href="#acronyms_DER">Distributed Energy Resources (DER)</a>-driven complexity.</p>
+<p>A year-long analysis of demand across AusNet’s 342 households found 342 unique consumption patterns. Each customer has distinct power usage in timing, magnitude, and motivation. Averaging these patterns produces a result that does not reflect any individual customer. Likewise, a <a href="#acronyms_DSO">DSO</a> cannot plan feeders, set tariffs, or manage demand-response programmes using 342 separate profiles. The practical approach is to identify a small set of recurring patterns that capture the diversity in these load curves. However, grouping similar patterns remains a complex challenge.</p>
+<p>“Clustering” has no universal definition, and no single correct answer for how many groups a population like this one actually contains. Jain’s own retrospective on fifty years of work past k-means is explicit about this: the choice of objective function is itself a modelling decision, not a fact waiting to be discovered <span class="citation" data-cites="jain2010clustering50years">[2]</span>. Four real questions this chapter answers, in order, before any chapter in this part clusters a single real customer:</p>
+<ul>
+<li>What formal criterion determines whether two customers or two feeders belong to the same category?</li>
+<li>Does a load curve require a specialised notion of distance and representation, or is a standard approach sufficient?</li>
+<li>In the absence of ground-truth labels, how can the validity of a discovered grouping be assessed to ensure it is not merely an artefact of the algorithm?</li>
+<li>How should background knowledge, such as information about customers sharing a physical feeder, directly constrain the clustering procedure instead of being used only to describe results after the fact?</li>
+</ul>
+<div id="fig-clustering-paradigm-landscape" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-clustering-paradigm-landscape-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="../../assets/clustering-paradigm-landscape.svg" class="img-fluid figure-img">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-clustering-paradigm-landscape-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;11.1: Where this part’s clustering methods sit: a hand-engineered shape feature or a learned embedding on the horizontal axis, a flat partition, a two-stage grouping, or a spectral/manifold view on the vertical axis. Later chapters test whether points this far apart in method space still agree on what counts as real structure.
+</figcaption>
+</figure>
+</div>
+<section id="four-ways-to-define-a-cluster" class="level2">
+<h2 class="anchored" data-anchor-id="four-ways-to-define-a-cluster">Four ways to define a cluster</h2>
+<p>There are four main objective families that address the initial question. These families cover most relevant aspects discussed here. Each family optimises a specific criterion and identifies different structural patterns within the same population.</p>
+<div class="ark-concept">
+<p><span class="ark-concept-title"><i class="bi bi-info-circle-fill"></i> Key Concept</span></p>
+<p><strong>Partition-based</strong> objectives aim to identify <span class="math inline">\(K\)</span> centroids that minimise within-cluster distances. This approach is based on MacQueen’s k-means formulation, later refined by the Lloyd algorithm and by Arthur and Vassilvitskii’s careful seeding, which addresses sensitivity to poor random initialisation <span class="citation" data-cites="macqueen1967kmeans arthur2007kmeanspp">[3], [4]</span>.</p>
+<p><strong>Hierarchical objectives</strong> build a tree by merging the two closest groups at each step, using one of three linkage rules. The single linkage rule considers the closest pair between groups, <span class="math inline">\(d_{SL}(G,H) = \min_{i\in G, i'\in H} d_{i,i'}\)</span>. The complete linkage rule considers the farthest pair, <span class="math inline">\(d_{CL}(G,H) = \max_{i\in G,i'\in H} d_{i,i'}\)</span>, while the average linkage rule takes the mean over every cross-group pair, <span class="math inline">\(d_{avg}(G,H) = \frac{1}{n_G n_H}\sum_{i\in G}\sum_{i'\in H} d_{i,i'}\)</span>, the family Ward’s own minimum-variance criterion belongs to <span class="citation" data-cites="ward1963hierarchical">[5]</span>.</p>
+<p><strong>Density-connectivity objectives</strong> group points into chains of nearby neighbours, avoiding the use of a fixed number of centroids. In the DBSCAN algorithm by Ester, Kriegel, Sander, and Xu, a point is classified as a core point if it has a sufficient number of neighbours within a specified radius, as a border point if it neighbours a core point but does not meet the core criteria itself, and as noise otherwise <span class="citation" data-cites="ester1996dbscan">[6]</span>.</p>
+<p><strong>Graph-based and spectral objectives</strong> define clustering as partitioning a similarity graph. For example, Ng, Jordan, and Weiss propose the normalised cut criterion: <span class="math display">\[\text{Ncut}(S_1,\dots,S_K) = \frac{1}{2}\sum_{k=1}^{K}\frac{\text{cut}(S_k,\bar{S}_k)}{\text{vol}(S_k)}\]</span> where <span class="math inline">\(\text{cut}(S_k,\bar S_k) = \sum_{i\in S_k, j\notin S_k} w_{ij}\)</span> represents the total similarity weight crossing the cut, and <span class="math inline">\(\text{vol}(S_k) = \sum_{i \in S_k} d_i\)</span> is the total degree within <span class="math inline">\(S_k\)</span>. The problem is solved using the eigenvectors of the graph Laplacian <span class="math inline">\(L = D - W\)</span> <span class="citation" data-cites="ngjordanweiss2002spectral">[7]</span>.</p>
+</div>
+<div id="fig-clustering-objective-families" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-clustering-objective-families-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="../../assets/clustering-objective-families.svg" class="img-fluid figure-img">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-clustering-objective-families-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;11.2: Each clustering objective family optimises a distinct criterion. Partition-based methods generate Voronoi-like regions centred around a centroid. Hierarchical approaches construct a tree and select a cut that yields the desired number of groups. Density-connectivity methods identify clusters of arbitrary shape and classify genuine outliers as noise rather than assigning them to clusters. Graph or spectral methods partition a similarity graph into the smallest number of components with minimal total edge weight.
+</figcaption>
+</figure>
+</div>
+<p><strong>Hierarchical clustering</strong> is especially relevant here, as it is among the most widely used methods in the energy literature. Michalakopoulos et al.&nbsp;conducted a comparative analysis of k-means, k-medoids, hierarchical clustering, and DBSCAN using empirical data from a London population, which the next chapter also revisits <span class="citation" data-cites="michalakopoulos2024clustering">[8]</span>. Murphy’s textbook provides a comprehensive treatment of all four families, including worked numeric examples, which serves as a common reference point for this chapter and Part 2’s unsupervised-learning chapter, not a citation to re-derive from scratch.</p>
+<p>Computational cost varies sharply across these four families, and that cost is itself a real selection criterion, not merely an implementation detail. Partition-based methods scale the most gently, <span class="math inline">\(O(nKdI)\)</span> for <span class="math inline">\(n\)</span> points, <span class="math inline">\(K\)</span> centroids, <span class="math inline">\(d\)</span> dimensions, and <span class="math inline">\(I\)</span> iterations, making them the practical default at real utility scale. Hierarchical methods are markedly more expensive: <span class="math inline">\(O(n^2)\)</span> space and <span class="math inline">\(O(n^3)\)</span> time in the naive implementation, reducible to <span class="math inline">\(O(n^2 \log n)\)</span> with a priority queue, a cost Murphy’s own textbook quantifies directly. Density-connectivity methods such as DBSCAN cost <span class="math inline">\(O(n \log n)\)</span> once a spatial index is available, but degrade to <span class="math inline">\(O(n^2)\)</span> without one. Graph and spectral methods carry the heaviest cost of the four, typically <span class="math inline">\(O(n^3)\)</span> for the eigendecomposition of the similarity graph’s Laplacian, a real practical limit on how many customers or feeders a single spectral run can handle before an approximate or sparse solver becomes necessary.</p>
+<p>These costs translate directly into a real selection criterion. A roughly known number of compact, well-separated groups favours a partition method, the cheapest of the four. A need to explore several candidate values of <span class="math inline">\(K\)</span> from one run, rather than commit to one in advance, favours a hierarchical method’s dendrogram, at real extra cost. An expectation of genuine noise or non-convex shapes within the population, rooftop-solar adopters following an irregular seasonal curve rather than a tidy blob, say, favours density-connectivity. A similarity structure that a raw distance does not capture well, but a graph of pairwise relationships does, favours graph or spectral methods, provided the population is small enough, or the graph sparse enough, for that heavier cost to be worth paying.</p>
+</section>
+<section id="distance-and-representation" class="level2">
+<h2 class="anchored" data-anchor-id="distance-and-representation">Distance and representation</h2>
+<p>A load curve presents a more challenging target for any of these four families than generic tabular data, the second question above. Two households can share the same real evening routine and still be a few minutes out of phase, a genuine behavioural match that raw Euclidean distance reads as a mismatch.</p>
+<div class="ark-concept">
+<p><span class="ark-concept-title"><i class="bi bi-info-circle-fill"></i> Key Concept</span></p>
+<p>Sakoe and Chiba’s <a href="#acronyms_DTW">Dynamic Time Warping (DTW)</a> algorithm addresses a more general form of this problem. The alignment cost is determined using dynamic programming instead of a fixed point-by-point comparison, a method originally developed for spoken word recognition rather than for analysing power curves <span class="citation" data-cites="sakoechiba1978dtw">[9]</span>. For two time series <span class="math inline">\(x = (x_1,\dots,x_n)\)</span> and <span class="math inline">\(y = (y_1,\dots,y_m)\)</span>, the cumulative alignment cost is computed recursively as follows: <span class="math display">\[D(i,j) = d(x_i, y_j) + \min\{D(i-1,j),\ D(i,j-1),\ D(i-1,j-1)\}\]</span> where <span class="math inline">\(D(0,0) = 0\)</span> and all other boundary cells are set to <span class="math inline">\(\infty\)</span>. The <a href="#acronyms_DTW">DTW</a> distance between the two series is defined as <span class="math inline">\(D(n,m)\)</span>, the cost of the least expensive monotonic path through the pairwise distance matrix, in contrast with the fixed diagonal path plain Euclidean distance is forced to take. Aghabozorgi, Shirkhorshidi, and Wah’s review of time-series clustering identifies this type of representation and distance choice as an open research question, rather than one already resolved by generic clustering theory <span class="citation" data-cites="aghabozorgi2015timeseries">[10]</span>.</p>
+</div>
+<div id="fig-dtw-vs-euclidean" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-dtw-vs-euclidean-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="../../assets/dtw-vs-euclidean.svg" class="img-fluid figure-img">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-dtw-vs-euclidean-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;11.3: Two customers exhibiting identical evening routines that are offset by several time steps. Euclidean distance (left) performs a strict point-by-point comparison, which may align a peak in one curve with a trough in the other. Dynamic time warping (right) adjusts its matching to align corresponding peaks and troughs despite temporal shifts, thereby yielding a lower distance that more accurately reflects the similarity in shape.
+</figcaption>
+</figure>
+</div>
+<p>The convention the rest of this part follows, comparing peak-normalised shapes using plain Euclidean distance, is a defensible simplification for regularly sampled, already time-aligned <a href="#acronyms_AMI">Advanced Metering Infrastructure (AMI)</a> data. Aghabozorgi’s review indicates that Euclidean distance performs comparably to warped alignment for such regular time series, although this is not a universal solution for every kind of time series.</p>
+<p>Later chapters introduce two additional representations that extend this concept beyond a single flat feature vector. A single customer’s demand is better represented as an entire season of daily curves stacked together, organised by customer, day, and time-of-day, forming a genuine three-way array rather than a simple table. Tucker’s multi-way factorisation, originally developed for psychometric factor analysis, is designed to factorise exactly this type of tensor <span class="math inline">\(\mathcal{X} \in \mathbb{R}^{I\times J \times K}\)</span> into a smaller core tensor and one factor matrix per mode, <span class="math inline">\(\mathcal{X} \approx \mathcal{G} \times_1 A \times_2 B \times_3 C\)</span>, the direct three-way generalisation of the standard matrix factorisation underlying principal component analysis <span class="citation" data-cites="tucker1966threemode">[11]</span>. In contrast, Coifman and Lafon’s diffusion maps employ a nonlinear approach to achieve a similar objective. They construct a Markov transition matrix <span class="math inline">\(P = D^{-1}W\)</span> from a kernel similarity, followed by an embedding derived from the top eigenvectors, each scaled by its corresponding eigenvalue raised to a diffusion time <span class="math inline">\(t\)</span>, <span class="math inline">\(\Psi_t(i) = (\lambda_1^t \psi_1(i), \lambda_2^t \psi_2(i), \dots)\)</span>. This method captures manifold structure that a single graph cut may overlook, by watching where a random walk actually spends its time, not just which edges it crosses once <span class="citation" data-cites="coifmanlafon2006diffusionmaps">[12]</span>.</p>
+<div class="ark-concept">
+<p><span class="ark-concept-title"><i class="bi bi-info-circle-fill"></i> Key Concept</span></p>
+<p>Real <a href="#acronyms_AMI">AMI</a> data rarely arrives ready to cluster. Aghabozorgi, Shirkhorshidi, and Wah’s own review treats this as a distinct stage in its own right, prior to and separate from the choice of distance measure <span class="citation" data-cites="aghabozorgi2015timeseries">[10]</span>. A gap from a missed meter read needs to be imputed or the affected day excluded outright, not silently filled with zero, which would fabricate a false trough rather than an honest absence of data. Every customer’s readings need a common, regular sampling interval before any distance calculation is meaningful, since comparing a fifteen-minute series against a thirty-minute one is not comparing shape at all. And the aggregation window itself, a single day, a full week, or a season, is a real modelling choice, not an afterthought: too short a window mistakes one unusual day for a customer’s whole pattern, while too long a window can average away exactly the behavioural shift a later chapter’s own stability check is built to detect.</p>
+</div>
+<div class="ark-mistake">
+<p><span class="ark-mistake-title"><i class="bi bi-bug-fill"></i> Common Mistake</span></p>
+<p>Adding more features may appear to enhance safety by providing additional information. This becomes problematic, however, once the number of features approaches the size of the population being clustered: as dimensionality increases, pairwise distances tend to concentrate, genuine and spurious structure become harder to tell apart, and a clustering algorithm may begin to report splits that are merely artefacts of noise, rather than meaningful groupings. Ezugwu et al.&nbsp;and Ren et al.&nbsp;both identify the curse of dimensionality as an ongoing, unresolved challenge in their own recent surveys, rather than a problem that clustering theory has already retired <span class="citation" data-cites="ezugwu2022clustering ren2024deepclustering">[13], [14]</span>. A subsequent chapter in this part runs directly into a concrete example of this specific failure mode, not just the general warning.</p>
+</div>
+<div class="ark-mistake">
+<p><span class="ark-mistake-title"><i class="bi bi-bug-fill"></i> Common Mistake</span></p>
+<p>Assuming every real population handed to a clustering algorithm is already one population. A vacant property still reports a smart-meter reading, near-zero and flat, that can look like a real, distinct behavioural archetype rather than the simple absence of a household behind it, and a faulty meter can report a stuck or clipped value that reads as an extreme outlier rather than a data-quality problem, neither is a new kind of behaviour worth clustering. A subtler version of the same mistake is mixing customer types that only look uniform on paper: residential and commercial customers, or genuinely different climates, are not one population for shape-based clustering’s own purposes, however uniform the billing category looks. A later chapter’s own check against a real, independently labelled population that mixes residential and commercial buildings runs into exactly this problem, and reports the real, honest limit it finds there rather than smoothing it over.</p>
+</div>
+</section>
+<section id="clustering-under-constraints" class="level2">
+<h2 class="anchored" data-anchor-id="clustering-under-constraints">Clustering under constraints</h2>
+<p>The fourth question, real background knowledge constraining a clustering directly, has generated its own distinct body of literature, commonly referred to as constrained clustering.</p>
+<div class="ark-concept">
+<p><span class="ark-concept-title"><i class="bi bi-info-circle-fill"></i> Key Concept</span></p>
+<p>Wagstaff, Cardie, Rogers, and Schrödl’s COP-KMeans algorithm modifies the standard k-means assignment step by incorporating two types of side information: a <strong>must-link</strong> constraint, which requires two points to be assigned to the same cluster, and a <strong>cannot-link</strong> constraint, which prohibits such an assignment. The algorithm simply rejects any assignment that would violate either, rather than optimising a soft penalty for breaking one <span class="citation" data-cites="wagstaff2001constrainedkmeans">[15]</span>.</p>
+</div>
+<div id="fig-must-link-cannot-link" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-must-link-cannot-link-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="../../assets/must-link-cannot-link.svg" class="img-fluid figure-img">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-must-link-cannot-link-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;11.4: Distance alone would merge the closest cross-feeder pair (dashed red) and might split the farthest same-feeder pair (solid green). A must-link constraint forces the same-feeder pair together regardless of their own distance; a cannot-link constraint forbids merging the close pair that happens to sit on different real feeders.
+</figcaption>
+</figure>
+</div>
+<p>This is the exact vocabulary a later chapter in this part needs once it starts clustering customers under the constraint that some of them share a single real physical feeder, a fact that a distance function alone cannot capture and should not be left to discover by accident.</p>
+</section>
+<section id="the-state-of-the-art" class="level2">
+<h2 class="anchored" data-anchor-id="the-state-of-the-art">The state of the art</h2>
+<p>The energy-domain literature has evolved from initial systematic comparisons to an increasing focus on representation learning. Chicco’s 2012 overview was the first to compare clustering methods for load-pattern grouping side by side, rather than introducing yet another method in isolation <span class="citation" data-cites="chicco2012overview">[16]</span>. McLoughlin, Kwac, and Haben demonstrated that shape-based clusters reflect actual behaviour, not merely statistical artefacts <span class="citation" data-cites="mcloughlin2015clustering kwac2014segmentation haben2016clustering">[17], [18], [19]</span>. Wang, Chen, Hong, and Kang’s 2019 review positions clustering as one of three main pillars of smart-meter analytics, alongside forecasting and load management, rather than as a niche technique <span class="citation" data-cites="wang2019smartmeterreview">[1]</span>. Rajabi et al.&nbsp;(2020) pushed toward rigorous comparative benchmarking of clustering techniques specifically for load patterns <span class="citation" data-cites="rajabi2020comparative">[20]</span>.</p>
+<p>In parallel, another line of research replaces hand-engineered shape features with learned ones entirely. Xie, Girshick, and Farhadi’s Deep Embedded Clustering <span class="citation" data-cites="xie2016dec">[21]</span> and Guo et al.’s improved version <span class="citation" data-cites="guo2017idec">[22]</span> have been broadly surveyed by Ezugwu et al.&nbsp;(2022, 847 citations) <span class="citation" data-cites="ezugwu2022clustering">[13]</span>, Ren et al.&nbsp;(2024) <span class="citation" data-cites="ren2024deepclustering">[14]</span>, and Alqahtani et al.’s time-series-specific deep-clustering review <span class="citation" data-cites="alqahtani2021deeptimeseries">[23]</span>. Two recent and quite distinct real-world applications demonstrate the field’s current range: Satre-Meloy, Diakonova, and Grünewald link clustered peak-demand profiles to real occupant-activity data <span class="citation" data-cites="satremeloy2020peakdemand">[24]</span>, and Eskandarnia, Al-Ammal, and Ksantini built an autoencoder-based load-profiling framework end to end <span class="citation" data-cites="eskandarnia2022deepclustering">[25]</span>. Yerbury et al.’s CROCS is the most current and most directly relevant precedent, a two-stage framework that first summarises each consumer’s own representative daily behaviours, then clusters consumers by how similar those summaries are <span class="citation" data-cites="yerbury2026crocs">[26]</span>. Not one of these, across a full decade of work, tests whether its own findings survive contact with a second, independently collected population, with more than a handful of clustering paradigms compared side by side. A later chapter in this part addresses this gap directly.</p>
+</section>
+<section id="evaluating-a-clustering" class="level2">
+<h2 class="anchored" data-anchor-id="evaluating-a-clustering">Evaluating a clustering</h2>
+<p>Every clustering method the rest of this part builds answers to the same set of real, literature-grounded decisions, in the order a practitioner actually faces them, starting with shape, not magnitude: two households can draw very different absolute power and still share the same underlying rhythm, and clustering on raw magnitude separates them by household size instead of behaviour. Every clustering method later in this part clusters on shape, established here first, applied concretely starting in the next chapter. Distance and representation matter too: Euclidean-on-shape, elastic alignment (<a href="#acronyms_DTW">DTW</a>), a multi-way tensor factorisation, a nonlinear manifold embedding, and a learned representation (DEC, IDEC, Chronos-2) trade off real compute cost against what kind of similarity actually gets captured, the tradeoff Aghabozorgi, Ren, and Alqahtani’s reviews all name directly. None is a free upgrade over the others.</p>
+<div class="ark-concept">
+<p><span class="ark-concept-title"><i class="bi bi-info-circle-fill"></i> Key Concept</span></p>
+<p>Relying on a single validity index is never sufficient. The silhouette coefficient, introduced by Rousseeuw <span class="citation" data-cites="rousseeuw1987silhouette">[27]</span>, offers one perspective on cluster quality. It measures how well each point fits within its assigned cluster compared to the closest alternative cluster. <span class="math display">\[s(i) = \frac{b(i) - a(i)}{\max\{a(i), b(i)\}}\]</span> where <span class="math inline">\(a(i)\)</span> is the mean distance from point <span class="math inline">\(i\)</span> to the other members of its own cluster, and <span class="math inline">\(b(i)\)</span> is the mean distance to the members of the nearest other cluster. Jain’s own retrospective is explicit that no single index is universally correct, and the rest of this part checks more than one every time a real number of clusters has to be chosen.</p>
+</div>
+</section>
+<section id="choosing-k" class="level2">
+<h2 class="anchored" data-anchor-id="choosing-k">Choosing K</h2>
+<p>The silhouette coefficient serves a dual purpose. When averaged across all points, it helps determine the actual number of clusters in a population, eliminating the need for a distortion curve’s elbow.</p>
+<div id="fig-choosing-k" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-choosing-k-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="../../assets/choosing-k.svg" class="img-fluid figure-img">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-choosing-k-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;11.5: Distortion (left) decreases monotonically as K increases, as expected, and the true elbow near K=3 can be difficult to detect. In contrast, the silhouette score (right), calculated from the same clustering runs, peaks sharply and clearly at K=3.
+</figcaption>
+</figure>
+</div>
+<div class="ark-mistake">
+<p><span class="ark-mistake-title"><i class="bi bi-bug-fill"></i> Common Mistake</span></p>
+<p>Determining the optimal value of <span class="math inline">\(K\)</span> using the elbow of a distortion or inertia curve presents significant challenges. Distortion, by definition, decreases monotonically as <span class="math inline">\(K\)</span> increases because the addition of clusters reduces within-cluster distances. As demonstrated in Murphy’s textbook, the elbow in the distortion curve is often difficult to identify, particularly at values of <span class="math inline">\(K\)</span> where the silhouette curve exhibits a distinct peak. Consequently, subsequent chapters assess multiple validity indices rather than relying solely on a single curve.</p>
+</div>
+</section>
+<section id="checking-stability" class="level2">
+<h2 class="anchored" data-anchor-id="checking-stability">Checking stability</h2>
+<p>When no ground truth exists, ensemble methods offer a practical way to assess stability. Strehl and Ghosh’s Cluster-based Similarity Partitioning Algorithm provides a clear example <span class="citation" data-cites="strehl2002clusterensembles">[28]</span>. It builds a consensus similarity matrix by combining results from several independent clusterings of the same objects. <span class="math display">\[S = \frac{1}{r}HH^\top,\qquad S_{ij} = \frac{1}{r}\sum_{m=1}^{r}\mathbb{1}\!\left[\lambda_m(i) = \lambda_m(j)\right]\]</span> This value shows how often, across <span class="math inline">\(r\)</span> independent clusterings, objects <span class="math inline">\(i\)</span> and <span class="math inline">\(j\)</span> appear together in the same cluster. Part 4 Chapter 3 used this co-association idea for phase identification, building on the work of Blakely and Reno <span class="citation" data-cites="blakely2020coassociation">[29]</span>. The following sections will broaden this discussion, focusing on the general method that supports their approach.</p>
+</section>
+<section id="validating-against-reality" class="level2">
+<h2 class="anchored" data-anchor-id="validating-against-reality">Validating against reality</h2>
+<p>Internal validity indices and ensemble stability both measure how well a clustering is structured, but neither can confirm if it is correct, and neither, on its own, can even confirm the structure it measures is real rather than an artefact of one extreme point. The next chapter turns that gap into its own central question, before any later chapter trusts a clustering result at all. Once a settled methodology has survived that check, a further chapter addresses a second, complementary gap by introducing a controlled behavioural change: a deliberate intervention with a known outcome, allowing direct comparison between clustering results and ground truth in a way no internal index or resampling check can offer by itself.</p>
+</section>
+<section id="where-this-leads" class="level2">
+<h2 class="anchored" data-anchor-id="where-this-leads">Where this leads</h2>
+<p>None of this is only theoretical. A validated cluster becomes a real lever a <a href="#acronyms_DSO">DSO</a> can pull: a tariff designed around a real archetype’s own rhythm rather than a population average, a targeted upgrade programme aimed at the customers actually likely to strain a feeder first, or a demand-response cohort chosen because its members’ own behaviour predicts they will respond, not because they happen to share a billing category.</p>
+<p>The four central questions introduced in this chapter shape the structure of the chapters that follow. The next chapter does not yet cluster a single real customer; it settles the methodology first, which of this chapter’s own open questions, feature representation, dimensionality, and above all validity, actually matter in practice, checked against three independent real utilities before any of them is trusted as a settled choice. Only once that recipe is settled does the chapter after it apply it, for the first time, to AusNet’s real customers and feeders. Later chapters test whether that same settled approach, together with four different data representations, a two-stage summary focused on behaviour, tensor decomposition, a learned foundation-model embedding, and a diffusion-map perspective, produces consistent definitions of real structure across various populations, including households in London and Spain. The analysis then expands to higher levels of aggregation, such as entire substations, and explores new contexts, comparing real charging sessions with daily routines. The final chapter in this sequence examines clustering directly constrained by the physical feeder graph, bringing the methodological journey to a conclusion.</p>
+</section>
+<section id="references" class="level2">
+<h2 class="anchored" data-anchor-id="references">References</h2>
+<div id="refs" class="references csl-bib-body" data-entry-spacing="0" role="list" style="display: none">
+<div id="ref-wang2019smartmeterreview" class="csl-entry" role="listitem">
+<div class="csl-left-margin">[1] </div><div class="csl-right-inline">Y. Wang, Q. Chen, T. Hong, and C. Kang, <span>“Review of smart meter data analytics: Applications, methodologies, and challenges,”</span> <em>IEEE Transactions on Smart Grid</em>, vol. 10, no. 3, pp. 3125–3148, 2019, doi: <a href="https://doi.org/10.1109/TSG.2018.2818167">10.1109/TSG.2018.2818167</a>.</div>
+</div>
+<div id="ref-jain2010clustering50years" class="csl-entry" role="listitem">
+<div class="csl-left-margin">[2] </div><div class="csl-right-inline">A. K. Jain, <span>“Data clustering: 50 years beyond k-means,”</span> <em>Pattern Recognition Letters</em>, vol. 31, no. 8, pp. 651–666, 2010, doi: <a href="https://doi.org/10.1016/j.patrec.2009.09.011">10.1016/j.patrec.2009.09.011</a>.</div>
+</div>
+<div id="ref-macqueen1967kmeans" class="csl-entry" role="listitem">
+<div class="csl-left-margin">[3] </div><div class="csl-right-inline">J. MacQueen, <span>“Some methods for classification and analysis of multivariate observations,”</span> in <em>Proceedings of the fifth berkeley symposium on mathematical statistics and probability, volume 1: statistics</em>, University of California Press, 1967, pp. 281–297.</div>
+</div>
+<div id="ref-arthur2007kmeanspp" class="csl-entry" role="listitem">
+<div class="csl-left-margin">[4] </div><div class="csl-right-inline">D. Arthur and S. Vassilvitskii, <span>“K-means++: The advantages of careful seeding,”</span> in <em>Proceedings of the eighteenth annual ACM-SIAM symposium on discrete algorithms (SODA)</em>, 2007, pp. 1027–1035.</div>
+</div>
+<div id="ref-ward1963hierarchical" class="csl-entry" role="listitem">
+<div class="csl-left-margin">[5] </div><div class="csl-right-inline">J. H. Ward, <span>“Hierarchical grouping to optimize an objective function,”</span> <em>Journal of the American Statistical Association</em>, vol. 58, no. 301, pp. 236–244, 1963, doi: <a href="https://doi.org/10.1080/01621459.1963.10500845">10.1080/01621459.1963.10500845</a>.</div>
+</div>
+<div id="ref-ester1996dbscan" class="csl-entry" role="listitem">
+<div class="csl-left-margin">[6] </div><div class="csl-right-inline">M. Ester, H.-P. Kriegel, J. Sander, and X. Xu, <span>“A density-based algorithm for discovering clusters in large spatial databases with noise,”</span> in <em>Proceedings of the second international conference on knowledge discovery and data mining (KDD-96)</em>, 1996, pp. 226–231.</div>
+</div>
+<div id="ref-ngjordanweiss2002spectral" class="csl-entry" role="listitem">
+<div class="csl-left-margin">[7] </div><div class="csl-right-inline">A. Y. Ng, M. I. Jordan, and Y. Weiss, <span>“On spectral clustering: Analysis and an algorithm,”</span> in <em>Advances in neural information processing systems (NeurIPS)</em>, 2002, pp. 849–856.</div>
+</div>
+<div id="ref-michalakopoulos2024clustering" class="csl-entry" role="listitem">
+<div class="csl-left-margin">[8] </div><div class="csl-right-inline">V. Michalakopoulos, E. Sarmas, I. Papias, P. Skaloumpakas, V. Marinakis, and H. Doukas, <span>“A machine learning-based framework for clustering residential electricity load profiles to enhance demand response programs,”</span> <em>Applied Energy</em>, vol. 361, 2024, doi: <a href="https://doi.org/10.1016/j.apenergy.2024.122943">10.1016/j.apenergy.2024.122943</a>.</div>
+</div>
+<div id="ref-sakoechiba1978dtw" class="csl-entry" role="listitem">
+<div class="csl-left-margin">[9] </div><div class="csl-right-inline">H. Sakoe and S. Chiba, <span>“Dynamic programming algorithm optimization for spoken word recognition,”</span> <em>IEEE Transactions on Acoustics, Speech, and Signal Processing</em>, vol. 26, no. 1, pp. 43–49, 1978, doi: <a href="https://doi.org/10.1109/TASSP.1978.1163055">10.1109/TASSP.1978.1163055</a>.</div>
+</div>
+<div id="ref-aghabozorgi2015timeseries" class="csl-entry" role="listitem">
+<div class="csl-left-margin">[10] </div><div class="csl-right-inline">S. Aghabozorgi, A. S. Shirkhorshidi, and T. Y. Wah, <span>“Time-series clustering – a decade review,”</span> <em>Information Systems</em>, vol. 53, pp. 16–38, 2015, doi: <a href="https://doi.org/10.1016/j.is.2015.04.007">10.1016/j.is.2015.04.007</a>.</div>
+</div>
+<div id="ref-tucker1966threemode" class="csl-entry" role="listitem">
+<div class="csl-left-margin">[11] </div><div class="csl-right-inline">L. R. Tucker, <span>“Some mathematical notes on three-mode factor analysis,”</span> <em>Psychometrika</em>, vol. 31, no. 3, pp. 279–311, 1966, doi: <a href="https://doi.org/10.1007/BF02289464">10.1007/BF02289464</a>.</div>
+</div>
+<div id="ref-coifmanlafon2006diffusionmaps" class="csl-entry" role="listitem">
+<div class="csl-left-margin">[12] </div><div class="csl-right-inline">R. R. Coifman and S. Lafon, <span>“Diffusion maps,”</span> <em>Applied and Computational Harmonic Analysis</em>, vol. 21, no. 1, pp. 5–30, 2006, doi: <a href="https://doi.org/10.1016/j.acha.2006.04.006">10.1016/j.acha.2006.04.006</a>.</div>
+</div>
+<div id="ref-ezugwu2022clustering" class="csl-entry" role="listitem">
+<div class="csl-left-margin">[13] </div><div class="csl-right-inline">A. E. Ezugwu <em>et al.</em>, <span>“A comprehensive survey of clustering algorithms: State-of-the-art machine learning applications, taxonomy, challenges, and future research prospects,”</span> <em>Engineering Applications of Artificial Intelligence</em>, vol. 110, 2022, doi: <a href="https://doi.org/10.1016/j.engappai.2022.104743">10.1016/j.engappai.2022.104743</a>.</div>
+</div>
+<div id="ref-ren2024deepclustering" class="csl-entry" role="listitem">
+<div class="csl-left-margin">[14] </div><div class="csl-right-inline">Y. Ren <em>et al.</em>, <span>“Deep clustering: A comprehensive survey,”</span> <em>IEEE Transactions on Neural Networks and Learning Systems</em>, 2024, doi: <a href="https://doi.org/10.1109/TNNLS.2024.3403155">10.1109/TNNLS.2024.3403155</a>.</div>
+</div>
+<div id="ref-wagstaff2001constrainedkmeans" class="csl-entry" role="listitem">
+<div class="csl-left-margin">[15] </div><div class="csl-right-inline">K. Wagstaff, C. Cardie, S. Rogers, and S. Schrödl, <span>“Constrained k-means clustering with background knowledge,”</span> in <em>Proceedings of the eighteenth international conference on machine learning (ICML)</em>, 2001, pp. 577–584.</div>
+</div>
+<div id="ref-chicco2012overview" class="csl-entry" role="listitem">
+<div class="csl-left-margin">[16] </div><div class="csl-right-inline">G. Chicco, <span>“Overview and performance assessment of the clustering methods for electrical load pattern grouping,”</span> <em>Energy</em>, vol. 42, no. 1, pp. 68–80, 2012, doi: <a href="https://doi.org/10.1016/j.energy.2011.12.031">10.1016/j.energy.2011.12.031</a>.</div>
+</div>
+<div id="ref-mcloughlin2015clustering" class="csl-entry" role="listitem">
+<div class="csl-left-margin">[17] </div><div class="csl-right-inline">F. McLoughlin, A. Duffy, and M. Conlon, <span>“A clustering approach to domestic electricity load profile characterisation using smart metering data,”</span> <em>Applied Energy</em>, vol. 141, pp. 190–199, 2015, doi: <a href="https://doi.org/10.1016/j.apenergy.2014.12.039">10.1016/j.apenergy.2014.12.039</a>.</div>
+</div>
+<div id="ref-kwac2014segmentation" class="csl-entry" role="listitem">
+<div class="csl-left-margin">[18] </div><div class="csl-right-inline">J. Kwac, J. Flora, and R. Rajagopal, <span>“Household energy consumption segmentation using hourly data,”</span> <em>IEEE Transactions on Smart Grid</em>, vol. 5, no. 1, pp. 420–430, 2014, doi: <a href="https://doi.org/10.1109/TSG.2013.2278477">10.1109/TSG.2013.2278477</a>.</div>
+</div>
+<div id="ref-haben2016clustering" class="csl-entry" role="listitem">
+<div class="csl-left-margin">[19] </div><div class="csl-right-inline">S. Haben, C. Singleton, and P. Grindrod, <span>“Analysis and clustering of residential customers energy behavioral demand using smart meter data,”</span> <em>IEEE Transactions on Smart Grid</em>, vol. 7, no. 1, pp. 136–144, 2016, doi: <a href="https://doi.org/10.1109/TSG.2015.2409786">10.1109/TSG.2015.2409786</a>.</div>
+</div>
+<div id="ref-rajabi2020comparative" class="csl-entry" role="listitem">
+<div class="csl-left-margin">[20] </div><div class="csl-right-inline">A. Rajabi, M. Eskandari, M. J. Ghadi, L. Li, J. Zhang, and P. Siano, <span>“A comparative study of clustering techniques for electrical load pattern segmentation,”</span> <em>Renewable and Sustainable Energy Reviews</em>, vol. 120, 2020, doi: <a href="https://doi.org/10.1016/j.rser.2019.109628">10.1016/j.rser.2019.109628</a>.</div>
+</div>
+<div id="ref-xie2016dec" class="csl-entry" role="listitem">
+<div class="csl-left-margin">[21] </div><div class="csl-right-inline">J. Xie, R. Girshick, and A. Farhadi, <span>“Unsupervised deep embedding for clustering analysis,”</span> in <em>Proceedings of the 33rd international conference on machine learning (ICML)</em>, 2016, pp. 478–487.</div>
+</div>
+<div id="ref-guo2017idec" class="csl-entry" role="listitem">
+<div class="csl-left-margin">[22] </div><div class="csl-right-inline">X. Guo, L. Gao, X. Liu, and J. Yin, <span>“Improved deep embedded clustering with local structure preservation,”</span> in <em>Proceedings of the 26th international joint conference on artificial intelligence (IJCAI)</em>, 2017, pp. 1753–1759.</div>
+</div>
+<div id="ref-alqahtani2021deeptimeseries" class="csl-entry" role="listitem">
+<div class="csl-left-margin">[23] </div><div class="csl-right-inline">A. Alqahtani, M. Ali, X. Xie, and M. W. Jones, <span>“Deep time-series clustering: A review,”</span> <em>Electronics</em>, vol. 10, no. 23, p. 3001, 2021, doi: <a href="https://doi.org/10.3390/electronics10233001">10.3390/electronics10233001</a>.</div>
+</div>
+<div id="ref-satremeloy2020peakdemand" class="csl-entry" role="listitem">
+<div class="csl-left-margin">[24] </div><div class="csl-right-inline">A. Satre-Meloy, M. Diakonova, and P. Grünewald, <span>“Cluster analysis and prediction of residential peak demand profiles using occupant activity data,”</span> <em>Applied Energy</em>, vol. 260, 2020, doi: <a href="https://doi.org/10.1016/j.apenergy.2019.114246">10.1016/j.apenergy.2019.114246</a>.</div>
+</div>
+<div id="ref-eskandarnia2022deepclustering" class="csl-entry" role="listitem">
+<div class="csl-left-margin">[25] </div><div class="csl-right-inline">E. Eskandarnia, H. M. Al-Ammal, and R. Ksantini, <span>“An embedded deep-clustering-based load profiling framework,”</span> <em>Sustainable Cities and Society</em>, vol. 78, 2022, doi: <a href="https://doi.org/10.1016/j.scs.2021.103618">10.1016/j.scs.2021.103618</a>.</div>
+</div>
+<div id="ref-yerbury2026crocs" class="csl-entry" role="listitem">
+<div class="csl-left-margin">[26] </div><div class="csl-right-inline">L. W. Yerbury, R. J. G. B. Campello, G. C. Livingston, M. Goldsworthy, and L. O’Neil, <span>“CROCS: A two-stage clustering framework for behaviour-centric consumer segmentation with smart meter data.”</span> 2026. Available: <a href="https://arxiv.org/abs/2601.10494">https://arxiv.org/abs/2601.10494</a></div>
+</div>
+<div id="ref-rousseeuw1987silhouette" class="csl-entry" role="listitem">
+<div class="csl-left-margin">[27] </div><div class="csl-right-inline">P. J. Rousseeuw, <span>“Silhouettes: A graphical aid to the interpretation and validation of cluster analysis,”</span> <em>Journal of Computational and Applied Mathematics</em>, vol. 20, pp. 53–65, 1987, doi: <a href="https://doi.org/10.1016/0377-0427(87)90125-7">10.1016/0377-0427(87)90125-7</a>.</div>
+</div>
+<div id="ref-strehl2002clusterensembles" class="csl-entry" role="listitem">
+<div class="csl-left-margin">[28] </div><div class="csl-right-inline">A. Strehl and J. Ghosh, <span>“Cluster ensembles - a knowledge reuse framework for combining multiple partitions,”</span> <em>Journal of Machine Learning Research</em>, vol. 3, pp. 583–617, 2002.</div>
+</div>
+<div id="ref-blakely2020coassociation" class="csl-entry" role="listitem">
+<div class="csl-left-margin">[29] </div><div class="csl-right-inline">L. Blakely and M. J. Reno, <span>“Phase identification using co-association matrix ensemble clustering,”</span> <em>IET Smart Grid</em>, vol. 3, no. 4, pp. 490–499, 2020, doi: <a href="https://doi.org/10.1049/iet-stg.2019.0280">10.1049/iet-stg.2019.0280</a>.</div>
+</div>
+</div>
+
+
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    // Ensure there is a toggle, if there isn't float one in the top right
+    if (window.document.querySelector('.quarto-color-scheme-toggle') === null) {
+      const a = window.document.createElement('a');
+      a.classList.add('top-right');
+      a.classList.add('quarto-color-scheme-toggle');
+      a.href = "";
+      a.onclick = function() { try { window.quartoToggleColorScheme(); } catch {} return false; };
+      const i = window.document.createElement("i");
+      i.classList.add('bi');
+      a.appendChild(i);
+      window.document.body.appendChild(a);
+    }
+    setColorSchemeToggle(hasAlternateSentinel())
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp("https:\/\/sambaiga\.github\.io\/ml-energy-disaggregation\/");
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+<nav class="page-navigation">
+  <div class="nav-page nav-page-previous">
+      <a href="../../book/04-network-foundations/03-phase-identification.html" class="pagination-link" aria-label="Chapter 3: Phase Identification from Smart-Meter Data">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text"><span class="chapter-title">Chapter 3: Phase Identification from Smart-Meter Data</span></span>
+      </a>          
+  </div>
+  <div class="nav-page nav-page-next">
+      <a href="../../book/05-clustering/02-clustering-methodology.html" class="pagination-link" aria-label="Chapter 2: Clustering Methodology">
+        <span class="nav-page-text"><span class="chapter-title">Chapter 2: Clustering Methodology</span></span> <i class="bi bi-arrow-right-short"></i>
+      </a>
+  </div>
+</nav>
+</div> <!-- /content -->
+<footer class="footer">
+  <div class="nav-footer">
+    <div class="nav-footer-left">
+<p><span class="faux-block">© 2025–2026 <a href="https://sambaiga.github.io/">Anthony Faustine</a></span> <span class="faux-block">Code licensed under <a href="https://www.apache.org/licenses/LICENSE-2.0">Apache 2.0</a></span></p>
+</div>   
+    <div class="nav-footer-center">
+<div class="footer-social">
+<p><a href="mailto:sambaiga@gmail.com" title="Email"><i class="bi bi-envelope-at-fill"></i></a> <a href="https://github.com/sambaiga" title="GitHub"><i class="bi bi-github"></i></a> <a href="https://www.linkedin.com/in/sambaiga" title="LinkedIn"><i class="bi bi-linkedin"></i></a></p>
+</div>
+<div class="toc-actions d-sm-block d-md-none"><ul><li><a href="https://github.com/sambaiga/ml-energy-disaggregation/edit/main/book/05-clustering/01-clustering-foundations.qmd" class="toc-action"><i class="bi bi-github"></i>Edit this page</a></li><li><a href="https://github.com/sambaiga/ml-energy-disaggregation/issues/new" class="toc-action"><i class="bi empty"></i>Report an issue</a></li><li><a href="https://github.com/sambaiga/ml-energy-disaggregation/blob/main/book/05-clustering/01-clustering-foundations.qmd" class="toc-action"><i class="bi empty"></i>View source</a></li></ul></div></div>
+    <div class="nav-footer-right">
+<p><span class="faux-block">Made with <a href="https://quarto.org">Quarto</a></span> <span class="faux-block"><a href="https://github.com/sambaiga/ml-energy-disaggregation"><i class="bi bi-github"></i> View source</a></span></p>
+</div>
+  </div>
+</footer>
+
+
+
+
+</body></html>

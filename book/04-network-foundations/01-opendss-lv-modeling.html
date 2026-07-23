@@ -89,7 +89,7 @@ div.csl-indent {
 <script src="../../site_libs/quarto-search/fuse.min.js"></script>
 <script src="../../site_libs/quarto-search/quarto-search.js"></script>
 <meta name="quarto:offset" content="../../">
-<link href="../../book/04-grid-edge/02-timeseries-der-modeling.html" rel="next">
+<link href="../../book/04-network-foundations/02-timeseries-der-modeling.html" rel="next">
 <link href="../../book/03-disaggregation/04-multi-task-low-frequency.html" rel="prev">
 <link href="../../assets/favicon.svg" rel="icon" type="image/svg+xml">
 <script src="../../site_libs/quarto-html/quarto.js" type="module"></script>
@@ -103,9 +103,9 @@ div.csl-indent {
 <link href="../../site_libs/quarto-html/quarto-syntax-highlighting-de63f62b328812d8e578a4d74e282472.css" rel="stylesheet" class="quarto-color-scheme-extra" id="quarto-text-highlighting-styles">
 <script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="../../site_libs/bootstrap/bootstrap-9661ac00a33b6c2a7ffb2cb4cb9f2155.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
-<link href="../../site_libs/bootstrap/bootstrap-dark-9b208294319f478b9205897e46a7db35.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="dark">
-<link href="../../site_libs/bootstrap/bootstrap-9661ac00a33b6c2a7ffb2cb4cb9f2155.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme-extra" id="quarto-bootstrap" data-mode="light">
+<link href="../../site_libs/bootstrap/bootstrap-84b0f63d2b22afb69d3c32ede53d2fe2.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
+<link href="../../site_libs/bootstrap/bootstrap-dark-86bd388472066654720eaf2de8d3b778.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="dark">
+<link href="../../site_libs/bootstrap/bootstrap-84b0f63d2b22afb69d3c32ede53d2fe2.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme-extra" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -445,7 +445,7 @@ window.Quarto = {
         <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
             <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true">
- <span class="menu-text">Part 4: Grid-Edge Value</span></a>
+ <span class="menu-text">Part 4: LV Network and Topology Foundations</span></a>
           <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true" aria-label="Toggle section">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
@@ -453,32 +453,17 @@ window.Quarto = {
       <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth1 show">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../../book/04-grid-edge/01-opendss-lv-modeling.html" class="sidebar-item-text sidebar-link active"><span class="chapter-title">Chapter 1: Modeling the Low-Voltage Network</span></a>
+  <a href="../../book/04-network-foundations/01-opendss-lv-modeling.html" class="sidebar-item-text sidebar-link active"><span class="chapter-title">Chapter 1: Modeling the Low-Voltage Network</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../../book/04-grid-edge/02-timeseries-der-modeling.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">Chapter 2: Time-Series Simulation and DER Modeling</span></a>
+  <a href="../../book/04-network-foundations/02-timeseries-der-modeling.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">Chapter 2: Time-Series Simulation and DER Modeling</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../../book/04-grid-edge/03-phase-identification.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">Chapter 3: Phase Identification from Smart-Meter Data</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../../book/04-grid-edge/04-customer-feeder-clustering.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">Chapter 4: Customer and Feeder Clustering</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../../book/04-grid-edge/05-ranking-recommendation.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">Chapter 5: Ranking and Recommendation under DER</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../../book/04-grid-edge/06-anomaly-detection.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">Chapter 6: Anomaly Detection Beyond the Meter</span></a>
+  <a href="../../book/04-network-foundations/03-phase-identification.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">Chapter 3: Phase Identification from Smart-Meter Data</span></a>
   </div>
 </li>
       </ul>
@@ -486,7 +471,7 @@ window.Quarto = {
         <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
             <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="false">
- <span class="menu-text">Part 5: Forecasting</span></a>
+ <span class="menu-text">Part 5: Clustering</span></a>
           <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="false" aria-label="Toggle section">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
@@ -494,32 +479,90 @@ window.Quarto = {
       <ul id="quarto-sidebar-section-3" class="collapse list-unstyled sidebar-section depth1 ">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../../book/05-forecasting/01-forecastability.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">Chapter 1: Household Smart-Meter Forecastability</span></a>
+  <a href="../../book/05-clustering/01-clustering-foundations.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">Chapter 1: Clustering Foundations</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../../book/05-forecasting/02-scaling-archetypes.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">Chapter 2: Scaling to Hundreds of Meters</span></a>
+  <a href="../../book/05-clustering/02-clustering-methodology.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">Chapter 2: Clustering Methodology</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../../book/05-forecasting/03-probabilistic-forecasting.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">Chapter 3: What a Probabilistic Forecast Is Actually Worth</span></a>
+  <a href="../../book/05-clustering/03-customer-feeder-clustering.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">Chapter 3: Customer and Feeder Clustering</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" role="navigation" aria-expanded="false">
+ <span class="menu-text">Part 6: Ranking and Recommendation</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" role="navigation" aria-expanded="false" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-4" class="collapse list-unstyled sidebar-section depth1 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../book/06-ranking-recommendation/01-ranking-recommendation.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">Chapter 1: Ranking and Recommendation under DER</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-5" role="navigation" aria-expanded="false">
+ <span class="menu-text">Part 7: Anomaly Detection</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-5" role="navigation" aria-expanded="false" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-5" class="collapse list-unstyled sidebar-section depth1 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../book/07-anomaly-detection/01-anomaly-detection.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">Chapter 1: Anomaly Detection Beyond the Meter</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-6" role="navigation" aria-expanded="false">
+ <span class="menu-text">Part 8: Forecasting</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-6" role="navigation" aria-expanded="false" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-6" class="collapse list-unstyled sidebar-section depth1 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../book/08-forecasting/01-forecastability.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">Chapter 1: Household Smart-Meter Forecastability</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../../book/05-forecasting/04-foundation-models.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">Part 5 Chapter 4: Do Foundation Models Fail Like Everything Else Does?</span></a>
+  <a href="../../book/08-forecasting/02-scaling-archetypes.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">Chapter 2: Scaling to Hundreds of Meters</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../../book/05-forecasting/05-what-if-scenario-analysis.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">Part 5 Chapter 5: What the Grid Actually Faces When These Forecasts Come True</span></a>
+  <a href="../../book/08-forecasting/03-probabilistic-forecasting.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">Chapter 3: What a Probabilistic Forecast Is Actually Worth</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../../book/05-forecasting/06-lv-state-estimation.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">Part 5 Chapter 6: Can Smart-Meter Readings Fill In What the Grid Cannot See</span></a>
+  <a href="../../book/08-forecasting/04-foundation-models.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">Part 8 Chapter 4: Do Foundation Models Fail Like Everything Else Does?</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../book/08-forecasting/05-what-if-scenario-analysis.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">Part 8 Chapter 5: What the Grid Actually Faces When These Forecasts Come True</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../book/08-forecasting/06-lv-state-estimation.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">Part 8 Chapter 6: Can Smart-Meter Readings Fill In What the Grid Cannot See</span></a>
   </div>
 </li>
       </ul>
@@ -556,7 +599,7 @@ window.Quarto = {
   <li><a href="#where-part-4-goes-from-here" id="toc-where-part-4-goes-from-here" class="nav-link" data-scroll-target="#where-part-4-goes-from-here">Where Part 4 goes from here</a></li>
   <li><a href="#references" id="toc-references" class="nav-link" data-scroll-target="#references">References</a></li>
   </ul>
-<div class="toc-actions"><ul><li><a href="https://github.com/sambaiga/ml-energy-disaggregation/edit/main/book/04-grid-edge/01-opendss-lv-modeling.qmd" class="toc-action"><i class="bi bi-github"></i>Edit this page</a></li><li><a href="https://github.com/sambaiga/ml-energy-disaggregation/issues/new" class="toc-action"><i class="bi empty"></i>Report an issue</a></li><li><a href="https://github.com/sambaiga/ml-energy-disaggregation/blob/main/book/04-grid-edge/01-opendss-lv-modeling.qmd" class="toc-action"><i class="bi empty"></i>View source</a></li></ul></div></nav>
+<div class="toc-actions"><ul><li><a href="https://github.com/sambaiga/ml-energy-disaggregation/edit/main/book/04-network-foundations/01-opendss-lv-modeling.qmd" class="toc-action"><i class="bi bi-github"></i>Edit this page</a></li><li><a href="https://github.com/sambaiga/ml-energy-disaggregation/issues/new" class="toc-action"><i class="bi empty"></i>Report an issue</a></li><li><a href="https://github.com/sambaiga/ml-energy-disaggregation/blob/main/book/04-network-foundations/01-opendss-lv-modeling.qmd" class="toc-action"><i class="bi empty"></i>View source</a></li></ul></div></nav>
     </div>
 <!-- main -->
 <main class="content" id="quarto-document-content">
@@ -615,7 +658,7 @@ Figure&nbsp;8.1: The traditional grid moves power one way, plant to customer. A 
 <section id="why-a-meter-alone-cant-show-it" class="level2">
 <h2 class="anchored" data-anchor-id="why-a-meter-alone-cant-show-it">Why a meter alone can’t show it</h2>
 <p>Given all that, the obvious question is why a <a href="#acronyms_DSO">DSO</a> would not just read the strain off its smart meters. It cannot, and the reason is exact, not a limitation of degree: a meter and a network model answer two different questions. A meter answers “how much power is this customer using right now,” a single Load’s kW and kvar, reported once per interval. A network model answers “what does that demand do to the rest of the feeder,” a question no single meter, or even every meter on the street added together, can answer on its own, because it depends on where each customer sits relative to the others and how the wire between them behaves. Two houses on the same street can report identical, perfectly normal meter readings while one sits at 0.95 pu and the other at 1.08 pu.</p>
-<p>The bridge between the two is direct, and it is what the rest of this chapter builds: a meter’s own reading becomes a network model’s input. One customer’s demand becomes one <code>Load</code>’s <code>kW</code>; a whole time series of meter readings becomes what OpenDSS calls a <code>LoadShape</code>, the mechanism Chapter 2 picks up directly. Combine that meter data with the network’s topology, the impedance of every line, the phase each customer connects to, none of which any meter reports, and solving the network answers the harder question. That combination, real meter data plus real topology, is the mechanism behind every thread the rest of Part 4 follows.</p>
+<p>The bridge between the two is direct, and it is what the rest of this chapter builds: a meter’s own reading becomes a network model’s input. One customer’s demand becomes one <code>Load</code>’s <code>kW</code>; a whole time series of meter readings becomes what OpenDSS calls a <code>LoadShape</code>, the mechanism Chapter 2 picks up directly. Combine that meter data with the network’s topology, the impedance of every line, the phase each customer connects to, none of which any meter reports, and solving the network answers the harder question. That combination, real meter data plus real topology, is the mechanism the rest of Part 4 reuses.</p>
 <div class="ark-concept">
 <p><span class="ark-concept-title"><i class="bi bi-info-circle-fill"></i> Key Concept</span></p>
 <p>Every voltage number in this book’s Part 4 chapters is reported in <strong>per-unit (pu)</strong>: <span class="math display">\[
@@ -631,7 +674,7 @@ V_{pu} = \frac{V_{actual}}{V_{nominal}}
 <section id="building-it" class="level3">
 <h3 class="anchored" data-anchor-id="building-it">Building it</h3>
 <p>Every simulation in this part of the book runs on <a href="https://www.epri.com/pages/sa/opendss">OpenDSS</a>, EPRI’s open-source distribution power-flow solver, through <a href="https://github.com/dss-extensions/OpenDSSDirect.py">OpenDSSDirect.py</a> and a small pythonic wrapper this project built around it, <code>ark.dss.Circuit</code> (see the companion notebook for the full interface). It was chosen specifically because it installs and runs identically on macOS, Linux, and Windows: no separate application to install, no Windows-only binding.</p>
-<div class="quarto-embed-nb-cell" data-notebook="/home/runner/work/ml-energy-disaggregation/ml-energy-disaggregation/book/04-grid-edge/01-opendss-lv-modeling-code.ipynb" data-notebook-title="Mastering the Fundamentals: A Guide to OpenDSS-LV Modeling" data-notebook-cellid="7772b57d">
+<div class="quarto-embed-nb-cell" data-notebook="/home/runner/work/ml-energy-disaggregation/ml-energy-disaggregation/book/04-network-foundations/01-opendss-lv-modeling-code.ipynb" data-notebook-title="Mastering the Fundamentals: A Guide to OpenDSS-LV Modeling" data-notebook-cellid="7772b57d">
 <div id="7772b57d" class="cell">
 <div class="cell-output cell-output-stdout">
 <pre><code>Backed by OpenDSSDirect.py, no external OpenDSS install needed on any OS</code></pre>
@@ -644,7 +687,7 @@ V_{pu} = \frac{V_{actual}}{V_{nominal}}
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>circuit.command(<span class="st">"new line.B_L1 bus1=B.1 bus2=C.1 ..."</span>)</span>
 <span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>circuit.command(<span class="st">"new load.Load_1 bus1=C.1 phases=1 kW=7 pf=0.95 ..."</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <p>Once every element is defined, solving the network is one call:</p>
-<div class="quarto-embed-nb-cell" data-notebook="/home/runner/work/ml-energy-disaggregation/ml-energy-disaggregation/book/04-grid-edge/01-opendss-lv-modeling-code.ipynb" data-notebook-title="Mastering the Fundamentals: A Guide to OpenDSS-LV Modeling" data-notebook-cellid="0f299686">
+<div class="quarto-embed-nb-cell" data-notebook="/home/runner/work/ml-energy-disaggregation/ml-energy-disaggregation/book/04-network-foundations/01-opendss-lv-modeling-code.ipynb" data-notebook-title="Mastering the Fundamentals: A Guide to OpenDSS-LV Modeling" data-notebook-cellid="0f299686">
 <div id="0f299686" class="cell">
 <div class="cell-output cell-output-stdout">
 <pre><code>The circuit was solved successfully</code></pre>
@@ -658,7 +701,7 @@ S_i = P_i + jQ_i = V_i \sum_{j} Y_{ij}^{*} V_j^{*}
 <section id="reading-it-back" class="level3">
 <h3 class="anchored" data-anchor-id="reading-it-back">Reading it back</h3>
 <p>A solved circuit holds more than bus voltages, and <code>Circuit</code> turns every element into a plain Python iterator, no manual bookkeeping required:</p>
-<div class="quarto-embed-nb-cell" data-notebook="/home/runner/work/ml-energy-disaggregation/ml-energy-disaggregation/book/04-grid-edge/01-opendss-lv-modeling-code.ipynb" data-notebook-title="Mastering the Fundamentals: A Guide to OpenDSS-LV Modeling" data-notebook-cellid="359836e6">
+<div class="quarto-embed-nb-cell" data-notebook="/home/runner/work/ml-energy-disaggregation/ml-energy-disaggregation/book/04-network-foundations/01-opendss-lv-modeling-code.ipynb" data-notebook-title="Mastering the Fundamentals: A Guide to OpenDSS-LV Modeling" data-notebook-cellid="359836e6">
 <div id="359836e6" class="cell">
 <div class="cell-output cell-output-stdout">
 <pre><code>Line(name='a_b', bus1='a.1.2.3', bus2='b.1.2.3', phases=3, length=1.0)
@@ -669,14 +712,14 @@ Line(name='b_l3', bus1='b.3', bus2='e.1', phases=1, length=0.01)</code></pre>
 </div>
 </div>
 <p>Each <code>Line</code>, <code>Load</code>, and <code>Transformer</code> is a small dataclass with the fields a chapter actually needs, <code>bus1</code>, <code>phases</code>, <code>kw</code>, <code>pf</code>, directly as attributes:</p>
-<div class="quarto-embed-nb-cell" data-notebook="/home/runner/work/ml-energy-disaggregation/ml-energy-disaggregation/book/04-grid-edge/01-opendss-lv-modeling-code.ipynb" data-notebook-title="Mastering the Fundamentals: A Guide to OpenDSS-LV Modeling" data-notebook-cellid="369e5ea6">
+<div class="quarto-embed-nb-cell" data-notebook="/home/runner/work/ml-energy-disaggregation/ml-energy-disaggregation/book/04-network-foundations/01-opendss-lv-modeling-code.ipynb" data-notebook-title="Mastering the Fundamentals: A Guide to OpenDSS-LV Modeling" data-notebook-cellid="369e5ea6">
 <div id="369e5ea6" class="cell">
 <div class="cell-output cell-output-stdout">
 <pre><code>Line a_b connected between buses (a.1.2.3, b.1.2.3) has a length of 1.0 km</code></pre>
 </div>
 </div>
 </div>
-<div class="quarto-embed-nb-cell" data-notebook="/home/runner/work/ml-energy-disaggregation/ml-energy-disaggregation/book/04-grid-edge/01-opendss-lv-modeling-code.ipynb" data-notebook-title="Mastering the Fundamentals: A Guide to OpenDSS-LV Modeling" data-notebook-cellid="d46445ca">
+<div class="quarto-embed-nb-cell" data-notebook="/home/runner/work/ml-energy-disaggregation/ml-energy-disaggregation/book/04-network-foundations/01-opendss-lv-modeling-code.ipynb" data-notebook-title="Mastering the Fundamentals: A Guide to OpenDSS-LV Modeling" data-notebook-cellid="d46445ca">
 <div id="d46445ca" class="cell">
 <div class="cell-output cell-output-stdout">
 <pre><code>Power factor of load_1 is 0.95</code></pre>
@@ -684,14 +727,14 @@ Line(name='b_l3', bus1='b.3', bus2='e.1', phases=1, length=0.01)</code></pre>
 </div>
 </div>
 <p>For anything <code>Circuit</code>’s dataclasses don’t model, <code>circuit.command</code> doubles as a query, the same escape hatch OpenDSS scripting always offers, and iteration combines naturally with it, no different from looping over any other Python collection:</p>
-<div class="quarto-embed-nb-cell" data-notebook="/home/runner/work/ml-energy-disaggregation/ml-energy-disaggregation/book/04-grid-edge/01-opendss-lv-modeling-code.ipynb" data-notebook-title="Mastering the Fundamentals: A Guide to OpenDSS-LV Modeling" data-notebook-cellid="37141e33">
+<div class="quarto-embed-nb-cell" data-notebook="/home/runner/work/ml-energy-disaggregation/ml-energy-disaggregation/book/04-network-foundations/01-opendss-lv-modeling-code.ipynb" data-notebook-title="Mastering the Fundamentals: A Guide to OpenDSS-LV Modeling" data-notebook-cellid="37141e33">
 <div id="37141e33" class="cell">
 <div class="cell-output cell-output-stdout">
 <pre><code>1</code></pre>
 </div>
 </div>
 </div>
-<div class="quarto-embed-nb-cell" data-notebook="/home/runner/work/ml-energy-disaggregation/ml-energy-disaggregation/book/04-grid-edge/01-opendss-lv-modeling-code.ipynb" data-notebook-title="Mastering the Fundamentals: A Guide to OpenDSS-LV Modeling" data-notebook-cellid="7b4d8ac2">
+<div class="quarto-embed-nb-cell" data-notebook="/home/runner/work/ml-energy-disaggregation/ml-energy-disaggregation/book/04-network-foundations/01-opendss-lv-modeling-code.ipynb" data-notebook-title="Mastering the Fundamentals: A Guide to OpenDSS-LV Modeling" data-notebook-cellid="7b4d8ac2">
 <div id="7b4d8ac2" class="cell">
 <div class="cell-output cell-output-stdout">
 <pre><code>{'a_b': 1.0, 'b_l1': 0.01, 'b_l2': 0.01, 'b_l3': 0.01}
@@ -700,7 +743,7 @@ Line(name='b_l3', bus1='b.3', bus2='e.1', phases=1, length=0.01)</code></pre>
 </div>
 </div>
 <p>The same iterate-and-read pattern produces a power table for any element type, one row per phase, not a flat list to index into by hand:</p>
-<div class="quarto-embed-nb-cell" data-notebook="/home/runner/work/ml-energy-disaggregation/ml-energy-disaggregation/book/04-grid-edge/01-opendss-lv-modeling-code.ipynb" data-notebook-title="Mastering the Fundamentals: A Guide to OpenDSS-LV Modeling" data-notebook-cellid="d5eeeca4">
+<div class="quarto-embed-nb-cell" data-notebook="/home/runner/work/ml-energy-disaggregation/ml-energy-disaggregation/book/04-network-foundations/01-opendss-lv-modeling-code.ipynb" data-notebook-title="Mastering the Fundamentals: A Guide to OpenDSS-LV Modeling" data-notebook-cellid="d5eeeca4">
 <div id="d5eeeca4" class="cell">
 <div class="cell-output cell-output-display">
 <div>
@@ -745,7 +788,7 @@ Line(name='b_l3', bus1='b.3', bus2='e.1', phases=1, length=0.01)</code></pre>
 </div>
 </div>
 </div>
-<div class="quarto-embed-nb-cell" data-notebook="/home/runner/work/ml-energy-disaggregation/ml-energy-disaggregation/book/04-grid-edge/01-opendss-lv-modeling-code.ipynb" data-notebook-title="Mastering the Fundamentals: A Guide to OpenDSS-LV Modeling" data-notebook-cellid="05148efe">
+<div class="quarto-embed-nb-cell" data-notebook="/home/runner/work/ml-energy-disaggregation/ml-energy-disaggregation/book/04-network-foundations/01-opendss-lv-modeling-code.ipynb" data-notebook-title="Mastering the Fundamentals: A Guide to OpenDSS-LV Modeling" data-notebook-cellid="05148efe">
 <div id="05148efe" class="cell">
 <div class="cell-output cell-output-display">
 <div>
@@ -791,7 +834,7 @@ Line(name='b_l3', bus1='b.3', bus2='e.1', phases=1, length=0.01)</code></pre>
 </div>
 </div>
 <p>Not everything is wrapped yet. Per-phase current isn’t, so this is a good place to reach for <code>circuit.dss</code>, the full native OpenDSSDirect.py API, unwrapped, one property away:</p>
-<div class="quarto-embed-nb-cell" data-notebook="/home/runner/work/ml-energy-disaggregation/ml-energy-disaggregation/book/04-grid-edge/01-opendss-lv-modeling-code.ipynb" data-notebook-title="Mastering the Fundamentals: A Guide to OpenDSS-LV Modeling" data-notebook-cellid="8283e121">
+<div class="quarto-embed-nb-cell" data-notebook="/home/runner/work/ml-energy-disaggregation/ml-energy-disaggregation/book/04-network-foundations/01-opendss-lv-modeling-code.ipynb" data-notebook-title="Mastering the Fundamentals: A Guide to OpenDSS-LV Modeling" data-notebook-cellid="8283e121">
 <div id="8283e121" class="cell">
 <div class="cell-output cell-output-stdout">
 <pre><code>Current of the transformer Transformer.lvtr:
@@ -802,7 +845,7 @@ phase 3 current = 1.278 A</code></pre>
 </div>
 </div>
 <p>And the per-unit voltage at every bus, the number the concept box above just defined, is a DataFrame away:</p>
-<div class="quarto-embed-nb-cell" data-notebook="/home/runner/work/ml-energy-disaggregation/ml-energy-disaggregation/book/04-grid-edge/01-opendss-lv-modeling-code.ipynb" data-notebook-title="Mastering the Fundamentals: A Guide to OpenDSS-LV Modeling" data-notebook-cellid="b517c96d">
+<div class="quarto-embed-nb-cell" data-notebook="/home/runner/work/ml-energy-disaggregation/ml-energy-disaggregation/book/04-network-foundations/01-opendss-lv-modeling-code.ipynb" data-notebook-title="Mastering the Fundamentals: A Guide to OpenDSS-LV Modeling" data-notebook-cellid="b517c96d">
 <div id="b517c96d" class="cell">
 <div class="cell-output cell-output-display">
 <div>
@@ -868,7 +911,7 @@ phase 3 current = 1.278 A</code></pre>
 </div>
 </div>
 <p>Every house here sits comfortably inside the 0.94-1.10 pu band. Reading a table of numbers is one way to check that; seeing the network is another, and it is usually the faster one. Everything above, in one diagram, colored by exactly that compliance band:</p>
-<div class="quarto-embed-nb-cell" data-notebook="/home/runner/work/ml-energy-disaggregation/ml-energy-disaggregation/book/04-grid-edge/01-opendss-lv-modeling-code.ipynb" data-notebook-title="Mastering the Fundamentals: A Guide to OpenDSS-LV Modeling" data-notebook-cellid="3042acef">
+<div class="quarto-embed-nb-cell" data-notebook="/home/runner/work/ml-energy-disaggregation/ml-energy-disaggregation/book/04-network-foundations/01-opendss-lv-modeling-code.ipynb" data-notebook-title="Mastering the Fundamentals: A Guide to OpenDSS-LV Modeling" data-notebook-cellid="3042acef">
 <div id="3042acef" class="cell">
 <div class="cell-output cell-output-display">
 <div>
@@ -890,7 +933,7 @@ phase 3 current = 1.278 A</code></pre>
 <h2 class="anchored" data-anchor-id="checking-a-feeder-over-time">Checking a feeder over time</h2>
 <p>Here is what checking several conditions actually looks like, using the same network expanded to six houses and a real annual load-duration curve: peak demand for 1650 hours a year, 67% of peak for 4280 hours, 33% of peak for the remaining 2830. <code>evaluate_loading_levels</code> rebuilds the circuit fresh at each level, and <code>plot_voltage_compliance</code> shades the compliant band directly on the chart rather than leaving the comparison to the reader:</p>
 <p>Building the expanded network reuses the exact same <code>circuit.command(...)</code> calls as above, just continued further:</p>
-<div class="quarto-embed-nb-cell" data-notebook="/home/runner/work/ml-energy-disaggregation/ml-energy-disaggregation/book/04-grid-edge/01-opendss-lv-modeling-code.ipynb" data-notebook-title="Mastering the Fundamentals: A Guide to OpenDSS-LV Modeling" data-notebook-cellid="c23dd734">
+<div class="quarto-embed-nb-cell" data-notebook="/home/runner/work/ml-energy-disaggregation/ml-energy-disaggregation/book/04-network-foundations/01-opendss-lv-modeling-code.ipynb" data-notebook-title="Mastering the Fundamentals: A Guide to OpenDSS-LV Modeling" data-notebook-cellid="c23dd734">
 <div id="c23dd734" class="cell">
 <div class="cell-output cell-output-display">
 <div>
@@ -902,14 +945,14 @@ phase 3 current = 1.278 A</code></pre>
 </div>
 </div>
 <p>At peak demand, the total annual energy lost to line resistance across the three loading levels:</p>
-<div class="quarto-embed-nb-cell" data-notebook="/home/runner/work/ml-energy-disaggregation/ml-energy-disaggregation/book/04-grid-edge/01-opendss-lv-modeling-code.ipynb" data-notebook-title="Mastering the Fundamentals: A Guide to OpenDSS-LV Modeling" data-notebook-cellid="d2b3277c">
+<div class="quarto-embed-nb-cell" data-notebook="/home/runner/work/ml-energy-disaggregation/ml-energy-disaggregation/book/04-network-foundations/01-opendss-lv-modeling-code.ipynb" data-notebook-title="Mastering the Fundamentals: A Guide to OpenDSS-LV Modeling" data-notebook-cellid="d2b3277c">
 <div id="d2b3277c" class="cell">
 <div class="cell-output cell-output-stdout">
 <pre><code>E1.1: total annual energy losses (expanded network) = 10293.1 kWh</code></pre>
 </div>
 </div>
 </div>
-<div class="quarto-embed-nb-cell" data-notebook="/home/runner/work/ml-energy-disaggregation/ml-energy-disaggregation/book/04-grid-edge/01-opendss-lv-modeling-code.ipynb" data-notebook-title="Mastering the Fundamentals: A Guide to OpenDSS-LV Modeling" data-notebook-cellid="3b870b32">
+<div class="quarto-embed-nb-cell" data-notebook="/home/runner/work/ml-energy-disaggregation/ml-energy-disaggregation/book/04-network-foundations/01-opendss-lv-modeling-code.ipynb" data-notebook-title="Mastering the Fundamentals: A Guide to OpenDSS-LV Modeling" data-notebook-cellid="3b870b32">
 <div id="3b870b32" class="cell">
 <div class="cell-output cell-output-stdout">
 <pre><code>Base 3-house network's peak-loading losses (Section 3 above) = 0.455 kW
@@ -919,7 +962,7 @@ Higher: the new branch through bus F carries 24 kW of additional peak demand, an
 </div>
 </div>
 <p>And the payoff, every house’s voltage at every loading level, on one chart:</p>
-<div class="quarto-embed-nb-cell" data-notebook="/home/runner/work/ml-energy-disaggregation/ml-energy-disaggregation/book/04-grid-edge/01-opendss-lv-modeling-code.ipynb" data-notebook-title="Mastering the Fundamentals: A Guide to OpenDSS-LV Modeling" data-notebook-cellid="5498f72a">
+<div class="quarto-embed-nb-cell" data-notebook="/home/runner/work/ml-energy-disaggregation/ml-energy-disaggregation/book/04-network-foundations/01-opendss-lv-modeling-code.ipynb" data-notebook-title="Mastering the Fundamentals: A Guide to OpenDSS-LV Modeling" data-notebook-cellid="5498f72a">
 <div id="5498f72a" class="cell">
 <div class="cell-output cell-output-display">
 
@@ -1272,13 +1315,8 @@ Higher: the new branch through bus F carries 24 kW of additional peak demand, an
 <section id="where-part-4-goes-from-here" class="level2">
 <h2 class="anchored" data-anchor-id="where-part-4-goes-from-here">Where Part 4 goes from here</h2>
 <p>This chapter built what every later chapter in this part reuses: a real, solvable low-voltage network, the vocabulary, per-unit voltage and the three constraints, to judge its health, and the full <code>ark.dss.Circuit</code> toolkit for reading a solved circuit back out. Chapter 2 picks up the very next question this chapter’s own mistake box raises: not one snapshot, but a real year of smart-meter data driving a real time-series simulation, plus how <a href="#acronyms_PV">PV</a>, storage, and inverter controls like Volt-Watt change the answer.</p>
-<p>From there, Part 4 follows four threads, each building on the last:</p>
-<ol type="1">
-<li><strong>Phase detection</strong>, recovering which phase a customer is actually connected to from nothing but voltage patterns, a real, common gap in utility records.</li>
-<li><strong>Customer and feeder clustering</strong>, grouping customers and feeders by how they actually behave, not just how they are labeled.</li>
-<li><strong>Voltage-violation and power-quality anomaly detection</strong>, catching a compliance problem, or a meter reporting bad data, as it happens rather than after a complaint call.</li>
-<li><strong>Grid health under forecasted <a href="#acronyms_DER">Distributed Energy Resources (DER)</a> growth</strong>, where Part 3’s forecasts become the input to exactly the kind of power-flow check this chapter just ran, and mitigation strategies get evaluated against it.</li>
-</ol>
+<p>Chapter 3 completes this part’s own foundation, recovering which phase a customer is actually connected to from nothing but voltage patterns, a real, common gap in utility records.</p>
+<p>This network model is what every later part in this book builds on: Part 5 groups customers and feeders by how they actually behave, not just how they are labeled; Part 6 turns that grouping into a real ranking and recommendation problem; Part 7 catches a compliance problem, or a meter reporting bad data, as it happens rather than after a complaint call; and Part 8’s own forecasts eventually become the input to exactly the kind of power-flow check this chapter just ran, testing grid health under forecasted <a href="#acronyms_DER">Distributed Energy Resources (DER)</a> growth rather than today’s snapshot.</p>
 <p>Each one runs on the same tools introduced here: <code>ark.dss.Circuit</code> to build, solve, and read a network, and the same per-unit, three-constraint vocabulary to judge what the solve returns.</p>
 </section>
 <section id="references" class="level2">
@@ -1719,7 +1757,7 @@ Higher: the new branch through bus F carries 24 kW of additional peak demand, an
       </a>          
   </div>
   <div class="nav-page nav-page-next">
-      <a href="../../book/04-grid-edge/02-timeseries-der-modeling.html" class="pagination-link" aria-label="Chapter 2: Time-Series Simulation and DER Modeling">
+      <a href="../../book/04-network-foundations/02-timeseries-der-modeling.html" class="pagination-link" aria-label="Chapter 2: Time-Series Simulation and DER Modeling">
         <span class="nav-page-text"><span class="chapter-title">Chapter 2: Time-Series Simulation and DER Modeling</span></span> <i class="bi bi-arrow-right-short"></i>
       </a>
   </div>
@@ -1734,7 +1772,7 @@ Higher: the new branch through bus F carries 24 kW of additional peak demand, an
 <div class="footer-social">
 <p><a href="mailto:sambaiga@gmail.com" title="Email"><i class="bi bi-envelope-at-fill"></i></a> <a href="https://github.com/sambaiga" title="GitHub"><i class="bi bi-github"></i></a> <a href="https://www.linkedin.com/in/sambaiga" title="LinkedIn"><i class="bi bi-linkedin"></i></a></p>
 </div>
-<div class="toc-actions d-sm-block d-md-none"><ul><li><a href="https://github.com/sambaiga/ml-energy-disaggregation/edit/main/book/04-grid-edge/01-opendss-lv-modeling.qmd" class="toc-action"><i class="bi bi-github"></i>Edit this page</a></li><li><a href="https://github.com/sambaiga/ml-energy-disaggregation/issues/new" class="toc-action"><i class="bi empty"></i>Report an issue</a></li><li><a href="https://github.com/sambaiga/ml-energy-disaggregation/blob/main/book/04-grid-edge/01-opendss-lv-modeling.qmd" class="toc-action"><i class="bi empty"></i>View source</a></li></ul></div></div>
+<div class="toc-actions d-sm-block d-md-none"><ul><li><a href="https://github.com/sambaiga/ml-energy-disaggregation/edit/main/book/04-network-foundations/01-opendss-lv-modeling.qmd" class="toc-action"><i class="bi bi-github"></i>Edit this page</a></li><li><a href="https://github.com/sambaiga/ml-energy-disaggregation/issues/new" class="toc-action"><i class="bi empty"></i>Report an issue</a></li><li><a href="https://github.com/sambaiga/ml-energy-disaggregation/blob/main/book/04-network-foundations/01-opendss-lv-modeling.qmd" class="toc-action"><i class="bi empty"></i>View source</a></li></ul></div></div>
     <div class="nav-footer-right">
 <p><span class="faux-block">Made with <a href="https://quarto.org">Quarto</a></span> <span class="faux-block"><a href="https://github.com/sambaiga/ml-energy-disaggregation"><i class="bi bi-github"></i> View source</a></span></p>
 </div>

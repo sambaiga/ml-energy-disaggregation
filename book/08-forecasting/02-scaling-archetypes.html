@@ -54,8 +54,8 @@ div.csl-indent {
 <script src="../../site_libs/quarto-search/fuse.min.js"></script>
 <script src="../../site_libs/quarto-search/quarto-search.js"></script>
 <meta name="quarto:offset" content="../../">
-<link href="../../book/05-forecasting/03-probabilistic-forecasting.html" rel="next">
-<link href="../../book/05-forecasting/01-forecastability.html" rel="prev">
+<link href="../../book/08-forecasting/03-probabilistic-forecasting.html" rel="next">
+<link href="../../book/08-forecasting/01-forecastability.html" rel="prev">
 <link href="../../assets/favicon.svg" rel="icon" type="image/svg+xml">
 <script src="../../site_libs/quarto-html/quarto.js" type="module"></script>
 <script src="../../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
@@ -68,9 +68,9 @@ div.csl-indent {
 <link href="../../site_libs/quarto-html/quarto-syntax-highlighting-de63f62b328812d8e578a4d74e282472.css" rel="stylesheet" class="quarto-color-scheme-extra" id="quarto-text-highlighting-styles">
 <script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="../../site_libs/bootstrap/bootstrap-9661ac00a33b6c2a7ffb2cb4cb9f2155.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
-<link href="../../site_libs/bootstrap/bootstrap-dark-9b208294319f478b9205897e46a7db35.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="dark">
-<link href="../../site_libs/bootstrap/bootstrap-9661ac00a33b6c2a7ffb2cb4cb9f2155.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme-extra" id="quarto-bootstrap" data-mode="light">
+<link href="../../site_libs/bootstrap/bootstrap-84b0f63d2b22afb69d3c32ede53d2fe2.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
+<link href="../../site_libs/bootstrap/bootstrap-dark-86bd388472066654720eaf2de8d3b778.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="dark">
+<link href="../../site_libs/bootstrap/bootstrap-84b0f63d2b22afb69d3c32ede53d2fe2.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme-extra" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -410,7 +410,7 @@ window.Quarto = {
         <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
             <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="false">
- <span class="menu-text">Part 4: Grid-Edge Value</span></a>
+ <span class="menu-text">Part 4: LV Network and Topology Foundations</span></a>
           <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="false" aria-label="Toggle section">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
@@ -418,73 +418,116 @@ window.Quarto = {
       <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth1 ">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../../book/04-grid-edge/01-opendss-lv-modeling.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">Chapter 1: Modeling the Low-Voltage Network</span></a>
+  <a href="../../book/04-network-foundations/01-opendss-lv-modeling.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">Chapter 1: Modeling the Low-Voltage Network</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../../book/04-grid-edge/02-timeseries-der-modeling.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">Chapter 2: Time-Series Simulation and DER Modeling</span></a>
+  <a href="../../book/04-network-foundations/02-timeseries-der-modeling.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">Chapter 2: Time-Series Simulation and DER Modeling</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../../book/04-grid-edge/03-phase-identification.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">Chapter 3: Phase Identification from Smart-Meter Data</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../../book/04-grid-edge/04-customer-feeder-clustering.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">Chapter 4: Customer and Feeder Clustering</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../../book/04-grid-edge/05-ranking-recommendation.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">Chapter 5: Ranking and Recommendation under DER</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../../book/04-grid-edge/06-anomaly-detection.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">Chapter 6: Anomaly Detection Beyond the Meter</span></a>
+  <a href="../../book/04-network-foundations/03-phase-identification.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">Chapter 3: Phase Identification from Smart-Meter Data</span></a>
   </div>
 </li>
       </ul>
   </li>
         <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
-            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="true">
- <span class="menu-text">Part 5: Forecasting</span></a>
-          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="false">
+ <span class="menu-text">Part 5: Clustering</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="false" aria-label="Toggle section">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
       </div>
-      <ul id="quarto-sidebar-section-3" class="collapse list-unstyled sidebar-section depth1 show">  
+      <ul id="quarto-sidebar-section-3" class="collapse list-unstyled sidebar-section depth1 ">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../../book/05-forecasting/01-forecastability.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">Chapter 1: Household Smart-Meter Forecastability</span></a>
+  <a href="../../book/05-clustering/01-clustering-foundations.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">Chapter 1: Clustering Foundations</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../../book/05-forecasting/02-scaling-archetypes.html" class="sidebar-item-text sidebar-link active"><span class="chapter-title">Chapter 2: Scaling to Hundreds of Meters</span></a>
+  <a href="../../book/05-clustering/02-clustering-methodology.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">Chapter 2: Clustering Methodology</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../../book/05-forecasting/03-probabilistic-forecasting.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">Chapter 3: What a Probabilistic Forecast Is Actually Worth</span></a>
+  <a href="../../book/05-clustering/03-customer-feeder-clustering.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">Chapter 3: Customer and Feeder Clustering</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" role="navigation" aria-expanded="false">
+ <span class="menu-text">Part 6: Ranking and Recommendation</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" role="navigation" aria-expanded="false" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-4" class="collapse list-unstyled sidebar-section depth1 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../book/06-ranking-recommendation/01-ranking-recommendation.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">Chapter 1: Ranking and Recommendation under DER</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-5" role="navigation" aria-expanded="false">
+ <span class="menu-text">Part 7: Anomaly Detection</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-5" role="navigation" aria-expanded="false" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-5" class="collapse list-unstyled sidebar-section depth1 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../book/07-anomaly-detection/01-anomaly-detection.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">Chapter 1: Anomaly Detection Beyond the Meter</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-6" role="navigation" aria-expanded="true">
+ <span class="menu-text">Part 8: Forecasting</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-6" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-6" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../book/08-forecasting/01-forecastability.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">Chapter 1: Household Smart-Meter Forecastability</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../../book/05-forecasting/04-foundation-models.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">Part 5 Chapter 4: Do Foundation Models Fail Like Everything Else Does?</span></a>
+  <a href="../../book/08-forecasting/02-scaling-archetypes.html" class="sidebar-item-text sidebar-link active"><span class="chapter-title">Chapter 2: Scaling to Hundreds of Meters</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../../book/05-forecasting/05-what-if-scenario-analysis.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">Part 5 Chapter 5: What the Grid Actually Faces When These Forecasts Come True</span></a>
+  <a href="../../book/08-forecasting/03-probabilistic-forecasting.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">Chapter 3: What a Probabilistic Forecast Is Actually Worth</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../../book/05-forecasting/06-lv-state-estimation.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">Part 5 Chapter 6: Can Smart-Meter Readings Fill In What the Grid Cannot See</span></a>
+  <a href="../../book/08-forecasting/04-foundation-models.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">Part 8 Chapter 4: Do Foundation Models Fail Like Everything Else Does?</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../book/08-forecasting/05-what-if-scenario-analysis.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">Part 8 Chapter 5: What the Grid Actually Faces When These Forecasts Come True</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../book/08-forecasting/06-lv-state-estimation.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">Part 8 Chapter 6: Can Smart-Meter Readings Fill In What the Grid Cannot See</span></a>
   </div>
 </li>
       </ul>
@@ -518,10 +561,10 @@ window.Quarto = {
   </ul></li>
   <li><a href="#from-mechanism-to-decision" id="toc-from-mechanism-to-decision" class="nav-link" data-scroll-target="#from-mechanism-to-decision">From mechanism to decision</a></li>
   <li><a href="#why-bother" id="toc-why-bother" class="nav-link" data-scroll-target="#why-bother">Why bother</a></li>
-  <li><a href="#where-this-leaves-part-5" id="toc-where-this-leaves-part-5" class="nav-link" data-scroll-target="#where-this-leaves-part-5">Where this leaves Part 5</a></li>
+  <li><a href="#where-this-leaves-part-8" id="toc-where-this-leaves-part-8" class="nav-link" data-scroll-target="#where-this-leaves-part-8">Where this leaves Part 8</a></li>
   <li><a href="#references" id="toc-references" class="nav-link" data-scroll-target="#references">References</a></li>
   </ul>
-<div class="toc-actions"><ul><li><a href="https://github.com/sambaiga/ml-energy-disaggregation/edit/main/book/05-forecasting/02-scaling-archetypes.qmd" class="toc-action"><i class="bi bi-github"></i>Edit this page</a></li><li><a href="https://github.com/sambaiga/ml-energy-disaggregation/issues/new" class="toc-action"><i class="bi empty"></i>Report an issue</a></li><li><a href="https://github.com/sambaiga/ml-energy-disaggregation/blob/main/book/05-forecasting/02-scaling-archetypes.qmd" class="toc-action"><i class="bi empty"></i>View source</a></li></ul></div></nav>
+<div class="toc-actions"><ul><li><a href="https://github.com/sambaiga/ml-energy-disaggregation/edit/main/book/08-forecasting/02-scaling-archetypes.qmd" class="toc-action"><i class="bi bi-github"></i>Edit this page</a></li><li><a href="https://github.com/sambaiga/ml-energy-disaggregation/issues/new" class="toc-action"><i class="bi empty"></i>Report an issue</a></li><li><a href="https://github.com/sambaiga/ml-energy-disaggregation/blob/main/book/08-forecasting/02-scaling-archetypes.qmd" class="toc-action"><i class="bi empty"></i>View source</a></li></ul></div></nav>
     </div>
 <!-- main -->
 <main class="content" id="quarto-document-content">
@@ -562,7 +605,7 @@ window.Quarto = {
 <img src="../../assets/known-vs-new-customer-routing.svg" class="img-fluid figure-img">
 </div>
 <figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-known-vs-new-customer-routing-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Figure&nbsp;15.1: Two different mechanisms, chosen by whether a customer is known or new. Left: a customer with real history gets a single shared model that treats archetype distance as an ordinary, legitimately personalizing feature. Right: a brand-new customer’s partial-history distance first passes through a calibrated confidence gate before deciding between a distance-weighted blend of archetype specialists and a safe global fallback.
+Figure&nbsp;17.1: Two different mechanisms, chosen by whether a customer is known or new. Left: a customer with real history gets a single shared model that treats archetype distance as an ordinary, legitimately personalizing feature. Right: a brand-new customer’s partial-history distance first passes through a calibrated confidence gate before deciding between a distance-weighted blend of archetype specialists and a safe global fallback.
 </figcaption>
 </figure>
 </div>
@@ -576,7 +619,7 @@ Figure&nbsp;15.1: Two different mechanisms, chosen by whether a customer is know
 <li><strong>Unified</strong>: <span class="math inline">\(\hat{y}_{i,t+h} = f(x_{i,t}, d_{i,1}, \dots, d_{i,5}; \theta)\)</span>, one shared <span class="math inline">\(\theta\)</span> again, but <span class="math inline">\(d_i\)</span> enters as five ordinary extra features alongside the lag-and-calendar inputs <span class="math inline">\(x_{i,t}\)</span>.</li>
 </ul>
 <p><span class="math inline">\(x_{i,t}\)</span> is the same lag-and-calendar feature recipe Chapter 1 built for feature-importance ranking, put to its first real use training a model, across all three.</p>
-<div class="quarto-embed-nb-cell" data-notebook="/home/runner/work/ml-energy-disaggregation/ml-energy-disaggregation/book/05-forecasting/02-scaling-archetypes-code.ipynb" data-notebook-title="Scaling to Hundreds of Meters" data-notebook-cellid="887b9c5c">
+<div class="quarto-embed-nb-cell" data-notebook="/home/runner/work/ml-energy-disaggregation/ml-energy-disaggregation/book/08-forecasting/02-scaling-archetypes-code.ipynb" data-notebook-title="Scaling to Hundreds of Meters" data-notebook-cellid="887b9c5c">
 <div id="887b9c5c" class="cell">
 <div class="cell-output cell-output-stdout">
 <pre><code>load_data: (342, 365, 48) (customers, days, half-hours)</code></pre>
@@ -685,14 +728,14 @@ Figure&nbsp;15.1: Two different mechanisms, chosen by whether a customer is know
 </div>
 </div>
 </div>
-<div class="quarto-embed-nb-cell" data-notebook="/home/runner/work/ml-energy-disaggregation/ml-energy-disaggregation/book/05-forecasting/02-scaling-archetypes-code.ipynb" data-notebook-title="Scaling to Hundreds of Meters" data-notebook-cellid="e6ee7960">
+<div class="quarto-embed-nb-cell" data-notebook="/home/runner/work/ml-energy-disaggregation/ml-energy-disaggregation/book/08-forecasting/02-scaling-archetypes-code.ipynb" data-notebook-title="Scaling to Hundreds of Meters" data-notebook-cellid="e6ee7960">
 <div id="e6ee7960" class="cell">
 <div class="cell-output cell-output-stdout">
 <pre><code>pooled rows: 5,860,512, train: 4,383,072, test: 1,477,440</code></pre>
 </div>
 </div>
 </div>
-<div class="quarto-embed-nb-cell" data-notebook="/home/runner/work/ml-energy-disaggregation/ml-energy-disaggregation/book/05-forecasting/02-scaling-archetypes-code.ipynb" data-notebook-title="Scaling to Hundreds of Meters" data-notebook-cellid="19eb08d1">
+<div class="quarto-embed-nb-cell" data-notebook="/home/runner/work/ml-energy-disaggregation/ml-energy-disaggregation/book/08-forecasting/02-scaling-archetypes-code.ipynb" data-notebook-title="Scaling to Hundreds of Meters" data-notebook-cellid="19eb08d1">
 <div id="19eb08d1" class="cell">
 <div class="cell-output cell-output-display">
 <div id="aynobsgbyt" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
@@ -809,7 +852,7 @@ Figure&nbsp;15.1: Two different mechanisms, chosen by whether a customer is know
 </div>
 </div>
 </div>
-<div class="quarto-embed-nb-cell" data-notebook="/home/runner/work/ml-energy-disaggregation/ml-energy-disaggregation/book/05-forecasting/02-scaling-archetypes-code.ipynb" data-notebook-title="Scaling to Hundreds of Meters" data-notebook-cellid="649ea05f">
+<div class="quarto-embed-nb-cell" data-notebook="/home/runner/work/ml-energy-disaggregation/ml-energy-disaggregation/book/08-forecasting/02-scaling-archetypes-code.ipynb" data-notebook-title="Scaling to Hundreds of Meters" data-notebook-cellid="649ea05f">
 <div id="649ea05f" class="cell">
 <div class="cell-output cell-output-display">
 
@@ -1080,7 +1123,7 @@ w_j = \frac{u_j}{\sum_{j'=1}^{J} u_{j'}}
 \]</span> <span class="math display">\[
 \text{score}(m) = \sum_{j=1}^{J} w_j \cdot \text{rank}_j(m)
 \]</span> so that MAE, RMSE, WMAPE, and SMAPE, which largely agree with each other here, do not collectively outvote Corr, the one metric asking whether a model tracks the real signal’s shape rather than just its average level.</p>
-<div class="quarto-embed-nb-cell" data-notebook="/home/runner/work/ml-energy-disaggregation/ml-energy-disaggregation/book/05-forecasting/02-scaling-archetypes-code.ipynb" data-notebook-title="Scaling to Hundreds of Meters" data-notebook-cellid="d12a26c5">
+<div class="quarto-embed-nb-cell" data-notebook="/home/runner/work/ml-energy-disaggregation/ml-energy-disaggregation/book/08-forecasting/02-scaling-archetypes-code.ipynb" data-notebook-title="Scaling to Hundreds of Meters" data-notebook-cellid="d12a26c5">
 <div id="d12a26c5" class="cell">
 <div class="cell-output cell-output-display">
 <div id="wgdnrtgqpn" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:100%;height:auto;">
@@ -1199,10 +1242,10 @@ w_j = \frac{u_j}{\sum_{j'=1}^{J} u_{j'}}
 </div>
 </div>
 <p>Unified comes out on top of this diversity-weighted ranking too, the same verdict the five-metric table already gave by eye, now backed by an explicit score rather than a reader’s own five-way judgment call. That agreement is itself worth noting: unlike Chapter 1’s own baseline comparison, where the formal ranking overturned the MAE-only answer, here the two methods agree because unified’s own win is not built on a single metric’s fluke, it holds in the same direction across all five, exactly the situation in which no amount of metric-weighting machinery should be expected to change the answer.</p>
-<div class="quarto-embed-nb-cell" data-notebook="/home/runner/work/ml-energy-disaggregation/ml-energy-disaggregation/book/05-forecasting/02-scaling-archetypes-code.ipynb" data-notebook-title="Scaling to Hundreds of Meters" data-notebook-cellid="410ff7b0">
+<div class="quarto-embed-nb-cell" data-notebook="/home/runner/work/ml-energy-disaggregation/ml-energy-disaggregation/book/08-forecasting/02-scaling-archetypes-code.ipynb" data-notebook-title="Scaling to Hundreds of Meters" data-notebook-cellid="410ff7b0">
 <p>Metrics tables report an average; they do not show what a forecast actually looks like. The unified model’s own best and worst real cases, by test-set MAE, make the population-level numbers concrete.</p>
 </div>
-<div class="quarto-embed-nb-cell" data-notebook="/home/runner/work/ml-energy-disaggregation/ml-energy-disaggregation/book/05-forecasting/02-scaling-archetypes-code.ipynb" data-notebook-title="Scaling to Hundreds of Meters" data-notebook-cellid="f3876676">
+<div class="quarto-embed-nb-cell" data-notebook="/home/runner/work/ml-energy-disaggregation/ml-energy-disaggregation/book/08-forecasting/02-scaling-archetypes-code.ipynb" data-notebook-title="Scaling to Hundreds of Meters" data-notebook-cellid="f3876676">
 <div id="f3876676" class="cell">
 <div class="cell-output cell-output-display">
 
@@ -1469,14 +1512,14 @@ w_j = \frac{u_j}{\sum_{j'=1}^{J} u_{j'}}
 </div>
 </div>
 </div>
-<div class="quarto-embed-nb-cell" data-notebook="/home/runner/work/ml-energy-disaggregation/ml-energy-disaggregation/book/05-forecasting/02-scaling-archetypes-code.ipynb" data-notebook-title="Scaling to Hundreds of Meters" data-notebook-cellid="b65e809c">
+<div class="quarto-embed-nb-cell" data-notebook="/home/runner/work/ml-energy-disaggregation/ml-energy-disaggregation/book/08-forecasting/02-scaling-archetypes-code.ipynb" data-notebook-title="Scaling to Hundreds of Meters" data-notebook-cellid="b65e809c">
 <p>The best real case tracks the daily rhythm almost exactly; the worst still lands close on the calmer days but misses the exact height and timing of irregular peaks, real household noise no forecastability battery in Chapter 1 could fully explain away. That is the honest range behind the single MAE number above, not a cherry-picked success story.</p>
 </div>
 </section>
 <section id="does-this-hold-up-over-time-not-just-one-snapshot" class="level2">
 <h2 class="anchored" data-anchor-id="does-this-hold-up-over-time-not-just-one-snapshot">Does this hold up over time, not just one snapshot?</h2>
 <p>A single train/test split is a snapshot, not a guarantee. The real check for whether unified’s win above is a genuine pattern, and not an artifact of exactly where a 90-day holdout happens to start, is expanding-window backtesting: train on a growing window of real history, test on the next real month, repeat, the same rolling-origin evaluation protocol <a href="https://sambaiga.github.io/twiga-docs/tutorials/notebooks/06-backtesting-and-evaluation.html">Twiga’s own backtesting tutorial</a> recommends. Three folds here, each ending before the headline holdout above ever begins, so this check and that comparison never share a single test row.</p>
-<div class="quarto-embed-nb-cell" data-notebook="/home/runner/work/ml-energy-disaggregation/ml-energy-disaggregation/book/05-forecasting/02-scaling-archetypes-code.ipynb" data-notebook-title="Scaling to Hundreds of Meters" data-notebook-cellid="8f11a93a">
+<div class="quarto-embed-nb-cell" data-notebook="/home/runner/work/ml-energy-disaggregation/ml-energy-disaggregation/book/08-forecasting/02-scaling-archetypes-code.ipynb" data-notebook-title="Scaling to Hundreds of Meters" data-notebook-cellid="8f11a93a">
 <div id="8f11a93a" class="cell">
 <div class="cell-output cell-output-display">
 <div id="uckkjrdaua" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:100%;height:auto;">
@@ -1607,7 +1650,7 @@ w_j = \frac{u_j}{\sum_{j'=1}^{J} u_{j'}}
 </div>
 </div>
 </div>
-<div class="quarto-embed-nb-cell" data-notebook="/home/runner/work/ml-energy-disaggregation/ml-energy-disaggregation/book/05-forecasting/02-scaling-archetypes-code.ipynb" data-notebook-title="Scaling to Hundreds of Meters" data-notebook-cellid="07d48c85">
+<div class="quarto-embed-nb-cell" data-notebook="/home/runner/work/ml-energy-disaggregation/ml-energy-disaggregation/book/08-forecasting/02-scaling-archetypes-code.ipynb" data-notebook-title="Scaling to Hundreds of Meters" data-notebook-cellid="07d48c85">
 <div id="07d48c85" class="cell">
 <div class="cell-output cell-output-display">
 
@@ -1881,7 +1924,7 @@ w_j = \frac{u_j}{\sum_{j'=1}^{J} u_{j'}}
 </div>
 </div>
 <p>Unified beats the blind floor in all three expanding-window folds, not only in the final 90-day holdout used above. That is real evidence this is a genuine pattern rather than an artifact of one arbitrary split, checked the same way Twiga’s own backtesting tutorial recommends checking any forecasting claim before trusting it. The same diversity-weighted ranking used throughout this chapter applies here too, averaged across the three folds:</p>
-<div class="quarto-embed-nb-cell" data-notebook="/home/runner/work/ml-energy-disaggregation/ml-energy-disaggregation/book/05-forecasting/02-scaling-archetypes-code.ipynb" data-notebook-title="Scaling to Hundreds of Meters" data-notebook-cellid="93a986b8">
+<div class="quarto-embed-nb-cell" data-notebook="/home/runner/work/ml-energy-disaggregation/ml-energy-disaggregation/book/08-forecasting/02-scaling-archetypes-code.ipynb" data-notebook-title="Scaling to Hundreds of Meters" data-notebook-cellid="93a986b8">
 <div id="93a986b8" class="cell">
 <div class="cell-output cell-output-display">
 <div id="ptomaenitx" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:100%;height:auto;">
@@ -1987,14 +2030,14 @@ w_j = \frac{u_j}{\sum_{j'=1}^{J} u_{j'}}
 <section id="what-does-a-brand-new-house-get-forecast-with" class="level2">
 <h2 class="anchored" data-anchor-id="what-does-a-brand-new-house-get-forecast-with">What does a brand-new house get forecast with?</h2>
 <p>A <a href="#acronyms_DSO">DSO</a> onboarding a new house tomorrow has no history for it in any trained model. The obvious idea is to reuse the unified model exactly as it is: compute the new house’s own <span class="math inline">\(d_i\)</span> from whatever real history exists, and feed those distances into the same model. Checked directly, before trusting it.</p>
-<div class="quarto-embed-nb-cell" data-notebook="/home/runner/work/ml-energy-disaggregation/ml-energy-disaggregation/book/05-forecasting/02-scaling-archetypes-code.ipynb" data-notebook-title="Scaling to Hundreds of Meters" data-notebook-cellid="79b3c46e">
+<div class="quarto-embed-nb-cell" data-notebook="/home/runner/work/ml-energy-disaggregation/ml-energy-disaggregation/book/08-forecasting/02-scaling-archetypes-code.ipynb" data-notebook-title="Scaling to Hundreds of Meters" data-notebook-cellid="79b3c46e">
 <div id="79b3c46e" class="cell">
 <div class="cell-output cell-output-stdout">
 <pre><code>retrained on 270 known customers, 72 held out entirely as 'new'</code></pre>
 </div>
 </div>
 </div>
-<div class="quarto-embed-nb-cell" data-notebook="/home/runner/work/ml-energy-disaggregation/ml-energy-disaggregation/book/05-forecasting/02-scaling-archetypes-code.ipynb" data-notebook-title="Scaling to Hundreds of Meters" data-notebook-cellid="68559944">
+<div class="quarto-embed-nb-cell" data-notebook="/home/runner/work/ml-energy-disaggregation/ml-energy-disaggregation/book/08-forecasting/02-scaling-archetypes-code.ipynb" data-notebook-title="Scaling to Hundreds of Meters" data-notebook-cellid="68559944">
 <div id="68559944" class="cell">
 <div class="cell-output cell-output-display">
 <div id="uxllwncdyy" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:100%;height:auto;">
@@ -2153,7 +2196,7 @@ w_j = \frac{u_j}{\sum_{j'=1}^{J} u_{j'}}
 </div>
 </div>
 </div>
-<div class="quarto-embed-nb-cell" data-notebook="/home/runner/work/ml-energy-disaggregation/ml-energy-disaggregation/book/05-forecasting/02-scaling-archetypes-code.ipynb" data-notebook-title="Scaling to Hundreds of Meters" data-notebook-cellid="a3136277">
+<div class="quarto-embed-nb-cell" data-notebook="/home/runner/work/ml-energy-disaggregation/ml-energy-disaggregation/book/08-forecasting/02-scaling-archetypes-code.ipynb" data-notebook-title="Scaling to Hundreds of Meters" data-notebook-cellid="a3136277">
 <div id="a3136277" class="cell">
 <div class="cell-output cell-output-display">
 <div id="dnszrlldmg" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:100%;height:auto;">
@@ -2267,11 +2310,11 @@ w_j = \frac{u_j}{\sum_{j'=1}^{J} u_{j'}}
 <img src="../../assets/archetype-distance-and-conformal.svg" class="img-fluid figure-img">
 </div>
 <figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-archetype-distance-and-conformal-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Figure&nbsp;15.2: Left: a new customer’s partial-history shape sits some distance from each archetype centroid; those distances become softmax weights, closer centroids counting for more. Right: a calibration histogram of nearest-neighbor distances from known customers, with the split-conformal threshold tau marking the boundary between customers the gate trusts (blend the specialists) and customers it flags (fall back to the blind model).
+Figure&nbsp;17.2: Left: a new customer’s partial-history shape sits some distance from each archetype centroid; those distances become softmax weights, closer centroids counting for more. Right: a calibration histogram of nearest-neighbor distances from known customers, with the split-conformal threshold tau marking the boundary between customers the gate trusts (blend the specialists) and customers it flags (fall back to the blind model).
 </figcaption>
 </figure>
 </div>
-<div class="quarto-embed-nb-cell" data-notebook="/home/runner/work/ml-energy-disaggregation/ml-energy-disaggregation/book/05-forecasting/02-scaling-archetypes-code.ipynb" data-notebook-title="Scaling to Hundreds of Meters" data-notebook-cellid="17272bc7">
+<div class="quarto-embed-nb-cell" data-notebook="/home/runner/work/ml-energy-disaggregation/ml-energy-disaggregation/book/08-forecasting/02-scaling-archetypes-code.ipynb" data-notebook-title="Scaling to Hundreds of Meters" data-notebook-cellid="17272bc7">
 <div id="17272bc7" class="cell">
 <div class="cell-output cell-output-stdout">
 <pre><code>calibrated retrieval tau: 0.8450</code></pre>
@@ -2281,7 +2324,7 @@ Figure&nbsp;15.2: Left: a new customer’s partial-history shape sits some dista
 <section id="meet-one-new-customer" class="level3">
 <h3 class="anchored" data-anchor-id="meet-one-new-customer">Meet one new customer</h3>
 <p>Population averages are easy to state and hard to feel. One customer from the 72 held out above shows what the gate actually tracks: not whether the single nearest archetype label happens to be correct, but whether a real, trustworthy match exists at all. The gate starts trusting this customer at 7 real days, well before their own hard archetype label finally turns correct at a full season, and the forecast improves exactly when trust arrives, not when the label does.</p>
-<div class="quarto-embed-nb-cell" data-notebook="/home/runner/work/ml-energy-disaggregation/ml-energy-disaggregation/book/05-forecasting/02-scaling-archetypes-code.ipynb" data-notebook-title="Scaling to Hundreds of Meters" data-notebook-cellid="914fcdb7">
+<div class="quarto-embed-nb-cell" data-notebook="/home/runner/work/ml-energy-disaggregation/ml-energy-disaggregation/book/08-forecasting/02-scaling-archetypes-code.ipynb" data-notebook-title="Scaling to Hundreds of Meters" data-notebook-cellid="914fcdb7">
 <div id="914fcdb7" class="cell">
 <div class="cell-output cell-output-display">
 <div id="rkiqhqgnqz" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:100%;height:auto;">
@@ -2406,7 +2449,7 @@ Figure&nbsp;15.2: Left: a new customer’s partial-history shape sits some dista
 </div>
 </div>
 <p>Zooming out from one customer to all 72 held out entirely from training:</p>
-<div class="quarto-embed-nb-cell" data-notebook="/home/runner/work/ml-energy-disaggregation/ml-energy-disaggregation/book/05-forecasting/02-scaling-archetypes-code.ipynb" data-notebook-title="Scaling to Hundreds of Meters" data-notebook-cellid="0b765cad">
+<div class="quarto-embed-nb-cell" data-notebook="/home/runner/work/ml-energy-disaggregation/ml-energy-disaggregation/book/08-forecasting/02-scaling-archetypes-code.ipynb" data-notebook-title="Scaling to Hundreds of Meters" data-notebook-cellid="0b765cad">
 <div id="0b765cad" class="cell">
 <div class="cell-output cell-output-display">
 
@@ -2677,7 +2720,7 @@ Figure&nbsp;15.2: Left: a new customer’s partial-history shape sits some dista
 </div>
 </div>
 <p>Four candidates this time, not two, the richest comparison in this chapter, so the diversity-weighted ranking earns its keep here more than anywhere else so far:</p>
-<div class="quarto-embed-nb-cell" data-notebook="/home/runner/work/ml-energy-disaggregation/ml-energy-disaggregation/book/05-forecasting/02-scaling-archetypes-code.ipynb" data-notebook-title="Scaling to Hundreds of Meters" data-notebook-cellid="8f82b164">
+<div class="quarto-embed-nb-cell" data-notebook="/home/runner/work/ml-energy-disaggregation/ml-energy-disaggregation/book/08-forecasting/02-scaling-archetypes-code.ipynb" data-notebook-title="Scaling to Hundreds of Meters" data-notebook-cellid="8f82b164">
 <div id="8f82b164" class="cell">
 <div class="cell-output cell-output-display">
 <div id="jrrucgsvop" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:100%;height:auto;">
@@ -2798,7 +2841,7 @@ Figure&nbsp;15.2: Left: a new customer’s partial-history shape sits some dista
 </div>
 <p>Gated soft mixture comes out on top, averaged across all five history lengths, the same verdict the MAE chart already suggested, now checked against Corr and RMSE too rather than taken on faith from one column.</p>
 <p>Two more real numbers explain the shape of that chart.</p>
-<div class="quarto-embed-nb-cell" data-notebook="/home/runner/work/ml-energy-disaggregation/ml-energy-disaggregation/book/05-forecasting/02-scaling-archetypes-code.ipynb" data-notebook-title="Scaling to Hundreds of Meters" data-notebook-cellid="f4745145">
+<div class="quarto-embed-nb-cell" data-notebook="/home/runner/work/ml-energy-disaggregation/ml-energy-disaggregation/book/08-forecasting/02-scaling-archetypes-code.ipynb" data-notebook-title="Scaling to Hundreds of Meters" data-notebook-cellid="f4745145">
 <div id="f4745145" class="cell">
 <div class="cell-output cell-output-display">
 <div id="wfkhajvroh" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:100%;height:auto;">
@@ -2922,9 +2965,9 @@ Figure&nbsp;15.2: Left: a new customer’s partial-history shape sits some dista
 <p>A <a href="#acronyms_DSO">DSO</a> does not get to choose between accurate and operationally maintainable, and does not get to wait for a new customer to accumulate a full season of history before forecasting them at all. The real, checked finding here is that both constraints have one honest answer each: reuse a single model with cluster information as a legitimate personalization signal once a customer has real history, and fall back to a calibrated, distance-weighted blend of already-trained specialists, safely gated, before that history exists. Neither answer was assumed going in. The first naive idea this chapter tried, reusing the same personalization mechanism for new customers, failed a genuine held-out test even with perfect information, and the fix that replaced it reuses machinery Chapters 4 and 5 already built rather than adding anything new.</p>
 <p>Two honest limits, not yet solved here rather than papered over. The archetypes themselves are a snapshot: if a customer population’s own behavior shifts substantially, the centroids this chapter reuses from Chapter 4 would need recomputing, not assumed to stay valid forever. And a genuinely atypical new customer, one whose real behavior does not resemble any of the five archetypes, is exactly the case the retrieval-confidence gate is built to catch: it falls back to the safe global model rather than forcing a bad match, but a low-trust customer still only gets the blind floor, not a personalized answer. Both are real, open questions for a future chapter, not solved by this one.</p>
 </section>
-<section id="where-this-leaves-part-5" class="level2">
-<h2 class="anchored" data-anchor-id="where-this-leaves-part-5">Where this leaves Part 5</h2>
-<p>A trained model clears Chapter 1’s baseline floor, and sharing information across Chapter 4’s archetypes inside a single model beats both training one model per customer and training one model for everyone. That same sharing mechanism does not survive contact with a customer it has never seen, and the fix that does, a calibrated, distance-weighted blend of specialists, is never worse than doing nothing while a new customer’s history accumulates. Chapter 3 picks up the model this chapter found actually earns its cost and asks what that forecast is worth without a number attached to how wrong it might be; Part 5 Chapter 4 asks a further question neither chapter can answer on its own, whether a foundation model pretrained on none of this data, given no fitting step at all, gets the same customers wrong that this chapter’s trained model does.</p>
+<section id="where-this-leaves-part-8" class="level2">
+<h2 class="anchored" data-anchor-id="where-this-leaves-part-8">Where this leaves Part 8</h2>
+<p>A trained model clears Chapter 1’s baseline floor, and sharing information across Chapter 4’s archetypes inside a single model beats both training one model per customer and training one model for everyone. That same sharing mechanism does not survive contact with a customer it has never seen, and the fix that does, a calibrated, distance-weighted blend of specialists, is never worse than doing nothing while a new customer’s history accumulates. Chapter 3 picks up the model this chapter found actually earns its cost and asks what that forecast is worth without a number attached to how wrong it might be; Part 8 Chapter 4 asks a further question neither chapter can answer on its own, whether a foundation model pretrained on none of this data, given no fitting step at all, gets the same customers wrong that this chapter’s trained model does.</p>
 </section>
 <section id="references" class="level2">
 <h2 class="anchored" data-anchor-id="references">References</h2>
@@ -3363,12 +3406,12 @@ Figure&nbsp;15.2: Left: a new customer’s partial-history shape sits some dista
   </script>
 <nav class="page-navigation">
   <div class="nav-page nav-page-previous">
-      <a href="../../book/05-forecasting/01-forecastability.html" class="pagination-link" aria-label="Chapter 1: Household Smart-Meter Forecastability">
+      <a href="../../book/08-forecasting/01-forecastability.html" class="pagination-link" aria-label="Chapter 1: Household Smart-Meter Forecastability">
         <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text"><span class="chapter-title">Chapter 1: Household Smart-Meter Forecastability</span></span>
       </a>          
   </div>
   <div class="nav-page nav-page-next">
-      <a href="../../book/05-forecasting/03-probabilistic-forecasting.html" class="pagination-link" aria-label="Chapter 3: What a Probabilistic Forecast Is Actually Worth">
+      <a href="../../book/08-forecasting/03-probabilistic-forecasting.html" class="pagination-link" aria-label="Chapter 3: What a Probabilistic Forecast Is Actually Worth">
         <span class="nav-page-text"><span class="chapter-title">Chapter 3: What a Probabilistic Forecast Is Actually Worth</span></span> <i class="bi bi-arrow-right-short"></i>
       </a>
   </div>
@@ -3383,7 +3426,7 @@ Figure&nbsp;15.2: Left: a new customer’s partial-history shape sits some dista
 <div class="footer-social">
 <p><a href="mailto:sambaiga@gmail.com" title="Email"><i class="bi bi-envelope-at-fill"></i></a> <a href="https://github.com/sambaiga" title="GitHub"><i class="bi bi-github"></i></a> <a href="https://www.linkedin.com/in/sambaiga" title="LinkedIn"><i class="bi bi-linkedin"></i></a></p>
 </div>
-<div class="toc-actions d-sm-block d-md-none"><ul><li><a href="https://github.com/sambaiga/ml-energy-disaggregation/edit/main/book/05-forecasting/02-scaling-archetypes.qmd" class="toc-action"><i class="bi bi-github"></i>Edit this page</a></li><li><a href="https://github.com/sambaiga/ml-energy-disaggregation/issues/new" class="toc-action"><i class="bi empty"></i>Report an issue</a></li><li><a href="https://github.com/sambaiga/ml-energy-disaggregation/blob/main/book/05-forecasting/02-scaling-archetypes.qmd" class="toc-action"><i class="bi empty"></i>View source</a></li></ul></div></div>
+<div class="toc-actions d-sm-block d-md-none"><ul><li><a href="https://github.com/sambaiga/ml-energy-disaggregation/edit/main/book/08-forecasting/02-scaling-archetypes.qmd" class="toc-action"><i class="bi bi-github"></i>Edit this page</a></li><li><a href="https://github.com/sambaiga/ml-energy-disaggregation/issues/new" class="toc-action"><i class="bi empty"></i>Report an issue</a></li><li><a href="https://github.com/sambaiga/ml-energy-disaggregation/blob/main/book/08-forecasting/02-scaling-archetypes.qmd" class="toc-action"><i class="bi empty"></i>View source</a></li></ul></div></div>
     <div class="nav-footer-right">
 <p><span class="faux-block">Made with <a href="https://quarto.org">Quarto</a></span> <span class="faux-block"><a href="https://github.com/sambaiga/ml-energy-disaggregation"><i class="bi bi-github"></i> View source</a></span></p>
 </div>

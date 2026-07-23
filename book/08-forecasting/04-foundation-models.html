@@ -8,7 +8,7 @@
 
 <meta name="description" content="A structured, project-based path through smart meter data: disaggregation, forecasting, anomaly detection, and grid-edge value, from raw signal to business insight.">
 
-<title>Part 5 Chapter 4: Do Foundation Models Fail Like Everything Else Does? – Machine Learning for Smart Meter Data</title>
+<title>Part 8 Chapter 4: Do Foundation Models Fail Like Everything Else Does? – Machine Learning for Smart Meter Data</title>
 <style>
 /* Default styles provided by pandoc.
 ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
@@ -54,8 +54,8 @@ div.csl-indent {
 <script src="../../site_libs/quarto-search/fuse.min.js"></script>
 <script src="../../site_libs/quarto-search/quarto-search.js"></script>
 <meta name="quarto:offset" content="../../">
-<link href="../../book/05-forecasting/05-what-if-scenario-analysis.html" rel="next">
-<link href="../../book/05-forecasting/03-probabilistic-forecasting.html" rel="prev">
+<link href="../../book/08-forecasting/05-what-if-scenario-analysis.html" rel="next">
+<link href="../../book/08-forecasting/03-probabilistic-forecasting.html" rel="prev">
 <link href="../../assets/favicon.svg" rel="icon" type="image/svg+xml">
 <script src="../../site_libs/quarto-html/quarto.js" type="module"></script>
 <script src="../../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
@@ -68,9 +68,9 @@ div.csl-indent {
 <link href="../../site_libs/quarto-html/quarto-syntax-highlighting-de63f62b328812d8e578a4d74e282472.css" rel="stylesheet" class="quarto-color-scheme-extra" id="quarto-text-highlighting-styles">
 <script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="../../site_libs/bootstrap/bootstrap-9661ac00a33b6c2a7ffb2cb4cb9f2155.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
-<link href="../../site_libs/bootstrap/bootstrap-dark-9b208294319f478b9205897e46a7db35.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="dark">
-<link href="../../site_libs/bootstrap/bootstrap-9661ac00a33b6c2a7ffb2cb4cb9f2155.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme-extra" id="quarto-bootstrap" data-mode="light">
+<link href="../../site_libs/bootstrap/bootstrap-84b0f63d2b22afb69d3c32ede53d2fe2.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
+<link href="../../site_libs/bootstrap/bootstrap-dark-86bd388472066654720eaf2de8d3b778.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="dark">
+<link href="../../site_libs/bootstrap/bootstrap-84b0f63d2b22afb69d3c32ede53d2fe2.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme-extra" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -104,11 +104,11 @@ div.csl-indent {
 <script src="https://cdn.jsdelivr.net/npm/@jupyter-widgets/html-manager@*/dist/embed-amd.js" crossorigin="anonymous"></script>
 
 
-<meta property="og:title" content="Part 5 Chapter 4: Do Foundation Models Fail Like Everything Else Does? – Machine Learning for Smart Meter Data">
+<meta property="og:title" content="Part 8 Chapter 4: Do Foundation Models Fail Like Everything Else Does? – Machine Learning for Smart Meter Data">
 <meta property="og:description" content="A structured, project-based path through smart meter data: disaggregation, forecasting, anomaly detection, and grid-edge value, from raw signal to business insight.">
 <meta property="og:image" content="https://sambaiga.github.io/ml-energy-disaggregation/assets/trained-specialist-vs-zero-shot.svg">
 <meta property="og:site_name" content="Machine Learning for Smart Meter Data">
-<meta name="twitter:title" content="Part 5 Chapter 4: Do Foundation Models Fail Like Everything Else Does? – Machine Learning for Smart Meter Data">
+<meta name="twitter:title" content="Part 8 Chapter 4: Do Foundation Models Fail Like Everything Else Does? – Machine Learning for Smart Meter Data">
 <meta name="twitter:description" content="A structured, project-based path through smart meter data: disaggregation, forecasting, anomaly detection, and grid-edge value, from raw signal to business insight.">
 <meta name="twitter:image" content="https://sambaiga.github.io/ml-energy-disaggregation/assets/trained-specialist-vs-zero-shot.svg">
 <meta name="twitter:card" content="summary_large_image">
@@ -322,7 +322,7 @@ div.csl-indent {
         <i class="bi bi-layout-text-sidebar-reverse"></i>
       </button>
         <a class="flex-grow-1 no-decor" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
-          <h1 class="quarto-secondary-nav-title"><span class="chapter-title">Part 5 Chapter 4: Do Foundation Models Fail Like Everything Else Does?</span></h1>
+          <h1 class="quarto-secondary-nav-title"><span class="chapter-title">Part 8 Chapter 4: Do Foundation Models Fail Like Everything Else Does?</span></h1>
         </a>     
     </div>
   </nav>
@@ -382,7 +382,7 @@ div.csl-indent {
         <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
             <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="false">
- <span class="menu-text">Part 4: Grid-Edge Value</span></a>
+ <span class="menu-text">Part 4: LV Network and Topology Foundations</span></a>
           <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="false" aria-label="Toggle section">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
@@ -390,73 +390,116 @@ div.csl-indent {
       <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth1 ">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../../book/04-grid-edge/01-opendss-lv-modeling.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">Chapter 1: Modeling the Low-Voltage Network</span></a>
+  <a href="../../book/04-network-foundations/01-opendss-lv-modeling.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">Chapter 1: Modeling the Low-Voltage Network</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../../book/04-grid-edge/02-timeseries-der-modeling.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">Chapter 2: Time-Series Simulation and DER Modeling</span></a>
+  <a href="../../book/04-network-foundations/02-timeseries-der-modeling.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">Chapter 2: Time-Series Simulation and DER Modeling</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../../book/04-grid-edge/03-phase-identification.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">Chapter 3: Phase Identification from Smart-Meter Data</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../../book/04-grid-edge/04-customer-feeder-clustering.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">Chapter 4: Customer and Feeder Clustering</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../../book/04-grid-edge/05-ranking-recommendation.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">Chapter 5: Ranking and Recommendation under DER</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../../book/04-grid-edge/06-anomaly-detection.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">Chapter 6: Anomaly Detection Beyond the Meter</span></a>
+  <a href="../../book/04-network-foundations/03-phase-identification.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">Chapter 3: Phase Identification from Smart-Meter Data</span></a>
   </div>
 </li>
       </ul>
   </li>
         <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
-            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="true">
- <span class="menu-text">Part 5: Forecasting</span></a>
-          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="false">
+ <span class="menu-text">Part 5: Clustering</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="false" aria-label="Toggle section">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
       </div>
-      <ul id="quarto-sidebar-section-3" class="collapse list-unstyled sidebar-section depth1 show">  
+      <ul id="quarto-sidebar-section-3" class="collapse list-unstyled sidebar-section depth1 ">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../../book/05-forecasting/01-forecastability.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">Chapter 1: Household Smart-Meter Forecastability</span></a>
+  <a href="../../book/05-clustering/01-clustering-foundations.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">Chapter 1: Clustering Foundations</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../../book/05-forecasting/02-scaling-archetypes.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">Chapter 2: Scaling to Hundreds of Meters</span></a>
+  <a href="../../book/05-clustering/02-clustering-methodology.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">Chapter 2: Clustering Methodology</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../../book/05-forecasting/03-probabilistic-forecasting.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">Chapter 3: What a Probabilistic Forecast Is Actually Worth</span></a>
+  <a href="../../book/05-clustering/03-customer-feeder-clustering.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">Chapter 3: Customer and Feeder Clustering</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" role="navigation" aria-expanded="false">
+ <span class="menu-text">Part 6: Ranking and Recommendation</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" role="navigation" aria-expanded="false" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-4" class="collapse list-unstyled sidebar-section depth1 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../book/06-ranking-recommendation/01-ranking-recommendation.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">Chapter 1: Ranking and Recommendation under DER</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-5" role="navigation" aria-expanded="false">
+ <span class="menu-text">Part 7: Anomaly Detection</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-5" role="navigation" aria-expanded="false" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-5" class="collapse list-unstyled sidebar-section depth1 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../book/07-anomaly-detection/01-anomaly-detection.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">Chapter 1: Anomaly Detection Beyond the Meter</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-6" role="navigation" aria-expanded="true">
+ <span class="menu-text">Part 8: Forecasting</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-6" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-6" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../book/08-forecasting/01-forecastability.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">Chapter 1: Household Smart-Meter Forecastability</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../../book/05-forecasting/04-foundation-models.html" class="sidebar-item-text sidebar-link active"><span class="chapter-title">Part 5 Chapter 4: Do Foundation Models Fail Like Everything Else Does?</span></a>
+  <a href="../../book/08-forecasting/02-scaling-archetypes.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">Chapter 2: Scaling to Hundreds of Meters</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../../book/05-forecasting/05-what-if-scenario-analysis.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">Part 5 Chapter 5: What the Grid Actually Faces When These Forecasts Come True</span></a>
+  <a href="../../book/08-forecasting/03-probabilistic-forecasting.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">Chapter 3: What a Probabilistic Forecast Is Actually Worth</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../../book/05-forecasting/06-lv-state-estimation.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">Part 5 Chapter 6: Can Smart-Meter Readings Fill In What the Grid Cannot See</span></a>
+  <a href="../../book/08-forecasting/04-foundation-models.html" class="sidebar-item-text sidebar-link active"><span class="chapter-title">Part 8 Chapter 4: Do Foundation Models Fail Like Everything Else Does?</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../book/08-forecasting/05-what-if-scenario-analysis.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">Part 8 Chapter 5: What the Grid Actually Faces When These Forecasts Come True</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../book/08-forecasting/06-lv-state-estimation.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">Part 8 Chapter 6: Can Smart-Meter Readings Fill In What the Grid Cannot See</span></a>
   </div>
 </li>
       </ul>
@@ -488,10 +531,10 @@ div.csl-indent {
   <li><a href="#one-honest-ranking-not-three-separate-leaderboards" id="toc-one-honest-ranking-not-three-separate-leaderboards" class="nav-link" data-scroll-target="#one-honest-ranking-not-three-separate-leaderboards">One honest ranking, not three separate leaderboards</a></li>
   <li><a href="#does-zero-shot-hold-up-beyond-ausnet" id="toc-does-zero-shot-hold-up-beyond-ausnet" class="nav-link" data-scroll-target="#does-zero-shot-hold-up-beyond-ausnet">Does zero-shot hold up beyond AusNet?</a></li>
   <li><a href="#why-bother" id="toc-why-bother" class="nav-link" data-scroll-target="#why-bother">Why bother</a></li>
-  <li><a href="#where-this-leaves-part-5" id="toc-where-this-leaves-part-5" class="nav-link" data-scroll-target="#where-this-leaves-part-5">Where this leaves Part 5</a></li>
+  <li><a href="#where-this-leaves-part-8" id="toc-where-this-leaves-part-8" class="nav-link" data-scroll-target="#where-this-leaves-part-8">Where this leaves Part 8</a></li>
   <li><a href="#references" id="toc-references" class="nav-link" data-scroll-target="#references">References</a></li>
   </ul>
-<div class="toc-actions"><ul><li><a href="https://github.com/sambaiga/ml-energy-disaggregation/edit/main/book/05-forecasting/04-foundation-models.qmd" class="toc-action"><i class="bi bi-github"></i>Edit this page</a></li><li><a href="https://github.com/sambaiga/ml-energy-disaggregation/issues/new" class="toc-action"><i class="bi empty"></i>Report an issue</a></li><li><a href="https://github.com/sambaiga/ml-energy-disaggregation/blob/main/book/05-forecasting/04-foundation-models.qmd" class="toc-action"><i class="bi empty"></i>View source</a></li></ul></div></nav>
+<div class="toc-actions"><ul><li><a href="https://github.com/sambaiga/ml-energy-disaggregation/edit/main/book/08-forecasting/04-foundation-models.qmd" class="toc-action"><i class="bi bi-github"></i>Edit this page</a></li><li><a href="https://github.com/sambaiga/ml-energy-disaggregation/issues/new" class="toc-action"><i class="bi empty"></i>Report an issue</a></li><li><a href="https://github.com/sambaiga/ml-energy-disaggregation/blob/main/book/08-forecasting/04-foundation-models.qmd" class="toc-action"><i class="bi empty"></i>View source</a></li></ul></div></nav>
     </div>
 <!-- main -->
 <main class="content" id="quarto-document-content">
@@ -499,7 +542,7 @@ div.csl-indent {
 
 <header id="title-block-header" class="quarto-title-block default">
 <div class="quarto-title">
-<h1 class="title d-none d-lg-block"><span class="chapter-title">Part 5 Chapter 4: Do Foundation Models Fail Like Everything Else Does?</span></h1>
+<h1 class="title d-none d-lg-block"><span class="chapter-title">Part 8 Chapter 4: Do Foundation Models Fail Like Everything Else Does?</span></h1>
 </div>
 
 
@@ -516,7 +559,7 @@ div.csl-indent {
 </header>
 
 
-<p>Every chapter in Part 5 so far has trained something on this exact 342-customer AusNet pool, however cheaply: a baseline in Chapter 1, a full LightGBM pipeline in Chapter 2, three probabilistic backbones in Chapter 3. That is the standard framing this whole literature still leans on for a new population: collect its history, engineer its features, fit a model to it, repeat the whole pipeline for the next population. A time-series foundation model claims to break that framing entirely, pretrained once on a huge, unrelated corpus, pointed directly at a customer it has never seen, zero-shot, no fitting step at all.</p>
+<p>Every chapter in Part 8 so far has trained something on this exact 342-customer AusNet pool, however cheaply: a baseline in Chapter 1, a full LightGBM pipeline in Chapter 2, three probabilistic backbones in Chapter 3. That is the standard framing this whole literature still leans on for a new population: collect its history, engineer its features, fit a model to it, repeat the whole pipeline for the next population. A time-series foundation model claims to break that framing entirely, pretrained once on a huge, unrelated corpus, pointed directly at a customer it has never seen, zero-shot, no fitting step at all.</p>
 <p>This chapter runs that claim against two real pretrained models, Chronos-2 <span class="citation" data-cites="ansari2025chronos2">[1]</span> and TimesFM <span class="citation" data-cites="das2024timesfm">[2]</span>, on the exact same 342 real AusNet customers Chapters 1 through 3 already know in detail. Neither model has ever seen an AusNet reading. Neither gets a single gradient step on this data. Both are just pointed at a customer’s own recent history and asked to forecast the next real day, and both come in more accurate than <code>unified</code>, Chapter 2’s own trained LightGBM winner, on the exact same real day: 0.2268 and 0.2290 kW mean absolute error against unified’s own 0.2418, checked on the identical 342 customers and the identical real test window, not a hand-picked comparison. That result alone does not settle anything, and should not be read as one.</p>
 <p>The real question is not whether a zero-shot model can match a model trained specifically on this data. That would be a surprising, and frankly suspicious, result, and chasing it would miss the more useful question underneath. The real question is whether a foundation model’s own failures land on the <em>same</em> customers Chapters 1 and 2 already found hard, or on a genuinely different subset, customers a model trained on smart-meter data specifically would never struggle with. That distinction decides what a foundation model is actually good for in a deployment: a substitute if the failures overlap, since then it buys nothing a trained model didn’t already buy; a real candidate for an ensemble or a cold-start fallback if they diverge, since then it is wrong in a different, complementary way.</p>
 <p>Three chained questions push past what a single accuracy number can answer:</p>
@@ -538,7 +581,7 @@ div.csl-indent {
 <img src="../../assets/trained-specialist-vs-zero-shot.svg" class="img-fluid figure-img">
 </div>
 <figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-trained-specialist-vs-zero-shot-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Figure&nbsp;17.1: Two ways to know a population. Left: the trained specialist every earlier chapter in Part 5 builds, a per-population pipeline that has to repeat in full for a new population. Right: a foundation model, pretrained once on a general corpus, consuming any customer’s own raw context window directly with no fitting step at all.
+Figure&nbsp;19.1: Two ways to know a population. Left: the trained specialist every earlier chapter in Part 8 builds, a per-population pipeline that has to repeat in full for a new population. Right: a foundation model, pretrained once on a general corpus, consuming any customer’s own raw context window directly with no fitting step at all.
 </figcaption>
 </figure>
 </div>
@@ -546,7 +589,7 @@ Figure&nbsp;17.1: Two ways to know a population. Left: the trained specialist ev
 <section id="setup-the-same-population-recomputed-not-imported" class="level2">
 <h2 class="anchored" data-anchor-id="setup-the-same-population-recomputed-not-imported">Setup: the same population, recomputed, not imported</h2>
 <p>Nothing from Chapter 1 or Chapter 2 is saved to disk anywhere in this book, so this chapter recomputes both directly, with the identical constants and the identical code, rather than re-deriving a looser approximation of what those chapters already found.</p>
-<div class="quarto-embed-nb-cell" data-notebook="/home/runner/work/ml-energy-disaggregation/ml-energy-disaggregation/book/05-forecasting/04-foundation-models-code.ipynb" data-notebook-title="Do Foundation Models Fail Like Everything Else Does?" data-notebook-cellid="cf333da5">
+<div class="quarto-embed-nb-cell" data-notebook="/home/runner/work/ml-energy-disaggregation/ml-energy-disaggregation/book/08-forecasting/04-foundation-models-code.ipynb" data-notebook-title="Do Foundation Models Fail Like Everything Else Does?" data-notebook-cellid="cf333da5">
 <div id="cf333da5" class="cell">
 <div class="cell-output cell-output-stdout">
 <pre><code>load_data: (342, 365, 48) (customers, days, half-hours)</code></pre>
@@ -554,7 +597,7 @@ Figure&nbsp;17.1: Two ways to know a population. Left: the trained specialist ev
 </div>
 </div>
 <p>Chapter 1’s own four-metric forecastability profile, permutation entropy, sample entropy, the Hurst exponent, and the DFA exponent, recomputed identically on the same 342 customers.</p>
-<div class="quarto-embed-nb-cell" data-notebook="/home/runner/work/ml-energy-disaggregation/ml-energy-disaggregation/book/05-forecasting/04-foundation-models-code.ipynb" data-notebook-title="Do Foundation Models Fail Like Everything Else Does?" data-notebook-cellid="c83eee1f">
+<div class="quarto-embed-nb-cell" data-notebook="/home/runner/work/ml-energy-disaggregation/ml-energy-disaggregation/book/08-forecasting/04-foundation-models-code.ipynb" data-notebook-title="Do Foundation Models Fail Like Everything Else Does?" data-notebook-cellid="c83eee1f">
 <div id="c83eee1f" class="cell">
 <div class="cell-output cell-output-display">
 <div>
@@ -635,14 +678,14 @@ Figure&nbsp;17.1: Two ways to know a population. Left: the trained specialist ev
 </div>
 </div>
 <p><code>unified</code>, Chapter 2’s own real winner, one LightGBM model pooled across every customer with each customer’s own archetype-centroid distance added as an ordinary feature, reused exactly: lag columns, distance columns, the <code>num_threads=1</code> fix this book already diagnosed, and all.</p>
-<div class="quarto-embed-nb-cell" data-notebook="/home/runner/work/ml-energy-disaggregation/ml-energy-disaggregation/book/05-forecasting/04-foundation-models-code.ipynb" data-notebook-title="Do Foundation Models Fail Like Everything Else Does?" data-notebook-cellid="11cb7506">
+<div class="quarto-embed-nb-cell" data-notebook="/home/runner/work/ml-energy-disaggregation/ml-energy-disaggregation/book/08-forecasting/04-foundation-models-code.ipynb" data-notebook-title="Do Foundation Models Fail Like Everything Else Does?" data-notebook-cellid="11cb7506">
 <div id="11cb7506" class="cell">
 <div class="cell-output cell-output-stdout">
 <pre><code>pooled rows: 5,860,512, train: 4,383,072, test: 1,477,440</code></pre>
 </div>
 </div>
 </div>
-<div class="quarto-embed-nb-cell" data-notebook="/home/runner/work/ml-energy-disaggregation/ml-energy-disaggregation/book/05-forecasting/04-foundation-models-code.ipynb" data-notebook-title="Do Foundation Models Fail Like Everything Else Does?" data-notebook-cellid="e947ea2d">
+<div class="quarto-embed-nb-cell" data-notebook="/home/runner/work/ml-energy-disaggregation/ml-energy-disaggregation/book/08-forecasting/04-foundation-models-code.ipynb" data-notebook-title="Do Foundation Models Fail Like Everything Else Does?" data-notebook-cellid="e947ea2d">
 <div id="e947ea2d" class="cell">
 <div class="cell-output cell-output-stdout">
 <pre><code>unified LightGBM, full 90-day population MAE: 0.2547
@@ -656,14 +699,14 @@ unified LightGBM, same single-day scope every method below is compared at: 0.241
 <h2 class="anchored" data-anchor-id="two-real-foundation-models-zero-shot">Two real foundation models, zero-shot</h2>
 <p>Chronos-2 <span class="citation" data-cites="ansari2025chronos2">[1]</span> and TimesFM <span class="citation" data-cites="das2024timesfm">[2]</span> are both pretrained once, on a huge, unrelated corpus of real time series that has never seen a single AusNet customer, then pointed directly at these 342 customers with no fitting step at all. Both share the exact quantile-output interface Chapter 3 already established, <code>loc</code>, <code>quantiles</code>, <code>quantile_levels</code>, so the same evaluation machinery applies unchanged, no new metrics code needed for either.</p>
 <p>Zero-shot inference on a real CPU has a real, measured cost that does not scale the way one classical model’s own fit does. Chronos-2 forecasts all 342 customers in under 5 seconds; TimesFM takes roughly 1.1 seconds per customer, over 6 minutes for the same population, confirmed directly before committing to this chapter’s own scope. Evaluating every customer over Chapters 1 and 2’s own full 90-day test period, 90 windows per customer, would take TimesFM alone the better part of a day. Both models are checked here on one representative real test day per customer instead, the most recent real day in each customer’s own held-out period, a disclosed, bounded comparison, not the full 90-day sweep, chosen for the same reason Chapter 3 bounded its own tree-backbone comparison to a subsample rather than the full pooled training set.</p>
-<div class="quarto-embed-nb-cell" data-notebook="/home/runner/work/ml-energy-disaggregation/ml-energy-disaggregation/book/05-forecasting/04-foundation-models-code.ipynb" data-notebook-title="Do Foundation Models Fail Like Everything Else Does?" data-notebook-cellid="8d3182f7">
+<div class="quarto-embed-nb-cell" data-notebook="/home/runner/work/ml-energy-disaggregation/ml-energy-disaggregation/book/08-forecasting/04-foundation-models-code.ipynb" data-notebook-title="Do Foundation Models Fail Like Everything Else Does?" data-notebook-cellid="8d3182f7">
 <div id="8d3182f7" class="cell">
 <div class="cell-output cell-output-stdout">
 <pre><code>one test day per customer: X_fm (342, 48, 1), y_fm (342, 48, 1)</code></pre>
 </div>
 </div>
 </div>
-<div class="quarto-embed-nb-cell" data-notebook="/home/runner/work/ml-energy-disaggregation/ml-energy-disaggregation/book/05-forecasting/04-foundation-models-code.ipynb" data-notebook-title="Do Foundation Models Fail Like Everything Else Does?" data-notebook-cellid="022de7bc">
+<div class="quarto-embed-nb-cell" data-notebook="/home/runner/work/ml-energy-disaggregation/ml-energy-disaggregation/book/08-forecasting/04-foundation-models-code.ipynb" data-notebook-title="Do Foundation Models Fail Like Everything Else Does?" data-notebook-cellid="022de7bc">
 <div id="022de7bc" class="cell">
 <div class="cell-output cell-output-display">
 <script type="application/vnd.jupyter.widget-view+json">
@@ -675,7 +718,7 @@ unified LightGBM, same single-day scope every method below is compared at: 0.241
 </div>
 </div>
 </div>
-<div class="quarto-embed-nb-cell" data-notebook="/home/runner/work/ml-energy-disaggregation/ml-energy-disaggregation/book/05-forecasting/04-foundation-models-code.ipynb" data-notebook-title="Do Foundation Models Fail Like Everything Else Does?" data-notebook-cellid="6c3271eb">
+<div class="quarto-embed-nb-cell" data-notebook="/home/runner/work/ml-energy-disaggregation/ml-energy-disaggregation/book/08-forecasting/04-foundation-models-code.ipynb" data-notebook-title="Do Foundation Models Fail Like Everything Else Does?" data-notebook-cellid="6c3271eb">
 <div id="6c3271eb" class="cell">
 <div class="cell-output cell-output-stdout">
 <pre><code>TimesFM zero-shot, population MAE: 0.2290</code></pre>
@@ -687,7 +730,7 @@ unified LightGBM, same single-day scope every method below is compared at: 0.241
 <section id="does-the-backbone-matter-or-the-customer" class="level2">
 <h2 class="anchored" data-anchor-id="does-the-backbone-matter-or-the-customer">Does the backbone matter, or the customer?</h2>
 <p>Every number so far answers “how wrong, on average.” The real question this chapter opened with is different: when a foundation model gets a customer wrong, is it the <em>same</em> customer classical models already struggle with, or a genuinely different one? One real table joins Chapter 1’s forecastability profile with every method’s own per-customer error, at the same last-day scope, to check directly.</p>
-<div class="quarto-embed-nb-cell" data-notebook="/home/runner/work/ml-energy-disaggregation/ml-energy-disaggregation/book/05-forecasting/04-foundation-models-code.ipynb" data-notebook-title="Do Foundation Models Fail Like Everything Else Does?" data-notebook-cellid="4fb4323d">
+<div class="quarto-embed-nb-cell" data-notebook="/home/runner/work/ml-energy-disaggregation/ml-energy-disaggregation/book/08-forecasting/04-foundation-models-code.ipynb" data-notebook-title="Do Foundation Models Fail Like Everything Else Does?" data-notebook-cellid="4fb4323d">
 <div id="4fb4323d" class="cell">
 <div class="cell-output cell-output-display">
 <div>
@@ -794,7 +837,7 @@ unified LightGBM, same single-day scope every method below is compared at: 0.241
 </div>
 </div>
 </div>
-<div class="quarto-embed-nb-cell" data-notebook="/home/runner/work/ml-energy-disaggregation/ml-energy-disaggregation/book/05-forecasting/04-foundation-models-code.ipynb" data-notebook-title="Do Foundation Models Fail Like Everything Else Does?" data-notebook-cellid="70ceb27a">
+<div class="quarto-embed-nb-cell" data-notebook="/home/runner/work/ml-energy-disaggregation/ml-energy-disaggregation/book/08-forecasting/04-foundation-models-code.ipynb" data-notebook-title="Do Foundation Models Fail Like Everything Else Does?" data-notebook-cellid="70ceb27a">
 <div id="70ceb27a" class="cell">
 <div class="cell-output cell-output-display">
 <div id="bdvrthtqgm" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:100%;height:auto;">
@@ -897,7 +940,7 @@ unified LightGBM, same single-day scope every method below is compared at: 0.241
 </div>
 </div>
 <p>The real overlap is not symmetric, and that asymmetry is the actual finding. Chronos-2 and TimesFM share 74 of their own worst-quartile customers, a Jaccard overlap of 0.755, the two foundation models mostly agree with each other on who is hard. Each foundation model shares far fewer hard customers with unified, 0.536 against Chronos-2 and 0.496 against TimesFM, roughly half the customers either foundation model finds hard are not the same customers unified finds hard, and the reverse holds too. A foundation model’s own failures are not simply a noisier copy of a trained model’s own failures; they cluster around a genuinely different, if internally consistent, notion of what makes a customer hard.</p>
-<div class="quarto-embed-nb-cell" data-notebook="/home/runner/work/ml-energy-disaggregation/ml-energy-disaggregation/book/05-forecasting/04-foundation-models-code.ipynb" data-notebook-title="Do Foundation Models Fail Like Everything Else Does?" data-notebook-cellid="3a286fd1">
+<div class="quarto-embed-nb-cell" data-notebook="/home/runner/work/ml-energy-disaggregation/ml-energy-disaggregation/book/08-forecasting/04-foundation-models-code.ipynb" data-notebook-title="Do Foundation Models Fail Like Everything Else Does?" data-notebook-cellid="3a286fd1">
 <div id="3a286fd1" class="cell">
 <div class="cell-output cell-output-display">
 <div id="cjnzzuegxl" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:100%;height:auto;">
@@ -1011,7 +1054,7 @@ unified LightGBM, same single-day scope every method below is compared at: 0.241
 </div>
 <p>Every correlation above stays weak, none crosses 0.18 in magnitude, for any method against any forecastability metric. No single metric from Chapter 1’s own battery strongly explains which customers a foundation model gets wrong, any more than it explains unified’s own errors; “hard for this method” is not simply “high entropy” or “low Hurst” read off a single number. The one direction worth noting rather than ignoring: the Hurst exponent correlates positively with error for both foundation models (0.096, 0.104) and near zero for unified (0.019), the opposite sign a naive intuition expects, since higher persistence should make a series easier, not harder. MAE is not scale-normalized, and this weak positive correlation is consistent with persistent customers also being larger-load customers, a real confound worth flagging rather than a clean causal story either way.</p>
 <p>A scatter of each method’s own error against the Hurst exponent, the metric Chapter 1 found most tied to real forecast difficulty, makes the correlation table above concrete rather than a column of numbers.</p>
-<div class="quarto-embed-nb-cell" data-notebook="/home/runner/work/ml-energy-disaggregation/ml-energy-disaggregation/book/05-forecasting/04-foundation-models-code.ipynb" data-notebook-title="Do Foundation Models Fail Like Everything Else Does?" data-notebook-cellid="d75e49cf">
+<div class="quarto-embed-nb-cell" data-notebook="/home/runner/work/ml-energy-disaggregation/ml-energy-disaggregation/book/08-forecasting/04-foundation-models-code.ipynb" data-notebook-title="Do Foundation Models Fail Like Everything Else Does?" data-notebook-cellid="d75e49cf">
 <div id="d75e49cf" class="cell">
 <div class="cell-output cell-output-display">
 
@@ -1276,7 +1319,7 @@ unified LightGBM, same single-day scope every method below is compared at: 0.241
 <section id="one-honest-ranking-not-three-separate-leaderboards" class="level2">
 <h2 class="anchored" data-anchor-id="one-honest-ranking-not-three-separate-leaderboards">One honest ranking, not three separate leaderboards</h2>
 <p>MAE alone does not settle which method actually forecasts best: it says nothing about correlation, bias, or scale-independent error. The same diversity-weighted, multi-metric ranking Chapters 2 and 3 already built, <code>ark.evaluate.ranking.rank_models</code>, answers that more honestly than one column can, at the exact same real day and resolution for every method.</p>
-<div class="quarto-embed-nb-cell" data-notebook="/home/runner/work/ml-energy-disaggregation/ml-energy-disaggregation/book/05-forecasting/04-foundation-models-code.ipynb" data-notebook-title="Do Foundation Models Fail Like Everything Else Does?" data-notebook-cellid="cd7f3876">
+<div class="quarto-embed-nb-cell" data-notebook="/home/runner/work/ml-energy-disaggregation/ml-energy-disaggregation/book/08-forecasting/04-foundation-models-code.ipynb" data-notebook-title="Do Foundation Models Fail Like Everything Else Does?" data-notebook-cellid="cd7f3876">
 <div id="cd7f3876" class="cell">
 <div class="cell-output cell-output-display">
 <div id="pyakydqemm" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:100%;height:auto;">
@@ -1391,7 +1434,7 @@ unified LightGBM, same single-day scope every method below is compared at: 0.241
 </tr>
 </tbody><tfoot>
 <tr class="gt_sourcenotes odd">
-<td colspan="9" class="gt_sourcenote" style="color: #6B7280; font-style: italic"><span class="gt_from_md">Diversity-weighted Borda ranking, same mechanism as Part 5 Chapters 2 and 3</span></td>
+<td colspan="9" class="gt_sourcenote" style="color: #6B7280; font-style: italic"><span class="gt_from_md">Diversity-weighted Borda ranking, same mechanism as Part 8 Chapters 2 and 3</span></td>
 </tr>
 </tfoot>
 
@@ -1407,7 +1450,7 @@ unified LightGBM, same single-day scope every method below is compared at: 0.241
 <section id="does-zero-shot-hold-up-beyond-ausnet" class="level2">
 <h2 class="anchored" data-anchor-id="does-zero-shot-hold-up-beyond-ausnet">Does zero-shot hold up beyond AusNet?</h2>
 <p>A trained model needs recalibration or retraining to move to a new population; Chapter 3 found real, measured costs to that, a conformal guarantee that simply did not transfer to NREL unmodified. A zero-shot foundation model needs neither: the same pretrained weights, pointed at real NREL ResStock buildings neither model has ever seen, no retraining step to even discuss. That is the one real advantage this chapter has not yet checked directly.</p>
-<div class="quarto-embed-nb-cell" data-notebook="/home/runner/work/ml-energy-disaggregation/ml-energy-disaggregation/book/05-forecasting/04-foundation-models-code.ipynb" data-notebook-title="Do Foundation Models Fail Like Everything Else Does?" data-notebook-cellid="4c97e7d4">
+<div class="quarto-embed-nb-cell" data-notebook="/home/runner/work/ml-energy-disaggregation/ml-energy-disaggregation/book/08-forecasting/04-foundation-models-code.ipynb" data-notebook-title="Do Foundation Models Fail Like Everything Else Does?" data-notebook-cellid="4c97e7d4">
 <div id="4c97e7d4" class="cell">
 <div class="cell-output cell-output-stdout">
 <pre><code>NREL ResStock: 200 real buildings, one test day each</code></pre>
@@ -1513,9 +1556,9 @@ unified LightGBM, same single-day scope every method below is compared at: 0.241
 <h2 class="anchored" data-anchor-id="why-bother">Why bother</h2>
 <p>Neither foundation model was trained on a single AusNet reading, and both beat a model built specifically for this population on the exact same real day, a real result worth taking seriously rather than the surprising, suspicious one this chapter opened by ruling out. The fuller ranking complicates a clean win, though: unified still has the smaller tail error and the better-tracked shape, so “more accurate on average” is not the same as “strictly better.” The more useful finding is what happens when each method is wrong. The two foundation models agree with each other about which customers are hard far more than either agrees with unified, 0.755 Jaccard overlap between Chronos-2 and TimesFM against roughly 0.5 between either one and unified, and no single forecastability metric from Chapter 1 strongly explains any method’s own error. That divergence is the actual answer to what a foundation model is good for here: not a drop-in substitute for a trained model, since it fails on a meaningfully different set of customers, but a real candidate for an ensemble or a cold-start fallback, precisely because its mistakes do not simply repeat the trained model’s own mistakes. And the one advantage a trained model genuinely cannot offer, moving to a new population with no retraining or recalibration step at all, comes at a real cost, roughly doubled error on NREL, but a cost of the same order a trained model itself pays when pushed outside its own population, the same honest, disclosed generalization check Chapter 3 already applied to its own conformal guarantee.</p>
 </section>
-<section id="where-this-leaves-part-5" class="level2">
-<h2 class="anchored" data-anchor-id="where-this-leaves-part-5">Where this leaves Part 5</h2>
-<p>Chapter 2 found the model that earns its cost; Chapter 3 attached an honest number to how wrong that model’s own forecasts might be. This chapter checked a different kind of cost: whether a pretrained foundation model, never trained or calibrated on this population at all, fails on the same customers these trained models do. It mostly does not, a real, checked reason to treat a foundation model as a complementary check rather than a replacement. Part 5’s closing chapters put these forecasts to work directly: running a forecasted load trajectory through Part 4’s own network model to check grid health before a violation happens, not after.</p>
+<section id="where-this-leaves-part-8" class="level2">
+<h2 class="anchored" data-anchor-id="where-this-leaves-part-8">Where this leaves Part 8</h2>
+<p>Chapter 2 found the model that earns its cost; Chapter 3 attached an honest number to how wrong that model’s own forecasts might be. This chapter checked a different kind of cost: whether a pretrained foundation model, never trained or calibrated on this population at all, fails on the same customers these trained models do. It mostly does not, a real, checked reason to treat a foundation model as a complementary check rather than a replacement. Part 8’s closing chapters put these forecasts to work directly: running a forecasted load trajectory through Part 4’s own network model to check grid health before a violation happens, not after.</p>
 </section>
 <section id="references" class="level2">
 <h2 class="anchored" data-anchor-id="references">References</h2>
@@ -1948,13 +1991,13 @@ unified LightGBM, same single-day scope every method below is compared at: 0.241
   </script>
 <nav class="page-navigation">
   <div class="nav-page nav-page-previous">
-      <a href="../../book/05-forecasting/03-probabilistic-forecasting.html" class="pagination-link" aria-label="Chapter 3: What a Probabilistic Forecast Is Actually Worth">
+      <a href="../../book/08-forecasting/03-probabilistic-forecasting.html" class="pagination-link" aria-label="Chapter 3: What a Probabilistic Forecast Is Actually Worth">
         <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text"><span class="chapter-title">Chapter 3: What a Probabilistic Forecast Is Actually Worth</span></span>
       </a>          
   </div>
   <div class="nav-page nav-page-next">
-      <a href="../../book/05-forecasting/05-what-if-scenario-analysis.html" class="pagination-link" aria-label="Part 5 Chapter 5: What the Grid Actually Faces When These Forecasts Come True">
-        <span class="nav-page-text"><span class="chapter-title">Part 5 Chapter 5: What the Grid Actually Faces When These Forecasts Come True</span></span> <i class="bi bi-arrow-right-short"></i>
+      <a href="../../book/08-forecasting/05-what-if-scenario-analysis.html" class="pagination-link" aria-label="Part 8 Chapter 5: What the Grid Actually Faces When These Forecasts Come True">
+        <span class="nav-page-text"><span class="chapter-title">Part 8 Chapter 5: What the Grid Actually Faces When These Forecasts Come True</span></span> <i class="bi bi-arrow-right-short"></i>
       </a>
   </div>
 </nav>
@@ -1968,7 +2011,7 @@ unified LightGBM, same single-day scope every method below is compared at: 0.241
 <div class="footer-social">
 <p><a href="mailto:sambaiga@gmail.com" title="Email"><i class="bi bi-envelope-at-fill"></i></a> <a href="https://github.com/sambaiga" title="GitHub"><i class="bi bi-github"></i></a> <a href="https://www.linkedin.com/in/sambaiga" title="LinkedIn"><i class="bi bi-linkedin"></i></a></p>
 </div>
-<div class="toc-actions d-sm-block d-md-none"><ul><li><a href="https://github.com/sambaiga/ml-energy-disaggregation/edit/main/book/05-forecasting/04-foundation-models.qmd" class="toc-action"><i class="bi bi-github"></i>Edit this page</a></li><li><a href="https://github.com/sambaiga/ml-energy-disaggregation/issues/new" class="toc-action"><i class="bi empty"></i>Report an issue</a></li><li><a href="https://github.com/sambaiga/ml-energy-disaggregation/blob/main/book/05-forecasting/04-foundation-models.qmd" class="toc-action"><i class="bi empty"></i>View source</a></li></ul></div></div>
+<div class="toc-actions d-sm-block d-md-none"><ul><li><a href="https://github.com/sambaiga/ml-energy-disaggregation/edit/main/book/08-forecasting/04-foundation-models.qmd" class="toc-action"><i class="bi bi-github"></i>Edit this page</a></li><li><a href="https://github.com/sambaiga/ml-energy-disaggregation/issues/new" class="toc-action"><i class="bi empty"></i>Report an issue</a></li><li><a href="https://github.com/sambaiga/ml-energy-disaggregation/blob/main/book/08-forecasting/04-foundation-models.qmd" class="toc-action"><i class="bi empty"></i>View source</a></li></ul></div></div>
     <div class="nav-footer-right">
 <p><span class="faux-block">Made with <a href="https://quarto.org">Quarto</a></span> <span class="faux-block"><a href="https://github.com/sambaiga/ml-energy-disaggregation"><i class="bi bi-github"></i> View source</a></span></p>
 </div>

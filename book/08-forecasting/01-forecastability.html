@@ -89,8 +89,8 @@ div.csl-indent {
 <script src="../../site_libs/quarto-search/fuse.min.js"></script>
 <script src="../../site_libs/quarto-search/quarto-search.js"></script>
 <meta name="quarto:offset" content="../../">
-<link href="../../book/05-forecasting/02-scaling-archetypes.html" rel="next">
-<link href="../../book/04-grid-edge/06-anomaly-detection.html" rel="prev">
+<link href="../../book/08-forecasting/02-scaling-archetypes.html" rel="next">
+<link href="../../book/07-anomaly-detection/01-anomaly-detection.html" rel="prev">
 <link href="../../assets/favicon.svg" rel="icon" type="image/svg+xml">
 <script src="../../site_libs/quarto-html/quarto.js" type="module"></script>
 <script src="../../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
@@ -103,9 +103,9 @@ div.csl-indent {
 <link href="../../site_libs/quarto-html/quarto-syntax-highlighting-de63f62b328812d8e578a4d74e282472.css" rel="stylesheet" class="quarto-color-scheme-extra" id="quarto-text-highlighting-styles">
 <script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="../../site_libs/bootstrap/bootstrap-9661ac00a33b6c2a7ffb2cb4cb9f2155.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
-<link href="../../site_libs/bootstrap/bootstrap-dark-9b208294319f478b9205897e46a7db35.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="dark">
-<link href="../../site_libs/bootstrap/bootstrap-9661ac00a33b6c2a7ffb2cb4cb9f2155.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme-extra" id="quarto-bootstrap" data-mode="light">
+<link href="../../site_libs/bootstrap/bootstrap-84b0f63d2b22afb69d3c32ede53d2fe2.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
+<link href="../../site_libs/bootstrap/bootstrap-dark-86bd388472066654720eaf2de8d3b778.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="dark">
+<link href="../../site_libs/bootstrap/bootstrap-84b0f63d2b22afb69d3c32ede53d2fe2.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme-extra" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -445,7 +445,7 @@ window.Quarto = {
         <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
             <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="false">
- <span class="menu-text">Part 4: Grid-Edge Value</span></a>
+ <span class="menu-text">Part 4: LV Network and Topology Foundations</span></a>
           <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="false" aria-label="Toggle section">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
@@ -453,73 +453,116 @@ window.Quarto = {
       <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth1 ">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../../book/04-grid-edge/01-opendss-lv-modeling.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">Chapter 1: Modeling the Low-Voltage Network</span></a>
+  <a href="../../book/04-network-foundations/01-opendss-lv-modeling.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">Chapter 1: Modeling the Low-Voltage Network</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../../book/04-grid-edge/02-timeseries-der-modeling.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">Chapter 2: Time-Series Simulation and DER Modeling</span></a>
+  <a href="../../book/04-network-foundations/02-timeseries-der-modeling.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">Chapter 2: Time-Series Simulation and DER Modeling</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../../book/04-grid-edge/03-phase-identification.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">Chapter 3: Phase Identification from Smart-Meter Data</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../../book/04-grid-edge/04-customer-feeder-clustering.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">Chapter 4: Customer and Feeder Clustering</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../../book/04-grid-edge/05-ranking-recommendation.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">Chapter 5: Ranking and Recommendation under DER</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../../book/04-grid-edge/06-anomaly-detection.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">Chapter 6: Anomaly Detection Beyond the Meter</span></a>
+  <a href="../../book/04-network-foundations/03-phase-identification.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">Chapter 3: Phase Identification from Smart-Meter Data</span></a>
   </div>
 </li>
       </ul>
   </li>
         <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
-            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="true">
- <span class="menu-text">Part 5: Forecasting</span></a>
-          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="false">
+ <span class="menu-text">Part 5: Clustering</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="false" aria-label="Toggle section">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
       </div>
-      <ul id="quarto-sidebar-section-3" class="collapse list-unstyled sidebar-section depth1 show">  
+      <ul id="quarto-sidebar-section-3" class="collapse list-unstyled sidebar-section depth1 ">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../../book/05-forecasting/01-forecastability.html" class="sidebar-item-text sidebar-link active"><span class="chapter-title">Chapter 1: Household Smart-Meter Forecastability</span></a>
+  <a href="../../book/05-clustering/01-clustering-foundations.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">Chapter 1: Clustering Foundations</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../../book/05-forecasting/02-scaling-archetypes.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">Chapter 2: Scaling to Hundreds of Meters</span></a>
+  <a href="../../book/05-clustering/02-clustering-methodology.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">Chapter 2: Clustering Methodology</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../../book/05-forecasting/03-probabilistic-forecasting.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">Chapter 3: What a Probabilistic Forecast Is Actually Worth</span></a>
+  <a href="../../book/05-clustering/03-customer-feeder-clustering.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">Chapter 3: Customer and Feeder Clustering</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" role="navigation" aria-expanded="false">
+ <span class="menu-text">Part 6: Ranking and Recommendation</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" role="navigation" aria-expanded="false" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-4" class="collapse list-unstyled sidebar-section depth1 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../book/06-ranking-recommendation/01-ranking-recommendation.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">Chapter 1: Ranking and Recommendation under DER</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-5" role="navigation" aria-expanded="false">
+ <span class="menu-text">Part 7: Anomaly Detection</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-5" role="navigation" aria-expanded="false" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-5" class="collapse list-unstyled sidebar-section depth1 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../book/07-anomaly-detection/01-anomaly-detection.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">Chapter 1: Anomaly Detection Beyond the Meter</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-6" role="navigation" aria-expanded="true">
+ <span class="menu-text">Part 8: Forecasting</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-6" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-6" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../book/08-forecasting/01-forecastability.html" class="sidebar-item-text sidebar-link active"><span class="chapter-title">Chapter 1: Household Smart-Meter Forecastability</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../../book/05-forecasting/04-foundation-models.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">Part 5 Chapter 4: Do Foundation Models Fail Like Everything Else Does?</span></a>
+  <a href="../../book/08-forecasting/02-scaling-archetypes.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">Chapter 2: Scaling to Hundreds of Meters</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../../book/05-forecasting/05-what-if-scenario-analysis.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">Part 5 Chapter 5: What the Grid Actually Faces When These Forecasts Come True</span></a>
+  <a href="../../book/08-forecasting/03-probabilistic-forecasting.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">Chapter 3: What a Probabilistic Forecast Is Actually Worth</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../../book/05-forecasting/06-lv-state-estimation.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">Part 5 Chapter 6: Can Smart-Meter Readings Fill In What the Grid Cannot See</span></a>
+  <a href="../../book/08-forecasting/04-foundation-models.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">Part 8 Chapter 4: Do Foundation Models Fail Like Everything Else Does?</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../book/08-forecasting/05-what-if-scenario-analysis.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">Part 8 Chapter 5: What the Grid Actually Faces When These Forecasts Come True</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../book/08-forecasting/06-lv-state-estimation.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">Part 8 Chapter 6: Can Smart-Meter Readings Fill In What the Grid Cannot See</span></a>
   </div>
 </li>
       </ul>
@@ -560,10 +603,10 @@ window.Quarto = {
   <li><a href="#from-diagnostic-to-decision" id="toc-from-diagnostic-to-decision" class="nav-link" data-scroll-target="#from-diagnostic-to-decision">From diagnostic to decision</a></li>
   <li><a href="#does-forecastability-itself-generalize-beyond-ausnet" id="toc-does-forecastability-itself-generalize-beyond-ausnet" class="nav-link" data-scroll-target="#does-forecastability-itself-generalize-beyond-ausnet">Does forecastability itself generalize beyond AusNet?</a></li>
   <li><a href="#why-bother" id="toc-why-bother" class="nav-link" data-scroll-target="#why-bother">Why bother</a></li>
-  <li><a href="#where-this-leaves-part-5" id="toc-where-this-leaves-part-5" class="nav-link" data-scroll-target="#where-this-leaves-part-5">Where this leaves Part 5</a></li>
+  <li><a href="#where-this-leaves-part-8" id="toc-where-this-leaves-part-8" class="nav-link" data-scroll-target="#where-this-leaves-part-8">Where this leaves Part 8</a></li>
   <li><a href="#references" id="toc-references" class="nav-link" data-scroll-target="#references">References</a></li>
   </ul>
-<div class="toc-actions"><ul><li><a href="https://github.com/sambaiga/ml-energy-disaggregation/edit/main/book/05-forecasting/01-forecastability.qmd" class="toc-action"><i class="bi bi-github"></i>Edit this page</a></li><li><a href="https://github.com/sambaiga/ml-energy-disaggregation/issues/new" class="toc-action"><i class="bi empty"></i>Report an issue</a></li><li><a href="https://github.com/sambaiga/ml-energy-disaggregation/blob/main/book/05-forecasting/01-forecastability.qmd" class="toc-action"><i class="bi empty"></i>View source</a></li></ul></div></nav>
+<div class="toc-actions"><ul><li><a href="https://github.com/sambaiga/ml-energy-disaggregation/edit/main/book/08-forecasting/01-forecastability.qmd" class="toc-action"><i class="bi bi-github"></i>Edit this page</a></li><li><a href="https://github.com/sambaiga/ml-energy-disaggregation/issues/new" class="toc-action"><i class="bi empty"></i>Report an issue</a></li><li><a href="https://github.com/sambaiga/ml-energy-disaggregation/blob/main/book/08-forecasting/01-forecastability.qmd" class="toc-action"><i class="bi empty"></i>View source</a></li></ul></div></nav>
     </div>
 <!-- main -->
 <main class="content" id="quarto-document-content">
@@ -588,7 +631,7 @@ window.Quarto = {
 </header>
 
 
-<p>A DSO forecasting a single feeder gets one smooth curve: thousands of households averaging out each other’s quirks into a predictable evening peak. A DSO forecasting one household gets something else entirely: a customer who works nights, a customer with an empty house half the year, a customer whose evening spikes exactly when the sun sets on their new rooftop panels. Part 5 forecasts at that second, harder scale, hundreds of individual AusNet customers, not one aggregate, using the same real smart-meter readings a utility already collects: load, and the <a href="#acronyms_PV">Photovoltaic (PV)</a> and <a href="#acronyms_EV">Electric Vehicle (EV)</a> signals hiding inside it. Before reaching for a model, this chapter asks the question every later chapter in this part depends on: how forecastable is a real household’s own signal, does that forecastability vary from one house to the next, and what does it say about which approach is actually worth using on them?</p>
+<p>A DSO forecasting a single feeder gets one smooth curve: thousands of households averaging out each other’s quirks into a predictable evening peak. A DSO forecasting one household gets something else entirely: a customer who works nights, a customer with an empty house half the year, a customer whose evening spikes exactly when the sun sets on their new rooftop panels. Part 8 forecasts at that second, harder scale, hundreds of individual AusNet customers, not one aggregate, using the same real smart-meter readings a utility already collects: load, and the <a href="#acronyms_PV">Photovoltaic (PV)</a> and <a href="#acronyms_EV">Electric Vehicle (EV)</a> signals hiding inside it. Before reaching for a model, this chapter asks the question every later chapter in this part depends on: how forecastable is a real household’s own signal, does that forecastability vary from one house to the next, and what does it say about which approach is actually worth using on them?</p>
 <section id="why-forecastability" class="level2">
 <h2 class="anchored" data-anchor-id="why-forecastability">Why forecastability</h2>
 <p>Individual household loads exhibit significantly greater volatility and are much more challenging to forecast than substation- or city-level aggregates. This is not a hypothesis unique to this chapter; it has been directly confirmed using approximate entropy on a real Irish smart-meter dataset <span class="citation" data-cites="peng2019aggregation">[1]</span>. This chapter examines whether similar variability exists within AusNet’s own pool of real households, rather than assuming findings transfer, and investigates the extent to which forecastability varies between individual homes.</p>
@@ -604,7 +647,7 @@ window.Quarto = {
 <img src="../../assets/forecastability-persistent-vs-volatile.svg" class="img-fluid figure-img">
 </div>
 <figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-forecastability-persistent-vs-volatile-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Figure&nbsp;14.1: Two signals sharing the same average level and daily cycle. Left: a persistent signal, low entropy, Hurst above 0.5, where yesterday’s reading genuinely predicts today’s. Right: a volatile signal, the same cycle buried under noise large enough to swamp it, high entropy, Hurst near the random-walk boundary. Every metric in this chapter measures this same real distinction from a different angle.
+Figure&nbsp;16.1: Two signals sharing the same average level and daily cycle. Left: a persistent signal, low entropy, Hurst above 0.5, where yesterday’s reading genuinely predicts today’s. Right: a volatile signal, the same cycle buried under noise large enough to swamp it, high entropy, Hurst near the random-walk boundary. Every metric in this chapter measures this same real distinction from a different angle.
 </figcaption>
 </figure>
 </div>
@@ -614,13 +657,13 @@ Figure&nbsp;14.1: Two signals sharing the same average level and daily cycle. Le
 <h2 class="anchored" data-anchor-id="getting-the-data">Getting the data</h2>
 <p>This chapter reuses the same real AusNet smart-meter pool Part 4 already vendored, no new fetch step needed. The dataset is public: 342 real households, uninterrupted 30-minute smart-meter readings across a full calendar year, freely downloadable with no signup gate, the same real data and the same fetch script every other Part 4 chapter already used.</p>
 <div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb1"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="ex">uv</span> run python scripts/fetch_part4_ausnet_data.py</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-<p>The generalization check later in this chapter reuses the same real <a href="#acronyms_NREL">National Renewable Energy Laboratory (NREL)</a> sample Part 4 Chapter 4 fetched, 760 real US buildings, restricted here to the 200 real ResStock homes:</p>
+<p>The generalization check later in this chapter reuses the same real <a href="#acronyms_NREL">National Renewable Energy Laboratory (NREL)</a> sample Part 4 Chapter 5 fetched, 760 real US buildings, restricted here to the 200 real ResStock homes:</p>
 <div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb2"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="ex">uv</span> run python scripts/fetch_part5_nrel_buildstock_data.py</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </section>
 <section id="hundreds-of-customers-not-one-aggregate-signal" class="level2">
 <h2 class="anchored" data-anchor-id="hundreds-of-customers-not-one-aggregate-signal">Hundreds of customers, not one aggregate signal</h2>
 <p>AusNet’s own real pool contains 342 real households, each with a full year of data at 30-minute resolution. Using every one of them, rather than working from one region-wide aggregate, is the only way to see whether forecastability itself varies from customer to customer, the question this whole chapter is built around. Checked directly rather than assumed: every one of the 342 real load series has genuine variance, no gaps, and no near-constant readings; the same real data Part 4 already ran a full OpenDSS time-series simulation against cleanly. No elaborate quality gate is needed here, unlike an earlier, since-dropped data source.</p>
-<div class="quarto-embed-nb-cell" data-notebook="/home/runner/work/ml-energy-disaggregation/ml-energy-disaggregation/book/05-forecasting/01-forecastability-code.ipynb" data-notebook-title="Load and PV Forecastability" data-notebook-cellid="58442c7e">
+<div class="quarto-embed-nb-cell" data-notebook="/home/runner/work/ml-energy-disaggregation/ml-energy-disaggregation/book/08-forecasting/01-forecastability-code.ipynb" data-notebook-title="Load and PV Forecastability" data-notebook-cellid="58442c7e">
 <div id="58442c7e" class="cell">
 <div class="cell-output cell-output-display">
 
@@ -880,7 +923,7 @@ Figure&nbsp;14.1: Two signals sharing the same average level and daily cycle. Le
 <p>Sample entropy <span class="citation" data-cites="richman2000sampleentropy">[9]</span> asks a related but distinct question directly in the signal’s own real units: pick two windows of length m that match within a tolerance, then check how often they still match once extended to length m+1. It was built to remove an earlier measure’s own self-matching bias, a real, checked improvement, not a cosmetic rename.</p>
 <p>The Hurst exponent <span class="citation" data-cites="hurst1951longterm">[5]</span> was built to size reservoirs on the Nile from centuries of real flood records, nothing to do with electricity in its own original form. It measures long-range dependence through rescaled-range analysis: H = 0.5 is a pure random walk with no memory, H &gt; 0.5 is persistent (a high reading tends to be followed by more high readings), and H &lt; 0.5 is anti-persistent (mean-reverting). A persistent signal is the easier one for a model to learn from.</p>
 <p>The DFA exponent <span class="citation" data-cites="peng1994mosaic">[6]</span> measures a close cousin of the same idea, built originally for DNA sequences, using detrended fluctuation analysis instead of the classical rescaled range. Its real practical advantage here is that it stays reliable on a signal that is drifting or trending, exactly the kind of real non-stationary behaviour a full year of household load actually has.</p>
-<div class="quarto-embed-nb-cell" data-notebook="/home/runner/work/ml-energy-disaggregation/ml-energy-disaggregation/book/05-forecasting/01-forecastability-code.ipynb" data-notebook-title="Load and PV Forecastability" data-notebook-cellid="6f6398f0">
+<div class="quarto-embed-nb-cell" data-notebook="/home/runner/work/ml-energy-disaggregation/ml-energy-disaggregation/book/08-forecasting/01-forecastability-code.ipynb" data-notebook-title="Load and PV Forecastability" data-notebook-cellid="6f6398f0">
 <div id="6f6398f0" class="cell">
 <div class="cell-output cell-output-display">
 <div id="ygkpqolhpf" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:100%;height:auto;">
@@ -977,7 +1020,7 @@ Figure&nbsp;14.1: Two signals sharing the same average level and daily cycle. Le
 </div>
 </div>
 </div>
-<div class="quarto-embed-nb-cell" data-notebook="/home/runner/work/ml-energy-disaggregation/ml-energy-disaggregation/book/05-forecasting/01-forecastability-code.ipynb" data-notebook-title="Load and PV Forecastability" data-notebook-cellid="9571fe1f">
+<div class="quarto-embed-nb-cell" data-notebook="/home/runner/work/ml-energy-disaggregation/ml-energy-disaggregation/book/08-forecasting/01-forecastability-code.ipynb" data-notebook-title="Load and PV Forecastability" data-notebook-cellid="9571fe1f">
 <div id="9571fe1f" class="cell">
 <div class="cell-output cell-output-display">
 <div id="xglzyhncwg" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:100%;height:auto;">
@@ -1087,7 +1130,7 @@ Figure&nbsp;14.1: Two signals sharing the same average level and daily cycle. Le
 <section id="meet-three-real-households" class="level2">
 <h2 class="anchored" data-anchor-id="meet-three-real-households">Meet three real households</h2>
 <p>A population median is easy to state and hard to picture. Three real customers, one real week each, make it concrete: the most persistent household in this pool, the least persistent, and one sitting exactly at the population’s own median.</p>
-<div class="quarto-embed-nb-cell" data-notebook="/home/runner/work/ml-energy-disaggregation/ml-energy-disaggregation/book/05-forecasting/01-forecastability-code.ipynb" data-notebook-title="Load and PV Forecastability" data-notebook-cellid="meethh02">
+<div class="quarto-embed-nb-cell" data-notebook="/home/runner/work/ml-energy-disaggregation/ml-energy-disaggregation/book/08-forecasting/01-forecastability-code.ipynb" data-notebook-title="Load and PV Forecastability" data-notebook-cellid="meethh02">
 <div id="meethh02" class="cell">
 <div class="cell-output cell-output-display">
 
@@ -1351,7 +1394,7 @@ Figure&nbsp;14.1: Two signals sharing the same average level and daily cycle. Le
 </div>
 </div>
 <p>The most persistent household exhibits a weekly pattern that remains nearly unchanged each night, with the evening peak consistently occurring at the same time. In contrast, the least persistent household shows no discernible repeating pattern, with significant variation in both the height and shape of evening peaks. The median household falls between these extremes, displaying a recognisable but noisier rhythm that is more representative of the broader set of 342 real customers analysed in this chapter.</p>
-<div class="quarto-embed-nb-cell" data-notebook="/home/runner/work/ml-energy-disaggregation/ml-energy-disaggregation/book/05-forecasting/01-forecastability-code.ipynb" data-notebook-title="Load and PV Forecastability" data-notebook-cellid="bb1ae995">
+<div class="quarto-embed-nb-cell" data-notebook="/home/runner/work/ml-energy-disaggregation/ml-energy-disaggregation/book/08-forecasting/01-forecastability-code.ipynb" data-notebook-title="Load and PV Forecastability" data-notebook-cellid="bb1ae995">
 <div id="bb1ae995" class="cell">
 <div class="cell-output cell-output-display">
 
@@ -1622,7 +1665,7 @@ Figure&nbsp;14.1: Two signals sharing the same average level and daily cycle. Le
 <p>Classical Box-Jenkins theory fills the gap left open by entropy and Hurst: which real lag carries the signal, and whether the series is drifting under its own diurnal or weekly cycle <span class="citation" data-cites="hyndman2021forecasting">[7]</span>.</p>
 <p>The autocorrelation function (<a href="#acronyms_ACF">Autocorrelation Function (ACF)</a>) measures how strongly a series correlates with a lagged copy of itself. The partial autocorrelation function (<a href="#acronyms_PACF">Partial Autocorrelation Function (PACF)</a>) asks a sharper question: how much does a given lag add on top of every shorter lag already in the model? The lag at which <a href="#acronyms_PACF">PACF</a> drops within its own confidence band is the classical signal of how many autoregressive terms a model actually needs.</p>
 <p>Stationarity asks whether a series’ own statistical properties stay stable over time. Two complementary tests decide it, deliberately paired because they test opposite null hypotheses: the Augmented Dickey-Fuller test <span class="citation" data-cites="dickey1979adf">[10]</span> has a null of non-stationarity; the <a href="#acronyms_KPSS">Kwiatkowski-Phillips-Schmidt-Shin (KPSS)</a> test <span class="citation" data-cites="kwiatkowski1992kpss">[11]</span> has the opposite null, stationarity. Run together, they resolve into four honest verdicts rather than one test’s blind spot.</p>
-<div class="quarto-embed-nb-cell" data-notebook="/home/runner/work/ml-energy-disaggregation/ml-energy-disaggregation/book/05-forecasting/01-forecastability-code.ipynb" data-notebook-title="Load and PV Forecastability" data-notebook-cellid="eedd5456">
+<div class="quarto-embed-nb-cell" data-notebook="/home/runner/work/ml-energy-disaggregation/ml-energy-disaggregation/book/08-forecasting/01-forecastability-code.ipynb" data-notebook-title="Load and PV Forecastability" data-notebook-cellid="eedd5456">
 <div id="eedd5456" class="cell">
 <div class="cell-output cell-output-display">
 <div id="zcmksieluj" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:100%;height:auto;">
@@ -1722,7 +1765,7 @@ Figure&nbsp;14.1: Two signals sharing the same average level and daily cycle. Le
 </div>
 </div>
 </div>
-<div class="quarto-embed-nb-cell" data-notebook="/home/runner/work/ml-energy-disaggregation/ml-energy-disaggregation/book/05-forecasting/01-forecastability-code.ipynb" data-notebook-title="Load and PV Forecastability" data-notebook-cellid="f52b83c6">
+<div class="quarto-embed-nb-cell" data-notebook="/home/runner/work/ml-energy-disaggregation/ml-energy-disaggregation/book/08-forecasting/01-forecastability-code.ipynb" data-notebook-title="Load and PV Forecastability" data-notebook-cellid="f52b83c6">
 <div id="f52b83c6" class="cell">
 <div class="cell-output cell-output-display">
 
@@ -2027,7 +2070,7 @@ Figure&nbsp;14.1: Two signals sharing the same average level and daily cycle. Le
 </div>
 </div>
 </div>
-<div class="quarto-embed-nb-cell" data-notebook="/home/runner/work/ml-energy-disaggregation/ml-energy-disaggregation/book/05-forecasting/01-forecastability-code.ipynb" data-notebook-title="Load and PV Forecastability" data-notebook-cellid="e0d469a6">
+<div class="quarto-embed-nb-cell" data-notebook="/home/runner/work/ml-energy-disaggregation/ml-energy-disaggregation/book/08-forecasting/01-forecastability-code.ipynb" data-notebook-title="Load and PV Forecastability" data-notebook-cellid="e0d469a6">
 <div id="e0d469a6" class="cell">
 <div class="cell-output cell-output-display">
 
@@ -2333,7 +2376,7 @@ Figure&nbsp;14.1: Two signals sharing the same average level and daily cycle. Le
 </div>
 </div>
 <p>For the most persistent customer, the autocorrelation function (<a href="#acronyms_ACF">ACF</a>) remains significant for lags extending into a second week. In contrast, the least persistent customer’s <a href="#acronyms_ACF">ACF</a> barely exceeds its confidence band beyond the first day. Using the same set of metrics and 30-minute AusNet data, these results highlight two fundamentally different signal profiles.</p>
-<div class="quarto-embed-nb-cell" data-notebook="/home/runner/work/ml-energy-disaggregation/ml-energy-disaggregation/book/05-forecasting/01-forecastability-code.ipynb" data-notebook-title="Load and PV Forecastability" data-notebook-cellid="c315552e">
+<div class="quarto-embed-nb-cell" data-notebook="/home/runner/work/ml-energy-disaggregation/ml-energy-disaggregation/book/08-forecasting/01-forecastability-code.ipynb" data-notebook-title="Load and PV Forecastability" data-notebook-cellid="c315552e">
 <div id="c315552e" class="cell">
 <div class="cell-output cell-output-display">
 
@@ -2638,7 +2681,7 @@ Figure&nbsp;14.1: Two signals sharing the same average level and daily cycle. Le
 </div>
 </div>
 </div>
-<div class="quarto-embed-nb-cell" data-notebook="/home/runner/work/ml-energy-disaggregation/ml-energy-disaggregation/book/05-forecasting/01-forecastability-code.ipynb" data-notebook-title="Load and PV Forecastability" data-notebook-cellid="ce3c335c">
+<div class="quarto-embed-nb-cell" data-notebook="/home/runner/work/ml-energy-disaggregation/ml-energy-disaggregation/book/08-forecasting/01-forecastability-code.ipynb" data-notebook-title="Load and PV Forecastability" data-notebook-cellid="ce3c335c">
 <div id="ce3c335c" class="cell">
 <div class="cell-output cell-output-display">
 <div id="hkwvjnhnqi" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:100%;height:auto;">
@@ -2754,7 +2797,7 @@ Figure&nbsp;14.1: Two signals sharing the same average level and daily cycle. Le
 <li><p>Select the top features according to this composite rank, considering the highest-ranked features as primary candidates for model training, with additional review to ensure that feature selection reflects both statistical signal and domain plausibility.</p></li>
 </ol>
 <p>This stepwise process provides a practical, defensible workflow that can be routinely applied by analysts working with new sets of household load data. It also ensures consistent feature selection across hundreds of customers while allowing genuine variation in which features are most predictive across different households.</p>
-<div class="quarto-embed-nb-cell" data-notebook="/home/runner/work/ml-energy-disaggregation/ml-energy-disaggregation/book/05-forecasting/01-forecastability-code.ipynb" data-notebook-title="Load and PV Forecastability" data-notebook-cellid="ef539019">
+<div class="quarto-embed-nb-cell" data-notebook="/home/runner/work/ml-energy-disaggregation/ml-energy-disaggregation/book/08-forecasting/01-forecastability-code.ipynb" data-notebook-title="Load and PV Forecastability" data-notebook-cellid="ef539019">
 <div id="ef539019" class="cell">
 <div class="cell-output cell-output-display">
 <div id="nozxuhbgnp" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:100%;height:auto;">
@@ -2864,7 +2907,7 @@ Figure&nbsp;14.1: Two signals sharing the same average level and daily cycle. Le
 <section id="which-baseline-actually-wins-and-does-it-vary-by-customer" class="level2">
 <h2 class="anchored" data-anchor-id="which-baseline-actually-wins-and-does-it-vary-by-customer">Which baseline actually wins, and does it vary by customer?</h2>
 <p>A trained model’s real cost, engineering time, compute, and maintenance, only pays for itself if it beats the cheapest reasonable alternative. Hyndman and Athanasopoulos are direct about this: naive, seasonal-naive, drift, and average-based benchmarks exist precisely so a more complex method has something honest to beat <span class="citation" data-cites="hyndman2021forecasting">[7]</span>. Chapter 2 is where a trained tree ensemble gets that honest check; this chapter’s own job is narrower and comes first: which of <code>twiga.models.baseline</code>’s own persistence strategies already win for a given customer, with no model training at all.</p>
-<div class="quarto-embed-nb-cell" data-notebook="/home/runner/work/ml-energy-disaggregation/ml-energy-disaggregation/book/05-forecasting/01-forecastability-code.ipynb" data-notebook-title="Load and PV Forecastability" data-notebook-cellid="ac5c37dd">
+<div class="quarto-embed-nb-cell" data-notebook="/home/runner/work/ml-energy-disaggregation/ml-energy-disaggregation/book/08-forecasting/01-forecastability-code.ipynb" data-notebook-title="Load and PV Forecastability" data-notebook-cellid="ac5c37dd">
 <div id="ac5c37dd" class="cell">
 <div class="cell-output cell-output-display">
 <div id="drvnyaaaur" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
@@ -3007,11 +3050,11 @@ w_j = \frac{u_j}{\sum_{j'=1}^{J} u_{j'}}
 <img src="../../assets/diversity-weighted-ranking.svg" class="img-fluid figure-img">
 </div>
 <figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-diversity-weighted-ranking-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Figure&nbsp;14.2: Four pointwise-error metrics point in almost the same direction, so each is individually down-weighted; Corr points somewhere else entirely and is weighted more, exactly the diversity-weighted Borda count this chapter’s own ranking table applies to these four baselines.
+Figure&nbsp;16.2: Four pointwise-error metrics point in almost the same direction, so each is individually down-weighted; Corr points somewhere else entirely and is weighted more, exactly the diversity-weighted Borda count this chapter’s own ranking table applies to these four baselines.
 </figcaption>
 </figure>
 </div>
-<div class="quarto-embed-nb-cell" data-notebook="/home/runner/work/ml-energy-disaggregation/ml-energy-disaggregation/book/05-forecasting/01-forecastability-code.ipynb" data-notebook-title="Load and PV Forecastability" data-notebook-cellid="32b4d2c4">
+<div class="quarto-embed-nb-cell" data-notebook="/home/runner/work/ml-energy-disaggregation/ml-energy-disaggregation/book/08-forecasting/01-forecastability-code.ipynb" data-notebook-title="Load and PV Forecastability" data-notebook-cellid="32b4d2c4">
 <div id="32b4d2c4" class="cell">
 <div class="cell-output cell-output-display">
 <div id="scbzyymyta" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:100%;height:auto;">
@@ -3141,7 +3184,7 @@ Figure&nbsp;14.2: Four pointwise-error metrics point in almost the same directio
 </div>
 </div>
 <p>Seasonal-naive comes out on top of this diversity-weighted ranking, not window-average, the opposite of what an MAE-only reading would crown. Corr alone carries roughly twice the weight of any single pointwise-error metric here, precisely because the four error metrics are busy agreeing with each other while Corr is the one column actually casting an independent vote. This is not a claim that MAE is the wrong metric to compute, only that treating it as the whole verdict, the way a one-line “lowest error wins” summary would, silently discards the one column that would have changed the answer.</p>
-<div class="quarto-embed-nb-cell" data-notebook="/home/runner/work/ml-energy-disaggregation/ml-energy-disaggregation/book/05-forecasting/01-forecastability-code.ipynb" data-notebook-title="Load and PV Forecastability" data-notebook-cellid="29a34e87">
+<div class="quarto-embed-nb-cell" data-notebook="/home/runner/work/ml-energy-disaggregation/ml-energy-disaggregation/book/08-forecasting/01-forecastability-code.ipynb" data-notebook-title="Load and PV Forecastability" data-notebook-cellid="29a34e87">
 <div id="29a34e87" class="cell">
 <div class="cell-output cell-output-display">
 <div id="aqgnhxfgqp" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:100%;height:auto;">
@@ -3248,7 +3291,7 @@ Figure&nbsp;14.2: Four pointwise-error metrics point in almost the same directio
 </div>
 <p>There is no single, universal winner among the 342 real customers, and the tally above is itself an MAE-only contest: window-average outperforms for 70% of customers, seasonal-naive for another 30%, and plain persistence for almost none. Given the correlation gap just shown, a deployment that also cares about tracking a customer’s real daily shape, not only minimizing average deviation, has a real case for favouring seasonal-naive more often than a MAE-only tally credits it for. This split is also a verified divergence from Twiga’s own published tutorial, which found seasonal-naive the best performer on a different dataset. Report a difference like this transparently rather than assume results transfer across contexts.</p>
 <p>For new customer deployments, analysts should operationalize baseline selection by first evaluating all key candidate baselines, such as window-average, seasonal-naive, and plain persistence, on a short, recent segment of each customer’s own data using simple out-of-sample error metrics like MAE or RMSE. The method with the lowest error on this holdout window should be adopted as the initial production baseline for that customer. To ensure ongoing model effectiveness, periodic automatic revalidation can be scheduled, in which the baseline is re-compared with available alternatives using the most recent data. This structured, repeatable approach ensures that the best-fitting baseline is maintained for each customer as data characteristics evolve.</p>
-<div class="quarto-embed-nb-cell" data-notebook="/home/runner/work/ml-energy-disaggregation/ml-energy-disaggregation/book/05-forecasting/01-forecastability-code.ipynb" data-notebook-title="Load and PV Forecastability" data-notebook-cellid="733ab75b">
+<div class="quarto-embed-nb-cell" data-notebook="/home/runner/work/ml-energy-disaggregation/ml-energy-disaggregation/book/08-forecasting/01-forecastability-code.ipynb" data-notebook-title="Load and PV Forecastability" data-notebook-cellid="733ab75b">
 <div id="733ab75b" class="cell">
 <div class="cell-output cell-output-display">
 
@@ -3569,7 +3612,7 @@ Figure&nbsp;14.2: Four pointwise-error metrics point in almost the same directio
 <section id="the-pv-signal-hiding-in-the-net-load" class="level3">
 <h3 class="anchored" data-anchor-id="the-pv-signal-hiding-in-the-net-load">The PV signal hiding in the net load</h3>
 <p>AusNet’s own data shows a real, separately recorded seasonal <a href="#acronyms_PV">PV</a> shape, shared across customers and scaled by each customer’s assumed system size, rather than being blended invisibly into a single metered column as a real net-metering-only utility feed usually is. That real, known component enables a check no proxy could offer directly: does adding a known <a href="#acronyms_PV">PV</a> component to a customer’s own real load make that customer’s own net load look more or less forecastable, by the exact same entropy and Hurst battery run above? Net load with rising <a href="#acronyms_DER">DER</a> adoption does not necessarily just get more volatile either: Fias, Hashmi and Deconinck’s own finding is that joint <a href="#acronyms_EV">EV</a> and <a href="#acronyms_PV">PV</a> activity can offset each other through a compensatory daytime effect <span class="citation" data-cites="fias2025uncertainty">[2]</span>, worth checking what a known <a href="#acronyms_PV">PV</a> component alone does here rather than assumed.</p>
-<div class="quarto-embed-nb-cell" data-notebook="/home/runner/work/ml-energy-disaggregation/ml-energy-disaggregation/book/05-forecasting/01-forecastability-code.ipynb" data-notebook-title="Load and PV Forecastability" data-notebook-cellid="b5892bbd">
+<div class="quarto-embed-nb-cell" data-notebook="/home/runner/work/ml-energy-disaggregation/ml-energy-disaggregation/book/08-forecasting/01-forecastability-code.ipynb" data-notebook-title="Load and PV Forecastability" data-notebook-cellid="b5892bbd">
 <div id="b5892bbd" class="cell">
 <div class="cell-output cell-output-display">
 <div id="xemqhsbyjm" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:100%;height:auto;">
@@ -3667,7 +3710,7 @@ Figure&nbsp;14.2: Four pointwise-error metrics point in almost the same directio
 </div>
 </div>
 </div>
-<div class="quarto-embed-nb-cell" data-notebook="/home/runner/work/ml-energy-disaggregation/ml-energy-disaggregation/book/05-forecasting/01-forecastability-code.ipynb" data-notebook-title="Load and PV Forecastability" data-notebook-cellid="0a8c7b39">
+<div class="quarto-embed-nb-cell" data-notebook="/home/runner/work/ml-energy-disaggregation/ml-energy-disaggregation/book/08-forecasting/01-forecastability-code.ipynb" data-notebook-title="Load and PV Forecastability" data-notebook-cellid="0a8c7b39">
 <div id="0a8c7b39" class="cell">
 <div class="cell-output cell-output-display">
 
@@ -3927,7 +3970,7 @@ Figure&nbsp;14.2: Four pointwise-error metrics point in almost the same directio
 <h2 class="anchored" data-anchor-id="load-pv-and-ev-which-signal-is-more-forecastable">Load, PV, and EV: which signal is more forecastable?</h2>
 <p>Part 4’s own <a href="#acronyms_EV">EV</a>-demand section already vendored a third real signal: diversified home <a href="#acronyms_EV">EV</a>-charging profiles from the UK’s real “Electric Nation” trial, at 1-minute resolution, weekday and weekend, diversified across 100-1,200 real vehicles. A real, honest caveat before comparing anything: this data is not the same kind of signal as load or <a href="#acronyms_PV">PV</a>. Load is 342 real individual households across a genuine full year; <a href="#acronyms_PV">PV</a> is one real, seasonally varying shape across the same year. The <a href="#acronyms_EV">EV</a> data is a single representative weekday shape and a single representative weekend shape, diversified across many real vehicles, with no per-vehicle time series and no real day-to-day variation at all. Making it long enough to run the same battery means tiling those two shapes across a synthetic year, a real, disclosed construction, not a genuine record of one <a href="#acronyms_EV">EV</a> owner’s own charging behaviour.</p>
 <p>Because the tiled <a href="#acronyms_EV">EV</a> signal is constructed from repeated representative shapes rather than true longitudinal vehicle-level readings, it provides an upper bound on forecastability rather than mirroring real-world unpredictability. As a result, the high degree of regularity in these synthetic EV series may overstate the ease of forecasting compared to real household EV signals, which would display more irregular timing, skipped days, or behavioural variation. Caution is needed when interpreting these results for operational planning, since actual deployment environments will likely face lower forecastability for individual EV charging than these synthetic constructs suggest.</p>
-<div class="quarto-embed-nb-cell" data-notebook="/home/runner/work/ml-energy-disaggregation/ml-energy-disaggregation/book/05-forecasting/01-forecastability-code.ipynb" data-notebook-title="Load and PV Forecastability" data-notebook-cellid="2920cc8a">
+<div class="quarto-embed-nb-cell" data-notebook="/home/runner/work/ml-energy-disaggregation/ml-energy-disaggregation/book/08-forecasting/01-forecastability-code.ipynb" data-notebook-title="Load and PV Forecastability" data-notebook-cellid="2920cc8a">
 <div id="2920cc8a" class="cell">
 <div class="cell-output cell-output-display">
 <div id="dxdfnxjnip" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:100%;height:auto;">
@@ -4048,7 +4091,7 @@ Figure&nbsp;14.2: Four pointwise-error metrics point in almost the same directio
 </div>
 </div>
 </div>
-<div class="quarto-embed-nb-cell" data-notebook="/home/runner/work/ml-energy-disaggregation/ml-energy-disaggregation/book/05-forecasting/01-forecastability-code.ipynb" data-notebook-title="Load and PV Forecastability" data-notebook-cellid="4d1260db">
+<div class="quarto-embed-nb-cell" data-notebook="/home/runner/work/ml-energy-disaggregation/ml-energy-disaggregation/book/08-forecasting/01-forecastability-code.ipynb" data-notebook-title="Load and PV Forecastability" data-notebook-cellid="4d1260db">
 <div id="4d1260db" class="cell">
 <div class="cell-output cell-output-display">
 
@@ -4333,7 +4376,7 @@ Figure&nbsp;14.2: Four pointwise-error metrics point in almost the same directio
 <section id="from-diagnostic-to-decision" class="level2">
 <h2 class="anchored" data-anchor-id="from-diagnostic-to-decision">From diagnostic to decision</h2>
 <p>A single recommendation that claims to fit every customer is false confidence; the same real lesson De Bortoli, Ferrari, Ravazzolo and Rossini draw from Italian electricity load data: report the set of approaches that are actually defensible for a given regime, not one falsely confident winner <span class="citation" data-cites="debortoli2026confidencesets">[4]</span>.</p>
-<div class="quarto-embed-nb-cell" data-notebook="/home/runner/work/ml-energy-disaggregation/ml-energy-disaggregation/book/05-forecasting/01-forecastability-code.ipynb" data-notebook-title="Load and PV Forecastability" data-notebook-cellid="9538ae79">
+<div class="quarto-embed-nb-cell" data-notebook="/home/runner/work/ml-energy-disaggregation/ml-energy-disaggregation/book/08-forecasting/01-forecastability-code.ipynb" data-notebook-title="Load and PV Forecastability" data-notebook-cellid="9538ae79">
 <div id="9538ae79" class="cell">
 <div class="cell-output cell-output-display">
 <div id="hoeyfcckpy" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:100%;height:auto;">
@@ -4446,7 +4489,7 @@ Figure&nbsp;14.2: Four pointwise-error metrics point in almost the same directio
 </div>
 </div>
 </div>
-<div class="quarto-embed-nb-cell" data-notebook="/home/runner/work/ml-energy-disaggregation/ml-energy-disaggregation/book/05-forecasting/01-forecastability-code.ipynb" data-notebook-title="Load and PV Forecastability" data-notebook-cellid="6cdf169e">
+<div class="quarto-embed-nb-cell" data-notebook="/home/runner/work/ml-energy-disaggregation/ml-energy-disaggregation/book/08-forecasting/01-forecastability-code.ipynb" data-notebook-title="Load and PV Forecastability" data-notebook-cellid="6cdf169e">
 <div id="6cdf169e" class="cell">
 <div class="cell-output cell-output-display">
 
@@ -4718,15 +4761,15 @@ Figure&nbsp;14.2: Four pointwise-error metrics point in almost the same directio
 </section>
 <section id="does-forecastability-itself-generalize-beyond-ausnet" class="level2">
 <h2 class="anchored" data-anchor-id="does-forecastability-itself-generalize-beyond-ausnet">Does forecastability itself generalize beyond AusNet?</h2>
-<p>Everything in this chapter is checked against one specific real population: 342 real Australian households, one country, one climate, one utility’s own metering program. Part 4 Chapter 4 already asked a version of this question for clustering, whether shape-based archetypes recover real ground-truth building categories, and found a real, honest limit once the population changed. This chapter’s own two headline findings, how forecastable a real household’s signal actually is, and which baseline actually wins once Corr is checked alongside MAE, deserve the same honest check: are they a property of load forecasting in general, or a property of AusNet’s own 342 customers specifically?</p>
-<div class="quarto-embed-nb-cell" data-notebook="/home/runner/work/ml-energy-disaggregation/ml-energy-disaggregation/book/05-forecasting/01-forecastability-code.ipynb" data-notebook-title="Load and PV Forecastability" data-notebook-cellid="5ff3cd14">
+<p>Everything in this chapter is checked against one specific real population: 342 real Australian households, one country, one climate, one utility’s own metering program. Part 4 Chapter 5 already asked a version of this question for clustering, whether shape-based archetypes recover real ground-truth building categories, and found a real, honest limit once the population changed. This chapter’s own two headline findings, how forecastable a real household’s signal actually is, and which baseline actually wins once Corr is checked alongside MAE, deserve the same honest check: are they a property of load forecasting in general, or a property of AusNet’s own 342 customers specifically?</p>
+<div class="quarto-embed-nb-cell" data-notebook="/home/runner/work/ml-energy-disaggregation/ml-energy-disaggregation/book/08-forecasting/01-forecastability-code.ipynb" data-notebook-title="Load and PV Forecastability" data-notebook-cellid="5ff3cd14">
 <div id="5ff3cd14" class="cell">
 <div class="cell-output cell-output-stdout">
 <pre><code>200 real NREL ResStock buildings with a full real year, shape (200, 17520)</code></pre>
 </div>
 </div>
 </div>
-<div class="quarto-embed-nb-cell" data-notebook="/home/runner/work/ml-energy-disaggregation/ml-energy-disaggregation/book/05-forecasting/01-forecastability-code.ipynb" data-notebook-title="Load and PV Forecastability" data-notebook-cellid="20c03e07">
+<div class="quarto-embed-nb-cell" data-notebook="/home/runner/work/ml-energy-disaggregation/ml-energy-disaggregation/book/08-forecasting/01-forecastability-code.ipynb" data-notebook-title="Load and PV Forecastability" data-notebook-cellid="20c03e07">
 <div id="20c03e07" class="cell">
 <div class="cell-output cell-output-display">
 <div id="ketojrpsou" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:100%;height:auto;">
@@ -4831,7 +4874,7 @@ Figure&nbsp;14.2: Four pointwise-error metrics point in almost the same directio
 </div>
 </div>
 <p>Real, US ResStock households read as more regular by permutation entropy, 0.939 against AusNet’s own 0.987, a genuine, checkable difference, not noise: a lower score means a smaller, more repeating set of ordinal patterns across the year. Sample entropy is nearly identical across the two real populations (0.394 against 0.407), and the Hurst and DFA exponents both stay in the same qualitative range, modestly higher for NREL on both. Forecastability is not a fixed, universal number for “household load,” it depends on which real households, which real climate, and which real appliance mix a given population actually has, exactly the same lesson this chapter already drew from AusNet’s own 342 customers not sharing one forecastability regime with each other, now shown to hold across countries as well as across customers within one country.</p>
-<div class="quarto-embed-nb-cell" data-notebook="/home/runner/work/ml-energy-disaggregation/ml-energy-disaggregation/book/05-forecasting/01-forecastability-code.ipynb" data-notebook-title="Load and PV Forecastability" data-notebook-cellid="6aa29674">
+<div class="quarto-embed-nb-cell" data-notebook="/home/runner/work/ml-energy-disaggregation/ml-energy-disaggregation/book/08-forecasting/01-forecastability-code.ipynb" data-notebook-title="Load and PV Forecastability" data-notebook-cellid="6aa29674">
 <div id="6aa29674" class="cell">
 <div class="cell-output cell-output-display">
 <div id="kygpmwblzz" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:100%;height:auto;">
@@ -4960,7 +5003,7 @@ Figure&nbsp;14.2: Four pointwise-error metrics point in almost the same directio
 </div>
 </div>
 </div>
-<div class="quarto-embed-nb-cell" data-notebook="/home/runner/work/ml-energy-disaggregation/ml-energy-disaggregation/book/05-forecasting/01-forecastability-code.ipynb" data-notebook-title="Load and PV Forecastability" data-notebook-cellid="fe6789b0">
+<div class="quarto-embed-nb-cell" data-notebook="/home/runner/work/ml-energy-disaggregation/ml-energy-disaggregation/book/08-forecasting/01-forecastability-code.ipynb" data-notebook-title="Load and PV Forecastability" data-notebook-cellid="fe6789b0">
 <div id="fe6789b0" class="cell">
 <div class="cell-output cell-output-display">
 <div id="fczdhducyw" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:100%;height:auto;">
@@ -5059,8 +5102,8 @@ Figure&nbsp;14.2: Four pointwise-error metrics point in almost the same directio
 <p>From the customer’s perspective, this transparent approach ensures fairness. Customers whose measured forecastability indicates that a simple baseline is sufficient should not incur costs directly or indirectly for infrastructure designed to address more complex forecasting challenges they do not face. Conversely, customers with genuinely volatile signals, as identified by the regime table, are precisely those for whom a <a href="#acronyms_DSO">DSO</a>’s investment in advanced, uncertainty-aware forecasting (addressed in Chapter 3) is justified.</p>
 <p>These counterintuitive findings are significant for both utilities and customers. Incorporating a known <a href="#acronyms_PV">PV</a> component increased the forecastability of net load, while the diversified <a href="#acronyms_EV">EV</a> construction appeared as the most forecastable signal, though this does not reflect the unpredictability of individual vehicle behaviour. Interpreting these results without careful analysis could lead to the mistaken belief that ‘more <a href="#acronyms_DER">DER</a> means more predictable,’ precisely the type of false confidence that De Bortoli et al.’s confidence-set framework cautions against. Direct empirical evaluation, rather than assumption, underpins the integrity of this chapter’s recommendations.</p>
 </section>
-<section id="where-this-leaves-part-5" class="level2">
-<h2 class="anchored" data-anchor-id="where-this-leaves-part-5">Where this leaves Part 5</h2>
+<section id="where-this-leaves-part-8" class="level2">
+<h2 class="anchored" data-anchor-id="where-this-leaves-part-8">Where this leaves Part 8</h2>
 <p>Forecastability varies substantially across individual customers, and a simple window-average baseline is effective for most, regardless of regime. The addition of a known <a href="#acronyms_PV">PV</a> component increases, rather than decreases, the persistence of net load. The diversified <a href="#acronyms_EV">EV</a> construction achieves a level of forecastability that is unattainable from any single vehicle’s actual charging behaviour. This chapter adopts a confidence-set approach, providing a nuanced framework for subsequent analysis rather than a single, overconfident recommendation.</p>
 <p>Neither finding turned out to be a universal property of household load. Checked against 200 real NREL ResStock homes, a genuinely different country and climate, forecastability itself reads more regular, and the baseline verdict flips outright, seasonal-naive winning the majority where window-average won on AusNet. Both are worth deploying as a first read on a new population, neither is worth assuming transfers unchecked.</p>
 <p>Chapter 2 checks whether a trained model clears this chapter’s own baseline floor at all, and whether profiling customers into Part 4’s own archetypes lets a single shared model scale to hundreds of customers without training one model per household.</p>
@@ -5523,12 +5566,12 @@ Figure&nbsp;14.2: Four pointwise-error metrics point in almost the same directio
   </script>
 <nav class="page-navigation">
   <div class="nav-page nav-page-previous">
-      <a href="../../book/04-grid-edge/06-anomaly-detection.html" class="pagination-link" aria-label="Chapter 6: Anomaly Detection Beyond the Meter">
-        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text"><span class="chapter-title">Chapter 6: Anomaly Detection Beyond the Meter</span></span>
+      <a href="../../book/07-anomaly-detection/01-anomaly-detection.html" class="pagination-link" aria-label="Chapter 1: Anomaly Detection Beyond the Meter">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text"><span class="chapter-title">Chapter 1: Anomaly Detection Beyond the Meter</span></span>
       </a>          
   </div>
   <div class="nav-page nav-page-next">
-      <a href="../../book/05-forecasting/02-scaling-archetypes.html" class="pagination-link" aria-label="Chapter 2: Scaling to Hundreds of Meters">
+      <a href="../../book/08-forecasting/02-scaling-archetypes.html" class="pagination-link" aria-label="Chapter 2: Scaling to Hundreds of Meters">
         <span class="nav-page-text"><span class="chapter-title">Chapter 2: Scaling to Hundreds of Meters</span></span> <i class="bi bi-arrow-right-short"></i>
       </a>
   </div>
@@ -5543,7 +5586,7 @@ Figure&nbsp;14.2: Four pointwise-error metrics point in almost the same directio
 <div class="footer-social">
 <p><a href="mailto:sambaiga@gmail.com" title="Email"><i class="bi bi-envelope-at-fill"></i></a> <a href="https://github.com/sambaiga" title="GitHub"><i class="bi bi-github"></i></a> <a href="https://www.linkedin.com/in/sambaiga" title="LinkedIn"><i class="bi bi-linkedin"></i></a></p>
 </div>
-<div class="toc-actions d-sm-block d-md-none"><ul><li><a href="https://github.com/sambaiga/ml-energy-disaggregation/edit/main/book/05-forecasting/01-forecastability.qmd" class="toc-action"><i class="bi bi-github"></i>Edit this page</a></li><li><a href="https://github.com/sambaiga/ml-energy-disaggregation/issues/new" class="toc-action"><i class="bi empty"></i>Report an issue</a></li><li><a href="https://github.com/sambaiga/ml-energy-disaggregation/blob/main/book/05-forecasting/01-forecastability.qmd" class="toc-action"><i class="bi empty"></i>View source</a></li></ul></div></div>
+<div class="toc-actions d-sm-block d-md-none"><ul><li><a href="https://github.com/sambaiga/ml-energy-disaggregation/edit/main/book/08-forecasting/01-forecastability.qmd" class="toc-action"><i class="bi bi-github"></i>Edit this page</a></li><li><a href="https://github.com/sambaiga/ml-energy-disaggregation/issues/new" class="toc-action"><i class="bi empty"></i>Report an issue</a></li><li><a href="https://github.com/sambaiga/ml-energy-disaggregation/blob/main/book/08-forecasting/01-forecastability.qmd" class="toc-action"><i class="bi empty"></i>View source</a></li></ul></div></div>
     <div class="nav-footer-right">
 <p><span class="faux-block">Made with <a href="https://quarto.org">Quarto</a></span> <span class="faux-block"><a href="https://github.com/sambaiga/ml-energy-disaggregation"><i class="bi bi-github"></i> View source</a></span></p>
 </div>

@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 <meta name="author" content="Anthony Faustine">
-<meta name="dcterms.date" content="2026-07-20">
+<meta name="dcterms.date" content="2026-07-23">
 <meta name="description" content="A structured, project-based path through smart meter data: ML foundations, disaggregation, grid-edge value, and forecasting, from raw signal to business insight.">
 
 <title>Machine Learning for Smart Meter Data</title>
@@ -49,9 +49,9 @@ ul.task-list li input[type="checkbox"] {
 <link href="site_libs/quarto-html/quarto-syntax-highlighting-de63f62b328812d8e578a4d74e282472.css" rel="stylesheet" class="quarto-color-scheme-extra" id="quarto-text-highlighting-styles">
 <script src="site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="site_libs/bootstrap/bootstrap-9661ac00a33b6c2a7ffb2cb4cb9f2155.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
-<link href="site_libs/bootstrap/bootstrap-dark-9b208294319f478b9205897e46a7db35.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="dark">
-<link href="site_libs/bootstrap/bootstrap-9661ac00a33b6c2a7ffb2cb4cb9f2155.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme-extra" id="quarto-bootstrap" data-mode="light">
+<link href="site_libs/bootstrap/bootstrap-84b0f63d2b22afb69d3c32ede53d2fe2.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
+<link href="site_libs/bootstrap/bootstrap-dark-86bd388472066654720eaf2de8d3b778.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="dark">
+<link href="site_libs/bootstrap/bootstrap-84b0f63d2b22afb69d3c32ede53d2fe2.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme-extra" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -357,7 +357,7 @@ ul.task-list li input[type="checkbox"] {
         <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
             <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="false">
- <span class="menu-text">Part 4: Grid-Edge Value</span></a>
+ <span class="menu-text">Part 4: LV Network and Topology Foundations</span></a>
           <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="false" aria-label="Toggle section">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
@@ -365,32 +365,17 @@ ul.task-list li input[type="checkbox"] {
       <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth1 ">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./book/04-grid-edge/01-opendss-lv-modeling.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">Chapter 1: Modeling the Low-Voltage Network</span></a>
+  <a href="./book/04-network-foundations/01-opendss-lv-modeling.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">Chapter 1: Modeling the Low-Voltage Network</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./book/04-grid-edge/02-timeseries-der-modeling.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">Chapter 2: Time-Series Simulation and DER Modeling</span></a>
+  <a href="./book/04-network-foundations/02-timeseries-der-modeling.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">Chapter 2: Time-Series Simulation and DER Modeling</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./book/04-grid-edge/03-phase-identification.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">Chapter 3: Phase Identification from Smart-Meter Data</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="./book/04-grid-edge/04-customer-feeder-clustering.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">Chapter 4: Customer and Feeder Clustering</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="./book/04-grid-edge/05-ranking-recommendation.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">Chapter 5: Ranking and Recommendation under DER</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="./book/04-grid-edge/06-anomaly-detection.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">Chapter 6: Anomaly Detection Beyond the Meter</span></a>
+  <a href="./book/04-network-foundations/03-phase-identification.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">Chapter 3: Phase Identification from Smart-Meter Data</span></a>
   </div>
 </li>
       </ul>
@@ -398,7 +383,7 @@ ul.task-list li input[type="checkbox"] {
         <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
             <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="false">
- <span class="menu-text">Part 5: Forecasting</span></a>
+ <span class="menu-text">Part 5: Clustering</span></a>
           <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="false" aria-label="Toggle section">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
@@ -406,32 +391,90 @@ ul.task-list li input[type="checkbox"] {
       <ul id="quarto-sidebar-section-3" class="collapse list-unstyled sidebar-section depth1 ">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./book/05-forecasting/01-forecastability.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">Chapter 1: Household Smart-Meter Forecastability</span></a>
+  <a href="./book/05-clustering/01-clustering-foundations.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">Chapter 1: Clustering Foundations</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./book/05-forecasting/02-scaling-archetypes.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">Chapter 2: Scaling to Hundreds of Meters</span></a>
+  <a href="./book/05-clustering/02-clustering-methodology.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">Chapter 2: Clustering Methodology</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./book/05-forecasting/03-probabilistic-forecasting.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">Chapter 3: What a Probabilistic Forecast Is Actually Worth</span></a>
+  <a href="./book/05-clustering/03-customer-feeder-clustering.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">Chapter 3: Customer and Feeder Clustering</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" role="navigation" aria-expanded="false">
+ <span class="menu-text">Part 6: Ranking and Recommendation</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" role="navigation" aria-expanded="false" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-4" class="collapse list-unstyled sidebar-section depth1 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./book/06-ranking-recommendation/01-ranking-recommendation.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">Chapter 1: Ranking and Recommendation under DER</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-5" role="navigation" aria-expanded="false">
+ <span class="menu-text">Part 7: Anomaly Detection</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-5" role="navigation" aria-expanded="false" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-5" class="collapse list-unstyled sidebar-section depth1 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./book/07-anomaly-detection/01-anomaly-detection.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">Chapter 1: Anomaly Detection Beyond the Meter</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-6" role="navigation" aria-expanded="false">
+ <span class="menu-text">Part 8: Forecasting</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-6" role="navigation" aria-expanded="false" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-6" class="collapse list-unstyled sidebar-section depth1 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./book/08-forecasting/01-forecastability.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">Chapter 1: Household Smart-Meter Forecastability</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./book/05-forecasting/04-foundation-models.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">Part 5 Chapter 4: Do Foundation Models Fail Like Everything Else Does?</span></a>
+  <a href="./book/08-forecasting/02-scaling-archetypes.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">Chapter 2: Scaling to Hundreds of Meters</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./book/05-forecasting/05-what-if-scenario-analysis.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">Part 5 Chapter 5: What the Grid Actually Faces When These Forecasts Come True</span></a>
+  <a href="./book/08-forecasting/03-probabilistic-forecasting.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">Chapter 3: What a Probabilistic Forecast Is Actually Worth</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./book/05-forecasting/06-lv-state-estimation.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">Part 5 Chapter 6: Can Smart-Meter Readings Fill In What the Grid Cannot See</span></a>
+  <a href="./book/08-forecasting/04-foundation-models.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">Part 8 Chapter 4: Do Foundation Models Fail Like Everything Else Does?</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./book/08-forecasting/05-what-if-scenario-analysis.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">Part 8 Chapter 5: What the Grid Actually Faces When These Forecasts Come True</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./book/08-forecasting/06-lv-state-estimation.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">Part 8 Chapter 6: Can Smart-Meter Readings Fill In What the Grid Cannot See</span></a>
   </div>
 </li>
       </ul>
@@ -483,7 +526,7 @@ ul.task-list li input[type="checkbox"] {
     <div>
     <div class="quarto-title-meta-heading">Published</div>
     <div class="quarto-title-meta-contents">
-      <p class="date">July 20, 2026</p>
+      <p class="date">July 23, 2026</p>
     </div>
   </div>
   
@@ -515,7 +558,7 @@ From raw meter signal to business decision, through the ML foundations, disaggre
 <span class="stat-value">16</span><span class="stat-label">Appliance types</span>
 </div>
 <div class="cover-stat">
-<span class="stat-value">13</span><span class="stat-label">Chapters live</span>
+<span class="stat-value">18</span><span class="stat-label">Chapters live</span>
 </div>
 </div>
 <p class="cover-author">
@@ -545,7 +588,7 @@ The arc every chapter follows
 </div>
 </div>
 <p class="pipeline-flow-label">
-The book, in five parts
+The book, in eight parts
 </p>
 <div class="pipeline-flow">
 <div class="pipeline-step">
@@ -561,11 +604,23 @@ The book, in five parts
 </div>
 <span class="pipeline-arrow">→</span>
 <div class="pipeline-step">
-<a class="pipeline-step-link" href="./book/04-grid-edge/01-opendss-lv-modeling.html"><span class="pipeline-dot pipeline-dot-4"><i class="bi bi-diagram-3-fill"></i></span><span class="pipeline-label">Grid-Edge Value</span></a>
+<a class="pipeline-step-link" href="./book/04-network-foundations/01-opendss-lv-modeling.html"><span class="pipeline-dot pipeline-dot-4"><i class="bi bi-diagram-3-fill"></i></span><span class="pipeline-label">Network Foundations</span></a>
 </div>
 <span class="pipeline-arrow">→</span>
 <div class="pipeline-step">
-<a class="pipeline-step-link" href="./book/05-forecasting/01-forecastability.html"><span class="pipeline-dot pipeline-dot-5"><i class="bi bi-graph-up-arrow"></i></span><span class="pipeline-label">Forecasting</span></a>
+<a class="pipeline-step-link" href="./book/05-clustering/01-clustering-foundations.html"><span class="pipeline-dot pipeline-dot-5"><i class="bi bi-diagram-2-fill"></i></span><span class="pipeline-label">Clustering</span></a>
+</div>
+<span class="pipeline-arrow">→</span>
+<div class="pipeline-step">
+<a class="pipeline-step-link" href="./book/06-ranking-recommendation/01-ranking-recommendation.html"><span class="pipeline-dot pipeline-dot-6"><i class="bi bi-sort-down"></i></span><span class="pipeline-label">Ranking</span></a>
+</div>
+<span class="pipeline-arrow">→</span>
+<div class="pipeline-step">
+<a class="pipeline-step-link" href="./book/07-anomaly-detection/01-anomaly-detection.html"><span class="pipeline-dot pipeline-dot-7"><i class="bi bi-exclamation-triangle-fill"></i></span><span class="pipeline-label">Anomaly Detection</span></a>
+</div>
+<span class="pipeline-arrow">→</span>
+<div class="pipeline-step">
+<a class="pipeline-step-link" href="./book/08-forecasting/01-forecastability.html"><span class="pipeline-dot pipeline-dot-8"><i class="bi bi-graph-up-arrow"></i></span><span class="pipeline-label">Forecasting</span></a>
 </div>
 </div>
 </div>
@@ -589,7 +644,7 @@ Reading a meter signal, general event and change detection, and feature-engineer
 </li>
 </ul>
 <p class="act-note">
-Chapters land after Part 5 ships.
+Chapters land after Part 8 ships.
 </p>
 </div>
 </div>
@@ -600,7 +655,7 @@ Chapters land after Part 5 ships.
 <div class="act-inner">
 <i class="bi bi-cpu-fill act-icon act-icon-2"></i> <span class="act-eyebrow">Part 2 · ML Foundations</span>
 <p class="act-desc">
-The mathematical and statistical theory behind every model this book uses as a tool: learning theory, optimization, tree ensembles, deep architectures, and the uncertainty-quantification foundations Part 5’s own forecasts depend on.
+The mathematical and statistical theory behind every model this book uses as a tool: learning theory, optimization, tree ensembles, deep architectures, and the uncertainty-quantification foundations Part 8’s own forecasts depend on.
 </p>
 <ul class="act-chapters">
 <li>
@@ -608,7 +663,7 @@ The mathematical and statistical theory behind every model this book uses as a t
 </li>
 </ul>
 <p class="act-note">
-Chapters land after Part 5 ships.
+Chapters land after Part 8 ships.
 </p>
 </div>
 </div>
@@ -642,28 +697,19 @@ Non-intrusive load monitoring: from the aggregate signal to appliance-level insi
 
 </div>
 <div class="act-inner">
-<i class="bi bi-diagram-3-fill act-icon act-icon-4"></i> <span class="act-eyebrow">Part 4 · Grid-Edge Value</span>
+<i class="bi bi-diagram-3-fill act-icon act-icon-4"></i> <span class="act-eyebrow">Part 4 · LV Network and Topology Foundations</span>
 <p class="act-desc">
-Phase detection, customer/feeder clustering, voltage-violation and power-quality anomaly detection, and ranking and recommendation for LV management under DER, modeled with open-source power-flow simulation.
+Modeling the low-voltage network, simulating DER time series on it, and identifying phase from smart-meter data alone, all with open-source power-flow simulation the rest of the book reuses.
 </p>
 <ul class="act-chapters">
 <li>
-<a href="./book/04-grid-edge/01-opendss-lv-modeling.html"><span class="ch-num">01</span><span class="ch-name">Modeling the Low-Voltage Network</span><i class="bi bi-check-circle-fill ch-check"></i></a>
+<a href="./book/04-network-foundations/01-opendss-lv-modeling.html"><span class="ch-num">01</span><span class="ch-name">Modeling the Low-Voltage Network</span><i class="bi bi-check-circle-fill ch-check"></i></a>
 </li>
 <li>
-<a href="./book/04-grid-edge/02-timeseries-der-modeling.html"><span class="ch-num">02</span><span class="ch-name">Time-Series Simulation and DER Modeling</span><i class="bi bi-check-circle-fill ch-check"></i></a>
+<a href="./book/04-network-foundations/02-timeseries-der-modeling.html"><span class="ch-num">02</span><span class="ch-name">Time-Series Simulation and DER Modeling</span><i class="bi bi-check-circle-fill ch-check"></i></a>
 </li>
 <li>
-<a href="./book/04-grid-edge/03-phase-identification.html"><span class="ch-num">03</span><span class="ch-name">Phase Identification from Smart-Meter Data</span><i class="bi bi-check-circle-fill ch-check"></i></a>
-</li>
-<li>
-<a href="./book/04-grid-edge/04-customer-feeder-clustering.html"><span class="ch-num">04</span><span class="ch-name">Customer and Feeder Clustering</span><i class="bi bi-check-circle-fill ch-check"></i></a>
-</li>
-<li>
-<a href="./book/04-grid-edge/05-ranking-recommendation.html"><span class="ch-num">05</span><span class="ch-name">Ranking and Recommendation under DER</span><i class="bi bi-check-circle-fill ch-check"></i></a>
-</li>
-<li>
-<a href="./book/04-grid-edge/06-anomaly-detection.html"><span class="ch-num">06</span><span class="ch-name">Anomaly Detection Combining Smart-Meter Data and LV Topology</span><i class="bi bi-check-circle-fill ch-check"></i></a>
+<a href="./book/04-network-foundations/03-phase-identification.html"><span class="ch-num">03</span><span class="ch-name">Phase Identification from Smart-Meter Data</span><i class="bi bi-check-circle-fill ch-check"></i></a>
 </li>
 </ul>
 </div>
@@ -673,26 +719,89 @@ Phase detection, customer/feeder clustering, voltage-violation and power-quality
 
 </div>
 <div class="act-inner">
-<i class="bi bi-graph-up-arrow act-icon act-icon-5"></i> <span class="act-eyebrow">Part 5 · Forecasting</span>
+<i class="bi bi-diagram-2-fill act-icon act-icon-5"></i> <span class="act-eyebrow">Part 5 · Clustering</span>
+<p class="act-desc">
+Theoretical foundations of clustering under DER, a settled methodology validated across three real utilities, then applying it to real AusNet customers and feeders.
+</p>
+<ul class="act-chapters">
+<li>
+<a href="./book/05-clustering/01-clustering-foundations.html"><span class="ch-num">01</span><span class="ch-name">Clustering Foundations</span><i class="bi bi-check-circle-fill ch-check"></i></a>
+</li>
+<li>
+<a href="./book/05-clustering/02-clustering-methodology.html"><span class="ch-num">02</span><span class="ch-name">Clustering Methodology</span><i class="bi bi-check-circle-fill ch-check"></i></a>
+</li>
+<li>
+<a href="./book/05-clustering/03-customer-feeder-clustering.html"><span class="ch-num">03</span><span class="ch-name">Customer and Feeder Clustering</span><i class="bi bi-check-circle-fill ch-check"></i></a>
+</li>
+</ul>
+</div>
+</div>
+<div class="act-card">
+<div class="act-stripe act-6">
+
+</div>
+<div class="act-inner">
+<i class="bi bi-sort-down act-icon act-icon-6"></i> <span class="act-eyebrow">Part 6 · Ranking and Recommendation</span>
+<p class="act-desc">
+Retrieval, ranking, and case-based recommendation for LV management under DER, checked against real, OpenDSS-simulated per-customer outcomes.
+</p>
+<ul class="act-chapters">
+<li>
+<a href="./book/06-ranking-recommendation/01-ranking-recommendation.html"><span class="ch-num">01</span><span class="ch-name">Ranking and Recommendation under DER</span><i class="bi bi-check-circle-fill ch-check"></i></a>
+</li>
+</ul>
+</div>
+</div>
+<div class="act-card">
+<div class="act-stripe act-7">
+
+</div>
+<div class="act-inner">
+<i class="bi bi-exclamation-triangle-fill act-icon act-icon-7"></i> <span class="act-eyebrow">Part 7 · Anomaly Detection</span>
+<p class="act-desc">
+Voltage-violation and power-quality anomaly detection combining smart-meter data and LV topology, beyond what a single meter can see alone.
+</p>
+<ul class="act-chapters">
+<li>
+<a href="./book/07-anomaly-detection/01-anomaly-detection.html"><span class="ch-num">01</span><span class="ch-name">Anomaly Detection Beyond the Meter</span><i class="bi bi-check-circle-fill ch-check"></i></a>
+</li>
+</ul>
+</div>
+</div>
+<div class="act-card">
+<div class="act-stripe act-8">
+
+</div>
+<div class="act-inner">
+<i class="bi bi-graph-up-arrow act-icon act-icon-8"></i> <span class="act-eyebrow">Part 8 · Forecasting</span>
 <p class="act-desc">
 Household-scale load, PV, and EV forecastability and uncertainty, built on Twiga. The book’s closing part, feeding its own forecasts back into Part 4’s LV network model.
 </p>
 <ul class="act-chapters">
 <li>
-<a href="./book/05-forecasting/01-forecastability.html"><span class="ch-num">01</span><span class="ch-name">Household Smart-Meter Forecastability</span><i class="bi bi-check-circle-fill ch-check"></i></a>
+<a href="./book/08-forecasting/01-forecastability.html"><span class="ch-num">01</span><span class="ch-name">Household Smart-Meter Forecastability</span><i class="bi bi-check-circle-fill ch-check"></i></a>
 </li>
 <li>
-<a href="./book/05-forecasting/02-scaling-archetypes.html"><span class="ch-num">02</span><span class="ch-name">Scaling to Hundreds of Meters</span><i class="bi bi-check-circle-fill ch-check"></i></a>
+<a href="./book/08-forecasting/02-scaling-archetypes.html"><span class="ch-num">02</span><span class="ch-name">Scaling to Hundreds of Meters</span><i class="bi bi-check-circle-fill ch-check"></i></a>
 </li>
 <li>
-<a href="./book/05-forecasting/03-probabilistic-forecasting.html"><span class="ch-num">03</span><span class="ch-name">What a Probabilistic Forecast Is Actually Worth</span><i class="bi bi-check-circle-fill ch-check"></i></a>
+<a href="./book/08-forecasting/03-probabilistic-forecasting.html"><span class="ch-num">03</span><span class="ch-name">What a Probabilistic Forecast Is Actually Worth</span><i class="bi bi-check-circle-fill ch-check"></i></a>
+</li>
+<li>
+<a href="./book/08-forecasting/04-foundation-models.html"><span class="ch-num">04</span><span class="ch-name">Do Foundation Models Fail Like Everything Else Does?</span><i class="bi bi-check-circle-fill ch-check"></i></a>
+</li>
+<li>
+<a href="./book/08-forecasting/05-what-if-scenario-analysis.html"><span class="ch-num">05</span><span class="ch-name">What the Grid Actually Faces When These Forecasts Come True</span><i class="bi bi-check-circle-fill ch-check"></i></a>
+</li>
+<li>
+<a href="./book/08-forecasting/06-lv-state-estimation.html"><span class="ch-num">06</span><span class="ch-name">Can Smart-Meter Readings Fill In What the Grid Cannot See</span><i class="bi bi-check-circle-fill ch-check"></i></a>
 </li>
 </ul>
 </div>
 </div>
 </div>
 <p style="color:#94A3B8;font-size:0.85rem;">
-13 chapters shipped so far, each with a runnable notebook. <a href="https://github.com/sambaiga/ml-energy-disaggregation" style="color:#64748B">Follow progress on GitHub</a>.
+17 chapters shipped so far, each with a runnable notebook. <a href="https://github.com/sambaiga/ml-energy-disaggregation" style="color:#64748B">Follow progress on GitHub</a>.
 </p>
 </div>
 
