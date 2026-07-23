@@ -55,6 +55,12 @@ acronyms:
       longname: Normalized Mutual Information
     - shortname: DTW
       longname: Dynamic Time Warping
+    - shortname: NSGA
+      longname: Non-dominated Sorting Genetic Algorithm
+    - shortname: fANOVA
+      longname: functional Analysis of Variance
+    - shortname: ELECTRE
+      longname: Elimination and Choice Expressing Reality
     - shortname: NREL
       longname: National Renewable Energy Laboratory
     - shortname: CBR

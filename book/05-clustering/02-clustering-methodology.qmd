@@ -1,0 +1,125 @@
+---
+title: "Chapter 2: Clustering Methodology"
+bibliography: ../../references.bib
+---
+
+Chapter 1 left four real questions open, on purpose: which objective family fits a given population, what distance and representation a load curve actually needs, how a discovered grouping can be checked without ground truth, and how background knowledge should constrain a clustering directly. Those were the right questions to raise before touching a single real customer, and the wrong ones to answer in the abstract. This chapter answers them concretely, once, so that every later chapter in this part can apply a settled recipe instead of re-litigating it three times.
+
+A search across 1,284 real London households, ten feature sets, five scalers, five reducer families, and three clustering algorithms once returned a combination that scored a silhouette of 0.994, the best result of several hundred trials. Checking what that combination actually produced, rather than trusting the number, told a different story: 1,282 households in one cluster, and one household each in two more. The "clusters" were not archetypes. One real London household, `MAC000037`, records almost no evening consumption at all, giving it a `morning_evening_ratio` of 1,296 against a population median under 1. The search had not found a customer segment. It had found one broken ratio and rewarded it.
+
+Chapter 1 already warned against trusting a single validity index, citing Jain's own retrospective on fifty years of work past k-means [@jain2010clustering50years]. The standard response to that warning is to check several indices together, silhouette alongside Davies-Bouldin and Calinski-Harabasz, on the reasoning that if independently constructed formulas agree, the agreement must mean something. `MAC000037` shows exactly why that reasoning fails. All three indices rated the degenerate split as excellent: silhouette 0.994, Davies-Bouldin 0.002, Calinski-Harabasz 3.18 million. They agreed because, however differently each is built, all three only ever measure how separated groups are, and a single point sitting far from everything else is, by construction, perfectly separated. None of them can ask the question that actually matters: is this separation a real customer archetype, or an artefact of one broken feature. Four questions follow directly from that gap, in the order this chapter answers them:
+
+- Which feature representation, scaler, and dimensionality-reduction choice actually drive whether a smart-meter clustering looks good, and does that answer depend on what "looks good" is even taken to mean?
+- How many components should a reduction step keep, and is there a principled alternative to an arbitrary cumulative-variance threshold?
+- Without ground truth, how can a discovered grouping be told apart from an artefact, given that even three independent-looking validity indices can agree on the wrong answer together?
+- Once a defensible recipe is settled on one real population, does it actually generalise to independently metered customers elsewhere, or only to the dataset it was tuned against?
+
+![The search architecture this chapter settles on: three cheap, live objectives narrow several hundred trials to a genuinely non-dominated Pareto front by dominance alone; a composite trust-gated score, cheap at first, then the full resampling-based version, narrows that front to one settled recipe.](../../assets/staged-search-pipeline.svg){#fig-staged-search-pipeline}
+
+## Choosing a pipeline is a search, not a guess
+
+Chapter 1's own "shape, not magnitude" convention and its discussion of {{< acr DTW >}}, tensor factorisation, and diffusion maps established that distance and representation matter, without settling which combination wins for a specific real population [@sakoechiba1978dtw; @tucker1966threemode; @coifmanlafon2006diffusionmaps]. Answering that concretely means trying enough combinations that the answer is a real finding, not a hand-picked example. A fixed grid, ten feature sets times five scalers times a handful of reducer settings times three clusterers times three values of $K$, is the obvious way to do this, and it is also the wrong tool: a reducer's own continuous hyperparameters, {{< acr UMAP >}}'s neighbourhood size and minimum distance, t-SNE's perplexity, cannot be explored by a grid at all without enumerating every value in advance [@mcinneshealymelville2018umap; @vandermaatenhinton2008tsne].
+
+This chapter instead runs a proper multi-objective search: {{< acr NSGA >}}-II, a genetic algorithm for problems with more than one objective at once, evaluated across 400 trials over feature set, scaler, reducer (Principal Component Analysis, Kernel {{< acr PCA >}}, t-SNE, {{< acr UMAP >}}, and PaCMAP, each with its own real hyperparameters), clusterer, and $K \in [2, 12]$ [@deb2002nsga2; @scholkopf1998kernelpca; @wang2021pacmap]. NSGA-II already draws its own initial population at random before crossover and mutation begin, which is exactly the space coverage a later importance analysis needs, so no separate warm-up phase is required. The search is implemented with Optuna, an open-source hyperparameter-optimisation framework built around exactly this trial-and-study abstraction [@akiba2019optuna].
+
+Which of these choices actually matters, quantified rather than eyeballed from a table of medians, comes from {{< acr fANOVA >}}, functional analysis of variance over a random-forest surrogate fitted to the completed trials [@hutter2014fanova]. Applied to this search:
+
+| Parameter | Silhouette | Balance | Cheap stability |
+|---|---|---|---|
+| Reducer | 0.545 | 0.575 | 0.061 |
+| $K$ | 0.180 | 0.033 | 0.642 |
+| Feature set | 0.151 | 0.201 | 0.107 |
+| Scaler | 0.074 | 0.122 | 0.030 |
+| Clusterer | 0.050 | 0.069 | 0.160 |
+
+Which reducer is chosen accounts for more than half the variance in both silhouette (54.5%) and balance (57.5%): whether a clustering *looks* good is mostly a question of geometry, how the reduction step warps local neighbourhood structure, not which features fed it. Feature-set choice is a clear second on those same two measures. Neither comes close to explaining the third column. There, $K$ alone accounts for 64.2% of the variance, more than every other parameter combined, a genuinely different question this chapter returns to directly once trustworthiness itself has been defined. Scaler choice is the least important parameter for both silhouette and balance, confirming directly, with a quantified decomposition behind it rather than a spread of medians, a finding an earlier exploratory pass over this same data already suggested informally.
+
+## How many components to keep
+
+Once a reducer that keeps more than two dimensions is in play, a further question Chapter 1 raised but did not settle returns: how many components to retain. This book's own existing convention elsewhere is a fixed rule, keep enough components to reach 90% of cumulative explained variance, a threshold chosen for convenience rather than derived from the data's own structure. Zhu and Ghodsi's profile-likelihood method offers a principled alternative: model the top $q$ eigenvalues and the remaining $p - q$ as two Gaussian groups sharing one pooled variance, and choose the $q$ that maximises the resulting profile log-likelihood [@zhu2006profilelikelihood],
+$$
+\ell(q) = \sum_{i=1}^{q} \log \mathcal{N}(\lambda_i \mid \mu_1, \sigma^2) + \sum_{i=q+1}^{p} \log \mathcal{N}(\lambda_i \mid \mu_2, \sigma^2),
+$$
+where $\lambda_1 \geq \dots \geq \lambda_p$ are the ordered eigenvalues, $\mu_1, \mu_2$ are each group's own mean, and $\sigma^2$ is pooled across both so that the profile likelihood cannot diverge by shrinking one group's variance to zero. The method finds an automatic change point in the spectrum itself, with no threshold to tune.
+
+Tried on four of this chapter's own real feature sets, chosen to span native dimensionality from 6 to 264 columns, the two methods disagree on every one, and not narrowly:
+
+| Feature set | Native dimensions | 90%-variance threshold | Profile-likelihood |
+|---|---|---|---|
+| `profile` | 264 | 14 (5.3%) | 1 (0.4%) |
+| `profile_weekly` | 168 | 13 (7.7%) | 1 (0.6%) |
+| `profile_seasonal` | 96 | 11 (11.5%) | 1 (1.0%) |
+| `distribution` | 6 | 3 (50.0%) | 1 (16.7%) |
+
+Profile-likelihood recommends a single component for all four, including `distribution`, the smallest and least redundant of the four sets. This is not the method failing; it is answering a genuinely different question. These load-shape spectra share one dominant direction, essentially how large and how peaky a household's overall demand is, followed by a long, smoothly decaying tail that a shared-variance Gaussian model correctly treats as one homogeneous group rather than a second confidently separable signal. Reaching 90% cumulative variance still costs 11 to 14 components on the three profile sets, each contributing a small, gradually diminishing slice of a fixed, somewhat arbitrary target, not a second real structure. The practical stakes are not abstract: this chapter's own best clustering results, below, come from two-component embeddings, far closer to profile-likelihood's own recommendation than the variance rule's.
+
+## When separation lies
+
+Chapter 1 introduced Rousseeuw's silhouette coefficient formally,
+$$s(i) = \frac{b(i) - a(i)}{\max\{a(i), b(i)\}},$$
+where $a(i)$ is a point's mean distance to its own cluster and $b(i)$ its mean distance to the nearest other cluster [@rousseeuw1987silhouette]. Davies-Bouldin and Calinski-Harabasz are built differently, one from a ratio of within-cluster scatter to between-cluster centroid distance, the other from a ratio of between-cluster to within-cluster variance, but all three share the same structural blind spot: each is a function of distances or variances alone, with no term that penalises one group holding almost none of the population. `MAC000037`'s own cluster satisfies $b(i) \gg a(i)$ trivially, since nothing else in London is remotely close to it, and every one of the three formulas reports that trivial fact as a triumph.
+
+::: {.ark-mistake}
+<span class="ark-mistake-title"><i class="bi bi-bug-fill"></i> Common Mistake</span>
+
+Checking multiple internal validity indices and treating their agreement as confirmation. Silhouette, Davies-Bouldin, and Calinski-Harabasz are three different formulas built from the same two ingredients, within-cluster compactness and between-cluster separation, so they systematically agree exactly where all three are equally blind: an isolated outlier, a single household whose own recorded behaviour is a data artefact rather than a genuine pattern, satisfies every separation-based definition of a good cluster at once. Agreement among these three is evidence they were computed from the same clustering, not evidence the clustering found something real.
+:::
+
+The fix requires a genuinely different kind of evidence, not one more formula built from the same two ingredients. A balance measure at least notices the shape of the problem directly: entropy over the cluster-size distribution, $H(\mathbf{p}) = -\sum_{k=1}^{K} p_k \log p_k$ where $p_k = n_k / n$ is cluster $k$'s share of the population, normalised to $[0, 1]$ by dividing by $\log K$, its own maximum when every cluster is exactly the same size [@shannon1948mathematicaltheory]. `MAC000037`'s own $[1282, 1, 1]$ split scores a balance of 0.009, about as far from even as three clusters can get. Balance is cheap, needs no resampling, and catches this specific failure directly, but it is a symptom check, not a proof of realness: a population could, in principle, contain a genuinely rare archetype that also happens to be a small cluster. Telling the two apart needs a check of a different kind again.
+
+## Validating a clustering without labels
+
+Chapter 1's own "Checking stability" section introduced Strehl and Ghosh's ensemble approach, building a consensus matrix from several independent clustering *runs* of the same data [@strehl2002clusterensembles]. That answers "does this algorithm keep finding the same structure," a real and useful question, and a different one from "does this structure survive at all if the data itself had come out slightly differently." This chapter needs the second, complementary notion directly, because an outlier-driven cluster can be perfectly reproducible across repeated runs on the exact same fixed dataset while still being entirely an artefact of that one household's presence.
+
+Two established, resampling-based methods answer the second question, neither invented for this book, both under-applied, as far as this book's own literature search found, to smart-meter customer archetyping specifically. Tibshirani and Walther's prediction strength treats clustering as an implicit classification problem [@tibshiranwalther2005predictionstrength]: split the data into two random halves $A$ and $B$, cluster each independently into $K$ groups, fit centroids on $A$'s own clustering, and predict $B$'s cluster membership from those centroids by nearest distance. For each of $B$'s own clusters $C$, the co-membership agreement is
+$$
+\text{ps}(C) = \frac{1}{n_C(n_C - 1)} \sum_{\substack{i, i' \in C \\ i \neq i'}} \mathbb{1}\!\left[\text{pred}(i) = \text{pred}(i')\right],
+$$
+the fraction of same-cluster pairs in $B$ that the $A$-trained centroids also predict together, and the prediction strength for $K$ is the minimum of $\text{ps}(C)$ over $B$'s own clusters. Tibshirani and Walther's own recommendation is to pick the largest $K$ with prediction strength above 0.8 to 0.9. A genuine limitation is worth stating plainly rather than glossed over: a cluster with fewer than two members contributes no pairs at all, so a singleton is excluded from its own split's minimum rather than penalised by it. Prediction strength validates whether $K$ itself is well supported globally; it is not, by itself, guaranteed to flag one small outlier cluster hiding inside an otherwise well-supported partition.
+
+That is exactly the gap Hennig's cluster-wise stability closes [@hennig2007clusterwise]. Bootstrap-resample the data with replacement, fit centroids on the resample, predict cluster membership for the *entire* original dataset from those centroids, and compute the Jaccard overlap between each original cluster $C$ and its best match among the predicted clusters,
+$$
+J(C, C') = \frac{|C \cap C'|}{|C \cup C'|}, \qquad \text{stability}(C) = \frac{1}{B}\sum_{b=1}^{B} \max_{C'_b} J(C, C'_b),
+$$
+averaged over $B$ bootstrap resamples. A real archetype's centroid is recovered reliably even from a partial resample, reclaiming essentially all of its original members every time, stability near 1.0. A cluster built around one extreme household only has a centroid to speak of in resamples where that one household happened to be drawn, and is silently absorbed into whichever real cluster is nearest otherwise. Hennig's own interpretation bands read stability below 0.5 as dissolved, 0.6 to 0.75 as patterned but not stable, and above 0.75 as genuinely stable. Checked against `MAC000037`'s own cluster directly, stability lands at 0.63, inside the "patterned but not stable" band, not near zero: whenever that one household is present in a resample it reliably isolates itself again, so its score settles close to $1 - 1/e \approx 0.632$, the plain probability that a single point survives one bootstrap draw, a value this book's own test suite for the method reproduces analytically before trusting the result on real data.
+
+## A trust-gated composite score
+
+Chapter 1's own closing warning, that no single validity index is universally correct, needs a real combination rule, not just a longer list of indices to eyeball together [@jain2010clustering50years]. The naive fix, averaging separation and trust into one additive score, does not work: `MAC000037`'s own combination scores a near-perfect separation ensemble and a trust factor of 0.009, and a flat average lets the separation term partially buy the trust deficit back, exactly the compensation a real decision rule for this problem cannot allow.
+
+![Two illustrative candidates, one with excellent separation and almost no trust, one with moderate separation and real trust. An additive average lets the first buy back its own trust deficit and wins outright, 0.51 against 0.47. A multiplicative gate, separation times trust, correctly prefers the trustworthy candidate instead, 0.23 against 0.02.](../../assets/trust-gated-composite-score.svg){#fig-trust-gated-composite-score}
+
+This is a well-studied problem outside clustering, under the name noncompensatory decision rules in multi-criteria decision analysis: an alternative that fails badly enough on one criterion is excluded, or vetoed, regardless of how well it performs on every other criterion, rather than being allowed to trade one off against the rest [@gilbrideallenby2004screening]. Roy's own outranking theory, the foundation of the {{< acr ELECTRE >}} family of methods, formalises exactly this with a veto threshold: a candidate whose performance on one criterion falls far enough behind is excluded from consideration outright [@roy1990outranking]. This chapter's own composite score is a direct, continuous version of that same principle, not an additive vote:
+$$
+\text{composite}(x) = S(x) \times T(x),
+$$
+where $S(x)$ is a diversity-weighted rank ensemble over silhouette, Calinski-Harabasz, and Davies-Bouldin, and $T(x) = \min\bigl(\text{balance}(x), \text{stability}(x)\bigr)$ is a trust factor built from whichever of balance or stability is weaker for that candidate, a Rawlsian "weakest link" reading rather than an average of the two. The diversity weighting itself follows the same logic Chapter 1's own choice of index already implied: metrics that are highly correlated with each other across the candidate pool contribute redundant information and are down-weighted, so a near-unanimous cluster of agreeing separation metrics cannot outvote whichever one is actually saying something different. Multiplication, not addition, is the load-bearing choice: $S(x)$ near its maximum cannot rescue a $T(x)$ near zero, since the product of a large number and a number near zero is itself near zero, exactly the veto behaviour Roy's own theory formalises and a flat weighted sum structurally cannot provide.
+
+Applied to the actual Pareto front this chapter's own search produced, the effect is immediate. Ranking by raw silhouette alone would shortlist `MAC000037`'s own degenerate trial, and two others just like it, for further, expensive scrutiny, exactly the bias this whole approach exists to avoid. Ranking by composite score instead, on the same 21 Pareto-optimal trials, drops every one of the outlier-isolation cases to the very bottom of the list and promotes five genuinely balanced candidates, each with a real, multi-hundred-household minority cluster, to the shortlist that receives the expensive, well-powered resampling audit: ten-split prediction strength and hundred-bootstrap cluster stability, run once each, not on every trial, since the cheap versions already did the work of finding a fair shortlist to spend that cost on.
+
+## Choosing K is really about trust
+
+The {{< acr fANOVA >}} decomposition above already answered this, quantitatively, once the question was asked correctly: $K$ explains 64.2% of the variance in this search's own cheap stability signal, more than every other parameter combined, and almost nothing of silhouette or balance. Chapter 1's own "Choosing K" section warned against the elbow method on distortion, since distortion falls monotonically by construction and offers no signal about when to stop [@jain2010clustering50years]. This chapter's own finding sharpens that warning into something a practitioner can act on directly: whichever reducer and feature set are chosen mostly determine how *separated* a clustering looks, but $K$ itself mostly determines whether that clustering is *trustworthy* under resampling, a genuinely different axis a separation-only view, however many indices it checks, cannot see at all.
+
+## The settled recipe, checked three times
+
+The audit's own verdict, on the five composite-score finalists, is decisive rather than close. `shape` features (peak-normalised daily demand, the same convention established for a different reason in Chapter 1), a robust scaler, PaCMAP, and Gaussian mixture clustering at $K = 2$ scores a prediction strength of 1.000 with a standard deviation of 0.000 across all ten held-out splits, every split agreeing completely, and a minimum bootstrap cluster stability of 1.000, both clusters recovered exactly in all one hundred resamples. The two clusters hold 982 and 302 of London's 1,284 households. A genuine runner-up exists, `volatility` features with the same reducer and a plain k-means clusterer, splitting households by how much their day-to-day demand varies rather than by its shape, narrowly behind on both silhouette and stability; that a second, independently defensible answer exists at all is itself an honest finding about this population, not a reason to treat the runner-up as meaningless.
+
+A settled recipe that only works on the dataset it was tuned against is not settled at all, so the same fixed pipeline, the identical feature set, scaler, reducer with its own winning hyperparameters, clusterer, and $K$, was reconstructed exactly and applied unchanged to AusNet's 342 real households and an 800-household real sample from GoiEner, a second, independently metered Spanish utility.
+
+| Dataset | Households | Silhouette | Balance | Prediction strength | Min. cluster stability | Cluster sizes |
+|---|---|---|---|---|---|---|
+| London | 1,284 | 0.784 | 0.787 | 1.000 | 1.000 | 982 / 302 |
+| AusNet | 342 | 0.430 | 0.978 | 0.749 | 0.845 | 201 / 141 |
+| GoiEner | 800 | 0.482 | 0.999 | 0.860 | 0.914 | 414 / 386 |
+
+Every population clears Hennig's own 0.75 stability bar on its weakest cluster, AusNet and GoiEner comfortably so, and every split is genuinely balanced rather than one dominant group and stragglers. AusNet's own prediction strength, 0.749, falls just under Tibshirani and Walther's suggested 0.8 to 0.9 range, worth stating directly rather than rounding favourably; with only 342 households to begin with, AusNet has the least data of the three to support a resampling-based check, so a slightly weaker reading here is an expected consequence of sample size, not a sign the recipe itself fails to travel. Silhouette is the one number that does not transfer cleanly, London's 0.784 well above AusNet's 0.430 or GoiEner's 0.482, and balance explains why: AusNet and GoiEner's own splits land close to even, 59/41 and 52/48, while London's is more skewed at 76/24, and a more even split leaves less silhouette headroom between two group centroids relative to their own internal spread by construction. The same recipe finds a real, stable, non-degenerate two-way behavioural split in every one of the three independent real populations tried, differently proportioned in each, which is precisely what a settled methodology needs to demonstrate before the next chapter is allowed to treat it as a fixed choice rather than a hypothesis still being tested.
+
+## Where this leads
+
+None of the four questions this chapter opened with had a knowable answer in advance, and pretending otherwise, publishing whichever combination scored best on the first metric checked, is exactly how `MAC000037` becomes an archetype instead of a footnote. The recipe settled here, real load-shape features, a resampling-validated dimensionality choice, a trust-gated composite score standing in for a single validity index, checked once against a second internal signal and then against two entirely independent utilities, is the fixed methodology the next chapter applies rather than re-derives. That chapter puts this exact recipe to work for the first time on AusNet's real customers and feeders: real archetypes, a comparison against a deep-clustering alternative, calibrated confidence in each customer's own membership, and a check against a real, independently labelled population that Chapter 1 already flagged as a genuine limit worth reporting honestly rather than smoothing over.
+
+## References
+
+::: {#refs}
+:::

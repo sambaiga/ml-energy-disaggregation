@@ -3011,3 +3011,139 @@ def must_link_cannot_link_diagram() -> plt.Figure:
     fig.tight_layout()
     plt.close(fig)
     return fig
+
+
+def trust_gated_composite_score_diagram() -> plt.Figure:
+    """Draw why gating separation by trust must be multiplicative, not additive.
+
+    Left: two illustrative candidates plotted on separation (x) vs. trust
+    (y). Candidate A sits far right, near-perfect separation, but low on
+    the y-axis; candidate B sits centrally, good but not exceptional
+    separation, high trust. The shaded band below a veto threshold is
+    Roy's own outranking concept: any candidate whose trust falls in that
+    band is vetoed regardless of how far right it sits
+    [@roy1990outranking]. Right: the same two candidates scored two ways.
+    A flat additive average lets A's huge separation edge partially
+    compensate for its trust deficit, enough here to win outright, a
+    compensatory combination in Gilbride and Allenby's own sense
+    [@gilbrideallenby2004screening]. The multiplicative gate this book
+    uses instead, separation times trust, crushes A's score toward zero
+    and correctly prefers B: no amount of separation can buy back a
+    candidate trust has already vetoed.
+
+    Returns:
+        The matplotlib Figure, ready to display in a notebook cell.
+    """
+    candidate_a = {"label": "Candidate A", "separation": 0.99, "trust": 0.02, "color": DANGER}
+    candidate_b = {"label": "Candidate B", "separation": 0.45, "trust": 0.50, "color": SUCCESS}
+    veto_threshold = 0.3
+
+    fig, axes = plt.subplots(1, 2, figsize=(9.6, 4.3), gridspec_kw={"width_ratios": [1.05, 0.95]})
+
+    ax = axes[0]
+    ax.set_title("Separation vs. trust", fontsize=11.5, color=PRIMARY, fontweight="bold")
+    ax.axhspan(0, veto_threshold, color=DANGER, alpha=0.08, zorder=0)
+    ax.axhline(veto_threshold, color=DANGER, linewidth=1.0, linestyle="dashed", alpha=0.6)
+    ax.text(0.02, veto_threshold + 0.02, "veto threshold (Roy 1990)", fontsize=7.8, color=DANGER, va="bottom")
+
+    for cand in (candidate_a, candidate_b):
+        ax.scatter(
+            [cand["separation"]],
+            [cand["trust"]],
+            s=180,
+            color=cand["color"],
+            edgecolor="white",
+            linewidth=1.3,
+            zorder=3,
+        )
+        ax.annotate(
+            cand["label"],
+            xy=(cand["separation"], cand["trust"]),
+            xytext=(cand["separation"] - 0.02, cand["trust"] + 0.06),
+            fontsize=9.5,
+            color=cand["color"],
+            fontweight="bold",
+            ha="right",
+        )
+
+    ax.set_xlabel("Separation ensemble", fontsize=9.5, color=TEXT_MUTED)
+    ax.set_ylabel("Trust factor", fontsize=9.5, color=TEXT_MUTED)
+    ax.set_xlim(0, 1.08)
+    ax.set_ylim(0, 1.08)
+    for spine in ("top", "right"):
+        ax.spines[spine].set_visible(False)
+
+    ax = axes[1]
+    ax.set_title("Resulting composite score", fontsize=11.5, color=PRIMARY, fontweight="bold")
+    rules = ["Additive\naverage", "Multiplicative\ngate (this book)"]
+    scores_a = [
+        (candidate_a["separation"] + candidate_a["trust"]) / 2,
+        candidate_a["separation"] * candidate_a["trust"],
+    ]
+    scores_b = [
+        (candidate_b["separation"] + candidate_b["trust"]) / 2,
+        candidate_b["separation"] * candidate_b["trust"],
+    ]
+    x = np.arange(len(rules))
+    width = 0.32
+    ax.bar(x - width / 2, scores_a, width, color=candidate_a["color"], label=candidate_a["label"])
+    ax.bar(x + width / 2, scores_b, width, color=candidate_b["color"], label=candidate_b["label"])
+    for xi, (sa, sb) in enumerate(zip(scores_a, scores_b, strict=True)):
+        ax.text(xi - width / 2, sa + 0.02, f"{sa:.2f}", ha="center", fontsize=8.5, color=candidate_a["color"])
+        ax.text(xi + width / 2, sb + 0.02, f"{sb:.2f}", ha="center", fontsize=8.5, color=candidate_b["color"])
+    ax.set_xticks(x)
+    ax.set_xticklabels(rules, fontsize=9.5)
+    ax.set_ylim(0, 0.75)
+    ax.set_ylabel("Composite score", fontsize=9.5, color=TEXT_MUTED)
+    ax.legend(loc="upper left", fontsize=8.5, frameon=False)
+    for spine in ("top", "right"):
+        ax.spines[spine].set_visible(False)
+
+    fig.tight_layout()
+    plt.close(fig)
+    return fig
+
+
+def staged_search_pipeline_diagram() -> plt.Figure:
+    """Draw the cheap-search, expensive-audit funnel this chapter's Optuna study follows.
+
+    A single-column funnel, not two contrasting panels: 400 trials
+    evaluated on three cheap, live objectives (silhouette, balance-entropy,
+    a single-split stability proxy) narrow, by Pareto dominance alone, to
+    a much smaller genuinely non-dominated front. `composite_trustworthy_
+    score` then shortlists the front's own top candidates, and only that
+    shortlist receives the expensive, well-powered audit (many-split
+    prediction strength, hundred-bootstrap cluster stability). Every
+    narrowing step is real: nothing downstream re-opens a question an
+    earlier, cheaper step already answered.
+
+    Returns:
+        The matplotlib Figure, ready to display in a notebook cell.
+    """
+    stages = [
+        ("400 trials\n3 cheap live objectives", INFO, 3.4),
+        ("~20 on the Pareto front\n(dominance alone)", INFO, 2.6),
+        ("Top 5 by composite score\n(cheap trust factor)", WARNING, 1.9),
+        ("Full resampling audit\n(expensive trust factor)", WARNING, 1.9),
+        ("1 settled recipe", SUCCESS, 1.4),
+    ]
+
+    fig, ax = plt.subplots(figsize=(5.6, 8.4))
+    box_h = 1.0
+    gap = 0.55
+    top = 8.6
+    for i, (label, color, width) in enumerate(stages):
+        box_top = top - i * (box_h + gap)
+        box_bottom = box_top - box_h
+        _flow_box(ax, (-width / 2, box_bottom), width, box_h, label, color=color)
+        if i < len(stages) - 1:
+            _flow_arrow(ax, (0, box_bottom), (0, box_bottom - gap), color=TEXT_MUTED)
+
+    ax.set_xlim(-2.2, 2.2)
+    ax.set_ylim(top - len(stages) * (box_h + gap) - 0.2, top + 0.2)
+    ax.set_aspect("equal")
+    ax.axis("off")
+
+    fig.tight_layout()
+    plt.close(fig)
+    return fig

@@ -1,5 +1,5 @@
 ---
-title: "Chapter 2: Customer and Feeder Clustering"
+title: "Chapter 3: Customer and Feeder Clustering"
 bibliography: ../../references.bib
 ---
 
@@ -111,7 +111,7 @@ a one-off late night. Averaging a real customer's own readings across a
 season smooths that out while staying specific to that customer, not a
 population average.
 
-{{< embed 02-customer-feeder-clustering-code.ipynb#5e9c50df >}}
+{{< embed 03-customer-feeder-clustering-code.ipynb#5e9c50df >}}
 
 ## A baseline worth checking, not assuming
 
@@ -122,16 +122,16 @@ index, the same combination McLoughlin et al. and Rajabi et al. recommend
 checking together, since no single index reliably picks the right k alone
 [@mcloughlin2015clustering; @rajabi2020comparative].
 
-{{< embed 02-customer-feeder-clustering-code.ipynb#c55f2ee6 >}}
+{{< embed 03-customer-feeder-clustering-code.ipynb#c55f2ee6 >}}
 
-{{< embed 02-customer-feeder-clustering-code.ipynb#c316f933 >}}
+{{< embed 03-customer-feeder-clustering-code.ipynb#c316f933 >}}
 
 The small-multiples view above puts each index on its own scale. Normalizing
 all three to a common 0-1 range and overlaying them makes the same trends
 easier to compare directly: does the elbow in inertia line up with the
 silhouette peak, or point somewhere else entirely.
 
-{{< embed 02-customer-feeder-clustering-code.ipynb#bcee7ce9 >}}
+{{< embed 03-customer-feeder-clustering-code.ipynb#bcee7ce9 >}}
 
 The data show no clear elbow, and the silhouette coefficient peaks at
 k=2 (0.227) then decays smoothly. Real residential behavior does not
@@ -142,9 +142,9 @@ statistical cleanliness for archetypes specific enough to tell a real
 story with, a defensible, common choice in applied clustering work, made
 transparently rather than silently.
 
-{{< embed 02-customer-feeder-clustering-code.ipynb#6405cdb4 >}}
+{{< embed 03-customer-feeder-clustering-code.ipynb#6405cdb4 >}}
 
-{{< embed 02-customer-feeder-clustering-code.ipynb#9459cd85 >}}
+{{< embed 03-customer-feeder-clustering-code.ipynb#9459cd85 >}}
 
 Five visually distinct rhythms: a sharp early-evening peaker, a gradual
 afternoon-into-evening riser, a late-evening peaker with a small morning
@@ -172,9 +172,9 @@ under. Any customer, old or new, then gets a prediction *set*, not a
 single label: every archetype whose centroid sits within that same
 threshold.
 
-{{< embed 02-customer-feeder-clustering-code.ipynb#69204201 >}}
+{{< embed 03-customer-feeder-clustering-code.ipynb#69204201 >}}
 
-{{< embed 02-customer-feeder-clustering-code.ipynb#ff2c58e3 >}}
+{{< embed 03-customer-feeder-clustering-code.ipynb#ff2c58e3 >}}
 
 Calibrated on 103 held-back customers, the threshold sits at 1.158. Only
 90 of 342 customers (26%) get an unambiguous, single-archetype set. Most
@@ -184,7 +184,7 @@ from its centroid than 90% of the held-back customers ever did, real
 households whose behavior does not confidently match any of the five
 archetypes.
 
-{{< embed 02-customer-feeder-clustering-code.ipynb#01fefd41 >}}
+{{< embed 03-customer-feeder-clustering-code.ipynb#01fefd41 >}}
 
 ::: {.ark-concept}
 <span class="ark-concept-title"><i class="bi bi-info-circle-fill"></i> Key Concept</span>
@@ -211,9 +211,9 @@ Mallipeddi apply the same idea to load-pattern segmentation directly,
 confirming that lineage is still active [@kumar2024deepclustering].
 Worth testing on this exact data before assuming it helps.
 
-{{< embed 02-customer-feeder-clustering-code.ipynb#f836f90b >}}
+{{< embed 03-customer-feeder-clustering-code.ipynb#f836f90b >}}
 
-{{< embed 02-customer-feeder-clustering-code.ipynb#78a91d7d >}}
+{{< embed 03-customer-feeder-clustering-code.ipynb#78a91d7d >}}
 
 ::: {.ark-mistake}
 <span class="ark-mistake-title"><i class="bi bi-bug-fill"></i> Common Mistake</span>
@@ -252,7 +252,7 @@ from each quarter's own data. If a customer's archetype is a stable
 trait, the quarter-to-quarter clusterings should agree closely. If
 archetypes actually drift over the year, they should not.
 
-{{< embed 02-customer-feeder-clustering-code.ipynb#458153e0 >}}
+{{< embed 03-customer-feeder-clustering-code.ipynb#458153e0 >}}
 
 Every quarter clusters about as cleanly as the season used above, so
 whatever comes next is not an artifact of picking an unusually messy
@@ -260,14 +260,14 @@ period. The real test is whether the same customer lands in a matching
 archetype across quarters, not just whether each quarter clusters
 cleanly on its own.
 
-{{< embed 02-customer-feeder-clustering-code.ipynb#71cb776b >}}
+{{< embed 03-customer-feeder-clustering-code.ipynb#71cb776b >}}
 
 The six pairwise {{< acr ARI >}} scores are a summary. The transition
 matrix below shows exactly where the disagreement comes from: which
 archetype each customer moves to between the first and the last quarter
 of the year.
 
-{{< embed 02-customer-feeder-clustering-code.ipynb#7eef3a8e >}}
+{{< embed 03-customer-feeder-clustering-code.ipynb#7eef3a8e >}}
 
 The {{< acr ARI >}} scores are low, between 0.06 and 0.34. The heatmap
 shows why: there is no strong diagonal. If archetypes were a fixed trait,
@@ -278,9 +278,9 @@ Before treating this as real drift, one thing is worth checking first:
 how much do the labels move around on their own, just from re-running
 k-means on the *same* quarter with a different random seed?
 
-{{< embed 02-customer-feeder-clustering-code.ipynb#e222a411 >}}
+{{< embed 03-customer-feeder-clustering-code.ipynb#e222a411 >}}
 
-{{< embed 02-customer-feeder-clustering-code.ipynb#f230cc27 >}}
+{{< embed 03-customer-feeder-clustering-code.ipynb#f230cc27 >}}
 
 ::: {.ark-concept}
 <span class="ark-concept-title"><i class="bi bi-info-circle-fill"></i> Key Concept</span>
@@ -341,9 +341,9 @@ the feeder's own peak-loading instant.
 Both scenarios use exactly the same seed and the same sampling call as
 Part 4 Chapter 2's own study, so they draw the same 31 real customers.
 
-{{< embed 02-customer-feeder-clustering-code.ipynb#8f5ed348 >}}
+{{< embed 03-customer-feeder-clustering-code.ipynb#8f5ed348 >}}
 
-{{< embed 02-customer-feeder-clustering-code.ipynb#ff56b6fd >}}
+{{< embed 03-customer-feeder-clustering-code.ipynb#ff56b6fd >}}
 
 Archetype 3 carries the highest mean voltage risk (1.1019 per-unit) but
 ranks only fourth of five on mean thermal contribution (8.38 kW).
@@ -377,7 +377,7 @@ inject it onto a known set of real households, and check whether
 unsupervised clustering rediscovers that group on its own, with no label
 telling it where to look.
 
-{{< embed 02-customer-feeder-clustering-code.ipynb#9182a404 >}}
+{{< embed 03-customer-feeder-clustering-code.ipynb#9182a404 >}}
 
 Add the real {{< acr EV >}} charging shape directly onto each adopter's
 own real kW draw, before normalizing, then re-cluster everyone. Two
@@ -385,16 +385,16 @@ versions: k=5, the same number of archetypes used throughout this
 chapter, and k=6, one extra slot in case the adopters form a genuinely
 new shape rather than just relabeling an existing one.
 
-{{< embed 02-customer-feeder-clustering-code.ipynb#8a4d3a19 >}}
+{{< embed 03-customer-feeder-clustering-code.ipynb#8a4d3a19 >}}
 
-{{< embed 02-customer-feeder-clustering-code.ipynb#adcbd769 >}}
+{{< embed 03-customer-feeder-clustering-code.ipynb#adcbd769 >}}
 
 The bar chart shows *where* the adopters landed. It does not show *what*
 that cluster's shape actually looks like, or whether it resembles a real
 {{< acr EV >}} charging bump rather than an existing archetype's own
 evening peak.
 
-{{< embed 02-customer-feeder-clustering-code.ipynb#636de7d1 >}}
+{{< embed 03-customer-feeder-clustering-code.ipynb#636de7d1 >}}
 
 ::: {.ark-concept}
 <span class="ark-concept-title"><i class="bi bi-info-circle-fill"></i> Key Concept</span>
@@ -428,9 +428,9 @@ They need to know this before considering the stability question. Chapter
 are needed for phase identification. This applies the same approach
 here.
 
-{{< embed 02-customer-feeder-clustering-code.ipynb#f2c0a5d3 >}}
+{{< embed 03-customer-feeder-clustering-code.ipynb#f2c0a5d3 >}}
 
-{{< embed 02-customer-feeder-clustering-code.ipynb#b7dbf2ef >}}
+{{< embed 03-customer-feeder-clustering-code.ipynb#b7dbf2ef >}}
 
 A single day of data hardly matches the season-long baseline. The
 {{< acr ARI >}} for one day is 0.02, which is almost random. Even after a
@@ -462,27 +462,27 @@ where $I(U,V)$ is the mutual information between the two partitions and $H(\cdot
 
 ![What ARI and NMI actually measure: agreement between two real partitions of the same objects, corrected for chance, not just matching group counts. A point whose true category and discovered cluster disagree is marked with an outline.](../../assets/ground-truth-vs-discovered-clusters.svg){#fig-ground-truth-vs-discovered-clusters}
 
-{{< embed 02-customer-feeder-clustering-code.ipynb#459405ad >}}
+{{< embed 03-customer-feeder-clustering-code.ipynb#459405ad >}}
 
-{{< embed 02-customer-feeder-clustering-code.ipynb#510b288c >}}
+{{< embed 03-customer-feeder-clustering-code.ipynb#510b288c >}}
 
 Every real ARI is close to 0, and every real NMI stays well short of 1, at every k tried, including k=19, matching the true number of subtypes exactly. Shape-based clustering, the same method that gave AusNet's own five archetypes real, checkable value earlier in this chapter, does not recover NREL's real building-type labels here. This is not the same question as before: AusNet's 342 customers are homes and homes only, so real archetypes there reflect genuine behavioral diversity within one functional category. NREL's 760 buildings span single-family homes, hospitals, warehouses, and schools at once, categories that plausibly differ in more than daily shape alone, and shape-based clustering alone is not enough to cleanly separate them.
 
-{{< embed 02-customer-feeder-clustering-code.ipynb#f76c2134 >}}
+{{< embed 03-customer-feeder-clustering-code.ipynb#f76c2134 >}}
 
 The clusters are not a random shuffle either: one cluster comes out almost entirely commercial, another skews residential, a real, partial structure the low ARI/NMI scores do not fully credit on their own, since those indices score agreement with the full 19-way (or 5-way) label, not the coarser residential/commercial split. The honest reading holds either way: shape alone captures some real structure in a population this diverse, a known building type, occupancy schedule, or floor area would plausibly sharpen it further, and this chapter's own AusNet archetypes should be read as *behavioral* archetypes within one real customer category, not a general-purpose recipe for discovering functional building categories from shape alone.
 
 A table of ARI and NMI numbers states that finding; it does not let a reader see it. Projecting the same 48-dimensional shape embedding this chapter has used throughout down to its first two principal components, the same reduction this book's own `ark.plot.clustering.cluster_scatter` already applies everywhere else a shape embedding needs a 2D picture, turns the abstract "does not recover" verdict into something checkable by eye.
 
-{{< embed 02-customer-feeder-clustering-code.ipynb#fe2210aa >}}
+{{< embed 03-customer-feeder-clustering-code.ipynb#fe2210aa >}}
 
-{{< embed 02-customer-feeder-clustering-code.ipynb#8c55a16e >}}
+{{< embed 03-customer-feeder-clustering-code.ipynb#8c55a16e >}}
 
 Side by side, the two panels show exactly what the ARI/NMI numbers already reported: the five discovered clusters cut across this projection in bands that only loosely track the real residential/commercial boundary. Some discovered clusters sit almost entirely on one side of that boundary, echoing the composition table above; others straddle it, buildings whose daily shape looks similar enough to land in the same cluster despite belonging to genuinely different real categories. No amount of staring at this projection would let a reader guess the true label perfectly from the discovered one, the same limit the ARI of roughly 0.06 to 0.09 already quantified.
 
 The cluster means themselves are the more concrete artifact a {{< acr DSO >}} would actually use, the same member-profiles-and-mean chart this chapter has shown for AusNet's own archetypes throughout, now run on NREL's real, more diverse population.
 
-{{< embed 02-customer-feeder-clustering-code.ipynb#47b34867 >}}
+{{< embed 03-customer-feeder-clustering-code.ipynb#47b34867 >}}
 
 These five discovered shapes read as genuinely distinct real behaviors, and the composition table above lines up with them directly. Cluster 1, 97% commercial, shows a sharp, tall midday peak, roughly 10:00 to 14:00, the shape of a business open standard daytime hours. Cluster 4, 92% commercial, peaks narrower still, later in the afternoon. Cluster 0, three-quarters commercial, stays relatively flat and elevated across the entire day, plausible for a round-the-clock operation rather than a nine-to-five one. Cluster 2, the most residential-leaning group at 73%, is the clear outlier of the five: a broader, gentler rise into the afternoon and evening, closer to a home's own daily rhythm than any of the sharp commercial peaks. Cluster 3, the most genuinely mixed group, 40% residential, reads as a broad, low-contrast plateau, no single real behavior dominating clearly, exactly what a 60/40 mix of two different populations sharing one cluster should look like. That is a genuinely useful, real finding on its own: shape-based clustering is not producing noise, it recovers real, interpretable behavioral groups, largely tracking the coarse residential/commercial split even where it does not track the full 19-way label. What it does not reliably do, and what the ARI/NMI numbers above already quantified, is line those groups up with NREL's own independently assigned building-type labels one-to-one. A cluster that looks "sharp midday peak" plausibly contains a real mix of offices, retail spaces, and schools that all happen to draw power on the same daytime schedule for different underlying reasons, a distinction daily shape alone cannot resolve, whatever a known building type, occupancy schedule, or floor area might resolve instead.
 
@@ -522,7 +522,7 @@ represents a much larger part of that feeder's customer base than the
 sample size alone suggests: samples drawn for other feeders often include
 patterns this feeder's own customers also happen to use.
 
-{{< embed 02-customer-feeder-clustering-code.ipynb#4f34063a >}}
+{{< embed 03-customer-feeder-clustering-code.ipynb#4f34063a >}}
 
 Coverage varies. Some feeders have thin coverage, only a handful of real
 customers whose sampled shape happened to match, worth keeping in mind:
@@ -531,9 +531,9 @@ with hundreds of matched customers (median 767, ranging 1 to 2,580), the
 same "how many meters do you need" caution Part 4 Chapter 3's own sensitivity
 section raised for customer-level phase identification.
 
-{{< embed 02-customer-feeder-clustering-code.ipynb#68718f7c >}}
+{{< embed 03-customer-feeder-clustering-code.ipynb#68718f7c >}}
 
-{{< embed 02-customer-feeder-clustering-code.ipynb#7def7104 >}}
+{{< embed 03-customer-feeder-clustering-code.ipynb#7def7104 >}}
 
 Clustering at the feeder level gives much clearer separation than at the
 customer level: a silhouette score of 0.67 at k=2, against 0.23 for
@@ -543,7 +543,7 @@ the customer level in the first place. Unlike the customer-level case,
 k=2 actually is the validity-index optimum here, not a compromise past
 it.
 
-{{< embed 02-customer-feeder-clustering-code.ipynb#895b3642 >}}
+{{< embed 03-customer-feeder-clustering-code.ipynb#895b3642 >}}
 
 Two distinct feeder archetypes emerge. The first shows a sharp evening
 peak and much lower daytime demand, consistent with a residential-heavy

@@ -44,7 +44,7 @@ jobs:
           # book/03-disaggregation/04-multi-task-low-frequency-code.ipynb
           # loads real UK-DALE data from resources/nilm-code/UNETNiLM, same
           # reason.
-          # book/05-clustering/02-customer-feeder-clustering-code.ipynb's
+          # book/05-clustering/03-customer-feeder-clustering-code.ipynb's
           # feeder-level section loads resources/smart-ds/AUS_P1U, fetched
           # locally via scripts/fetch_part4_smartds_data.py (~340MB across
           # 500+ individual S3 requests), gitignored and too slow/fragile
@@ -93,7 +93,7 @@ jobs:
           # (confirmed directly: both stream imp-post.tzst identically to
           # the base GoiEner replica above), missing from the SKIP_LIST when
           # first merged.
-          SKIP_LIST="book/03-disaggregation/02-feature-engineering-code.ipynb book/03-disaggregation/03-multi-appliance-recognition-code.ipynb book/03-disaggregation/04-multi-task-low-frequency-code.ipynb book/05-clustering/02-customer-feeder-clustering-code.ipynb book/06-ranking-recommendation/01-ranking-recommendation-code.ipynb book/07-anomaly-detection/01-anomaly-detection-code.ipynb book/08-forecasting/04-foundation-models-code.ipynb book/05-clustering/04-customer-feeder-clustering-london-code.ipynb book/05-clustering/04-customer-feeder-clustering-goiener-code.ipynb book/05-clustering/04-customer-feeder-clustering-goiener-tucker-code.ipynb book/05-clustering/04-customer-feeder-clustering-goiener-chronos-embed-code.ipynb book/05-clustering/04-customer-feeder-clustering-goiener-diffusion-code.ipynb book/05-clustering/04-customer-feeder-clustering-goiener-multires-code.ipynb book/05-clustering/04-customer-feeder-clustering-goiener-crocs-code.ipynb"
+          SKIP_LIST="book/03-disaggregation/02-feature-engineering-code.ipynb book/03-disaggregation/03-multi-appliance-recognition-code.ipynb book/03-disaggregation/04-multi-task-low-frequency-code.ipynb book/05-clustering/03-customer-feeder-clustering-code.ipynb book/06-ranking-recommendation/01-ranking-recommendation-code.ipynb book/07-anomaly-detection/01-anomaly-detection-code.ipynb book/08-forecasting/04-foundation-models-code.ipynb book/05-clustering/04-customer-feeder-clustering-london-code.ipynb book/05-clustering/04-customer-feeder-clustering-goiener-code.ipynb book/05-clustering/04-customer-feeder-clustering-goiener-tucker-code.ipynb book/05-clustering/04-customer-feeder-clustering-goiener-chronos-embed-code.ipynb book/05-clustering/04-customer-feeder-clustering-goiener-diffusion-code.ipynb book/05-clustering/04-customer-feeder-clustering-goiener-multires-code.ipynb book/05-clustering/04-customer-feeder-clustering-goiener-crocs-code.ipynb"
 
           # Helper: find all notebooks, excluding archived ones
           find_notebooks() {
