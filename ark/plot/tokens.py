@@ -119,3 +119,23 @@ DIVERGING_PURPLE_ORANGE = [
     "#FB923C",
     WARNING,
 ]
+
+CATEGORICAL_PALETTE = [
+    "#0369A1",  # INFO - Strong blue (best starter)
+    "#EA580C",  # WARNING - Vibrant orange (excellent contrast)
+    "#059669",  # SUCCESS - Rich teal-green
+    "#8B5CF6",  # AI_ACCENT - Purple (great distinction)
+    "#DC2626",  # DANGER - Red (careful, used in 4th position)
+    "#10B981",  # ENERGY_ACCENT - Bright emerald
+    "#DB2777",  # ROSE - Deep pink/magenta
+    "#CA8A04",  # YELLOW - Warm amber (avoid using too early)
+    "#1E40AF",  # Deeper blue variant
+    "#7C3AED",  # Stronger violet
+    "#F97316",  # Bright orange alternative
+    "#14B8A6",  # Teal
+    "#EC4899",  # Hot pink
+    "#84CC16",  # Lime green
+    "#6366F1",  # Indigo
+]
+
+SHAPE_PALETTE = [16, 17, 15, 18, 8, 5, 14, 9, 3, 4, 2, 6, 7, 11, 0, 13]

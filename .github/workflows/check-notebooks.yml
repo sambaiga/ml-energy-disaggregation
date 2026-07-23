@@ -44,17 +44,17 @@ jobs:
           # book/03-disaggregation/04-multi-task-low-frequency-code.ipynb
           # loads real UK-DALE data from resources/nilm-code/UNETNiLM, same
           # reason.
-          # book/04-grid-edge/04-customer-feeder-clustering-code.ipynb's
+          # book/05-clustering/03-customer-feeder-clustering-code.ipynb's
           # feeder-level section loads resources/smart-ds/AUS_P1U, fetched
           # locally via scripts/fetch_part4_smartds_data.py (~340MB across
           # 500+ individual S3 requests), gitignored and too slow/fragile
           # to fetch fresh on every CI run.
-          # book/04-grid-edge/05-ranking-recommendation-code.ipynb and
-          # book/04-grid-edge/06-anomaly-detection-code.ipynb both solve
+          # book/06-ranking-recommendation/01-ranking-recommendation-code.ipynb and
+          # book/07-anomaly-detection/01-anomaly-detection-code.ipynb both solve
           # a live OpenDSS power flow across the UK network's 414 real
           # feeders (18,997 loads), several minutes each, too slow to
           # re-run on every CI trigger alongside every other notebook.
-          # book/05-forecasting/04-foundation-models-code.ipynb runs real
+          # book/08-forecasting/04-foundation-models-code.ipynb runs real
           # zero-shot inference with Chronos-2 and TimesFM against all 342
           # AusNet customers plus 200 NREL buildings; confirmed to take
           # about 14 minutes end to end on a local Apple Silicon machine
@@ -65,29 +65,46 @@ jobs:
           # {{< embed >}} reads them directly without re-executing the
           # notebook, so the rendered book is unaffected; only this
           # from-scratch CI re-execution can't run them.
-          # book/04-grid-edge/04-customer-feeder-clustering-london-code.ipynb
+          # book/05-clustering/04-customer-feeder-clustering-london-code.ipynb
           # is exploratory only, not wired into any chapter: it loads
           # resources/london-lcl/data/Partitioned LCL Data.zip, fetched
           # locally via scripts/fetch_london_lcl_data.py (~760MB), gitignored
           # and not fetched in CI.
-          # book/04-grid-edge/04-customer-feeder-clustering-goiener-code.ipynb
+          # book/05-clustering/04-customer-feeder-clustering-goiener-code.ipynb
           # is the same exploratory replica against GoiEner: needs
           # resources/goiener/data/imp-post.tzst, fetched locally via
           # scripts/fetch_goiener_data.py, gitignored, plus the zstandard
           # package (not a project dependency, GoiEner is still only under
           # evaluation), neither available in CI.
-          # book/04-grid-edge/04-customer-feeder-clustering-goiener-tucker-code.ipynb
+          # book/05-clustering/04-customer-feeder-clustering-goiener-tucker-code.ipynb
           # needs the same gitignored GoiEner archive plus zstandard and
           # tensorly (neither a project dependency).
-          # book/04-grid-edge/04-customer-feeder-clustering-goiener-chronos-embed-code.ipynb
+          # book/05-clustering/04-customer-feeder-clustering-goiener-chronos-embed-code.ipynb
           # needs the same gitignored GoiEner archive plus zstandard, and
           # downloads/runs the real Chronos-2 foundation model (already
           # skip-listed elsewhere for the same real inference-cost reason
-          # as book/05-forecasting/04-foundation-models-code.ipynb).
-          # book/04-grid-edge/04-customer-feeder-clustering-goiener-diffusion-code.ipynb
+          # as book/08-forecasting/04-foundation-models-code.ipynb).
+          # book/05-clustering/04-customer-feeder-clustering-goiener-diffusion-code.ipynb
           # rebuilds both embeddings above, so needs the same gitignored
           # archive, zstandard, tensorly, and Chronos-2 dependencies.
-          SKIP_LIST="book/03-disaggregation/02-feature-engineering-code.ipynb book/03-disaggregation/03-multi-appliance-recognition-code.ipynb book/03-disaggregation/04-multi-task-low-frequency-code.ipynb book/04-grid-edge/04-customer-feeder-clustering-code.ipynb book/04-grid-edge/05-ranking-recommendation-code.ipynb book/04-grid-edge/06-anomaly-detection-code.ipynb book/05-forecasting/04-foundation-models-code.ipynb book/04-grid-edge/04-customer-feeder-clustering-london-code.ipynb book/04-grid-edge/04-customer-feeder-clustering-goiener-code.ipynb book/04-grid-edge/04-customer-feeder-clustering-goiener-tucker-code.ipynb book/04-grid-edge/04-customer-feeder-clustering-goiener-chronos-embed-code.ipynb book/04-grid-edge/04-customer-feeder-clustering-goiener-diffusion-code.ipynb"
+          # book/05-clustering/04-customer-feeder-clustering-goiener-multires-code.ipynb
+          # and book/05-clustering/04-customer-feeder-clustering-goiener-crocs-code.ipynb
+          # both need the same gitignored GoiEner archive plus zstandard
+          # (confirmed directly: both stream imp-post.tzst identically to
+          # the base GoiEner replica above), missing from the SKIP_LIST when
+          # first merged.
+          # book/05-clustering/london-cluster.ipynb runs a 400-trial NSGA-II
+          # (Optuna) multi-objective search over feature set, scaler, reducer,
+          # and clusterer as a single cell; confirmed to take about 53 minutes
+          # on a local Apple Silicon machine. Locally this is a one-time cost,
+          # since Optuna persists the study to resources/.optuna_cache/ and
+          # every rerun after the first loads it instead of re-searching, but
+          # that cache directory is gitignored (resources/*), so a from-scratch
+          # CI run has no study to load and reruns the full search, exceeding
+          # this job's own per-cell nbmake timeout the same way the foundation-
+          # models notebook above exceeds the job timeout. The notebook's own
+          # outputs are committed and {{< embed >}} reads them directly.
+          SKIP_LIST="book/03-disaggregation/02-feature-engineering-code.ipynb book/03-disaggregation/03-multi-appliance-recognition-code.ipynb book/03-disaggregation/04-multi-task-low-frequency-code.ipynb book/05-clustering/03-customer-feeder-clustering-code.ipynb book/06-ranking-recommendation/01-ranking-recommendation-code.ipynb book/07-anomaly-detection/01-anomaly-detection-code.ipynb book/08-forecasting/04-foundation-models-code.ipynb book/05-clustering/04-customer-feeder-clustering-london-code.ipynb book/05-clustering/04-customer-feeder-clustering-goiener-code.ipynb book/05-clustering/04-customer-feeder-clustering-goiener-tucker-code.ipynb book/05-clustering/04-customer-feeder-clustering-goiener-chronos-embed-code.ipynb book/05-clustering/04-customer-feeder-clustering-goiener-diffusion-code.ipynb book/05-clustering/04-customer-feeder-clustering-goiener-multires-code.ipynb book/05-clustering/04-customer-feeder-clustering-goiener-crocs-code.ipynb book/05-clustering/london-cluster.ipynb"
 
           # Helper: find all notebooks, excluding archived ones
           find_notebooks() {

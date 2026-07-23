@@ -29,6 +29,14 @@ repos:
       - id: check-yaml
       - id: check-added-large-files
         args: [--maxkb=1200]
+        # These two exceed the limit on legitimate real notebook output (many
+        # cells, real lets-plot visualizations across a large grid search),
+        # the same reason book/03-disaggregation/02-feature-engineering-code.ipynb
+        # and book/08-forecasting/01-forecastability-code.ipynb already exceed
+        # it too; those two just never triggered this check because git sees
+        # their growth as a modification to an already-tracked path, not a new
+        # "added" file, and this hook only inspects newly added paths.
+        exclude: ^book/05-clustering/(04-customer-feeder-clustering-goiener-code|london-cluster)\.ipynb$
       - id: check-docstring-first
       - id: check-shebang-scripts-are-executable
       - id: check-merge-conflict
@@ -53,6 +61,7 @@ repos:
     rev: v2.3.0
     hooks:
       - id: codespell
+        args: ["-L", "trough,teh"]
 
   - repo: local
     hooks:

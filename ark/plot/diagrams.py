@@ -2640,6 +2640,96 @@ def _dsse_feeder_panel(ax: plt.Axes, title: str, customer_measured: list[bool]) 
     ax.axis("off")
 
 
+def clustering_paradigm_landscape_diagram() -> plt.Figure:
+    """Draw where this chapter's five clustering methods sit relative to each other.
+
+    Two axes, neither one a strict contrast: the horizontal axis is how a
+    load curve gets represented before anything is clustered, a hand-
+    engineered shape feature on the left, a learned embedding on the
+    right; the vertical axis is the structure-discovery mechanism applied
+    to that representation, a flat partition at the bottom, a
+    hierarchical or two-stage grouping in the middle, a spectral or
+    manifold view at the top. Shape-KMeans, this book's own established
+    baseline, sits at the hand-engineered, partition corner. CROCS moves
+    up the mechanism axis without changing representation, a two-stage
+    grouping over the same kind of engineered daily-behavior features.
+    Tucker decomposition and Chronos-2 embeddings both move right, a
+    learned multi-way factorization and a learned foundation-model
+    embedding respectively, each still clustered by a flat partition.
+    Diffusion maps moves up instead, a nonlinear manifold view applied on
+    top of whichever representation feeds it. No method in this chapter
+    occupies more than one point in this space alone; the real question
+    later sections ask is whether different points in this space agree
+    on what counts as real structure.
+
+    Returns:
+        The matplotlib Figure, ready to display in a notebook cell.
+    """
+    methods = [
+        ("Shape k-means", 0.12, 0.14, PRIMARY),
+        ("CROCS\n(RLS + WSMD)", 0.24, 0.56, INFO),
+        ("Tucker\ndecomposition", 0.62, 0.20, SUCCESS),
+        ("Chronos-2\nembeddings", 0.90, 0.26, AI_ACCENT),
+        ("Diffusion maps", 0.66, 0.90, WARNING),
+    ]
+
+    fig, ax = plt.subplots(figsize=(7.4, 6.0))
+
+    ax.add_patch(FancyArrowPatch((0, 0), (1.05, 0), arrowstyle="-|>", mutation_scale=14, color=TEXT_MUTED, lw=1.2))
+    ax.add_patch(FancyArrowPatch((0, 0), (0, 1.05), arrowstyle="-|>", mutation_scale=14, color=TEXT_MUTED, lw=1.2))
+
+    ax.text(0.0, -0.08, "Hand-engineered\nfeature", fontsize=9, color=TEXT_MUTED, ha="left", va="top")
+    ax.text(1.05, -0.08, "Learned\nembedding", fontsize=9, color=TEXT_MUTED, ha="right", va="top")
+    ax.text(
+        -0.06,
+        0.0,
+        "Partition",
+        fontsize=9,
+        color=TEXT_MUTED,
+        ha="right",
+        va="bottom",
+        rotation=90,
+    )
+    ax.text(
+        -0.06,
+        1.05,
+        "Spectral / manifold",
+        fontsize=9,
+        color=TEXT_MUTED,
+        ha="right",
+        va="top",
+        rotation=90,
+    )
+    ax.text(
+        -0.06, 0.55, "Hierarchical /\ntwo-stage", fontsize=8.5, color=TEXT_MUTED, ha="right", va="center", rotation=90
+    )
+
+    for label, x, y, color in methods:
+        ax.add_patch(Circle((x, y), 0.028, facecolor=color, edgecolor="white", linewidth=1.2, zorder=3))
+        label_dy = 0.11 if y < 0.8 else -0.11
+        va = "bottom" if y < 0.8 else "top"
+        ax.annotate(
+            label,
+            xy=(x, y),
+            xytext=(x, y + label_dy),
+            fontsize=9,
+            color=color,
+            fontweight="bold",
+            ha="center",
+            va=va,
+        )
+
+    ax.set_title("Where this chapter's five methods sit", fontsize=12.5, color=PRIMARY, fontweight="bold", pad=14)
+    ax.set_xlim(-0.32, 1.18)
+    ax.set_ylim(-0.22, 1.28)
+    ax.set_aspect("equal")
+    ax.axis("off")
+
+    fig.tight_layout()
+    plt.close(fig)
+    return fig
+
+
 def pseudo_measurement_observability_diagram() -> plt.Figure:
     """Draw why smart-meter readings can turn an unobservable feeder into an observable one.
 
@@ -2660,5 +2750,633 @@ def pseudo_measurement_observability_diagram() -> plt.Figure:
     _dsse_feeder_panel(axes[1], "Smart-meter pseudo-measurements", [True, True, True, True, True])
 
     fig.tight_layout()
+    plt.close(fig)
+    return fig
+
+
+def clustering_objective_families_diagram() -> plt.Figure:
+    """Draw what each of the four clustering objective families actually sees.
+
+    Four small panels, the same kind of question, four different answers.
+    Partition: k-means finds three round blobs by distance to a centroid,
+    marked with a star, and cannot represent a shape a centroid does not
+    describe well. Hierarchical: the same points merge pairwise into a
+    tree, a dendrogram, read at whatever height gives the number of
+    groups wanted, not fixed in advance. Density-connectivity: DBSCAN
+    finds two interleaved crescents no centroid could separate, plus a
+    few real noise points it refuses to force into either one. Spectral:
+    a similarity graph gets cut into two groups by removing the fewest,
+    lightest edges, a global graph property no local distance rule sees.
+
+    Returns:
+        The matplotlib Figure, ready to display in a notebook cell.
+    """
+    rng = np.random.default_rng(3)
+    fig, axes = plt.subplots(2, 2, figsize=(8.4, 7.2))
+
+    # Partition: three round blobs, centroid marked
+    ax = axes[0, 0]
+    centers = [(-1.1, 0.7), (1.1, 0.6), (0.0, -1.1)]
+    colors = [PRIMARY, INFO, SUCCESS]
+    for (cx, cy), color in zip(centers, colors, strict=True):
+        pts = rng.normal(loc=(cx, cy), scale=0.24, size=(22, 2))
+        ax.scatter(pts[:, 0], pts[:, 1], s=18, color=color, alpha=0.75, edgecolor="none")
+        ax.scatter([cx], [cy], marker="*", s=180, color=color, edgecolor="white", linewidth=0.8, zorder=5)
+    ax.set_title("Partition (k-means)", fontsize=10.5, color=PRIMARY, fontweight="bold")
+
+    # Hierarchical: a small dendrogram
+    ax = axes[0, 1]
+    leaf_x = [0, 1, 2, 3, 4]
+    leaf_y = 0.0
+    for x in leaf_x:
+        ax.plot([x, x], [leaf_y, 0.35], color=TEXT_MUTED, linewidth=1.3)
+    merges = [((0, 1), 0.35, 0.6), ((3, 4), 0.35, 0.75), ((0.5, 2), 0.6, 1.15), ((1.25, 3.5), 1.15, 1.6)]
+    for (a, b), y0, y1 in merges:
+        ax.plot([a, a], [y0, y1], color=WARNING, linewidth=1.6)
+        ax.plot([b, b], [y0, y1], color=WARNING, linewidth=1.6)
+        ax.plot([a, b], [y1, y1], color=WARNING, linewidth=1.6)
+    ax.axhline(0.9, color=TEXT_MUTED, linestyle="--", linewidth=1.0)
+    ax.text(4.15, 1.0, "cut height", fontsize=7.5, color=TEXT_MUTED, va="bottom")
+    ax.set_xlim(-0.5, 5.3)
+    ax.set_ylim(-0.1, 1.85)
+    ax.set_title("Hierarchical (linkage)", fontsize=10.5, color=PRIMARY, fontweight="bold")
+
+    # Density-connectivity: two interleaved crescents plus noise
+    ax = axes[1, 0]
+    theta1 = rng.uniform(0.1, np.pi - 0.1, 60)
+    moon1 = np.column_stack([np.cos(theta1), np.sin(theta1)]) + rng.normal(scale=0.04, size=(60, 2))
+    theta2 = rng.uniform(0.1, np.pi - 0.1, 60)
+    moon2 = np.column_stack([1 - np.cos(theta2), 1 - np.sin(theta2) - 0.5]) + rng.normal(scale=0.04, size=(60, 2))
+    noise = rng.uniform([-0.8, -1.0], [1.8, 1.3], size=(6, 2))
+    ax.scatter(moon1[:, 0], moon1[:, 1], s=14, color=PRIMARY, alpha=0.75, edgecolor="none")
+    ax.scatter(moon2[:, 0], moon2[:, 1], s=14, color=INFO, alpha=0.75, edgecolor="none")
+    ax.scatter(noise[:, 0], noise[:, 1], s=30, color=DANGER, linewidth=1.3, marker="x")
+    ax.set_title("Density-connectivity (DBSCAN)", fontsize=10.5, color=PRIMARY, fontweight="bold")
+
+    # Spectral: a small graph cut into two groups
+    ax = axes[1, 1]
+    left_nodes = [(-1.1, 0.5), (-1.4, -0.2), (-0.6, -0.5)]
+    right_nodes = [(0.9, 0.4), (1.3, -0.2), (0.7, -0.6)]
+    within_edges = [(0, 1), (1, 2), (0, 2)]
+    for a, b in within_edges:
+        ax.plot(*zip(left_nodes[a], left_nodes[b], strict=True), color=PRIMARY, linewidth=1.3, zorder=1)
+        ax.plot(*zip(right_nodes[a], right_nodes[b], strict=True), color=INFO, linewidth=1.3, zorder=1)
+    cut_edges = [(left_nodes[2], right_nodes[2]), (left_nodes[0], right_nodes[0])]
+    for p1, p2 in cut_edges:
+        ax.plot(*zip(p1, p2, strict=True), color=DANGER, linewidth=1.2, linestyle=":", zorder=1)
+    for x, y in left_nodes:
+        ax.add_patch(Circle((x, y), 0.09, facecolor=PRIMARY, edgecolor="white", linewidth=0.8, zorder=3))
+    for x, y in right_nodes:
+        ax.add_patch(Circle((x, y), 0.09, facecolor=INFO, edgecolor="white", linewidth=0.8, zorder=3))
+    ax.text(0, 0.95, "cut here", fontsize=7.5, color=DANGER, ha="center")
+    ax.set_title("Graph / spectral (Ncut)", fontsize=10.5, color=PRIMARY, fontweight="bold")
+
+    for ax in axes.flat:
+        ax.set_aspect("equal")
+        ax.axis("off")
+
+    fig.tight_layout()
+    plt.close(fig)
+    return fig
+
+
+def choosing_k_diagram() -> plt.Figure:
+    """Draw why an elbow curve and a silhouette curve do not read the same way.
+
+    Left: distortion (within-cluster distance) against K, decreasing
+    monotonically by construction, with a real elbow near K=3 that is
+    faint enough to miss entirely. Right: the silhouette score for the
+    same clustering runs, peaking sharply and unambiguously at the same
+    K=3, the more reliable of the two signals for exactly the reason the
+    left panel is easy to misread.
+
+    Returns:
+        The matplotlib Figure, ready to display in a notebook cell.
+    """
+    k = np.arange(2, 9)
+    distortion = 8.0 / k + 0.35 * np.log(k)
+    silhouette = np.array([0.42, 0.71, 0.55, 0.46, 0.41, 0.37, 0.33])
+
+    fig, axes = plt.subplots(1, 2, figsize=(9.0, 3.8))
+
+    ax = axes[0]
+    ax.plot(k, distortion, marker="o", color=PRIMARY, linewidth=1.8, markersize=5)
+    ax.axvline(3, color=TEXT_MUTED, linestyle="--", linewidth=1.0)
+    ax.annotate(
+        "elbow here,\neasy to miss",
+        xy=(3, distortion[1]),
+        xytext=(5.0, distortion[1] + 0.9),
+        fontsize=8.5,
+        color=WARNING,
+        arrowprops={"arrowstyle": "-", "color": WARNING, "linewidth": 0.9},
+    )
+    ax.set_xlabel("K", fontsize=9)
+    ax.set_ylabel("distortion", fontsize=9)
+    ax.set_title("Distortion vs K", fontsize=11, color=PRIMARY, fontweight="bold")
+
+    ax = axes[1]
+    ax.plot(k, silhouette, marker="o", color=SUCCESS, linewidth=1.8, markersize=5)
+    ax.axvline(3, color=TEXT_MUTED, linestyle="--", linewidth=1.0)
+    ax.annotate(
+        "clear, unambiguous\npeak",
+        xy=(3, silhouette[1]),
+        xytext=(5.2, silhouette[1] - 0.08),
+        fontsize=8.5,
+        color=SUCCESS,
+        arrowprops={"arrowstyle": "-", "color": SUCCESS, "linewidth": 0.9},
+    )
+    ax.set_xlabel("K", fontsize=9)
+    ax.set_ylabel("silhouette score", fontsize=9)
+    ax.set_title("Silhouette vs K", fontsize=11, color=PRIMARY, fontweight="bold")
+
+    for ax in axes:
+        ax.spines["top"].set_visible(False)
+        ax.spines["right"].set_visible(False)
+
+    fig.tight_layout()
+    plt.close(fig)
+    return fig
+
+
+def dtw_vs_euclidean_diagram() -> plt.Figure:
+    """Draw why a shifted-but-similar routine needs more than Euclidean distance.
+
+    Left: two evening-routine-shaped curves, one a few time steps later
+    than the other, compared point by point. The straight vertical
+    matching lines connect a peak on one curve to a trough on the other,
+    exactly the false mismatch Euclidean distance reports. Right: the
+    same two curves compared by dynamic time warping, whose matching
+    lines bend to align each real peak and trough regardless of the
+    time shift, reporting the low distance the shared shape deserves.
+
+    Returns:
+        The matplotlib Figure, ready to display in a notebook cell.
+    """
+    t = np.linspace(0, 10, 60)
+    curve_a = np.exp(-((t - 5.0) ** 2) / 3.0) + 0.15 * np.exp(-((t - 1.5) ** 2) / 1.0)
+    curve_b = np.exp(-((t - 6.2) ** 2) / 3.0) + 0.15 * np.exp(-((t - 2.7) ** 2) / 1.0)
+
+    fig, axes = plt.subplots(1, 2, figsize=(9.2, 4.0))
+
+    ax = axes[0]
+    ax.plot(t, curve_a, color=PRIMARY, linewidth=1.8, label="Customer A")
+    ax.plot(t, curve_b, color=INFO, linewidth=1.8, label="Customer B")
+    for i in range(0, 60, 6):
+        ax.plot([t[i], t[i]], [curve_a[i], curve_b[i]], color=DANGER, linewidth=0.8, alpha=0.8, zorder=1)
+    ax.set_title("Euclidean: point by point", fontsize=11, color=PRIMARY, fontweight="bold")
+    ax.legend(loc="upper left", fontsize=8, frameon=False)
+
+    ax = axes[1]
+    ax.plot(t, curve_a, color=PRIMARY, linewidth=1.8)
+    ax.plot(t, curve_b, color=INFO, linewidth=1.8)
+    shift_steps = 7
+    for i in range(0, 60, 6):
+        j = min(max(i + shift_steps, 0), 59)
+        ax.plot([t[i], t[j]], [curve_a[i], curve_b[j]], color=SUCCESS, linewidth=0.8, alpha=0.8, zorder=1)
+    ax.set_title("DTW: warped alignment", fontsize=11, color=PRIMARY, fontweight="bold")
+
+    for ax in axes:
+        ax.set_xlabel("time of day", fontsize=9)
+        ax.set_yticks([])
+        ax.spines["top"].set_visible(False)
+        ax.spines["right"].set_visible(False)
+        ax.spines["left"].set_visible(False)
+
+    fig.tight_layout()
+    plt.close(fig)
+    return fig
+
+
+def must_link_cannot_link_diagram() -> plt.Figure:
+    """Draw how background knowledge overrides a distance function alone.
+
+    A single population where distance alone would draw the cluster
+    boundary right through two customers known, from real network
+    topology, to share one physical feeder. A must-link constraint
+    forces them together regardless of their own distance; a
+    cannot-link constraint, drawn between two nearby points known to sit
+    on different feeders, forbids the opposite mistake.
+
+    Returns:
+        The matplotlib Figure, ready to display in a notebook cell.
+    """
+    rng = np.random.default_rng(11)
+    group_a = rng.normal(loc=(-0.5, 0.25), scale=0.3, size=(14, 2))
+    group_b = rng.normal(loc=(0.5, -0.25), scale=0.3, size=(14, 2))
+
+    fig, ax = plt.subplots(figsize=(6.4, 5.0))
+    ax.scatter(group_a[:, 0], group_a[:, 1], s=34, color=PRIMARY, alpha=0.8, edgecolor="none", label="Feeder A")
+    ax.scatter(group_b[:, 0], group_b[:, 1], s=34, color=INFO, alpha=0.8, edgecolor="none", label="Feeder B")
+
+    # must-link: the two farthest-apart points within the same real feeder,
+    # exactly the pair a distance function alone would be tempted to split.
+    dist_within_a = np.linalg.norm(group_a[:, None, :] - group_a[None, :, :], axis=-1)
+    i_a, j_a = np.unravel_index(np.argmax(dist_within_a), dist_within_a.shape)
+    must_link = (group_a[i_a], group_a[j_a])
+    ax.plot(*zip(must_link[0], must_link[1], strict=True), color=SUCCESS, linewidth=2.2, zorder=4)
+    mid_must = (must_link[0] + must_link[1]) / 2
+    ax.annotate(
+        "must-link\n(same real feeder)",
+        xy=tuple(mid_must),
+        xytext=(mid_must[0] - 0.1, mid_must[1] + 0.75),
+        fontsize=8.5,
+        color=SUCCESS,
+        ha="center",
+        arrowprops={"arrowstyle": "-", "color": SUCCESS, "linewidth": 0.9},
+    )
+
+    # cannot-link: the closest cross-feeder pair, exactly what a distance
+    # function alone would be tempted to merge.
+    dist_cross = np.linalg.norm(group_a[:, None, :] - group_b[None, :, :], axis=-1)
+    i_b, j_b = np.unravel_index(np.argmin(dist_cross), dist_cross.shape)
+    cannot_link = (group_a[i_b], group_b[j_b])
+    ax.plot(*zip(cannot_link[0], cannot_link[1], strict=True), color=DANGER, linewidth=2.0, linestyle="--", zorder=4)
+    mid_cannot = (cannot_link[0] + cannot_link[1]) / 2
+    ax.annotate(
+        "cannot-link\n(different real feeders)",
+        xy=tuple(mid_cannot),
+        xytext=(mid_cannot[0] + 0.15, mid_cannot[1] - 0.7),
+        fontsize=8.5,
+        color=DANGER,
+        ha="center",
+        arrowprops={"arrowstyle": "-", "color": DANGER, "linewidth": 0.9},
+    )
+
+    ax.legend(loc="upper right", fontsize=8.5, frameon=False)
+    ax.set_xlim(-1.4, 1.4)
+    ax.set_ylim(-1.3, 1.3)
+    ax.set_aspect("equal")
+    ax.axis("off")
+
+    fig.tight_layout()
+    plt.close(fig)
+    return fig
+
+
+def trust_gated_composite_score_diagram() -> plt.Figure:
+    """Draw why gating separation by trust must be multiplicative, not additive.
+
+    Left: two illustrative candidates plotted on separation (x) vs. trust
+    (y). Candidate A sits far right, near-perfect separation, but low on
+    the y-axis; candidate B sits centrally, good but not exceptional
+    separation, high trust. The shaded band below a veto threshold is
+    Roy's own outranking concept: any candidate whose trust falls in that
+    band is vetoed regardless of how far right it sits
+    [@roy1990outranking]. Right: the same two candidates scored two ways.
+    A flat additive average lets A's huge separation edge partially
+    compensate for its trust deficit, enough here to win outright, a
+    compensatory combination in Gilbride and Allenby's own sense
+    [@gilbrideallenby2004screening]. The multiplicative gate this book
+    uses instead, separation times trust, crushes A's score toward zero
+    and correctly prefers B: no amount of separation can buy back a
+    candidate trust has already vetoed.
+
+    Returns:
+        The matplotlib Figure, ready to display in a notebook cell.
+    """
+    candidate_a = {"label": "Candidate A", "separation": 0.99, "trust": 0.02, "color": WARNING}
+    candidate_b = {"label": "Candidate B", "separation": 0.45, "trust": 0.50, "color": INFO}
+    veto_threshold = 0.3
+
+    fig, axes = plt.subplots(1, 2, figsize=(9.6, 4.3), gridspec_kw={"width_ratios": [1.05, 0.95]})
+
+    ax = axes[0]
+    ax.set_title("Separation vs. trust", fontsize=11.5, color=PRIMARY, fontweight="bold")
+    ax.axhspan(0, veto_threshold, color=DANGER, alpha=0.08, zorder=0)
+    ax.axhline(veto_threshold, color=DANGER, linewidth=1.0, linestyle="dashed", alpha=0.6)
+    ax.text(0.02, veto_threshold + 0.02, "veto threshold (Roy 1990)", fontsize=7.8, color=DANGER, va="bottom")
+
+    for cand in (candidate_a, candidate_b):
+        ax.scatter(
+            [cand["separation"]],
+            [cand["trust"]],
+            s=180,
+            color=cand["color"],
+            edgecolor="white",
+            linewidth=1.3,
+            zorder=3,
+        )
+        ax.annotate(
+            cand["label"],
+            xy=(cand["separation"], cand["trust"]),
+            xytext=(cand["separation"] - 0.02, cand["trust"] + 0.06),
+            fontsize=9.5,
+            color=cand["color"],
+            fontweight="bold",
+            ha="right",
+        )
+
+    ax.set_xlabel("Separation ensemble", fontsize=9.5, color=TEXT_MUTED)
+    ax.set_ylabel("Trust factor", fontsize=9.5, color=TEXT_MUTED)
+    ax.set_xlim(0, 1.08)
+    ax.set_ylim(0, 1.08)
+    for spine in ("top", "right"):
+        ax.spines[spine].set_visible(False)
+
+    ax = axes[1]
+    ax.set_title("Resulting composite score", fontsize=11.5, color=PRIMARY, fontweight="bold")
+    rules = ["Additive\naverage", "Multiplicative\ngate (this book)"]
+    scores_a = [
+        (candidate_a["separation"] + candidate_a["trust"]) / 2,
+        candidate_a["separation"] * candidate_a["trust"],
+    ]
+    scores_b = [
+        (candidate_b["separation"] + candidate_b["trust"]) / 2,
+        candidate_b["separation"] * candidate_b["trust"],
+    ]
+    x = np.arange(len(rules))
+    width = 0.32
+    ax.bar(x - width / 2, scores_a, width, color=candidate_a["color"], label=candidate_a["label"])
+    ax.bar(x + width / 2, scores_b, width, color=candidate_b["color"], label=candidate_b["label"])
+    for xi, (sa, sb) in enumerate(zip(scores_a, scores_b, strict=True)):
+        ax.text(xi - width / 2, sa + 0.02, f"{sa:.2f}", ha="center", fontsize=8.5, color=candidate_a["color"])
+        ax.text(xi + width / 2, sb + 0.02, f"{sb:.2f}", ha="center", fontsize=8.5, color=candidate_b["color"])
+    ax.set_xticks(x)
+    ax.set_xticklabels(rules, fontsize=9.5)
+    ax.set_ylim(0, 0.75)
+    ax.set_ylabel("Composite score", fontsize=9.5, color=TEXT_MUTED)
+    ax.legend(loc="upper left", fontsize=8.5, frameon=False)
+    for spine in ("top", "right"):
+        ax.spines[spine].set_visible(False)
+
+    fig.tight_layout()
+    plt.close(fig)
+    return fig
+
+
+def same_blind_spot_diagram() -> plt.Figure:
+    """Draw why silhouette, Davies-Bouldin, and Calinski-Harabasz all miss the same failure.
+
+    Two scatters, deliberately unlabelled on the axes since neither is a
+    real feature space, just illustrative points. Left: a real two-way
+    split, evenly sized, well separated, silhouette 0.78. Right: the
+    MAC000037 pattern this chapter opens with, one dominant group plus two
+    isolated points, silhouette 0.99, the higher score of the two despite
+    representing almost no one. Both numbers come from formulas built from
+    the same two ingredients, within-cluster compactness and between-
+    cluster separation; population share, the one thing that would tell
+    these two scatters apart, appears in neither formula.
+
+    Returns:
+        The matplotlib Figure, ready to display in a notebook cell.
+    """
+    rng = np.random.default_rng(3)
+
+    fig, axes = plt.subplots(1, 2, figsize=(9.4, 4.4))
+
+    ax = axes[0]
+    ax.set_title("A real split", fontsize=11.5, color=PRIMARY, fontweight="bold")
+    group_a = rng.normal(loc=(-1.4, 0.0), scale=0.35, size=(40, 2))
+    group_b = rng.normal(loc=(1.4, 0.0), scale=0.35, size=(40, 2))
+    ax.scatter(*group_a.T, s=26, color=SUCCESS, alpha=0.85, edgecolor="none")
+    ax.scatter(*group_b.T, s=26, color=INFO, alpha=0.85, edgecolor="none")
+    ax.text(0, -1.7, "silhouette 0.78 · 50% / 50%", fontsize=9.5, color=TEXT_MUTED, ha="center")
+
+    ax = axes[1]
+    ax.set_title("`MAC000037`'s split", fontsize=11.5, color=PRIMARY, fontweight="bold")
+    main_group = rng.normal(loc=(0.0, 0.0), scale=0.5, size=(78, 2))
+    ax.scatter(*main_group.T, s=22, color=INFO, alpha=0.75, edgecolor="none")
+    outliers = np.array([[2.7, 1.8], [2.9, -2.0]])
+    ax.scatter(*outliers.T, s=90, color=DANGER, edgecolor="white", linewidth=1.2, zorder=3)
+    ax.text(0, -3.0, "silhouette 0.99 · 98.7% / 1.3%", fontsize=9.5, color=TEXT_MUTED, ha="center")
+
+    for ax in axes:
+        ax.set_xlim(-3.0, 3.6)
+        ax.set_ylim(-3.6, 3.0)
+        ax.set_aspect("equal")
+        ax.axis("off")
+
+    fig.text(
+        0.5,
+        0.03,
+        "Same formulas, same blind spot: the higher score belongs to the fake split",
+        fontsize=10.5,
+        color=TEXT_MUTED,
+        ha="center",
+    )
+    fig.tight_layout(rect=(0, 0.11, 1, 1))
+    plt.close(fig)
+    return fig
+
+
+def _two_cluster_scatter(
+    ax: plt.Axes,
+    rng: np.random.Generator,
+    loc1: tuple[float, float],
+    loc2: tuple[float, float],
+    n1: int,
+    n2: int,
+    *,
+    scale: float = 0.3,
+    s: float = 20,
+    alpha: float = 0.85,
+) -> tuple[np.ndarray, np.ndarray]:
+    """Two illustrative point clouds, the shared unit every scene in `resampling_validity_diagram` is built from."""
+    pts1 = rng.normal(loc=loc1, scale=scale, size=(n1, 2))
+    pts2 = rng.normal(loc=loc2, scale=scale, size=(n2, 2))
+    ax.scatter(*pts1.T, s=s, color=INFO, alpha=alpha, edgecolor="none", zorder=2)
+    ax.scatter(*pts2.T, s=s, color=SUCCESS, alpha=alpha, edgecolor="none", zorder=2)
+    return pts1, pts2
+
+
+def _centroid_star(ax: plt.Axes, pts: np.ndarray, color: str, *, s: float = 220) -> tuple[float, float]:
+    """A star marker at a point cloud's own mean, the shared "fitted centroid" unit."""
+    center = pts.mean(axis=0)
+    ax.scatter(*center, s=s, marker="*", color=color, edgecolor="white", linewidth=1.0, zorder=4)
+    return float(center[0]), float(center[1])
+
+
+_LABEL_BBOX = {"boxstyle": "round,pad=0.18", "facecolor": "white", "edgecolor": "none", "alpha": 0.85}
+
+
+def _prediction_strength_panel(ax: plt.Axes, rng: np.random.Generator) -> None:
+    """One real illustrative split: centroids from Half A predict Half B's own points."""
+    ax.set_title("Prediction strength", fontsize=12, color=PRIMARY, fontweight="bold")
+
+    _two_cluster_scatter(ax, rng, (0.6, 5.6), (2.5, 5.5), 14, 10, scale=0.28)
+    ax.text(1.55, 6.2, "Full data", fontsize=9.5, color=PRIMARY, fontweight="bold", ha="center")
+    ax.text(1.55, 4.95, ICONS["scissors"], fontproperties=icon_font(20), color=PRIMARY, ha="center", va="center")
+    ax.text(
+        2.35,
+        4.95,
+        "split in two",
+        fontsize=7.3,
+        color=TEXT_MUTED,
+        ha="left",
+        va="center",
+        style="italic",
+        bbox=_LABEL_BBOX,
+    )
+    _curved_flow_arrow(ax, (1.05, 4.65), (-0.55, 3.55), PRIMARY, rad=-0.2, linewidth=1.3)
+    _curved_flow_arrow(ax, (2.05, 4.65), (3.6, 3.55), PRIMARY, rad=0.2, linewidth=1.3)
+
+    a1, a2 = _two_cluster_scatter(ax, rng, (-1.15, 3.05), (0.15, 2.95), 7, 5, scale=0.24, s=18)
+    ax.text(-0.5, 3.65, "Half A", fontsize=9, color=INFO, fontweight="bold", ha="center")
+    star_a1 = _centroid_star(ax, a1, INFO)
+    star_a2 = _centroid_star(ax, a2, SUCCESS)
+    ax.text(-0.5, 2.2, "centroids from A", fontsize=7, color=TEXT_MUTED, ha="center", style="italic")
+
+    _two_cluster_scatter(ax, rng, (3.25, 3.05), (4.55, 2.95), 7, 5, scale=0.24, s=18)
+    ax.text(3.9, 3.65, "Half B", fontsize=9, color=INFO, fontweight="bold", ha="center")
+    _curved_flow_arrow(ax, star_a1, (3.25, 3.05), PRIMARY, rad=-0.22, linewidth=1.4)
+    _curved_flow_arrow(ax, star_a2, (4.55, 2.95), PRIMARY, rad=0.22, linewidth=1.4)
+    ax.text(
+        1.7,
+        2.75,
+        "predict nearest\ncentroid",
+        fontsize=7.3,
+        color=PRIMARY,
+        fontweight="bold",
+        ha="center",
+        va="center",
+        bbox=_LABEL_BBOX,
+    )
+
+    ax.text(
+        3.9, 1.75, ICONS["check-circle-fill"], fontproperties=icon_font(16), color=SUCCESS, ha="center", va="center"
+    )
+    ax.text(3.9, 1.15, "B's own pairs agree\n→ high prediction strength", fontsize=7, color=SUCCESS, ha="center")
+
+    ax.set_xlim(-2.1, 5.5)
+    ax.set_ylim(0.85, 6.5)
+    ax.set_aspect("equal")
+    ax.axis("off")
+
+
+def _cluster_wise_stability_panel(ax: plt.Axes, rng: np.random.Generator) -> None:
+    """One real illustrative bootstrap: a fragile cluster C either survives resampling or does not."""
+    ax.set_title("Cluster-wise stability", fontsize=12, color=PRIMARY, fontweight="bold")
+
+    _two_cluster_scatter(ax, rng, (0.7, 5.6), (2.6, 5.5), 14, 10, scale=0.28)
+    fragile_home = np.array([4.55, 5.35])
+    ax.scatter(*fragile_home, s=55, color=DANGER, edgecolor="white", linewidth=1.0, zorder=3)
+    ax.add_patch(Circle(fragile_home, 0.32, facecolor="none", edgecolor=DANGER, linewidth=1.1, linestyle="dashed"))
+    ax.text(4.55, 5.82, "cluster $C$", fontsize=7.5, color=DANGER, fontweight="bold", ha="center", style="italic")
+    ax.text(1.65, 6.2, "Full data", fontsize=9.5, color=PRIMARY, fontweight="bold", ha="center")
+
+    ax.text(0.75, 4.4, ICONS["dice-5-fill"], fontproperties=icon_font(20), color=WARNING, ha="center", va="center")
+    ax.text(
+        2.55,
+        4.4,
+        "bootstrap resample\n(with replacement)",
+        fontsize=7.3,
+        color=TEXT_MUTED,
+        ha="left",
+        va="center",
+        style="italic",
+        bbox=_LABEL_BBOX,
+    )
+    _flow_arrow(ax, (1.65, 5.05), (1.65, 3.75), color=WARNING)
+
+    r1, r2 = _two_cluster_scatter(ax, rng, (0.7, 3.05), (2.6, 2.95), 14, 10, scale=0.28, s=18)
+    faded_home = np.array([4.5, 3.15])
+    ax.scatter(*faded_home, s=40, color=DANGER, alpha=0.35, edgecolor="none", zorder=2)
+    ax.text(4.5, 3.5, "C's household:\npresent this time?", fontsize=6.6, color=DANGER, ha="center", style="italic")
+
+    star_r1 = _centroid_star(ax, r1, INFO, s=170)
+    ax.scatter([star_r1[0] + 0.34], [star_r1[1] - 0.08], s=55, marker="x", color=DANGER, linewidth=2.0, zorder=4)
+    _centroid_star(ax, r2, SUCCESS, s=170)
+    ax.text(
+        1.65,
+        1.85,
+        "re-clustered: C's lone\nmember absorbed nearby",
+        fontsize=6.6,
+        color=TEXT_MUTED,
+        ha="center",
+        style="italic",
+    )
+
+    left_c, right_c = (0.95, 0.55), (1.95, 0.55)
+    ax.add_patch(Circle(left_c, 0.42, facecolor="none", edgecolor=DANGER, linewidth=1.4))
+    ax.add_patch(Circle(right_c, 0.42, facecolor="none", edgecolor=AI_ACCENT, linewidth=1.4))
+    ax.add_patch(Circle((1.45, 0.55), 0.22, facecolor=AI_ACCENT, alpha=0.4, edgecolor="none"))
+    ax.text(left_c[0] - 1.02, 0.55, "cluster $C$\n(original)", fontsize=6.4, color=DANGER, ha="center", va="center")
+    ax.text(right_c[0] + 1.02, 0.55, "best match\n(resample)", fontsize=6.4, color=AI_ACCENT, ha="center", va="center")
+    ax.text(
+        1.45, -0.05, "Jaccard overlap = stability(C)", fontsize=7.3, color=AI_ACCENT, fontweight="bold", ha="center"
+    )
+
+    ax.set_xlim(-1.8, 5.9)
+    ax.set_ylim(-0.35, 6.5)
+    ax.set_aspect("equal")
+    ax.axis("off")
+
+
+def _stability_gauge_panel(ax: plt.Axes) -> None:
+    """The two mechanisms' own real verdicts on this book's own data, not illustrative numbers."""
+    ax.set_title(
+        "Reading the result: the same idea, two different verdicts",
+        fontsize=11.5,
+        color=PRIMARY,
+        fontweight="bold",
+        pad=12,
+    )
+
+    y_ps = 1.55
+    ax.add_patch(plt.Rectangle((0, y_ps - 0.13), 1.0, 0.26, facecolor=TEXT_MUTED, alpha=0.1, edgecolor="none"))
+    ax.add_patch(plt.Rectangle((0.8, y_ps - 0.13), 0.2, 0.26, facecolor=SUCCESS, alpha=0.2, edgecolor="none"))
+    ax.text(-0.02, y_ps, "Prediction strength", fontsize=9.5, color=PRIMARY, fontweight="bold", ha="right", va="center")
+    ax.text(
+        0.9,
+        y_ps - 0.32,
+        "Tibshirani & Walther's\n0.8-0.9 cutoff",
+        fontsize=6.5,
+        color=SUCCESS,
+        ha="center",
+        style="italic",
+    )
+    for x, label, color, dy in [(1.0, "London\n1.000", SUCCESS, 0.4), (0.749, "AusNet\n0.749", WARNING, 0.4)]:
+        ax.scatter([x], [y_ps], s=120, marker="D", color=color, edgecolor="white", linewidth=1.1, zorder=3)
+        ax.text(x, y_ps + dy, label, fontsize=7.3, color=color, fontweight="bold", ha="center", va="center")
+
+    y_st = 0.25
+    bands = [(0.0, 0.5, DANGER, "dissolved"), (0.5, 0.25, WARNING, "patterned"), (0.75, 0.25, SUCCESS, "stable")]
+    for start, width, color, label in bands:
+        ax.add_patch(plt.Rectangle((start, y_st - 0.13), width, 0.26, facecolor=color, alpha=0.18, edgecolor="none"))
+        ax.text(start + width / 2, y_st - 0.32, label, fontsize=6.8, color=color, ha="center", style="italic")
+    ax.text(
+        -0.02, y_st, "Cluster-wise stability", fontsize=9.5, color=PRIMARY, fontweight="bold", ha="right", va="center"
+    )
+    for x, label, color, dy in [
+        (1.0, "settled archetypes\n1.000", SUCCESS, 0.4),
+        (0.63, "`MAC000037`'s cluster\n0.63", WARNING, 0.4),
+    ]:
+        ax.scatter([x], [y_st], s=120, marker="D", color=color, edgecolor="white", linewidth=1.1, zorder=3)
+        ax.text(x, y_st + dy, label, fontsize=7.3, color=color, fontweight="bold", ha="center", va="center")
+
+    ax.set_xlim(-0.62, 1.14)
+    ax.set_ylim(-0.35, 2.15)
+    ax.axis("off")
+
+
+def resampling_validity_diagram() -> plt.Figure:
+    """Draw the two resampling mechanisms this chapter checks a clustering against, plus their real verdicts.
+
+    Top-left: Tibshirani and Walther's prediction strength, drawn as an
+    actual illustrative split rather than a labelled box: two synthetic
+    clusters get cut into Half A and Half B, centroids fit on A predict
+    B's own points, and B's own pairs either agree or they do not.
+    Top-right: Hennig's cluster-wise stability, the same underlying idea
+    run the other way: a fragile, near-singleton cluster C sits inside
+    the full data, survives (or does not) a bootstrap resample, and gets
+    scored by how much of itself it recovers. Bottom: the two mechanisms'
+    own real verdicts on this book's own data, prediction strength
+    comfortably above Tibshirani and Walther's 0.8-0.9 cutoff for London
+    and just under it for AusNet, cluster-wise stability landing at 1.000
+    for a genuine archetype and at 0.63, inside Hennig's own "patterned,
+    not stable" band, for `MAC000037`'s isolated cluster.
+
+    Returns:
+        The matplotlib Figure, ready to display in a notebook cell.
+    """
+    rng = np.random.default_rng(11)
+
+    fig = plt.figure(figsize=(11.4, 7.9))
+    gs = fig.add_gridspec(2, 2, height_ratios=[2.3, 1.3], hspace=0.12, wspace=0.15)
+
+    _prediction_strength_panel(fig.add_subplot(gs[0, 0]), rng)
+    _cluster_wise_stability_panel(fig.add_subplot(gs[0, 1]), rng)
+    _stability_gauge_panel(fig.add_subplot(gs[1, :]))
+
     plt.close(fig)
     return fig

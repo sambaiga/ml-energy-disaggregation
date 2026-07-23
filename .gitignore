@@ -138,12 +138,12 @@ resources/*
 
 # OpenDSS auto-writes a monitor CSV (<Circuit>_Mon_<name>_<n>.csv) to the
 # working directory on solve whenever a Monitor object exists, independent
-# of any explicit `export` command. Stray output from book/04-grid-edge/'s
-# OpenDSS notebooks, not something to commit.
+# of any explicit `export` command. Stray output from this book's OpenDSS
+# notebooks (Parts 4-7), not something to commit.
 *_Mon_*.csv
 
 # PyTorch Lightning auto-writes a lightning_logs/ (TensorBoard event files,
 # checkpoints) next to the working directory on every .fit() call, from
-# Part 5's own MLPGAM training notebooks. Build artifacts, not content.
+# Part 8's own MLPGAM training notebooks. Build artifacts, not content.
 logs/
 lightning_logs/

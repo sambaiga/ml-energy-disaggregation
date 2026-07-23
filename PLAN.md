@@ -28,7 +28,15 @@
   nothing behind it and blocking the one thread ahead of it that actually
   needed a forecast to design against.
 
-## Structure: five parts
+## Structure: five parts (superseded)
+
+**Superseded by `book-restructuring-plan-nine-parts.md`**: former "Part 4:
+Grid-Edge Value" below has since split into four top-level parts (Network
+Foundations, Customer and Feeder Clustering, Ranking and Recommendation,
+Anomaly Detection), and Forecasting moved from Part 5 to Part 8. The prose
+below is kept as historical record of the reasoning that produced the
+five-part order, not a live description of today's structure; see the
+restructuring doc for the current 8-9 part plan.
 
 **Revised this session** from the earlier four-part order (Foundations ->
 Disaggregation -> Forecasting -> Grid-Edge) after the user asked to move
