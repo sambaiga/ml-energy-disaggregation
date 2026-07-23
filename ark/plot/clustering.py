@@ -85,19 +85,6 @@ VALIDITY_METRIC_COLORS = {
     "davies_bouldin": BRAND_PALETTE[3],
 }
 
-CLUSTER_COLOR_LIST = [
-    "#1b9e77",
-    "#d95f02",
-    "#7570b3",
-    "#e7298a",
-    "#66a61e",
-    "#e6ab02",
-    "#a6761d",
-    "#666666",
-    "#1f78b4",
-    "#b15928",
-]
-
 
 def plot_cluster_centroids(
     df: pd.DataFrame,
@@ -119,7 +106,7 @@ def plot_cluster_centroids(
         Sequence of cluster labels aligned with `df.columns`.
     colors:
         Optional sequence of colors for clusters. If None, a default
-        palette derived from `CLUSTER_COLOR_LIST` is used.
+        palette derived from `CATEGORICAL_PALETTE` is used.
     weekly:
         If True, aggregate by day-of-week. Otherwise aggregate by hour.
 
@@ -160,7 +147,7 @@ def plot_cluster_centroids(
     n_clusters = int(plot_df["cluster"].nunique())
 
     if colors is None:
-        colors = (CLUSTER_COLOR_LIST * (n_clusters // len(CLUSTER_COLOR_LIST) + 1))[:n_clusters]
+        colors = (CATEGORICAL_PALETTE * (n_clusters // len(CATEGORICAL_PALETTE) + 1))[:n_clusters]
 
     tooltips = (
         layer_tooltips()
@@ -248,7 +235,7 @@ def plot_clustered_profiles(
     mean_plot_df = member_plot_df.groupby(["cluster", "cluster_label", "x"], as_index=False)["value"].mean()
 
     cluster_colors = {
-        label: CLUSTER_COLOR_LIST[i % len(CLUSTER_COLOR_LIST)]
+        label: CATEGORICAL_PALETTE[i % len(CATEGORICAL_PALETTE)]
         for i, label in enumerate(sorted(cluster_labels.values()))
     }
 
@@ -362,7 +349,7 @@ def cluster_scatter(
     n_clusters = df["cluster"].nunique()
 
     # Safe palette cycling
-    colors = (CLUSTER_COLOR_LIST * (n_clusters // len(CLUSTER_COLOR_LIST) + 1))[:n_clusters]
+    colors = (CATEGORICAL_PALETTE * (n_clusters // len(CATEGORICAL_PALETTE) + 1))[:n_clusters]
     shapes = (SHAPE_PALETTE * (n_clusters // len(SHAPE_PALETTE) + 1))[:n_clusters]
 
     # Tooltip configuration
