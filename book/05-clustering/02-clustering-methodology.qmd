@@ -74,11 +74,25 @@ $$
 $$
 the fraction of same-cluster pairs in $B$ that the $A$-trained centroids also predict together, and the prediction strength for $K$ is the minimum of $\text{ps}(C)$ over $B$'s own clusters. Tibshirani and Walther's own recommendation is to pick the largest $K$ with prediction strength above 0.8 to 0.9. A genuine limitation is worth stating plainly rather than glossed over: a cluster with fewer than two members contributes no pairs, so a singleton is excluded from its own split's minimum rather than penalised by it. Prediction strength validates whether $K$ itself is well supported globally; it is not, by itself, guaranteed to flag one small outlier cluster hiding inside an otherwise well-supported partition.
 
+::: {.ark-concept}
+<span class="ark-concept-title"><i class="bi bi-info-circle-fill"></i> Key Concept</span>
+
+Prediction strength asks one checkable question: if this population had come out slightly differently, would a clustering fit on half of it still make the same calls on the other half's own pairs? A $K$ that only holds together on the exact rows it was fit against is not a customer segment, it is a coincidence of that particular sample. The score is reported once per $K$, a judgement about whether that many groups is safe to trust at all, before any single cluster inside that partition gets scrutinised on its own.
+
+:::
+
 This is the gap Hennig's cluster-wise stability closes [@hennig2007clusterwise]. Bootstrap-resample the data with replacement, fit centroids on the resample, predict cluster membership for the *entire* original dataset from those centroids, and compute the Jaccard overlap between each original cluster $C$ and its best match among the predicted clusters,
 $$
 J(C, C') = \frac{|C \cap C'|}{|C \cup C'|}, \qquad \text{stability}(C) = \frac{1}{B}\sum_{b=1}^{B} \max_{C'_b} J(C, C'_b),
 $$
 averaged over $B$ bootstrap resamples. A real archetype's centroid is recovered reliably even from a partial resample, reclaiming essentially all of its original members every time, stability near 1.0. A cluster built around one extreme household only has a centroid to speak of in resamples where that household happened to be drawn, and is silently absorbed into whichever cluster is nearest otherwise. Hennig's own interpretation bands read stability below 0.5 as dissolved, 0.6 to 0.75 as patterned but not stable, and above 0.75 as stable. Checked against `MAC000037`'s own cluster, stability lands at 0.63, inside the "patterned but not stable" band, not near zero: whenever that household is present in a resample it isolates itself again, so its score settles close to $1 - 1/e \approx 0.632$, the plain probability that a single point survives one bootstrap draw, a value this book's own test suite for the method reproduces analytically before trusting the result on real data.
+
+::: {.ark-concept}
+<span class="ark-concept-title"><i class="bi bi-info-circle-fill"></i> Key Concept</span>
+
+Cluster-wise stability asks the question prediction strength cannot: not whether $K$ as a whole is safe to trust, but whether this specific cluster survives being found again. Bootstrap-resample the population, re-cluster, and check how much of the original cluster comes back. A real archetype's centroid has hundreds of households anchoring it, so it comes back almost every time. A cluster built around one household only exists in the resamples lucky enough to draw that one household, and Hennig's interpretation bands turn that difference into a number a practitioner can act on rather than eyeball.
+
+:::
 
 ## A trust-gated composite score
 
@@ -91,6 +105,13 @@ $$
 \text{composite}(x) = S(x) \times T(x),
 $$
 where $S(x)$ is a diversity-weighted rank ensemble over silhouette, Calinski-Harabasz, and Davies-Bouldin, and $T(x) = \min\bigl(\text{balance}(x), \text{stability}(x)\bigr)$ is a trust factor built from whichever of balance or stability is weaker for that candidate, a Rawlsian "weakest link" reading rather than an average of the two. The diversity weighting itself follows the same logic Chapter 1's own choice of index already implied: metrics that are highly correlated with each other across the candidate pool contribute redundant information and are down-weighted, so a near-unanimous cluster of agreeing separation metrics cannot outvote whichever one is actually saying something different. Multiplication, not addition, is the load-bearing choice: $S(x)$ near its maximum cannot rescue a $T(x)$ near zero, since the product of a large number and a number near zero is itself near zero, the same veto behaviour Roy's own theory formalises and a flat weighted sum structurally cannot provide.
+
+::: {.ark-concept}
+<span class="ark-concept-title"><i class="bi bi-info-circle-fill"></i> Key Concept</span>
+
+The composite score folds three separation metrics and two trust signals into one number a search can rank candidates by, without letting either side hide the other. High separation cannot buy back low trust, and high trust alone is not enough if nothing about the split is actually separated. A candidate only reaches the top of this ranking by being both well separated and safe to believe, the same standard a human reviewer would apply by eye if there were time to check every trial by hand.
+
+:::
 
 Ranking by raw silhouette alone would shortlist `MAC000037`'s own degenerate trial, and two others just like it, for further, expensive scrutiny, the exact bias this whole approach exists to avoid. Ranking by composite score instead, on the same Pareto-optimal trials, drops every outlier-isolation case to the bottom of the list. Five balanced candidates rise instead, each with a real multi-hundred-household minority cluster, forming a shortlist worth the expensive, well-powered resampling audit: ten-split prediction strength and hundred-bootstrap cluster stability. Those checks run once per shortlisted candidate, not on every trial, since the cheap versions already did the work of finding a fair shortlist to spend that cost on.
 
@@ -122,7 +143,7 @@ A settled recipe that only works on the dataset it was tuned against is not sett
 
 {{< embed london-cluster.ipynb#912feac2 >}}
 
-Every population clears Hennig's own 0.75 stability bar on its weakest cluster, AusNet and GoiEner comfortably so, and every split is balanced rather than one dominant group and stragglers. AusNet's own prediction strength, 0.749, falls just under Tibshirani and Walther's suggested 0.8 to 0.9 range, worth reporting as it stands rather than rounding favourably; with only 342 households to begin with, AusNet has the least data of the three to support a resampling-based check, so a slightly weaker reading here is an expected consequence of sample size, not a sign the recipe itself fails to travel. A number this close to a published threshold is a call for more splits, not a verdict either way. Silhouette is the one number that does not transfer cleanly, London's 0.784 well above AusNet's 0.430 or GoiEner's 0.482, and balance explains why: AusNet and GoiEner's own splits land close to even, 59/41 and 52/48, while London's is more skewed at 76/24, and a more even split leaves less silhouette headroom between two group centroids relative to their own internal spread by construction. The same recipe finds a stable, non-degenerate two-way behavioural split in each of the three independent populations tried, differently proportioned in every case, which is what a settled methodology has to show before the next chapter can treat it as a fixed choice, not a hypothesis still being tested.
+Every population clears Hennig's own 0.75 stability bar on its weakest cluster, AusNet and GoiEner comfortably so, and every split is balanced rather than one dominant group and stragglers. AusNet's own prediction strength, 0.749, falls just under Tibshirani and Walther's suggested 0.8 to 0.9 range, worth reporting as it stands rather than rounding favourably; with only 342 households to begin with, AusNet has the least data of the three to support a resampling-based check, so a slightly weaker reading here is an expected consequence of sample size, not a sign the recipe itself fails to travel. A number this close to a published threshold is a call for more splits, not a verdict either way. Silhouette is the one number that does not transfer cleanly, London's 0.784 well above AusNet's 0.430 or GoiEner's 0.482, and balance explains why: AusNet and GoiEner's own splits land close to even, 59/41 and 52/48, while London's is more skewed at 76/24, and a more even split leaves less silhouette headroom between two group centroids relative to their own internal spread by construction. The same recipe finds a stable, non-degenerate two-way behavioural split in each of the three independent populations tried, differently proportioned in every case, which is what a settled methodology has to show before the next chapter can treat it as decided rather than still being tested.
 
 ## Why bother
 
