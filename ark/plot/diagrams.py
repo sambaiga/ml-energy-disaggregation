@@ -3034,8 +3034,8 @@ def trust_gated_composite_score_diagram() -> plt.Figure:
     Returns:
         The matplotlib Figure, ready to display in a notebook cell.
     """
-    candidate_a = {"label": "Candidate A", "separation": 0.99, "trust": 0.02, "color": DANGER}
-    candidate_b = {"label": "Candidate B", "separation": 0.45, "trust": 0.50, "color": SUCCESS}
+    candidate_a = {"label": "Candidate A", "separation": 0.99, "trust": 0.02, "color": WARNING}
+    candidate_b = {"label": "Candidate B", "separation": 0.45, "trust": 0.50, "color": INFO}
     veto_threshold = 0.3
 
     fig, axes = plt.subplots(1, 2, figsize=(9.6, 4.3), gridspec_kw={"width_ratios": [1.05, 0.95]})
@@ -3159,58 +3159,224 @@ def same_blind_spot_diagram() -> plt.Figure:
     return fig
 
 
-def resampling_validity_diagram() -> plt.Figure:
-    """Draw the two resampling mechanisms this chapter checks a clustering against.
+def _two_cluster_scatter(
+    ax: plt.Axes,
+    rng: np.random.Generator,
+    loc1: tuple[float, float],
+    loc2: tuple[float, float],
+    n1: int,
+    n2: int,
+    *,
+    scale: float = 0.3,
+    s: float = 20,
+    alpha: float = 0.85,
+) -> tuple[np.ndarray, np.ndarray]:
+    """Two illustrative point clouds, the shared unit every scene in `resampling_validity_diagram` is built from."""
+    pts1 = rng.normal(loc=loc1, scale=scale, size=(n1, 2))
+    pts2 = rng.normal(loc=loc2, scale=scale, size=(n2, 2))
+    ax.scatter(*pts1.T, s=s, color=INFO, alpha=alpha, edgecolor="none", zorder=2)
+    ax.scatter(*pts2.T, s=s, color=SUCCESS, alpha=alpha, edgecolor="none", zorder=2)
+    return pts1, pts2
 
-    Left: Tibshirani and Walther's prediction strength. The data is split
-    into two random halves; centroids fit on half A predict half B's own
-    membership; the check is whether pairs half B's own clustering keeps
-    together are still predicted together. Right: Hennig's cluster-wise
-    stability. The whole dataset is bootstrap-resampled with replacement,
-    re-clustered, and each original cluster is scored by its best Jaccard
-    match in the resampled clustering. Different mechanics, the same real
-    question underneath: does this structure survive data that came out
-    slightly differently, not just a repeated run on the same fixed rows.
+
+def _centroid_star(ax: plt.Axes, pts: np.ndarray, color: str, *, s: float = 220) -> tuple[float, float]:
+    """A star marker at a point cloud's own mean, the shared "fitted centroid" unit."""
+    center = pts.mean(axis=0)
+    ax.scatter(*center, s=s, marker="*", color=color, edgecolor="white", linewidth=1.0, zorder=4)
+    return float(center[0]), float(center[1])
+
+
+_LABEL_BBOX = {"boxstyle": "round,pad=0.18", "facecolor": "white", "edgecolor": "none", "alpha": 0.85}
+
+
+def _prediction_strength_panel(ax: plt.Axes, rng: np.random.Generator) -> None:
+    """One real illustrative split: centroids from Half A predict Half B's own points."""
+    ax.set_title("Prediction strength", fontsize=12, color=PRIMARY, fontweight="bold")
+
+    _two_cluster_scatter(ax, rng, (0.6, 5.6), (2.5, 5.5), 14, 10, scale=0.28)
+    ax.text(1.55, 6.2, "Full data", fontsize=9.5, color=PRIMARY, fontweight="bold", ha="center")
+    ax.text(1.55, 4.95, ICONS["scissors"], fontproperties=icon_font(20), color=PRIMARY, ha="center", va="center")
+    ax.text(
+        2.35,
+        4.95,
+        "split in two",
+        fontsize=7.3,
+        color=TEXT_MUTED,
+        ha="left",
+        va="center",
+        style="italic",
+        bbox=_LABEL_BBOX,
+    )
+    _curved_flow_arrow(ax, (1.05, 4.65), (-0.55, 3.55), PRIMARY, rad=-0.2, linewidth=1.3)
+    _curved_flow_arrow(ax, (2.05, 4.65), (3.6, 3.55), PRIMARY, rad=0.2, linewidth=1.3)
+
+    a1, a2 = _two_cluster_scatter(ax, rng, (-1.15, 3.05), (0.15, 2.95), 7, 5, scale=0.24, s=18)
+    ax.text(-0.5, 3.65, "Half A", fontsize=9, color=INFO, fontweight="bold", ha="center")
+    star_a1 = _centroid_star(ax, a1, INFO)
+    star_a2 = _centroid_star(ax, a2, SUCCESS)
+    ax.text(-0.5, 2.2, "centroids from A", fontsize=7, color=TEXT_MUTED, ha="center", style="italic")
+
+    _two_cluster_scatter(ax, rng, (3.25, 3.05), (4.55, 2.95), 7, 5, scale=0.24, s=18)
+    ax.text(3.9, 3.65, "Half B", fontsize=9, color=INFO, fontweight="bold", ha="center")
+    _curved_flow_arrow(ax, star_a1, (3.25, 3.05), PRIMARY, rad=-0.22, linewidth=1.4)
+    _curved_flow_arrow(ax, star_a2, (4.55, 2.95), PRIMARY, rad=0.22, linewidth=1.4)
+    ax.text(
+        1.7,
+        2.75,
+        "predict nearest\ncentroid",
+        fontsize=7.3,
+        color=PRIMARY,
+        fontweight="bold",
+        ha="center",
+        va="center",
+        bbox=_LABEL_BBOX,
+    )
+
+    ax.text(
+        3.9, 1.75, ICONS["check-circle-fill"], fontproperties=icon_font(16), color=SUCCESS, ha="center", va="center"
+    )
+    ax.text(3.9, 1.15, "B's own pairs agree\n→ high prediction strength", fontsize=7, color=SUCCESS, ha="center")
+
+    ax.set_xlim(-2.1, 5.5)
+    ax.set_ylim(0.85, 6.5)
+    ax.set_aspect("equal")
+    ax.axis("off")
+
+
+def _cluster_wise_stability_panel(ax: plt.Axes, rng: np.random.Generator) -> None:
+    """One real illustrative bootstrap: a fragile cluster C either survives resampling or does not."""
+    ax.set_title("Cluster-wise stability", fontsize=12, color=PRIMARY, fontweight="bold")
+
+    _two_cluster_scatter(ax, rng, (0.7, 5.6), (2.6, 5.5), 14, 10, scale=0.28)
+    fragile_home = np.array([4.55, 5.35])
+    ax.scatter(*fragile_home, s=55, color=DANGER, edgecolor="white", linewidth=1.0, zorder=3)
+    ax.add_patch(Circle(fragile_home, 0.32, facecolor="none", edgecolor=DANGER, linewidth=1.1, linestyle="dashed"))
+    ax.text(4.55, 5.82, "cluster $C$", fontsize=7.5, color=DANGER, fontweight="bold", ha="center", style="italic")
+    ax.text(1.65, 6.2, "Full data", fontsize=9.5, color=PRIMARY, fontweight="bold", ha="center")
+
+    ax.text(0.75, 4.4, ICONS["dice-5-fill"], fontproperties=icon_font(20), color=WARNING, ha="center", va="center")
+    ax.text(
+        2.55,
+        4.4,
+        "bootstrap resample\n(with replacement)",
+        fontsize=7.3,
+        color=TEXT_MUTED,
+        ha="left",
+        va="center",
+        style="italic",
+        bbox=_LABEL_BBOX,
+    )
+    _flow_arrow(ax, (1.65, 5.05), (1.65, 3.75), color=WARNING)
+
+    r1, r2 = _two_cluster_scatter(ax, rng, (0.7, 3.05), (2.6, 2.95), 14, 10, scale=0.28, s=18)
+    faded_home = np.array([4.5, 3.15])
+    ax.scatter(*faded_home, s=40, color=DANGER, alpha=0.35, edgecolor="none", zorder=2)
+    ax.text(4.5, 3.5, "C's household:\npresent this time?", fontsize=6.6, color=DANGER, ha="center", style="italic")
+
+    star_r1 = _centroid_star(ax, r1, INFO, s=170)
+    ax.scatter([star_r1[0] + 0.34], [star_r1[1] - 0.08], s=55, marker="x", color=DANGER, linewidth=2.0, zorder=4)
+    _centroid_star(ax, r2, SUCCESS, s=170)
+    ax.text(
+        1.65,
+        1.85,
+        "re-clustered: C's lone\nmember absorbed nearby",
+        fontsize=6.6,
+        color=TEXT_MUTED,
+        ha="center",
+        style="italic",
+    )
+
+    left_c, right_c = (0.95, 0.55), (1.95, 0.55)
+    ax.add_patch(Circle(left_c, 0.42, facecolor="none", edgecolor=DANGER, linewidth=1.4))
+    ax.add_patch(Circle(right_c, 0.42, facecolor="none", edgecolor=AI_ACCENT, linewidth=1.4))
+    ax.add_patch(Circle((1.45, 0.55), 0.22, facecolor=AI_ACCENT, alpha=0.4, edgecolor="none"))
+    ax.text(left_c[0] - 1.02, 0.55, "cluster $C$\n(original)", fontsize=6.4, color=DANGER, ha="center", va="center")
+    ax.text(right_c[0] + 1.02, 0.55, "best match\n(resample)", fontsize=6.4, color=AI_ACCENT, ha="center", va="center")
+    ax.text(
+        1.45, -0.05, "Jaccard overlap = stability(C)", fontsize=7.3, color=AI_ACCENT, fontweight="bold", ha="center"
+    )
+
+    ax.set_xlim(-1.8, 5.9)
+    ax.set_ylim(-0.35, 6.5)
+    ax.set_aspect("equal")
+    ax.axis("off")
+
+
+def _stability_gauge_panel(ax: plt.Axes) -> None:
+    """The two mechanisms' own real verdicts on this book's own data, not illustrative numbers."""
+    ax.set_title(
+        "Reading the result: the same idea, two different verdicts",
+        fontsize=11.5,
+        color=PRIMARY,
+        fontweight="bold",
+        pad=12,
+    )
+
+    y_ps = 1.55
+    ax.add_patch(plt.Rectangle((0, y_ps - 0.13), 1.0, 0.26, facecolor=TEXT_MUTED, alpha=0.1, edgecolor="none"))
+    ax.add_patch(plt.Rectangle((0.8, y_ps - 0.13), 0.2, 0.26, facecolor=SUCCESS, alpha=0.2, edgecolor="none"))
+    ax.text(-0.02, y_ps, "Prediction strength", fontsize=9.5, color=PRIMARY, fontweight="bold", ha="right", va="center")
+    ax.text(
+        0.9,
+        y_ps - 0.32,
+        "Tibshirani & Walther's\n0.8-0.9 cutoff",
+        fontsize=6.5,
+        color=SUCCESS,
+        ha="center",
+        style="italic",
+    )
+    for x, label, color, dy in [(1.0, "London\n1.000", SUCCESS, 0.4), (0.749, "AusNet\n0.749", WARNING, 0.4)]:
+        ax.scatter([x], [y_ps], s=120, marker="D", color=color, edgecolor="white", linewidth=1.1, zorder=3)
+        ax.text(x, y_ps + dy, label, fontsize=7.3, color=color, fontweight="bold", ha="center", va="center")
+
+    y_st = 0.25
+    bands = [(0.0, 0.5, DANGER, "dissolved"), (0.5, 0.25, WARNING, "patterned"), (0.75, 0.25, SUCCESS, "stable")]
+    for start, width, color, label in bands:
+        ax.add_patch(plt.Rectangle((start, y_st - 0.13), width, 0.26, facecolor=color, alpha=0.18, edgecolor="none"))
+        ax.text(start + width / 2, y_st - 0.32, label, fontsize=6.8, color=color, ha="center", style="italic")
+    ax.text(
+        -0.02, y_st, "Cluster-wise stability", fontsize=9.5, color=PRIMARY, fontweight="bold", ha="right", va="center"
+    )
+    for x, label, color, dy in [
+        (1.0, "settled archetypes\n1.000", SUCCESS, 0.4),
+        (0.63, "`MAC000037`'s cluster\n0.63", WARNING, 0.4),
+    ]:
+        ax.scatter([x], [y_st], s=120, marker="D", color=color, edgecolor="white", linewidth=1.1, zorder=3)
+        ax.text(x, y_st + dy, label, fontsize=7.3, color=color, fontweight="bold", ha="center", va="center")
+
+    ax.set_xlim(-0.62, 1.14)
+    ax.set_ylim(-0.35, 2.15)
+    ax.axis("off")
+
+
+def resampling_validity_diagram() -> plt.Figure:
+    """Draw the two resampling mechanisms this chapter checks a clustering against, plus their real verdicts.
+
+    Top-left: Tibshirani and Walther's prediction strength, drawn as an
+    actual illustrative split rather than a labelled box: two synthetic
+    clusters get cut into Half A and Half B, centroids fit on A predict
+    B's own points, and B's own pairs either agree or they do not.
+    Top-right: Hennig's cluster-wise stability, the same underlying idea
+    run the other way: a fragile, near-singleton cluster C sits inside
+    the full data, survives (or does not) a bootstrap resample, and gets
+    scored by how much of itself it recovers. Bottom: the two mechanisms'
+    own real verdicts on this book's own data, prediction strength
+    comfortably above Tibshirani and Walther's 0.8-0.9 cutoff for London
+    and just under it for AusNet, cluster-wise stability landing at 1.000
+    for a genuine archetype and at 0.63, inside Hennig's own "patterned,
+    not stable" band, for `MAC000037`'s isolated cluster.
 
     Returns:
         The matplotlib Figure, ready to display in a notebook cell.
     """
-    fig, axes = plt.subplots(1, 2, figsize=(10.2, 5.2))
+    rng = np.random.default_rng(11)
 
-    ax = axes[0]
-    ax.set_title("Prediction strength", fontsize=12, color=PRIMARY, fontweight="bold")
-    _flow_box(ax, (0.9, 4.3), 2.2, 0.6, "Full data", color=PRIMARY)
-    _flow_box(ax, (-0.35, 3.0), 2.0, 0.6, "Half A", color=INFO)
-    _flow_box(ax, (2.35, 3.0), 2.0, 0.6, "Half B", color=INFO)
-    _flow_arrow(ax, (1.6, 4.3), (0.65, 3.6), color=PRIMARY)
-    _flow_arrow(ax, (2.4, 4.3), (3.35, 3.6), color=PRIMARY)
-    _flow_box(ax, (-0.35, 1.7), 2.0, 0.6, "Cluster + centroids", color=SUCCESS)
-    _flow_arrow(ax, (0.65, 3.0), (0.65, 2.3), color=INFO)
-    _flow_arrow(ax, (1.65, 2.0), (3.35, 3.0), color=SUCCESS)
-    ax.text(2.5, 2.35, "predict", fontsize=8.3, color=SUCCESS, fontweight="bold", ha="center")
-    ax.scatter([3.35], [1.5], s=1100, marker="D", facecolor="white", edgecolor=PRIMARY, linewidth=1.5, zorder=3)
-    ax.text(
-        3.35, 1.5, "do B's\npairs\nagree?", fontsize=6.6, color=PRIMARY, fontweight="bold", ha="center", va="center"
-    )
-    _flow_arrow(ax, (3.35, 3.0), (3.35, 1.85), color=TEXT_MUTED)
+    fig = plt.figure(figsize=(11.4, 7.9))
+    gs = fig.add_gridspec(2, 2, height_ratios=[2.3, 1.3], hspace=0.12, wspace=0.15)
 
-    ax = axes[1]
-    ax.set_title("Cluster-wise stability", fontsize=12, color=PRIMARY, fontweight="bold")
-    _flow_box(ax, (0.9, 4.3), 2.2, 0.6, "Full data", color=PRIMARY)
-    _flow_box(ax, (0.9, 3.0), 2.2, 0.6, "Bootstrap resample", color=WARNING)
-    _flow_arrow(ax, (2.0, 4.3), (2.0, 3.6), color=PRIMARY)
-    ax.text(2.7, 3.75, "with\nreplacement", fontsize=7.2, color=TEXT_MUTED, ha="left", va="center")
-    _flow_box(ax, (0.9, 1.7), 2.2, 0.6, "Re-cluster", color=SUCCESS)
-    _flow_arrow(ax, (2.0, 3.0), (2.0, 2.3), color=WARNING)
-    _flow_box(ax, (0.9, 0.4), 2.2, 0.6, "Jaccard vs.\noriginal cluster $C$", color=AI_ACCENT)
-    _flow_arrow(ax, (2.0, 1.7), (2.0, 1.0), color=SUCCESS)
+    _prediction_strength_panel(fig.add_subplot(gs[0, 0]), rng)
+    _cluster_wise_stability_panel(fig.add_subplot(gs[0, 1]), rng)
+    _stability_gauge_panel(fig.add_subplot(gs[1, :]))
 
-    for ax in axes:
-        ax.set_xlim(-0.9, 5.0)
-        ax.set_ylim(0.1, 5.0)
-        ax.set_aspect("equal")
-        ax.axis("off")
-
-    fig.tight_layout()
     plt.close(fig)
     return fig
