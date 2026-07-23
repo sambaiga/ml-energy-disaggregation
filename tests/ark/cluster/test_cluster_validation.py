@@ -5,7 +5,12 @@ from sklearn.base import BaseEstimator
 from sklearn.cluster import AgglomerativeClustering
 from sklearn.mixture import GaussianMixture
 
-from ark.cluster.cluster_validation import clustering_validity_scores, external_validity_scores, recommend_k
+from ark.cluster.cluster_validation import (
+    clustering_validity_scores,
+    composite_trustworthy_score,
+    external_validity_scores,
+    recommend_k,
+)
 
 
 def test_clustering_validity_scores_recovers_true_k():
@@ -165,3 +170,94 @@ def test_external_validity_scores_purity_with_impure_clusters():
 def test_external_validity_scores_rejects_length_mismatch():
     with pytest.raises(ValueError, match="same length"):
         external_validity_scores(np.array([0, 1]), np.array([0, 1, 2]))
+
+
+def test_composite_trustworthy_score_cannot_be_bought_back_by_separation_alone():
+    # The exact real finding from london-cluster.ipynb: trial 1 has
+    # near-perfect separation (silhouette 0.999) but near-zero trust
+    # (balance/stability ~0.01-0.63, the MAC000037 outlier-isolation
+    # signature), while trial 2 has good-but-imperfect separation and high
+    # trust. A flat weighted average could let trial 1's huge separation
+    # edge outweigh its trust deficit; the multiplicative gate must not.
+    candidates = pd.DataFrame(
+        {
+            "trial_number": [1, 2, 3],
+            "silhouette": [0.999, 0.935, 0.5],
+            "calinski_harabasz": [3_000_000.0, 3_000.0, 500.0],
+            "davies_bouldin": [0.002, 0.3, 0.9],
+            "balance": [0.009, 0.85, 0.9],
+            "stability": [0.63, 0.95, 0.9],
+        }
+    )
+
+    result = composite_trustworthy_score(candidates)
+
+    assert result.iloc[0]["trial_number"] == 2
+    # trial 1 has the best raw separation_score of the three (it dominates
+    # every separation metric) but must not win on composite_score.
+    best_separation_trial = result.loc[result["separation_score"].idxmax(), "trial_number"]
+    assert best_separation_trial == 1
+    assert result.loc[result["trial_number"] == 1, "composite_score"].iloc[0] < result["composite_score"].max()
+
+
+def test_composite_trustworthy_score_orders_by_composite_not_separation():
+    candidates = pd.DataFrame(
+        {
+            "trial_number": [10, 20],
+            "silhouette": [0.9, 0.6],
+            "calinski_harabasz": [5000.0, 2000.0],
+            "davies_bouldin": [0.2, 0.5],
+            "balance": [0.1, 0.95],
+            "stability": [0.2, 0.95],
+        }
+    )
+
+    result = composite_trustworthy_score(candidates)
+
+    assert list(result["trial_number"]) == [20, 10]
+    assert result["composite_score"].is_monotonic_decreasing
+
+
+def test_composite_trustworthy_score_uses_minimum_across_trust_metrics():
+    # A candidate that is balanced but not stable (or vice versa) should be
+    # penalized by its worst trust axis, not averaged with its best one.
+    candidates = pd.DataFrame(
+        {
+            "trial_number": [1, 2],
+            "silhouette": [0.8, 0.8],
+            "calinski_harabasz": [1000.0, 1000.0],
+            "davies_bouldin": [0.3, 0.3],
+            "balance": [0.95, 0.5],
+            "stability": [0.5, 0.95],
+        }
+    )
+
+    result = composite_trustworthy_score(candidates)
+
+    assert result["trust_factor"].tolist() == [0.5, 0.5]
+    assert result["composite_score"].iloc[0] == result["composite_score"].iloc[1]
+
+
+def test_composite_trustworthy_score_handles_a_real_k_column_colliding_with_id_column():
+    # The real usage in london-cluster.ipynb: candidates come from Optuna
+    # trials that already have their own genuine "k" column (the trial's
+    # own suggested cluster count), separate from id_column="trial_number".
+    # Renaming trial_number -> "k" naively would collide with that existing
+    # column into two same-named columns, breaking recommend_k's own
+    # set_index("k") internally.
+    candidates = pd.DataFrame(
+        {
+            "trial_number": [7, 8, 9],
+            "k": [3, 5, 4],
+            "silhouette": [0.9, 0.6, 0.75],
+            "calinski_harabasz": [5000.0, 2000.0, 3000.0],
+            "davies_bouldin": [0.2, 0.5, 0.3],
+            "balance": [0.9, 0.9, 0.9],
+            "stability": [0.9, 0.9, 0.9],
+        }
+    )
+
+    result = composite_trustworthy_score(candidates)
+
+    assert set(result["trial_number"]) == {7, 8, 9}
+    assert result.iloc[0]["trial_number"] == 7

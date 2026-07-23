@@ -401,3 +401,66 @@ def external_validity_scores(labels_pred: Sequence, labels_true: Sequence) -> di
         "nmi": float(normalized_mutual_info_score(labels_true, labels_pred)),
         "purity": float(_purity_score(labels_pred, labels_true)),
     }
+
+
+def composite_trustworthy_score(
+    candidates: pd.DataFrame,
+    separation_metrics: Sequence[str] = ("silhouette", "calinski_harabasz", "davies_bouldin"),
+    trust_metrics: Sequence[str] = ("balance", "stability"),
+    id_column: str = "trial_number",
+) -> pd.DataFrame:
+    """Rank candidate pipelines by separation quality, discounted by structural trustworthiness.
+
+    Separation-only metrics (silhouette, Calinski-Harabasz, Davies-Bouldin)
+    cannot distinguish a real archetype from a single extreme outlier
+    isolated into its own cluster, since all three only measure how
+    separated groups are: an isolated outlier is, by construction,
+    perfectly separated from everything else. Folding a trust signal
+    (`ark.cluster.stability`'s balance-entropy or resampling-based
+    stability) into the *same* additive ensemble as separation does not fix
+    this on its own, since a near-perfect separation score can still
+    average out to something respectable-looking even when trust is near
+    zero. This function instead treats trust as a genuine multiplicative
+    gate on separation quality, not another vote alongside it: no amount
+    of separation can buy back a low trust factor, matching the property a
+    flat weighted average does not have.
+
+    Args:
+        candidates: One row per candidate pipeline, with `id_column` plus
+            every column named in `separation_metrics` and `trust_metrics`.
+        separation_metrics: Column names combined into a single
+            diversity-weighted rank ensemble via `recommend_k`'s own
+            `strategy="rank"` machinery (reused here, not reimplemented;
+            `id_column` is temporarily treated as `k` to do so).
+        trust_metrics: Column names combined into a single trust factor via
+            their minimum (a Rawlsian "weakest link" reflecting the same
+            convention `cluster_stability`'s own `min_cluster_stability`
+            already uses), each expected to already be oriented so that
+            higher means more trustworthy and scaled to roughly [0, 1]
+            (e.g. `balance`, `cheap_stability`, or the full audited
+            `min_cluster_stability`).
+        id_column: Column identifying each candidate row (e.g. a trial
+            number); need not actually be a cluster count.
+
+    Returns:
+        DataFrame with `id_column`, `separation_score` (the rank ensemble,
+        normalized to [0, 1]), `trust_factor`, and `composite_score`
+        (their product), sorted by `composite_score` descending.
+    """
+    # Built as a fresh frame, not candidates.rename(id_column -> "k"): the
+    # caller's own candidates frame may already have a real "k" column
+    # (e.g. an Optuna trial's own cluster-count param), and renaming would
+    # collide into two same-named columns rather than replacing it.
+    renamed = pd.DataFrame({"k": candidates[id_column].to_numpy()})
+    for metric in separation_metrics:
+        renamed[metric] = candidates[metric].to_numpy()
+    _, ranking_df = recommend_k(renamed, strategy="rank", return_ranking=True)
+    separation_score = ranking_df["weighted_borda"] / len(renamed)
+
+    trust_factor = candidates.set_index(candidates[id_column])[list(trust_metrics)].min(axis=1)
+
+    result = pd.DataFrame({"separation_score": separation_score, "trust_factor": trust_factor})
+    result["composite_score"] = result["separation_score"] * result["trust_factor"]
+    result = result.sort_values("composite_score", ascending=False)
+    result.index.name = id_column
+    return result.reset_index()
