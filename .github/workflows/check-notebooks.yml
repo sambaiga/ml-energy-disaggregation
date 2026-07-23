@@ -93,7 +93,18 @@ jobs:
           # (confirmed directly: both stream imp-post.tzst identically to
           # the base GoiEner replica above), missing from the SKIP_LIST when
           # first merged.
-          SKIP_LIST="book/03-disaggregation/02-feature-engineering-code.ipynb book/03-disaggregation/03-multi-appliance-recognition-code.ipynb book/03-disaggregation/04-multi-task-low-frequency-code.ipynb book/05-clustering/03-customer-feeder-clustering-code.ipynb book/06-ranking-recommendation/01-ranking-recommendation-code.ipynb book/07-anomaly-detection/01-anomaly-detection-code.ipynb book/08-forecasting/04-foundation-models-code.ipynb book/05-clustering/04-customer-feeder-clustering-london-code.ipynb book/05-clustering/04-customer-feeder-clustering-goiener-code.ipynb book/05-clustering/04-customer-feeder-clustering-goiener-tucker-code.ipynb book/05-clustering/04-customer-feeder-clustering-goiener-chronos-embed-code.ipynb book/05-clustering/04-customer-feeder-clustering-goiener-diffusion-code.ipynb book/05-clustering/04-customer-feeder-clustering-goiener-multires-code.ipynb book/05-clustering/04-customer-feeder-clustering-goiener-crocs-code.ipynb"
+          # book/05-clustering/london-cluster.ipynb runs a 400-trial NSGA-II
+          # (Optuna) multi-objective search over feature set, scaler, reducer,
+          # and clusterer as a single cell; confirmed to take about 53 minutes
+          # on a local Apple Silicon machine. Locally this is a one-time cost,
+          # since Optuna persists the study to resources/.optuna_cache/ and
+          # every rerun after the first loads it instead of re-searching, but
+          # that cache directory is gitignored (resources/*), so a from-scratch
+          # CI run has no study to load and reruns the full search, exceeding
+          # this job's own per-cell nbmake timeout the same way the foundation-
+          # models notebook above exceeds the job timeout. The notebook's own
+          # outputs are committed and {{< embed >}} reads them directly.
+          SKIP_LIST="book/03-disaggregation/02-feature-engineering-code.ipynb book/03-disaggregation/03-multi-appliance-recognition-code.ipynb book/03-disaggregation/04-multi-task-low-frequency-code.ipynb book/05-clustering/03-customer-feeder-clustering-code.ipynb book/06-ranking-recommendation/01-ranking-recommendation-code.ipynb book/07-anomaly-detection/01-anomaly-detection-code.ipynb book/08-forecasting/04-foundation-models-code.ipynb book/05-clustering/04-customer-feeder-clustering-london-code.ipynb book/05-clustering/04-customer-feeder-clustering-goiener-code.ipynb book/05-clustering/04-customer-feeder-clustering-goiener-tucker-code.ipynb book/05-clustering/04-customer-feeder-clustering-goiener-chronos-embed-code.ipynb book/05-clustering/04-customer-feeder-clustering-goiener-diffusion-code.ipynb book/05-clustering/04-customer-feeder-clustering-goiener-multires-code.ipynb book/05-clustering/04-customer-feeder-clustering-goiener-crocs-code.ipynb book/05-clustering/london-cluster.ipynb"
 
           # Helper: find all notebooks, excluding archived ones
           find_notebooks() {
