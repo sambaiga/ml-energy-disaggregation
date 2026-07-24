@@ -255,14 +255,15 @@ different quarters and comparing the result answers a question none of
 the ten papers do: is a customer's archetype a stable trait, or does it
 drift?
 
-Checking stability needs a metric first. The Adjusted Rand Index
-({{< acr ARI >}}) compares two sets of cluster labels for the same
-customers. For every pair of customers, it asks whether both label sets
-agree on putting them together or keeping them apart. A score of 1.0
-means the two labelings agree on every pair. A score of 0.0 means the
-agreement is no better than what random labels would give by chance,
-since {{< acr ARI >}} corrects for that chance level. There is no ground
-truth to compare against here, so the two labelings being compared are
+Checking stability needs a metric first. Chapter 1 already defined the
+Adjusted Rand Index ({{< acr ARI >}}) formally: it compares two sets of
+cluster labels for the same customers, for every pair asking whether
+both label sets agree on putting them together or keeping them apart. A
+score of 1.0 means the two labelings agree on every pair. A score of 0.0
+means the agreement is no better than what random labels would give by
+chance, since {{< acr ARI >}} corrects for that chance level. There is
+no ground truth to compare against here, so the two labelings being
+compared are
 two independent, real clusterings of the same 342 customers, one built
 from each quarter's own data. If a customer's archetype is a stable
 trait, the quarter-to-quarter clusterings should agree closely. If
@@ -468,9 +469,9 @@ NREL's real ResStock and ComStock building-stock data, 760 real buildings strati
 
 <span class='ark-concept-title'><i class="bi bi-info-circle-fill"></i> Key Concept</span>
 
-Two indices compare a discovered partition against a known one, both correcting for the agreement chance alone would produce. Hubert and Arabie's Adjusted Rand Index counts every pair of objects and asks whether the two partitions agree on whether that pair belongs together, then subtracts the agreement expected from random chance and rescales so a perfect match scores 1 and a chance-level match scores 0 [@hubert1985comparing]:
+Chapter 1 already defined both indices this check needs to compare a discovered partition against a known one, each correcting for the agreement chance alone would produce [@hubert1985comparing; @strehl2002clusterensembles]. As a brief reminder, the Adjusted Rand Index counts every pair of objects and asks whether the two partitions agree on whether that pair belongs together, rescaled so a perfect match scores 1 and a chance-level match scores 0:
 $$\text{ARI} = \frac{\sum_{ij}\binom{n_{ij}}{2} - \left[\sum_i \binom{a_i}{2}\sum_j \binom{b_j}{2}\right]\big/\binom{n}{2}}{\frac{1}{2}\left[\sum_i \binom{a_i}{2} + \sum_j \binom{b_j}{2}\right] - \left[\sum_i \binom{a_i}{2}\sum_j \binom{b_j}{2}\right]\big/\binom{n}{2}}$$
-where $n_{ij}$ is the number of objects placed in true group $i$ and discovered group $j$ at once, and $a_i$, $b_j$ are each partition's own group sizes. Strehl and Ghosh's Normalized Mutual Information asks a different question, how much does knowing one partition reduce real uncertainty about the other [@strehl2002clusterensembles]:
+where $n_{ij}$ is the number of objects placed in true group $i$ and discovered group $j$ at once, and $a_i$, $b_j$ are each partition's own group sizes. Normalized Mutual Information asks a different question, how much does knowing one partition reduce real uncertainty about the other:
 $$\text{NMI}(U, V) = \frac{I(U, V)}{\tfrac{1}{2}\left[H(U) + H(V)\right]}$$
 where $I(U,V)$ is the mutual information between the two partitions and $H(\cdot)$ is Shannon entropy. Neither index rewards a discovered partition just for having a similar number of groups to the true one; both only reward it for actually grouping the same real objects together.
 
