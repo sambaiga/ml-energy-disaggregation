@@ -65,7 +65,11 @@ book:
       chapters:
         - book/05-clustering/01-clustering-foundations.qmd
         - book/05-clustering/02-clustering-methodology.qmd
-        - book/05-clustering/03-customer-feeder-clustering.qmd
+        - book/05-clustering/03-customer-clustering.qmd
+        # Chapter 4 (Alternative Representations, Tested Honestly) lands here
+        # once the new London/GoiEner notebooks exist; numbering already
+        # reserved so Chapter 5 below doesn't need a second renumbering pass.
+        - book/05-clustering/05-feeder-level-clustering.qmd
     - part: "Part 6: Ranking and Recommendation"
       chapters:
         - book/06-ranking-recommendation/01-ranking-recommendation.qmd

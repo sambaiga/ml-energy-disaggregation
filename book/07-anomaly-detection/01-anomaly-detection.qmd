@@ -16,7 +16,7 @@ actually builds and tests the anomaly-detection paradigm every paper in
 this space still uses: one meter, one baseline, decide if today's reading
 deviates from it. That framing quietly assumes two things that are
 becoming false as {{< acr LV >}} networks evolve. It assumes a customer's
-own "normal" stays fixed once established, and Part 5 Chapter 2 already
+own "normal" stays fixed once established, and Part 5 Chapter 3 already
 found real archetype drift within a single year that says otherwise. And it
 assumes an anomaly lives inside one customer's own meter, when real
 {{< acr DER >}} adoption clusters and synchronizes, so a real anomaly can
@@ -82,7 +82,7 @@ method Lundberg and Lee published in 2017 [@lundberg2017shap].
 ## Getting the data
 
 This chapter reuses the same real AusNet smart-meter pool Part 4
-Chapters 1 through 3 and Part 5 Chapters 1 and 2 already vendored, no
+Chapters 1 through 3 and Part 5 Chapter 3 already vendored, no
 new fetch step needed:
 
 ```bash
@@ -117,7 +117,7 @@ window into a distance-matrix image carrying far more identifying signal
 than any single reading. The same lesson applies here, on a different
 signal, at a different frequency: every detector in this section runs on
 each customer's own peak-normalized daily shape, the same representation
-Part 5 Chapters 1 and 2 already cluster and retrieve on, plus rolling statistics
+Part 5 Chapter 3 already clusters and retrieves on, plus rolling statistics
 and FFT-magnitude features carrying the moment-to-moment
 structure a pure shape embedding would miss.
 
@@ -141,7 +141,7 @@ anomalies.
 ### Injecting known anomalies, honestly
 
 No real, publicly labeled stuck-meter or communication-dropout data
-exists for this feeder. Matching the exact discipline Part 5 Chapter 2 used for
+exists for this feeder. Matching the exact discipline Part 5 Chapter 3 used for
 its {{< acr EV >}}-injection test and Part 6 Chapter 1 used for its
 new-adopter validation: inject known, realistic anomalies onto real customer data, so
 detection is checked against ground truth this chapter actually knows,
@@ -325,7 +325,7 @@ a customer-day flagged only once its own score $z > \tau$. This is the
 same finite-sample, distribution-free guarantee behind every other
 split-conformal threshold in this book [@lei2018distributionfree], the
 guarantee itself unchanged, only the nonconformity score's own meaning:
-a distance to a centroid in Part 4 Chapter 3 or Part 5 Chapter 2, an
+a distance to a centroid in Part 4 Chapter 3 or Part 5 Chapter 3, an
 anomaly score here. Every earlier chapter that used split-conformal calibration set a
 single confidence level and moved on; this section makes the tradeoff
 itself visible instead, calibrating the same real pipeline at three
@@ -546,7 +546,7 @@ feeder is a single transformer serving thirty-one customers, a star, not
 a multi-hop graph. The UK network's 414 real feeders are each still a
 modest, shallow topology, the same reason this book keeps finding added
 model complexity does not earn its keep at this scale, {{< acr IDEC >}}
-in Part 5 Chapter 2, the learned ranker in Part 6 Chapter 1. A topology-aware check
+in Part 5 Chapter 3, the learned ranker in Part 6 Chapter 1. A topology-aware check
 here does not need a learned model at all: knowing which customers share
 a transformer, and summing their real simultaneous export, catches what
 Section 1's per-customer pipeline cannot see by construction.
@@ -615,7 +615,7 @@ first two: not whether a detector works today, but whether it keeps
 working as the population it watches changes underneath it. Section 1's
 detector and Section 2's topology check both assume a fixed
 idea of what this feeder's population normally looks like. That
-assumption has an expiration date. Part 5 Chapter 2 already found real
+assumption has an expiration date. Part 5 Chapter 3 already found real
 archetype drift within a single year, real customers really do change
 their own behavior as they adopt {{< acr PV >}}, an {{< acr EV >}}, or
 storage. A confidence threshold calibrated once and never revisited will
@@ -628,7 +628,7 @@ retrieval-confidence machinery unchanged, no new algorithm.
 ### A false start, kept honest
 
 The first version of this test gave every adopter the exact same
-injected {{< acr EV >}} shape, matching Part 5 Chapter 2's own new-adopter
+injected {{< acr EV >}} shape, matching Part 5 Chapter 3's own new-adopter
 test cell for cell. Trust went up as adoption climbed, not down, the opposite
 of the point this section is trying to make. The reason, checked directly
 rather than shrugged off: when every adopter's shape shifts identically,
@@ -850,7 +850,7 @@ a behavioral question, occurrence, severity, timing instead of
 magnitude, that catches a real fault the standard paradigm misses more
 than half the time, while also confirming, on a real voltage violation,
 that some structural blind spots survive any feature choice. Section 3
-turns Part 5 Chapter 2's own archetype drift into a forward-looking KPI, so a
+turns Part 5 Chapter 3's own archetype drift into a forward-looking KPI, so a
 {{< acr DSO >}} learns a model has gone stale from a real number, not a
 rising complaint count.
 

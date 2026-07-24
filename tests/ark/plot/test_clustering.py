@@ -81,6 +81,28 @@ def test_cluster_scatter_returns_a_plot_spec():
     assert type(chart).__name__ == "PlotSpec"
 
 
+def test_cluster_scatter_max_points_below_row_count_still_returns_a_plot_spec():
+    rng = np.random.default_rng(0)
+    embedding = rng.normal(size=(200, 2))
+    labels = rng.choice([0, 1, 2], size=200, p=[0.7, 0.2, 0.1])
+
+    # A dense scatter with a max_points cap should apply stratified
+    # sampling rather than error, still returning a normal plot spec.
+    chart = cluster_scatter(embedding, labels, max_points=50)
+
+    assert type(chart).__name__ == "PlotSpec"
+
+
+def test_cluster_scatter_max_points_above_row_count_is_a_no_op():
+    embedding = np.array([[0.0, 0.0], [1.0, 1.0], [5.0, 5.0]])
+    labels = [0, 0, 1]
+
+    # max_points larger than the data itself should not engage sampling.
+    chart = cluster_scatter(embedding, labels, max_points=1000)
+
+    assert type(chart).__name__ == "PlotSpec"
+
+
 def test_cluster_profiles_returns_a_plot_spec():
     profiles = np.array(
         [
