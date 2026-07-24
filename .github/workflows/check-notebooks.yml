@@ -87,6 +87,20 @@ jobs:
           # directly: both stream imp-post.tzst identically to the base
           # GoiEner replica above), missing from the SKIP_LIST when first
           # merged.
+          # book/05-clustering/04-customer-feeder-clustering-london-tucker-code.ipynb,
+          # book/05-clustering/04-customer-feeder-clustering-london-crocs-code.ipynb
+          # need the real London LCL archives under resources/london-lcl/data/
+          # (13304499.zip, Partitioned LCL Data.zip), gitignored the same way
+          # as the GoiEner archive above (resources/*), and not available in
+          # CI; the Tucker notebook also needs tensorly.
+          # book/05-clustering/04-customer-feeder-clustering-london-chronos-embed-code.ipynb
+          # and book/05-clustering/04-customer-feeder-clustering-london-diffusion-code.ipynb
+          # need the same gitignored London archives, and download/run the
+          # real Chronos-2 foundation model (already skip-listed elsewhere
+          # for the same real inference-cost reason as
+          # book/08-forecasting/04-foundation-models-code.ipynb); the
+          # diffusion notebook also rebuilds the Tucker embedding internally,
+          # so needs tensorly too.
           # book/05-clustering/02-clustering-methodology-code.ipynb runs a 400-trial NSGA-II
           # (Optuna) multi-objective search over feature set, scaler, reducer,
           # and clusterer as a single cell; confirmed to take about 53 minutes
@@ -98,7 +112,7 @@ jobs:
           # this job's own per-cell nbmake timeout the same way the foundation-
           # models notebook above exceeds the job timeout. The notebook's own
           # outputs are committed and {{< embed >}} reads them directly.
-          SKIP_LIST="book/03-disaggregation/02-feature-engineering-code.ipynb book/03-disaggregation/03-multi-appliance-recognition-code.ipynb book/03-disaggregation/04-multi-task-low-frequency-code.ipynb book/05-clustering/03-customer-clustering-code.ipynb book/06-ranking-recommendation/01-ranking-recommendation-code.ipynb book/07-anomaly-detection/01-anomaly-detection-code.ipynb book/08-forecasting/04-foundation-models-code.ipynb book/05-clustering/04-customer-feeder-clustering-goiener-code.ipynb book/05-clustering/04-customer-feeder-clustering-goiener-tucker-code.ipynb book/05-clustering/04-customer-feeder-clustering-goiener-chronos-embed-code.ipynb book/05-clustering/04-customer-feeder-clustering-goiener-diffusion-code.ipynb book/05-clustering/04-customer-feeder-clustering-goiener-multires-code.ipynb book/05-clustering/04-customer-feeder-clustering-goiener-crocs-code.ipynb book/05-clustering/02-clustering-methodology-code.ipynb"
+          SKIP_LIST="book/03-disaggregation/02-feature-engineering-code.ipynb book/03-disaggregation/03-multi-appliance-recognition-code.ipynb book/03-disaggregation/04-multi-task-low-frequency-code.ipynb book/05-clustering/03-customer-clustering-code.ipynb book/06-ranking-recommendation/01-ranking-recommendation-code.ipynb book/07-anomaly-detection/01-anomaly-detection-code.ipynb book/08-forecasting/04-foundation-models-code.ipynb book/05-clustering/04-customer-feeder-clustering-goiener-code.ipynb book/05-clustering/04-customer-feeder-clustering-goiener-tucker-code.ipynb book/05-clustering/04-customer-feeder-clustering-goiener-chronos-embed-code.ipynb book/05-clustering/04-customer-feeder-clustering-goiener-diffusion-code.ipynb book/05-clustering/04-customer-feeder-clustering-goiener-multires-code.ipynb book/05-clustering/04-customer-feeder-clustering-goiener-crocs-code.ipynb book/05-clustering/04-customer-feeder-clustering-london-tucker-code.ipynb book/05-clustering/04-customer-feeder-clustering-london-chronos-embed-code.ipynb book/05-clustering/04-customer-feeder-clustering-london-diffusion-code.ipynb book/05-clustering/04-customer-feeder-clustering-london-crocs-code.ipynb book/05-clustering/02-clustering-methodology-code.ipynb"
 
           # Helper: find all notebooks, excluding archived ones
           find_notebooks() {
