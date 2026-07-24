@@ -12,84 +12,51 @@ around 342 individual shapes. It needs a smaller number of real,
 recurring patterns underneath that mess, not an average that describes no
 one.
 
-This chapter builds those patterns from AusNet's own year of real
-smart-meter data. It checks whether a customer's pattern is a stable
-trait or a one-day snapshot, a question none of this chapter's own
-reference papers ask. And it tests whether knowing a customer's pattern
-actually predicts anything a {{< acr DSO >}} would care about: which real
-{{< acr DER >}} constraint, voltage or thermal, that customer's own
-future {{< acr PV >}} or {{< acr EV >}} adoption is likely to trigger.
+Chapter 1 named the four real questions behind that need. Chapter 2
+settled how to answer them without labels: cluster on shape, not
+magnitude, and validate the result against resampling rather than a
+single index. Whatever recipe wins still has to check out against more
+than one real population before anyone trusts it. This chapter is where
+that settled methodology meets AusNet's own real customers for the first
+time. It builds archetypes from AusNet's own year of real smart-meter
+data. It checks whether a customer's pattern is a stable trait or a
+one-day snapshot, a question the literature Chapter 1 reviewed never
+asks. And it tests whether knowing a customer's pattern predicts
+anything a {{< acr DSO >}} would care about. Specifically, which real
+{{< acr DER >}} constraint, voltage or thermal, a customer's own future
+{{< acr PV >}} or {{< acr EV >}} adoption is likely to trigger.
 
-## Why cluster, not classify
+## Applying a settled methodology, not re-deriving one
 
-There is no ground-truth "true customer type" label for real households
-at this scale. No utility keeps one. That makes this a clustering
-problem, an unsupervised search for structure, not a classification
-problem with a known answer to check against. Part 4 Chapter 3's phase-
-identification work had a real answer to check its own clustering
-against. This chapter does not, and leans on validity indices and honest
-sensitivity checks instead.
+Chapter 1 already settled why this is a clustering problem, not a
+classification one. No utility keeps a ground-truth "true customer type"
+label, so there is structure to discover here, not a known answer to
+check against. Part 4 Chapter 3's phase-identification work had a real
+answer to check its own clustering against. This chapter does not, and
+leans on the same validity indices and honest sensitivity checks Chapter
+1 introduced and Chapter 2 put into real practice.
 
-The second choice that matters is what "similar" means for a load shape.
-A small apartment and a large house can have very different absolute
-demand and still share the same underlying rhythm, both peaking in the
-evening, both quiet at 3 a.m. Clustering on raw magnitude would separate
-them by size instead of by behavior. Every profile in this chapter is
-normalized by its own peak before clustering, the same "shape, not
-magnitude" principle Part 4 Chapter 3 used for a different reason, voltage
-correlation rather than raw voltage tracked phase membership there. Here
-it is what lets a small household and a large one land in the same
-archetype when their rhythm actually matches.
+Chapter 1 and Chapter 2 also already settled what "similar" means for a
+load shape. Every method in this part clusters on peak-normalized shape,
+not raw magnitude. A small apartment and a large house can then land in
+the same archetype when their rhythm matches, shown directly in Chapter
+1's own figure. Part 4 Chapter 3 used the same principle for a different
+reason, tracking phase membership through voltage correlation rather
+than raw voltage. This chapter applies that settled choice. It does not
+re-derive it.
 
-This is not new ground. McLoughlin, Duffy, and Conlon compared k-means,
-k-medoids, and self-organizing maps for exactly this problem, domestic
-load-shape characterization, and settled the same habit this chapter
-follows below: check more than one validity index, since no single one
-reliably picks the right number of clusters alone
-[@mcloughlin2015clustering]. Kwac, Flora, and Rajagopal built an encoded
-load-shape dictionary from real California smart-meter data to drive five
-program-relevant lifestyle segments, an early demonstration that shape-
-based clusters map onto real customer behavior, not just statistical
-artifacts [@kwac2014segmentation]. Haben, Singleton, and Grindrod
-clustered real UK residential demand directly on behavioral shape, the
-same instinct this chapter applies to AusNet's own data
-[@haben2016clustering].
-
-More recently, Rajabi et al. benchmarked clustering techniques for load-
-pattern segmentation directly, the role this chapter's own validity-index
-comparison plays for AusNet specifically [@rajabi2020comparative].
-Michalakopoulos et al. ran nearly 5,000 real London households through
-k-means, k-medoids, hierarchical, and DBSCAN clustering, adding
-explainable AI so the resulting archetypes are interpretable,
-not just numerically distinct [@michalakopoulos2024clustering]. Yerbury
-et al. pushed further still with CROCS, a two-stage framework that first
-summarizes each real consumer's own representative daily behaviors, then
-clusters consumers by how similar those behavior sets are, tested on real
-Australian smart-meter data, the most current entry in this lineage
-[@yerbury2026crocs]. None of the five, though, ask whether a customer's
-archetype holds up across a full year rather than the one window each one
-clusters on, the gap this chapter's own stability check fills.
-
-::: {.ark-concept}
-<span class="ark-concept-title"><i class="bi bi-info-circle-fill"></i> Key Concept</span>
-
-**Shape, not magnitude, is the clustering feature.** Two households can
-draw very different absolute power and still share the same underlying
-rhythm. A method that clusters on raw magnitude answers "which customers
-use a similar amount of power," a question dominated by household size.
-A method that clusters on peak-normalized shape answers "which
-customers' demand rises and falls together," the question that actually
-separates behavioral archetypes. Every result in this chapter clusters
-on shape.
-
-:::
-
-![A small apartment (peak 1.0 kW) and a large house (peak 4.5 kW) share the same evening rhythm. Clustering on raw magnitude (left) separates them by size; clustering on peak-normalized shape (right), the choice this chapter makes, groups them together because their rhythm matches.](../../assets/customer-shape-vs-magnitude.svg){#fig-shape-vs-magnitude}
+Chapter 1's own literature review already covers this ground in depth,
+from McLoughlin, Kwac, and Haben's early shape-based work through
+Rajabi's comparative benchmarking to Michalakopoulos's explainable
+clustering and Yerbury's CROCS. None of that literature asks whether a
+customer's archetype holds up across a full real year, or only the one
+window each study clustered on. That gap is what this chapter's own
+stability check fills, later on.
 
 ## Getting the data
 
-This chapter reuses the same real AusNet smart-meter pool Chapters 1
-through 3 already vendored, no new fetch step needed:
+This chapter reuses the same real AusNet smart-meter pool Part 4
+Chapters 1 through 3 already vendored, no new fetch step needed:
 
 ```bash
 uv run python scripts/fetch_part4_ausnet_data.py
@@ -151,6 +118,31 @@ afternoon-into-evening riser, a late-evening peaker with a small morning
 bump, and two broadly similar late-night risers, exactly the pair the
 modest silhouette score was warning about. The chart makes concrete what
 the number only hinted at: some of these archetypes genuinely overlap.
+
+### Does the clustering algorithm matter here too?
+
+Part 5 Chapter 2 found that k-means, Gaussian mixture, and agglomerative
+clustering return the identical partition once feature, scaler, and
+reducer are already fixed. That finding was checked on London's own
+PaCMAP-reduced embedding at $K=2$, not on AusNet's own raw
+48-dimensional shape at $K=5$. A different population, a different
+dimensionality, and a different $K$ is exactly the kind of change that
+could break an inherited assumption rather than confirm it, so it gets
+checked directly here, not assumed to travel.
+
+{{< embed 03-customer-clustering-code.ipynb#11a0708c >}}
+
+Unlike London's own clean two-way split, the clusterer choice is not
+free here. k-means and Gaussian mixture come close, nearly identical
+silhouette (0.163 against 0.162) and balance (0.975 against 0.972), and
+a real but imperfect agreement (Adjusted Rand Index 0.876). Agglomerative
+clustering diverges more. Its silhouette drops to 0.129 and it agrees
+with k-means on barely half the population (Adjusted Rand Index 0.456).
+Five overlapping archetypes leave real room for algorithms to disagree,
+room a cleanly separated two-way split simply does not have. k-means
+remains this chapter's own reasonable, defensible choice. It is not
+interchangeable with every other family the way Chapter 2's own
+easier case suggested.
 
 Choosing five archetypes over the strict silhouette optimum of two was a
 deliberate trade, made transparently earlier in this section rather than
@@ -263,14 +255,15 @@ different quarters and comparing the result answers a question none of
 the ten papers do: is a customer's archetype a stable trait, or does it
 drift?
 
-Checking stability needs a metric first. The Adjusted Rand Index
-({{< acr ARI >}}) compares two sets of cluster labels for the same
-customers. For every pair of customers, it asks whether both label sets
-agree on putting them together or keeping them apart. A score of 1.0
-means the two labelings agree on every pair. A score of 0.0 means the
-agreement is no better than what random labels would give by chance,
-since {{< acr ARI >}} corrects for that chance level. There is no ground
-truth to compare against here, so the two labelings being compared are
+Checking stability needs a metric first. Chapter 1 already defined the
+Adjusted Rand Index ({{< acr ARI >}}) formally: it compares two sets of
+cluster labels for the same customers, for every pair asking whether
+both label sets agree on putting them together or keeping them apart. A
+score of 1.0 means the two labelings agree on every pair. A score of 0.0
+means the agreement is no better than what random labels would give by
+chance, since {{< acr ARI >}} corrects for that chance level. There is
+no ground truth to compare against here, so the two labelings being
+compared are
 two independent, real clusterings of the same 342 customers, one built
 from each quarter's own data. If a customer's archetype is a stable
 trait, the quarter-to-quarter clusterings should agree closely. If
@@ -476,15 +469,13 @@ NREL's real ResStock and ComStock building-stock data, 760 real buildings strati
 
 <span class='ark-concept-title'><i class="bi bi-info-circle-fill"></i> Key Concept</span>
 
-Two indices compare a discovered partition against a known one, both correcting for the agreement chance alone would produce. Hubert and Arabie's Adjusted Rand Index counts every pair of objects and asks whether the two partitions agree on whether that pair belongs together, then subtracts the agreement expected from random chance and rescales so a perfect match scores 1 and a chance-level match scores 0 [@hubert1985comparing]:
+Chapter 1 already defined both indices this check needs to compare a discovered partition against a known one, each correcting for the agreement chance alone would produce [@hubert1985comparing; @strehl2002clusterensembles]. As a brief reminder, the Adjusted Rand Index counts every pair of objects and asks whether the two partitions agree on whether that pair belongs together, rescaled so a perfect match scores 1 and a chance-level match scores 0:
 $$\text{ARI} = \frac{\sum_{ij}\binom{n_{ij}}{2} - \left[\sum_i \binom{a_i}{2}\sum_j \binom{b_j}{2}\right]\big/\binom{n}{2}}{\frac{1}{2}\left[\sum_i \binom{a_i}{2} + \sum_j \binom{b_j}{2}\right] - \left[\sum_i \binom{a_i}{2}\sum_j \binom{b_j}{2}\right]\big/\binom{n}{2}}$$
-where $n_{ij}$ is the number of objects placed in true group $i$ and discovered group $j$ at once, and $a_i$, $b_j$ are each partition's own group sizes. Strehl and Ghosh's Normalized Mutual Information asks a different question, how much does knowing one partition reduce real uncertainty about the other [@strehl2002clusterensembles]:
+where $n_{ij}$ is the number of objects placed in true group $i$ and discovered group $j$ at once, and $a_i$, $b_j$ are each partition's own group sizes. Normalized Mutual Information asks a different question, how much does knowing one partition reduce real uncertainty about the other:
 $$\text{NMI}(U, V) = \frac{I(U, V)}{\tfrac{1}{2}\left[H(U) + H(V)\right]}$$
-where $I(U,V)$ is the mutual information between the two partitions and $H(\cdot)$ is Shannon entropy. Neither index rewards a discovered partition just for having a similar number of groups to the true one; both only reward it for actually grouping the same real objects together.
+where $I(U,V)$ is the mutual information between the two partitions and $H(\cdot)$ is Shannon entropy. Neither index rewards a discovered partition just for having a similar number of groups to the true one; both only reward it for actually grouping the same real objects together. Chapter 1's own diagram shows exactly what that means: agreement between two real partitions of the same objects, not just matching group counts.
 
 </div>
-
-![What ARI and NMI actually measure: agreement between two real partitions of the same objects, corrected for chance, not just matching group counts. A point whose true category and discovered cluster disagree is marked with an outline.](../../assets/ground-truth-vs-discovered-clusters.svg){#fig-ground-truth-vs-discovered-clusters}
 
 {{< embed 03-customer-clustering-code.ipynb#459405ad >}}
 
@@ -544,14 +535,14 @@ less resampling confidence.
 
 Worth being precise about which of Chapter 2's own findings this
 reconfirms. That chapter's own search surfaced several real, differently
-resolved answers for London, not only $K=2$: a richer six-way split on
-the same shape representation and a genuinely different four-way split on
-day-to-day volatility both pass the same real resampling thresholds just
-as convincingly. This section's own no-dimension-reduction pipeline
-reconfirms specifically the *coarse* two-way resolution, independently, on
-a different embedding entirely. The richer resolutions remain a
-PaCMAP-space-specific finding, not yet checked against this chapter's own
-no-reduction convention the way $K=2$ has been here.
+resolved answers for London, not only $K=2$. A richer six-way split on
+the same shape representation passes the same real resampling thresholds
+just as convincingly, and so does a genuinely different four-way split
+on day-to-day volatility. This section's own no-dimension-reduction
+pipeline reconfirms specifically the *coarse* two-way resolution,
+independently, on a different embedding entirely. The richer resolutions
+remain a PaCMAP-space-specific finding. They are not yet checked against
+this chapter's own no-reduction convention the way $K=2$ has been here.
 
 {{< embed 03-customer-clustering-code.ipynb#383ef6fe >}}
 

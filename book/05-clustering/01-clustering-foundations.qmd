@@ -36,7 +36,7 @@ where $\text{cut}(S_k,\bar S_k) = \sum_{i\in S_k, j\notin S_k} w_{ij}$ represent
 
 ![Each clustering objective family optimises a distinct criterion. Partition-based methods generate Voronoi-like regions centred around a centroid. Hierarchical approaches construct a tree and select a cut that yields the desired number of groups. Density-connectivity methods identify clusters of arbitrary shape and classify genuine outliers as noise rather than assigning them to clusters. Graph or spectral methods partition a similarity graph into the smallest number of components with minimal total edge weight.](../../assets/clustering-objective-families.svg){#fig-clustering-objective-families}
 
-**Hierarchical clustering** is especially relevant here, as it is among the most widely used methods in the energy literature. Michalakopoulos et al. conducted a comparative analysis of k-means, k-medoids, hierarchical clustering, and DBSCAN using empirical data from a London population, which the next chapter also revisits [@michalakopoulos2024clustering]. Murphy's textbook provides a comprehensive treatment of all four families, including worked numeric examples, which serves as a common reference point for this chapter and Part 2's unsupervised-learning chapter, not a citation to re-derive from scratch.
+**Hierarchical clustering** is especially relevant here, as it is among the most widely used methods in the energy literature. Michalakopoulos et al. conducted a comparative analysis of k-means, k-medoids, hierarchical clustering, and DBSCAN using empirical data from a London population, the same population Chapter 2 settles a methodology on [@michalakopoulos2024clustering]. Murphy's textbook provides a comprehensive treatment of all four families, including worked numeric examples, which serves as a common reference point for this chapter and Part 2's unsupervised-learning chapter, not a citation to re-derive from scratch.
 
 Computational cost varies sharply across these four families, and that cost is itself a real selection criterion, not merely an implementation detail. Partition-based methods scale the most gently, $O(nKdI)$ for $n$ points, $K$ centroids, $d$ dimensions, and $I$ iterations, making them the practical default at real utility scale. Hierarchical methods are markedly more expensive: $O(n^2)$ space and $O(n^3)$ time in the naive implementation, reducible to $O(n^2 \log n)$ with a priority queue, a cost Murphy's own textbook quantifies directly. Density-connectivity methods such as DBSCAN cost $O(n \log n)$ once a spatial index is available, but degrade to $O(n^2)$ without one. Graph and spectral methods carry the heaviest cost of the four, typically $O(n^3)$ for the eigendecomposition of the similarity graph's Laplacian, a real practical limit on how many customers or feeders a single spectral run can handle before an approximate or sparse solver becomes necessary.
 
@@ -72,6 +72,18 @@ Real {{< acr AMI >}} data rarely arrives ready to cluster. Aghabozorgi, Shirkhor
 Adding more features may appear to enhance safety by providing additional information. This becomes problematic, however, once the number of features approaches the size of the population being clustered: as dimensionality increases, pairwise distances tend to concentrate, genuine and spurious structure become harder to tell apart, and a clustering algorithm may begin to report splits that are merely artefacts of noise, rather than meaningful groupings. Ezugwu et al. and Ren et al. both identify the curse of dimensionality as an ongoing, unresolved challenge in their own recent surveys, rather than a problem that clustering theory has already retired [@ezugwu2022clustering; @ren2024deepclustering]. A subsequent chapter in this part runs directly into a concrete example of this specific failure mode, not just the general warning.
 :::
 
+Reducing dimensions is the standard answer to that warning, and it raises its own real question: once a technique like {{< acr PCA >}} or a nonlinear embedding is in play, how many of its components are actually worth keeping. A fixed rule, keep enough to reach 90% of cumulative explained variance, is common but arbitrary, chosen for convenience rather than derived from the data's own structure.
+
+::: {.ark-concept}
+<span class="ark-concept-title"><i class="bi bi-info-circle-fill"></i> Key Concept</span>
+
+Zhu and Ghodsi's profile-likelihood method offers a principled alternative, an automatic change point in the eigenvalue spectrum itself, with no threshold to tune [@zhu2006profilelikelihood]. Model the top $q$ eigenvalues and the remaining $p - q$ as two Gaussian groups sharing one pooled variance, and choose the $q$ that maximises the resulting profile log-likelihood:
+$$\ell(q) = \sum_{i=1}^{q} \log \mathcal{N}(\lambda_i \mid \mu_1, \sigma^2) + \sum_{i=q+1}^{p} \log \mathcal{N}(\lambda_i \mid \mu_2, \sigma^2)$$
+where $\lambda_1 \geq \dots \geq \lambda_p$ are the ordered eigenvalues, $\mu_1, \mu_2$ are each group's own mean, and $\sigma^2$ is pooled across both so the profile likelihood cannot diverge by shrinking one group's variance to zero. A later chapter checks this method directly against the fixed 90%-variance rule on this book's own real data, and reports where the two agree and where they genuinely diverge.
+:::
+
+![An illustrative eigenvalue spectrum, one dominant direction followed by a long, smoothly decaying tail. The 90%-variance rule and profile likelihood's own change point land at genuinely different points along the same curve, since a smoothly decaying tail gives neither method an obvious place to stop by construction.](../../assets/component-selection.svg){#fig-component-selection}
+
 ::: {.ark-mistake}
 <span class="ark-mistake-title"><i class="bi bi-bug-fill"></i> Common Mistake</span>
 
@@ -100,15 +112,33 @@ In parallel, another line of research replaces hand-engineered shape features wi
 
 ## Evaluating a clustering
 
-Every clustering method the rest of this part builds answers to the same set of real, literature-grounded decisions, in the order a practitioner actually faces them, starting with shape, not magnitude: two households can draw very different absolute power and still share the same underlying rhythm, and clustering on raw magnitude separates them by household size instead of behaviour. Every clustering method later in this part clusters on shape, established here first, applied concretely starting in the next chapter. Distance and representation matter too: Euclidean-on-shape, elastic alignment ({{< acr DTW >}}), a multi-way tensor factorisation, a nonlinear manifold embedding, and a learned representation (DEC, IDEC, Chronos-2) trade off real compute cost against what kind of similarity actually gets captured, the tradeoff Aghabozorgi, Ren, and Alqahtani's reviews all name directly. None is a free upgrade over the others.
+Every clustering method the rest of this part builds answers to the same set of real, literature-grounded decisions, in the order a practitioner actually faces them, starting with shape, not magnitude: two households can draw very different absolute power and still share the same underlying rhythm, and clustering on raw magnitude separates them by household size instead of behaviour. Every clustering method later in this part clusters on shape, established here first, applied concretely starting in the next chapter.
+
+![A small apartment (peak 1.0 kW) and a large house (peak 4.5 kW) share the same evening rhythm. Clustering on raw magnitude (left) separates them by size; clustering on peak-normalised shape (right), the convention every method in this part follows, groups them together because their rhythm matches.](../../assets/customer-shape-vs-magnitude.svg){#fig-shape-vs-magnitude}
+
+Distance and representation matter too: Euclidean-on-shape, elastic alignment ({{< acr DTW >}}), a multi-way tensor factorisation, a nonlinear manifold embedding, and a learned representation (DEC, IDEC, Chronos-2) trade off real compute cost against what kind of similarity actually gets captured, the tradeoff Aghabozorgi, Ren, and Alqahtani's reviews all name directly. None is a free upgrade over the others.
 
 ::: {.ark-concept}
 <span class="ark-concept-title"><i class="bi bi-info-circle-fill"></i> Key Concept</span>
 
-Relying on a single validity index is never sufficient. The silhouette coefficient, introduced by Rousseeuw [@rousseeuw1987silhouette], offers one perspective on cluster quality. It measures how well each point fits within its assigned cluster compared to the closest alternative cluster.
+Relying on a single validity index is never sufficient. Three separation-based indices recur throughout this part, each built from a different ratio of the same two ingredients, within-cluster compactness and between-cluster separation. The silhouette coefficient, introduced by Rousseeuw, measures how well each point fits within its assigned cluster compared to the closest alternative cluster [@rousseeuw1987silhouette].
 $$s(i) = \frac{b(i) - a(i)}{\max\{a(i), b(i)\}}$$
-where $a(i)$ is the mean distance from point $i$ to the other members of its own cluster, and $b(i)$ is the mean distance to the members of the nearest other cluster. Jain's own retrospective is explicit that no single index is universally correct, and the rest of this part checks more than one every time a real number of clusters has to be chosen.
+Here $a(i)$ is the mean distance from point $i$ to the other members of its own cluster, and $b(i)$ is the mean distance to the members of the nearest other cluster. Davies and Bouldin instead compare each cluster to its own worst-case neighbour [@daviesbouldin1979clusterseparation]:
+$$DB = \frac{1}{K}\sum_{i=1}^{K}\max_{j \neq i}\left(\frac{\sigma_i + \sigma_j}{d(c_i, c_j)}\right)$$
+where $\sigma_i$ is the mean distance of cluster $i$'s own members to their centroid $c_i$, and $d(c_i, c_j)$ is the distance between two centroids; lower values mean better-separated clusters. Caliński and Harabasz take a variance-ratio view instead [@calinskiharabasz1974dendrite]:
+$$CH = \frac{SS_B / (K - 1)}{SS_W / (n - K)}$$
+where $SS_B$ is the between-cluster sum of squares (each centroid's own squared distance to the overall mean, weighted by cluster size) and $SS_W$ is the within-cluster sum of squares (every point's own squared distance to its cluster's centroid); higher values mean better-separated clusters. Jain's own retrospective is explicit that no single index is universally correct, and the rest of this part checks more than one every time a real number of clusters has to be chosen.
 :::
+
+::: {.ark-mistake}
+<span class="ark-mistake-title"><i class="bi bi-bug-fill"></i> Common Mistake</span>
+
+Checking multiple separation-based indices and treating their agreement as confirmation. Silhouette, Davies-Bouldin, and Calinski-Harabasz are three different formulas built from the same two ingredients, compactness and separation. They agree precisely where all three are equally blind: an isolated outlier, a single point far from everything else, satisfies every separation-based definition of a good cluster at once, however small that cluster is. None of the three has a term that penalises one group holding almost none of the population. A balance measure closes that specific gap, entropy over the cluster-size distribution [@shannon1948mathematicaltheory]:
+$$H(\mathbf{p}) = -\sum_{k=1}^{K} p_k \log p_k, \qquad p_k = n_k / n$$
+normalised to $[0, 1]$ by dividing by $\log K$, its own maximum when every cluster is exactly the same size. Balance is cheap to compute and needs no resampling, but it is a symptom check, not proof that a cluster is real: a genuine rare archetype and a fabricated one can both score low. A later chapter finds a concrete, real example of separation-index agreement hiding exactly this failure, and builds a decision rule around balance and resampling evidence together rather than separation alone.
+:::
+
+![Two illustrative populations, both reading as well separated by every formula above. Left: a real, even two-way split. Right: one dominant group plus two isolated points, a genuine outlier rather than a real archetype. Neither silhouette, Davies-Bouldin, nor Calinski-Harabasz has a term for population share, so both score as a win.](../../assets/separation-index-blind-spot.svg){#fig-separation-index-blind-spot}
 
 ## Choosing K
 
@@ -124,13 +154,51 @@ Determining the optimal value of $K$ using the elbow of a distortion or inertia 
 
 ## Checking stability
 
-When no ground truth exists, ensemble methods offer a practical way to assess stability. Strehl and Ghosh's Cluster-based Similarity Partitioning Algorithm provides a clear example [@strehl2002clusterensembles]. It builds a consensus similarity matrix by combining results from several independent clusterings of the same objects.
+When no ground truth exists, several complementary methods ask whether a clustering is trustworthy, not just well-scored. Each answers a genuinely different version of "checking stability."
+
+Strehl and Ghosh's Cluster-based Similarity Partitioning Algorithm asks whether an algorithm keeps finding the same structure across several independent runs on the same objects [@strehl2002clusterensembles]. It builds a consensus similarity matrix.
 $$S = \frac{1}{r}HH^\top,\qquad S_{ij} = \frac{1}{r}\sum_{m=1}^{r}\mathbb{1}\!\left[\lambda_m(i) = \lambda_m(j)\right]$$
-This value shows how often, across $r$ independent clusterings, objects $i$ and $j$ appear together in the same cluster. Part 4 Chapter 3 used this co-association idea for phase identification, building on the work of Blakely and Reno [@blakely2020coassociation]. The following sections will broaden this discussion, focusing on the general method that supports their approach.
+This value shows how often, across $r$ independent clusterings, objects $i$ and $j$ appear together in the same cluster. Part 4 Chapter 3 used this co-association idea for phase identification, building on the work of Blakely and Reno [@blakely2020coassociation].
+
+That is a real question, and a different one from whether a clustering's own structure survives the data itself coming out slightly differently, not just the algorithm's own randomness on one fixed sample. Two resampling-based methods, neither invented for smart-meter data specifically, answer that second question directly.
+
+::: {.ark-concept}
+<span class="ark-concept-title"><i class="bi bi-info-circle-fill"></i> Key Concept</span>
+
+Tibshirani and Walther's prediction strength treats clustering as an implicit classification problem [@tibshiranwalther2005predictionstrength]. Split the data into two random halves $A$ and $B$. Cluster each independently into $K$ groups. Fit centroids on $A$'s own clustering, and predict $B$'s cluster membership from those centroids by nearest distance. For each of $B$'s own clusters $C$, the co-membership agreement is
+$$\text{ps}(C) = \frac{1}{n_C(n_C - 1)} \sum_{\substack{i, i' \in C \\ i \neq i'}} \mathbb{1}\!\left[\text{pred}(i) = \text{pred}(i')\right]$$
+the fraction of same-cluster pairs in $B$ that the $A$-trained centroids also predict together. Prediction strength for $K$ is the minimum of $\text{ps}(C)$ over $B$'s own clusters. Tibshirani and Walther's own recommendation is to pick the largest $K$ with prediction strength above 0.8 to 0.9.
+:::
+
+::: {.ark-concept}
+<span class="ark-concept-title"><i class="bi bi-info-circle-fill"></i> Key Concept</span>
+
+Hennig's cluster-wise stability asks a narrower question than prediction strength: not whether $K$ as a whole is safe to trust, but whether one specific cluster survives being found again [@hennig2007clusterwise]. Bootstrap-resample the data with replacement. Fit centroids on the resample. Predict cluster membership for the entire original dataset from those centroids. Compute the Jaccard overlap between each original cluster $C$ and its best match among the predicted clusters.
+$$J(C, C') = \frac{|C \cap C'|}{|C \cup C'|}, \qquad \text{stability}(C) = \frac{1}{B}\sum_{b=1}^{B} \max_{C'_b} J(C, C'_b)$$
+averaged over $B$ bootstrap resamples. Hennig's own interpretation bands read stability below 0.5 as dissolved, 0.6 to 0.75 as patterned but not stable, and above 0.75 as stable.
+:::
+
+![Two ways to ask whether a clustering survives data coming out slightly differently. Prediction strength splits the data once and checks whether one half's own centroids still predict the other half's own pairs correctly. Cluster-wise stability bootstraps the whole dataset and checks how well one specific cluster survives being found again.](../../assets/resampling-mechanisms.svg){#fig-resampling-mechanisms}
+
+Every method above, the ensemble check and both resampling checks, ultimately compares two partitions of the same objects and needs a way to score how much they agree. Two indices do that job, each correcting for the agreement chance alone would produce.
+
+::: {.ark-concept}
+<span class="ark-concept-title"><i class="bi bi-info-circle-fill"></i> Key Concept</span>
+
+Hubert and Arabie's Adjusted Rand Index ({{< acr ARI >}}) counts every pair of objects and asks whether two partitions agree on whether that pair belongs together [@hubert1985comparing]. It then subtracts the agreement expected from random chance, and rescales so a perfect match scores 1 and a chance-level match scores 0.
+$$\text{ARI} = \frac{\sum_{ij}\binom{n_{ij}}{2} - \left[\sum_i \binom{a_i}{2}\sum_j \binom{b_j}{2}\right]\big/\binom{n}{2}}{\frac{1}{2}\left[\sum_i \binom{a_i}{2} + \sum_j \binom{b_j}{2}\right] - \left[\sum_i \binom{a_i}{2}\sum_j \binom{b_j}{2}\right]\big/\binom{n}{2}}$$
+Here $n_{ij}$ is the number of objects placed in group $i$ by one partition and group $j$ by the other at once, and $a_i$, $b_j$ are each partition's own group sizes. Strehl and Ghosh's Normalised Mutual Information ({{< acr NMI >}}) asks a related but different question, how much does knowing one partition reduce real uncertainty about the other [@strehl2002clusterensembles]:
+$$\text{NMI}(U, V) = \frac{I(U, V)}{\tfrac{1}{2}\left[H(U) + H(V)\right]}$$
+where $I(U, V)$ is the mutual information between the two partitions and $H(\cdot)$ is Shannon entropy. Neither index rewards a partition just for having a similar number of groups to the one it is compared against; both only reward it for actually grouping the same real objects together.
+:::
+
+![What ARI and NMI actually measure: agreement between two real partitions of the same objects, corrected for chance, not just matching group counts. A point whose true category and discovered cluster disagree is marked with an outline.](../../assets/ground-truth-vs-discovered-clusters.svg){#fig-ground-truth-vs-discovered-clusters}
+
+A later chapter puts all four of these methods to work on this book's own real data, and reports at least one case where a clustering that reads well on separation alone does not survive contact with a resample.
 
 ## Validating against reality
 
-Internal validity indices and ensemble stability both measure how well a clustering is structured, but neither can confirm if it is correct, and neither, on its own, can even confirm the structure it measures is real rather than an artefact of one extreme point. The next chapter turns that gap into its own central question, before any later chapter trusts a clustering result at all. Once a settled methodology has survived that check, a further chapter addresses a second, complementary gap by introducing a controlled behavioural change: a deliberate intervention with a known outcome, allowing direct comparison between clustering results and ground truth in a way no internal index or resampling check can offer by itself.
+Every method above, separation indices, balance, ensemble agreement, and resampling stability, measures how well a clustering is structured. None of them, alone or together, can confirm a clustering is correct. None can even confirm the structure it measures is real rather than an artefact of one extreme point. The next chapter turns that gap into its own central question, applying this chapter's own tools together for the first time rather than inventing new ones, before any later chapter trusts a clustering result at all. Once a settled methodology has survived that check, a further chapter addresses a second, complementary gap by introducing a controlled behavioural change: a deliberate intervention with a known outcome, allowing direct comparison between clustering results and ground truth in a way no internal index or resampling check can offer by itself.
 
 ## Where this leads
 

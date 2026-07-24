@@ -172,3 +172,60 @@ def test_load_goiener_pivot_returns_float_dtype_even_from_integer_readings(tmp_p
 
     assert (pivot.dtypes == np.float64).all()
     assert pd.api.types.is_datetime64_any_dtype(pivot.index)
+
+
+def test_load_ausnet_pivot_missing_file_raises_system_exit(tmp_path, monkeypatch):
+    monkeypatch.setattr(datasets_module, "_RESOURCES", tmp_path)
+
+    with pytest.raises(SystemExit, match="fetch_part4_ausnet_data"):
+        load_ausnet_pivot()
+
+
+def test_load_london_pivot_missing_file_raises_system_exit(tmp_path, monkeypatch):
+    monkeypatch.setattr(datasets_module, "_RESOURCES", tmp_path)
+
+    with pytest.raises(SystemExit, match="fetch_london_lcl_data"):
+        load_london_pivot()
+
+
+def test_load_goiener_pivot_missing_file_raises_system_exit(tmp_path, monkeypatch):
+    monkeypatch.setattr(datasets_module, "_RESOURCES", tmp_path)
+
+    with pytest.raises(SystemExit, match="fetch_goiener_data"):
+        load_goiener_pivot()
+
+
+def test_load_goiener_pivot_skips_non_file_and_non_target_tar_members(tmp_path, monkeypatch):
+    # A real GoiEner archive holds a directory entry (isfile() is False) and
+    # more households than any one sample targets; both real streaming-loop
+    # branches (skip non-file members, skip members outside the stratified
+    # sample) need a household pool larger than the sample to ever fire.
+    monkeypatch.setattr(datasets_module, "_RESOURCES", tmp_path)
+    data_dir = tmp_path / "goiener" / "data"
+    data_dir.mkdir(parents=True)
+    rng = np.random.default_rng(3)
+    _write_goiener_archive(data_dir / "imp-post.tzst", data_dir / "metadata.csv", rng, n_households=5)
+
+    import zstandard as zstd
+
+    archive_path = data_dir / "imp-post.tzst"
+    dctx = zstd.ZstdDecompressor()
+    with archive_path.open("rb") as fh:
+        raw_tar = dctx.decompress(fh.read())
+    buf = io.BytesIO(raw_tar)
+    with tarfile.open(fileobj=buf, mode="r") as tar:
+        members = {m.name: tar.extractfile(m).read() for m in tar.getmembers()}
+    new_buf = io.BytesIO()
+    with tarfile.open(fileobj=new_buf, mode="w") as tar:
+        dir_info = tarfile.TarInfo(name="subdir")
+        dir_info.type = tarfile.DIRTYPE
+        tar.addfile(dir_info)
+        for name, content in members.items():
+            info = tarfile.TarInfo(name=name)
+            info.size = len(content)
+            tar.addfile(info, io.BytesIO(content))
+    archive_path.write_bytes(zstd.ZstdCompressor().compress(new_buf.getvalue()))
+
+    pivot = load_goiener_pivot(n_households=3, min_coverage=0.5)
+
+    assert pivot.shape[1] <= 3  # sampled a real subset, not all 5 real households on disk
