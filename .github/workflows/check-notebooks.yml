@@ -68,26 +68,25 @@ jobs:
           # book/05-clustering/04-customer-feeder-clustering-goiener-code.ipynb
           # is the same exploratory replica against GoiEner: needs
           # resources/goiener/data/imp-post.tzst, fetched locally via
-          # scripts/fetch_goiener_data.py, gitignored, plus the zstandard
-          # package (not a project dependency, GoiEner is still only under
-          # evaluation), neither available in CI.
+          # scripts/fetch_goiener_data.py, gitignored and not available in
+          # CI (zstandard itself is now a real project dependency).
           # book/05-clustering/04-customer-feeder-clustering-goiener-tucker-code.ipynb
-          # needs the same gitignored GoiEner archive plus zstandard and
-          # tensorly (neither a project dependency).
+          # needs the same gitignored GoiEner archive plus tensorly (not a
+          # project dependency).
           # book/05-clustering/04-customer-feeder-clustering-goiener-chronos-embed-code.ipynb
-          # needs the same gitignored GoiEner archive plus zstandard, and
-          # downloads/runs the real Chronos-2 foundation model (already
-          # skip-listed elsewhere for the same real inference-cost reason
-          # as book/08-forecasting/04-foundation-models-code.ipynb).
+          # needs the same gitignored GoiEner archive, and downloads/runs
+          # the real Chronos-2 foundation model (already skip-listed
+          # elsewhere for the same real inference-cost reason as
+          # book/08-forecasting/04-foundation-models-code.ipynb).
           # book/05-clustering/04-customer-feeder-clustering-goiener-diffusion-code.ipynb
           # rebuilds both embeddings above, so needs the same gitignored
-          # archive, zstandard, tensorly, and Chronos-2 dependencies.
+          # archive, tensorly, and Chronos-2 dependencies.
           # book/05-clustering/04-customer-feeder-clustering-goiener-multires-code.ipynb
           # and book/05-clustering/04-customer-feeder-clustering-goiener-crocs-code.ipynb
-          # both need the same gitignored GoiEner archive plus zstandard
-          # (confirmed directly: both stream imp-post.tzst identically to
-          # the base GoiEner replica above), missing from the SKIP_LIST when
-          # first merged.
+          # both need the same gitignored GoiEner archive (confirmed
+          # directly: both stream imp-post.tzst identically to the base
+          # GoiEner replica above), missing from the SKIP_LIST when first
+          # merged.
           # book/05-clustering/02-clustering-methodology-code.ipynb runs a 400-trial NSGA-II
           # (Optuna) multi-objective search over feature set, scaler, reducer,
           # and clusterer as a single cell; confirmed to take about 53 minutes
