@@ -1,0 +1,657 @@
+---
+title: "Chapter 3: Customer Clustering Across Three Utilities"
+bibliography: ../../references.bib
+---
+
+Part 4 Chapter 2 plotted a handful of AusNet's 342 real households side by side
+and made one plain observation: no two profiles agree. Some households
+barely draw half a kilowatt all day. Others spike past five kilowatts
+every evening. That chart was true, and also incomplete. A {{< acr DSO >}}
+cannot plan a feeder, price a tariff, or run a demand-response program
+around 342 individual shapes. It needs a smaller number of real,
+recurring patterns underneath that mess, not an average that describes no
+one.
+
+This chapter builds those patterns from AusNet's own year of real
+smart-meter data. It checks whether a customer's pattern is a stable
+trait or a one-day snapshot, a question none of this chapter's own
+reference papers ask. And it tests whether knowing a customer's pattern
+actually predicts anything a {{< acr DSO >}} would care about: which real
+{{< acr DER >}} constraint, voltage or thermal, that customer's own
+future {{< acr PV >}} or {{< acr EV >}} adoption is likely to trigger.
+
+## Why cluster, not classify
+
+There is no ground-truth "true customer type" label for real households
+at this scale. No utility keeps one. That makes this a clustering
+problem, an unsupervised search for structure, not a classification
+problem with a known answer to check against. Part 4 Chapter 3's phase-
+identification work had a real answer to check its own clustering
+against. This chapter does not, and leans on validity indices and honest
+sensitivity checks instead.
+
+The second choice that matters is what "similar" means for a load shape.
+A small apartment and a large house can have very different absolute
+demand and still share the same underlying rhythm, both peaking in the
+evening, both quiet at 3 a.m. Clustering on raw magnitude would separate
+them by size instead of by behavior. Every profile in this chapter is
+normalized by its own peak before clustering, the same "shape, not
+magnitude" principle Part 4 Chapter 3 used for a different reason, voltage
+correlation rather than raw voltage tracked phase membership there. Here
+it is what lets a small household and a large one land in the same
+archetype when their rhythm actually matches.
+
+This is not new ground. McLoughlin, Duffy, and Conlon compared k-means,
+k-medoids, and self-organizing maps for exactly this problem, domestic
+load-shape characterization, and settled the same habit this chapter
+follows below: check more than one validity index, since no single one
+reliably picks the right number of clusters alone
+[@mcloughlin2015clustering]. Kwac, Flora, and Rajagopal built an encoded
+load-shape dictionary from real California smart-meter data to drive five
+program-relevant lifestyle segments, an early demonstration that shape-
+based clusters map onto real customer behavior, not just statistical
+artifacts [@kwac2014segmentation]. Haben, Singleton, and Grindrod
+clustered real UK residential demand directly on behavioral shape, the
+same instinct this chapter applies to AusNet's own data
+[@haben2016clustering].
+
+More recently, Rajabi et al. benchmarked clustering techniques for load-
+pattern segmentation directly, the role this chapter's own validity-index
+comparison plays for AusNet specifically [@rajabi2020comparative].
+Michalakopoulos et al. ran nearly 5,000 real London households through
+k-means, k-medoids, hierarchical, and DBSCAN clustering, adding
+explainable AI so the resulting archetypes are interpretable,
+not just numerically distinct [@michalakopoulos2024clustering]. Yerbury
+et al. pushed further still with CROCS, a two-stage framework that first
+summarizes each real consumer's own representative daily behaviors, then
+clusters consumers by how similar those behavior sets are, tested on real
+Australian smart-meter data, the most current entry in this lineage
+[@yerbury2026crocs]. None of the five, though, ask whether a customer's
+archetype holds up across a full year rather than the one window each one
+clusters on, the gap this chapter's own stability check fills.
+
+::: {.ark-concept}
+<span class="ark-concept-title"><i class="bi bi-info-circle-fill"></i> Key Concept</span>
+
+**Shape, not magnitude, is the clustering feature.** Two households can
+draw very different absolute power and still share the same underlying
+rhythm. A method that clusters on raw magnitude answers "which customers
+use a similar amount of power," a question dominated by household size.
+A method that clusters on peak-normalized shape answers "which
+customers' demand rises and falls together," the question that actually
+separates behavioral archetypes. Every result in this chapter clusters
+on shape.
+
+:::
+
+![A small apartment (peak 1.0 kW) and a large house (peak 4.5 kW) share the same evening rhythm. Clustering on raw magnitude (left) separates them by size; clustering on peak-normalized shape (right), the choice this chapter makes, groups them together because their rhythm matches.](../../assets/customer-shape-vs-magnitude.svg){#fig-shape-vs-magnitude}
+
+## Getting the data
+
+This chapter reuses the same real AusNet smart-meter pool Chapters 1
+through 3 already vendored, no new fetch step needed:
+
+```bash
+uv run python scripts/fetch_part4_ausnet_data.py
+```
+
+Later in this chapter, a real generalization check against NREL's public
+ResStock and ComStock building-stock data needs one further fetch, a
+stratified sample of 760 real US buildings across 19 real subtypes,
+complementing AusNet's own real data, not replacing it:
+
+```bash
+uv run python scripts/fetch_part5_nrel_buildstock_data.py
+```
+
+## A real season, not one day
+
+A single day is a noisy read on anyone's routine: a sick day, a weekend,
+a one-off late night. Averaging a real customer's own readings across a
+season smooths that out while staying specific to that customer, not a
+population average.
+
+{{< embed 03-customer-clustering-code.ipynb#5e9c50df >}}
+
+## A baseline worth checking, not assuming
+
+The first step is k-means. Rather than assuming the number of clusters,
+this chapter checks it with three validity indices together: the elbow
+method on inertia, the silhouette coefficient, and the Davies-Bouldin
+index, the same combination McLoughlin et al. and Rajabi et al. recommend
+checking together, since no single index reliably picks the right k alone
+[@mcloughlin2015clustering; @rajabi2020comparative].
+
+{{< embed 03-customer-clustering-code.ipynb#c55f2ee6 >}}
+
+{{< embed 03-customer-clustering-code.ipynb#c316f933 >}}
+
+The small-multiples view above puts each index on its own scale. Normalizing
+all three to a common 0-1 range and overlaying them makes the same trends
+easier to compare directly: does the elbow in inertia line up with the
+silhouette peak, or point somewhere else entirely.
+
+{{< embed 03-customer-clustering-code.ipynb#bcee7ce9 >}}
+
+The data show no clear elbow, and the silhouette coefficient peaks at
+k=2 (0.227) then decays smoothly. Real residential behavior does not
+split into a small number of cleanly separated groups, a genuine finding
+about this data, not a modeling failure. k=5 is used from here on, past
+the strict silhouette optimum (0.163 at k=5), trading a small amount of
+statistical cleanliness for archetypes specific enough to tell a real
+story with, a defensible, common choice in applied clustering work, made
+transparently rather than silently.
+
+{{< embed 03-customer-clustering-code.ipynb#6405cdb4 >}}
+
+{{< embed 03-customer-clustering-code.ipynb#9459cd85 >}}
+
+Five visually distinct rhythms: a sharp early-evening peaker, a gradual
+afternoon-into-evening riser, a late-evening peaker with a small morning
+bump, and two broadly similar late-night risers, exactly the pair the
+modest silhouette score was warning about. The chart makes concrete what
+the number only hinted at: some of these archetypes genuinely overlap.
+
+Choosing five archetypes over the strict silhouette optimum of two was a
+deliberate trade, made transparently earlier in this section rather than
+silently. Part 5 Chapter 2's own trust-gated composite score put a real
+number on exactly this kind of trade: separation bought at the cost of
+resampling trust does not average out, it gets vetoed. The same real,
+well-powered check that chapter built, prediction strength across ten
+held-out splits and cluster-wise stability across a hundred bootstrap
+resamples, run here against AusNet's own five-archetype split, prices
+that trade honestly instead of leaving it as a qualitative aside.
+
+{{< embed 03-customer-clustering-code.ipynb#3d92fcd5 >}}
+
+A prediction strength of 0.408 sits well under Tibshirani and Walther's
+own suggested 0.8 to 0.9 range, the real cost of choosing five archetypes
+for the story they tell rather than the two a stricter resampling
+standard would prefer. The minimum cluster-wise stability, 0.693, lands
+inside Hennig's own "patterned, not stable" band, not the "dissolved"
+one below it: these five archetypes are not statistical noise, but they
+are not the resampling-bulletproof structure Part 5 Chapter 2's own
+settled recipe found for London either. Both readings are the honest
+price of choosing operational richness over the maximally trustworthy
+split, not a flaw hiding behind the validity indices already reported
+above.
+
+## How much does that overlap actually matter?
+
+"Some overlap" is a qualitative read on a chart. Turning it into a number
+a {{< acr DSO >}} could actually use borrows a tool Part 4 Chapter 3 already
+built: split conformal prediction. There, it checked phase assignments
+against a known answer, flagging which customers' labels deserved a
+second look. This chapter has no known answer to check against, but the
+same tool still works, aimed at a different question: not "is this label
+correct," but "how many archetypes could this customer plausibly belong
+to."
+
+The method fits k-means on part of the customers and holds the rest back.
+For each held-back customer, it measures the distance from that
+customer's profile to its own nearest cluster centroid, a real, checkable
+number for every customer, not just the ones near a boundary. The held-
+back customers' distances pick a threshold, the value 90% of them fall
+under. Any customer, old or new, then gets a prediction *set*, not a
+single label: every archetype whose centroid sits within that same
+threshold.
+
+{{< embed 03-customer-clustering-code.ipynb#69204201 >}}
+
+{{< embed 03-customer-clustering-code.ipynb#ff2c58e3 >}}
+
+Calibrated on 103 held-back customers, the threshold sits at 1.158. Only
+90 of 342 customers (26%) get an unambiguous, single-archetype set. Most
+get two, three, or even four plausible archetypes. Twenty customers (6%)
+get an empty set: their own best-matching archetype still sits farther
+from its centroid than 90% of the held-back customers ever did, real
+households whose behavior does not confidently match any of the five
+archetypes.
+
+{{< embed 03-customer-clustering-code.ipynb#01fefd41 >}}
+
+::: {.ark-concept}
+<span class="ark-concept-title"><i class="bi bi-info-circle-fill"></i> Key Concept</span>
+
+This is the same split conformal machinery Part 4 Chapter 3 used, aimed at a
+different job. There, it flagged phase assignments worth a second look
+against a known answer. Here, with no known answer to check against, it
+still earns its keep: it turns "some of these archetypes overlap," a
+read on a chart, into a checkable, per-customer confidence set. A
+{{< acr DSO >}} deciding how much to trust an archetype-based connection
+or tariff decision now has a real number to weigh that decision against.
+
+:::
+
+![Three archetype centroids, each surrounded by a circle of radius equal to the calibrated conformal threshold. A customer inside exactly one circle gets a confident single-archetype set; inside two overlapping circles, an honest two-archetype set; outside every circle, an empty set flagging behavior that does not confidently resemble any archetype.](../../assets/cluster-confidence-set.svg){#fig-cluster-confidence-set}
+
+## Does a more advanced method earn its complexity?
+
+IDEC, Improved Deep Embedded Clustering, pretrains an autoencoder, then
+jointly optimizes a reconstruction loss and a clustering loss, in
+principle learning a representation shaped for clustering rather than
+clustering whatever k-means is handed [@guo2017idec]. Kumar and
+Mallipeddi apply the same idea to load-pattern segmentation directly,
+confirming that lineage is still active [@kumar2024deepclustering].
+Worth testing on this exact data before assuming it helps.
+
+{{< embed 03-customer-clustering-code.ipynb#f836f90b >}}
+
+{{< embed 03-customer-clustering-code.ipynb#78a91d7d >}}
+
+::: {.ark-mistake}
+<span class="ark-mistake-title"><i class="bi bi-bug-fill"></i> Common Mistake</span>
+
+**IDEC underperforms plain k-means at every k tested, and the gap widens
+as k grows.** This is not a bug. It is what happens when a deep method
+meets data too small and low-dimensional to need it: 342 customers, 48
+features, is not enough for an autoencoder's extra representational
+flexibility to earn its own complexity over a much simpler method already
+finding the same structure. The lesson is not "IDEC is bad." It is that a
+more advanced method has to prove itself on the data actually in hand,
+not get credited for sophistication it does not need here.
+
+:::
+
+## Are these archetypes stable, or a snapshot artifact?
+
+None of this chapter's ten reference papers test this directly. Every one
+clusters on a single representative period and treats the result as
+fixed. AusNet's own real data is a full year, 365 days per customer, and
+most of it goes unused once one season is picked. Re-clustering on
+different quarters and comparing the result answers a question none of
+the ten papers do: is a customer's archetype a stable trait, or does it
+drift?
+
+Checking stability needs a metric first. The Adjusted Rand Index
+({{< acr ARI >}}) compares two sets of cluster labels for the same
+customers. For every pair of customers, it asks whether both label sets
+agree on putting them together or keeping them apart. A score of 1.0
+means the two labelings agree on every pair. A score of 0.0 means the
+agreement is no better than what random labels would give by chance,
+since {{< acr ARI >}} corrects for that chance level. There is no ground
+truth to compare against here, so the two labelings being compared are
+two independent, real clusterings of the same 342 customers, one built
+from each quarter's own data. If a customer's archetype is a stable
+trait, the quarter-to-quarter clusterings should agree closely. If
+archetypes actually drift over the year, they should not.
+
+{{< embed 03-customer-clustering-code.ipynb#458153e0 >}}
+
+Every quarter clusters about as cleanly as the season used above, so
+whatever comes next is not an artifact of picking an unusually messy
+period. The real test is whether the same customer lands in a matching
+archetype across quarters, not just whether each quarter clusters
+cleanly on its own.
+
+{{< embed 03-customer-clustering-code.ipynb#71cb776b >}}
+
+The six pairwise {{< acr ARI >}} scores are a summary. The transition
+matrix below shows exactly where the disagreement comes from: which
+archetype each customer moves to between the first and the last quarter
+of the year.
+
+{{< embed 03-customer-clustering-code.ipynb#7eef3a8e >}}
+
+The {{< acr ARI >}} scores are low, between 0.06 and 0.34. The heatmap
+shows why: there is no strong diagonal. If archetypes were a fixed trait,
+most customers would keep the same label from Q1 to Q4, filling the
+diagonal cells. Instead the counts spread across the grid.
+
+Before treating this as real drift, one thing is worth checking first:
+how much do the labels move around on their own, just from re-running
+k-means on the *same* quarter with a different random seed?
+
+{{< embed 03-customer-clustering-code.ipynb#e222a411 >}}
+
+{{< embed 03-customer-clustering-code.ipynb#f230cc27 >}}
+
+::: {.ark-concept}
+<span class="ark-concept-title"><i class="bi bi-info-circle-fill"></i> Key Concept</span>
+
+Same-quarter, different-seed agreement sits at 0.96-0.99. K-means is
+highly deterministic on this data, ruling out algorithmic noise as the
+explanation. Cross-quarter agreement is 0.06-0.34, an order of magnitude
+lower, showing two clearly separated clusters of points in the chart
+above. The gap between these numbers is the actual finding: this is not
+the clustering method being unreliable. Real customers genuinely change
+which archetype they belong to as the year moves on. This is not a
+stable trait a utility can safely assume holds from one assessment to
+the next.
+
+:::
+
+## Can archetype really predict DER risk?
+
+In Part 4 Chapter 1, three ways {{< acr DER >}} strains a feeder were
+identified: fluctuation, load growth, and constraint violations. Chapter
+2 showed that {{< acr PV >}} and {{< acr EV >}} adoption bind on
+different constraints on this same feeder, voltage first for
+{{< acr PV >}}, thermal first for {{< acr EV >}}. If archetype membership
+predicts which constraint a customer is likely to trigger, network
+planning can shift from reactive, a hosting-capacity study run after a
+connection request arrives, to proactive, knowing the risk before it
+does.
+
+This is checkable directly. Part 4 Chapter 2's own `run_penetration()` sampled
+its 31-customer subset from this exact 342-customer pool with
+`np.random.default_rng(42)`. The same seed reproduces exactly which real
+customers that study used, so their archetype labels, from the
+342-customer clustering above, and their real simulated risk can be
+compared directly, not approximated.
+
+There is a solid physical reason to expect this connection, not just
+wishful thinking. An archetype describes a customer's own demand shape.
+Voltage rise from {{< acr PV >}} depends on how much power flows backward
+through the line at the moment {{< acr PV >}} output is highest, usually
+midday. A customer who already draws very little at midday leaves more
+room for that export before their own local voltage rises too far.
+Thermal loading from {{< acr EV >}} charging depends on how much extra
+power lands on the transformer at the moment it is already busiest,
+usually the evening peak. A customer whose archetype already peaks hard
+in the evening adds an {{< acr EV >}}'s charging load right on top of
+their own peak, not into a quiet period. If archetype carried no real
+information, none of this would show up in the simulation below. If it
+does, archetype becomes a genuine planning signal, not just a label.
+
+Two functions do the work. `build_ausnet_network()` rebuilds the same
+feeder Chapters 1 and 2 already solved. `per_customer_pv_voltage_risk()`
+sweeps a {{< acr PV >}} scenario across it and returns each customer's
+own worst-case bus voltage, not only the feeder-wide maximum Part 4 Chapter 2
+reported. A matching `per_customer_ev_thermal_contribution()` sweeps an
+{{< acr EV >}} scenario and returns each customer's own peak kW draw at
+the feeder's own peak-loading instant.
+
+Both scenarios use exactly the same seed and the same sampling call as
+Part 4 Chapter 2's own study, so they draw the same 31 real customers.
+
+{{< embed 03-customer-clustering-code.ipynb#8f5ed348 >}}
+
+{{< embed 03-customer-clustering-code.ipynb#ff56b6fd >}}
+
+Archetype 3 carries the highest mean voltage risk (1.1019 per-unit) but
+ranks only fourth of five on mean thermal contribution (8.38 kW).
+Archetype 2 carries the highest mean thermal contribution (10.61 kW) but
+ranks only second on voltage risk (1.0994 per-unit). Different customer
+groups lead different risks on the same feeder, mirroring Part 4 Chapter 2's own
+{{< acr PV >}}-versus-{{< acr EV >}} finding, now visible at the
+archetype level.
+
+::: {.ark-concept}
+<span class="ark-concept-title"><i class="bi bi-info-circle-fill"></i> Key Concept</span>
+
+Archetype membership carries a real signal, and it does not point the
+same way for both {{< acr DER >}} types. A {{< acr DSO >}} that only
+checks "which archetype is risky" without asking "risky for which
+constraint" would still miss half the picture. The sample is small, 31
+customers across five archetypes, so this is a real, checkable
+association worth pairing with more data before treating it as settled,
+not a large-scale statistical claim.
+
+:::
+
+## A controlled test: can clustering discover a new behavior?
+
+Every check so far describes behavior already sitting in the data. A
+{{< acr DSO >}}'s real question is forward-looking: if a specific group
+of customers started charging an {{< acr EV >}} tomorrow, would re-
+running this same clustering actually notice? That is a testable claim,
+not a hypothetical one. Take a real {{< acr EV >}} charging profile,
+inject it onto a known set of real households, and check whether
+unsupervised clustering rediscovers that group on its own, with no label
+telling it where to look.
+
+{{< embed 03-customer-clustering-code.ipynb#9182a404 >}}
+
+Add the real {{< acr EV >}} charging shape directly onto each adopter's
+own real kW draw, before normalizing, then re-cluster everyone. Two
+versions: k=5, the same number of archetypes used throughout this
+chapter, and k=6, one extra slot in case the adopters form a genuinely
+new shape rather than just relabeling an existing one.
+
+{{< embed 03-customer-clustering-code.ipynb#8a4d3a19 >}}
+
+{{< embed 03-customer-clustering-code.ipynb#adcbd769 >}}
+
+The bar chart shows *where* the adopters landed. It does not show *what*
+that cluster's shape actually looks like, or whether it resembles a real
+{{< acr EV >}} charging bump rather than an existing archetype's own
+evening peak.
+
+{{< embed 03-customer-clustering-code.ipynb#636de7d1 >}}
+
+::: {.ark-concept}
+<span class="ark-concept-title"><i class="bi bi-info-circle-fill"></i> Key Concept</span>
+
+Recall is strong: 90% of the injected households land in the same single
+cluster at k=5, and 97.5% at k=6. Purity is honest, not perfect: that
+cluster is only 38-51% actual adopters, the rest are real households
+whose own baseline behavior already looks similar to an evening-charging
+{{< acr EV >}} shape. Re-clustering does not perfectly separate every new
+adopter from a household that already resembled one, but it reliably
+flags where the new behavior concentrates. A {{< acr DSO >}} re-running
+this analysis periodically would see this cluster grow and know
+something real changed there, even without perfectly identifying every
+individual adopter.
+
+:::
+
+## Sensitivity: how much history does one clustering run need?
+
+The stability check above looks at whether an archetype remains
+consistent across different situations. But there is another, more
+practical question to consider. Within a single season, how much data
+does one clustering run actually need to be reliable?
+
+This is important for a {{< acr DSO >}} deciding whether to run this
+analysis on just the first week of readings from a new meter instead of
+waiting for a full quarter.
+
+They need to know this before considering the stability question. Chapter
+3 looked at a similar question about how much data and how many meters
+are needed for phase identification. This applies the same approach
+here.
+
+{{< embed 03-customer-clustering-code.ipynb#f2c0a5d3 >}}
+
+{{< embed 03-customer-clustering-code.ipynb#b7dbf2ef >}}
+
+A single day of data hardly matches the season-long baseline. The
+{{< acr ARI >}} for one day is 0.02, which is almost random. Even after a
+week, the score is still low at 0.11. After a month, the score improves
+to 0.35, better, but still not stable. Choosing a season-long window was
+not a random decision at the start of this analysis. It marks the point
+where the archetype labels stop changing on their own, before the
+cross-quarter stability question above even gets asked. A {{< acr DSO >}}
+trying to shortcut this analysis with a single day or week of new meter
+data would be clustering noise, not behavior.
+
+## Does this generalize beyond AusNet?
+
+Every check so far asks whether an archetype is *stable*, across quarters, across random seeds, across how much history feeds the clustering run. None of them can ask whether an archetype is *right*, because AusNet's own 342 real customers carry no independent, ground-truth label for what kind of customer each one actually is. That is not a gap this chapter can close with more AusNet data, no matter how much of it: the label simply does not exist for these real, anonymous meters.
+
+NREL's real ResStock and ComStock building-stock data, 760 real buildings stratified across 19 real subtypes from single-family homes to hospitals, does carry a genuine ground-truth label: `building_type`, assigned independently of anything this chapter's own clustering could see. Reusing the exact same recipe this chapter already committed to, peak-normalized mean daily shape, `KMeans`, no new method invented for this check, on a population where the right answer is actually known makes a real question checkable for the first time: does clustering by shape alone recover real, known categories, or does it find something else?
+
+<div class='ark-concept'>
+
+<span class='ark-concept-title'><i class="bi bi-info-circle-fill"></i> Key Concept</span>
+
+Two indices compare a discovered partition against a known one, both correcting for the agreement chance alone would produce. Hubert and Arabie's Adjusted Rand Index counts every pair of objects and asks whether the two partitions agree on whether that pair belongs together, then subtracts the agreement expected from random chance and rescales so a perfect match scores 1 and a chance-level match scores 0 [@hubert1985comparing]:
+$$\text{ARI} = \frac{\sum_{ij}\binom{n_{ij}}{2} - \left[\sum_i \binom{a_i}{2}\sum_j \binom{b_j}{2}\right]\big/\binom{n}{2}}{\frac{1}{2}\left[\sum_i \binom{a_i}{2} + \sum_j \binom{b_j}{2}\right] - \left[\sum_i \binom{a_i}{2}\sum_j \binom{b_j}{2}\right]\big/\binom{n}{2}}$$
+where $n_{ij}$ is the number of objects placed in true group $i$ and discovered group $j$ at once, and $a_i$, $b_j$ are each partition's own group sizes. Strehl and Ghosh's Normalized Mutual Information asks a different question, how much does knowing one partition reduce real uncertainty about the other [@strehl2002clusterensembles]:
+$$\text{NMI}(U, V) = \frac{I(U, V)}{\tfrac{1}{2}\left[H(U) + H(V)\right]}$$
+where $I(U,V)$ is the mutual information between the two partitions and $H(\cdot)$ is Shannon entropy. Neither index rewards a discovered partition just for having a similar number of groups to the true one; both only reward it for actually grouping the same real objects together.
+
+</div>
+
+![What ARI and NMI actually measure: agreement between two real partitions of the same objects, corrected for chance, not just matching group counts. A point whose true category and discovered cluster disagree is marked with an outline.](../../assets/ground-truth-vs-discovered-clusters.svg){#fig-ground-truth-vs-discovered-clusters}
+
+{{< embed 03-customer-clustering-code.ipynb#459405ad >}}
+
+{{< embed 03-customer-clustering-code.ipynb#510b288c >}}
+
+Every real ARI is close to 0, and every real NMI stays well short of 1, at every k tried, including k=19, matching the true number of subtypes exactly. Shape-based clustering, the same method that gave AusNet's own five archetypes real, checkable value earlier in this chapter, does not recover NREL's real building-type labels here. This is not the same question as before: AusNet's 342 customers are homes and homes only, so real archetypes there reflect genuine behavioral diversity within one functional category. NREL's 760 buildings span single-family homes, hospitals, warehouses, and schools at once, categories that plausibly differ in more than daily shape alone, and shape-based clustering alone is not enough to cleanly separate them.
+
+{{< embed 03-customer-clustering-code.ipynb#f76c2134 >}}
+
+The clusters are not a random shuffle either: one cluster comes out almost entirely commercial, another skews residential, a real, partial structure the low ARI/NMI scores do not fully credit on their own, since those indices score agreement with the full 19-way (or 5-way) label, not the coarser residential/commercial split. The honest reading holds either way: shape alone captures some real structure in a population this diverse, a known building type, occupancy schedule, or floor area would plausibly sharpen it further, and this chapter's own AusNet archetypes should be read as *behavioral* archetypes within one real customer category, not a general-purpose recipe for discovering functional building categories from shape alone.
+
+A table of ARI and NMI numbers states that finding; it does not let a reader see it. Projecting the same 48-dimensional shape embedding this chapter has used throughout down to its first two principal components, the same reduction this book's own `ark.plot.clustering.cluster_scatter` already applies everywhere else a shape embedding needs a 2D picture, turns the abstract "does not recover" verdict into something checkable by eye.
+
+{{< embed 03-customer-clustering-code.ipynb#fe2210aa >}}
+
+{{< embed 03-customer-clustering-code.ipynb#8c55a16e >}}
+
+Side by side, the two panels show exactly what the ARI/NMI numbers already reported: the five discovered clusters cut across this projection in bands that only loosely track the real residential/commercial boundary. Some discovered clusters sit almost entirely on one side of that boundary, echoing the composition table above; others straddle it, buildings whose daily shape looks similar enough to land in the same cluster despite belonging to genuinely different real categories. No amount of staring at this projection would let a reader guess the true label perfectly from the discovered one, the same limit the ARI of roughly 0.06 to 0.09 already quantified.
+
+The cluster means themselves are the more concrete artifact a {{< acr DSO >}} would actually use, the same member-profiles-and-mean chart this chapter has shown for AusNet's own archetypes throughout, now run on NREL's real, more diverse population.
+
+{{< embed 03-customer-clustering-code.ipynb#47b34867 >}}
+
+These five discovered shapes read as genuinely distinct real behaviors, and the composition table above lines up with them directly. Cluster 1, 97% commercial, shows a sharp, tall midday peak, roughly 10:00 to 14:00, the shape of a business open standard daytime hours. Cluster 4, 92% commercial, peaks narrower still, later in the afternoon. Cluster 0, three-quarters commercial, stays relatively flat and elevated across the entire day, plausible for a round-the-clock operation rather than a nine-to-five one. Cluster 2, the most residential-leaning group at 73%, is the clear outlier of the five: a broader, gentler rise into the afternoon and evening, closer to a home's own daily rhythm than any of the sharp commercial peaks. Cluster 3, the most genuinely mixed group, 40% residential, reads as a broad, low-contrast plateau, no single real behavior dominating clearly, exactly what a 60/40 mix of two different populations sharing one cluster should look like. That is a genuinely useful, real finding on its own: shape-based clustering is not producing noise, it recovers real, interpretable behavioral groups, largely tracking the coarse residential/commercial split even where it does not track the full 19-way label. What it does not reliably do, and what the ARI/NMI numbers above already quantified, is line those groups up with NREL's own independently assigned building-type labels one-to-one. A cluster that looks "sharp midday peak" plausibly contains a real mix of offices, retail spaces, and schools that all happen to draw power on the same daytime schedule for different underlying reasons, a distinction daily shape alone cannot resolve, whatever a known building type, occupancy schedule, or floor area might resolve instead.
+
+## Does this generalize to other utilities?
+
+The NREL check above asks whether shape recovers a *known* label. It is a
+different question from whether the recipe itself, peak-normalised
+shape, no dimension reduction, $K$ chosen by the same validity indices
+this chapter already uses, finds similarly coherent structure on an
+independently metered population elsewhere. London and GoiEner, loaded
+through the same shared `ark.cluster.datasets` helpers Part 5 Chapter 2's
+own cross-utility check reuses, answer that here, letting each
+population's own $K$ emerge rather than forcing AusNet's five onto it.
+
+{{< embed 03-customer-clustering-code.ipynb#ee7d137c >}}
+
+{{< embed 03-customer-clustering-code.ipynb#14e00cd5 >}}
+
+London settles on $K=2$, the same answer Part 5 Chapter 2's own
+PaCMAP-reduced search found, even with no dimension-reduction step in the
+pipeline at all: a real, independent confirmation that London's own
+two-way split is a property of the population itself, not an artefact of
+any one embedding. The resampling numbers still move, though. Prediction
+strength drops from Chapter 2's own perfect 1.000 to 0.782 here, and
+minimum cluster stability from 1.000 to 0.915, both still comfortably
+inside Tibshirani and Walther's and Hennig's own trustworthy ranges, but
+a real, measurable cost: dimension reduction is not only cosmetic, it
+finds a more resampling-robust separation than clustering on the raw
+48-dimensional shape directly. GoiEner settles on a genuinely different
+$K=4$, its own smallest cluster's stability, 0.796, and prediction
+strength, 0.546, both weaker again, consistent with the same pattern
+this chapter's own sensitivity section already established: less data,
+here a smaller real population and a coarser hourly resolution, buys
+less resampling confidence.
+
+Worth being precise about which of Chapter 2's own findings this
+reconfirms. That chapter's own search surfaced several real, differently
+resolved answers for London, not only $K=2$: a richer six-way split on
+the same shape representation and a genuinely different four-way split on
+day-to-day volatility both pass the same real resampling thresholds just
+as convincingly. This section's own no-dimension-reduction pipeline
+reconfirms specifically the *coarse* two-way resolution, independently, on
+a different embedding entirely. The richer resolutions remain a
+PaCMAP-space-specific finding, not yet checked against this chapter's own
+no-reduction convention the way $K=2$ has been here.
+
+{{< embed 03-customer-clustering-code.ipynb#383ef6fe >}}
+
+Three real populations, three different answers when no dimension
+reduction is involved: AusNet's own five, chosen for operational
+richness at a real resampling cost already quantified above; London's
+two, the same trustworthy split Chapter 2's reduced-space search found
+independently; GoiEner's four, its own real answer, not borrowed from
+either of the other two. What generalises is the recipe, peak-normalised
+shape, real validity-index-driven $K$ selection, a real resampling audit
+before trusting the result, not one fixed number of archetypes every
+utility is assumed to share.
+
+{{< embed 03-customer-clustering-code.ipynb#0a98a24d >}}
+
+{{< embed 03-customer-clustering-code.ipynb#ce6c7191 >}}
+
+London's own two archetypes read as cleanly as AusNet's five did, a
+sharper evening-peaking group against a flatter, lower one. GoiEner's
+four are less crisply separated visually, consistent with its own
+weaker resampling numbers above: real structure, read honestly, is not
+always as clean as the population that happens to anchor this chapter.
+
+The real {{< acr PV >}}/{{< acr EV >}} {{< acr DER >}}-risk
+cross-tabulation earlier in this chapter stays AusNet-network-specific:
+it needs the real OpenDSS feeder model Part 4 Chapters 1 and 2 already
+solved, and neither London nor GoiEner has a paired real network model in
+this book. What generalises here is the clustering recipe itself, not
+the {{< acr DER >}}-risk simulation built on top of it.
+
+## Why bother
+
+Part 4 Chapter 1 named three ways {{< acr DER >}} strains a feeder: fluctuation,
+load growth, and constraint violations. Every study since Part 4 Chapter 2 has
+answered "how much strain, and where" one feeder at a time, after the
+fact. This chapter's contribution is different: knowing which customers
+are likely to cause which kind of strain, before they ever apply to
+connect solar or an {{< acr EV >}} charger.
+
+**On the utility side**, the archetype-versus-risk cross-tabulation above
+is a leading indicator, not a retrospective one. Archetype 3 flags
+voltage risk; archetype 2 flags thermal risk; neither flag would exist
+without clustering customers by behavior first. A {{< acr DSO >}}
+triaging a connection queue can prioritize monitoring and reinforcement
+spend on the archetypes this chapter actually flags as high-risk, and
+pair the right lever from Part 4 Chapter 2, Volt-Watt, Volt-VAr, or storage,
+with the right archetype at connection time, instead of a one-size-fits-
+all rule applied after a hosting-capacity study finds a problem. The
+controlled {{< acr EV >}} injection test adds a second, forward-looking
+piece: re-clustering periodically would catch a new adopter cluster
+forming with 90-97.5% recall, a real early-warning signal for where
+{{< acr DER >}} adoption is concentrating, not just where it already has.
+
+**On the customer side**, the same cross-tabulation cuts the other way. A
+customer whose archetype this chapter shows as low-risk can get a faster,
+cheaper connection approval. One whose archetype shows real risk can be
+paired with the right mitigation up front, storage bundled with the
+connection, say, instead of a surprise curtailment discovered months
+later. A tariff targeted by real behavioral archetype, not a blanket
+residential rate, is a fairer cost-to-serve match for both sides of the
+meter.
+
+**The stability finding closes the loop.** This two-sided value only
+holds if an archetype-based decision stays valid after it is made. The
+conformal confidence sets above already flag which customers' archetype
+labels are solid and which are ambiguous at the moment of decision. The
+cross-quarter check goes further: it shows the label itself can drift
+within a year, 0.06-0.34 agreement against 0.96-0.99 for pure algorithmic
+noise. A stable archetype is a trustworthy basis for a connection-
+approval or tariff decision that persists. A churning one means last
+year's archetype is targeting the wrong households today, a real, costed
+risk, repeated re-clustering, or decisions quietly going stale, a
+{{< acr DSO >}} would actually have to weigh, not a hypothetical one.
+
+## Where this leaves Part 5
+
+Five real customer archetypes, tested against three separate validity
+indices rather than assumed. A deep-clustering contender that honestly
+loses to a much simpler method on this data. A conformal confidence set
+that turns "some archetypes overlap" into a checkable, per-customer
+number. A stability check none of this chapter's ten reference papers
+run, showing those archetypes are a real but genuinely time-varying
+trait, not a fixed label. A sensitivity check showing why a full season,
+not a day or a week, earns that trust. A controlled test showing
+clustering can rediscover a real behavior change with 90-97.5% recall.
+And a direct, checkable link from archetype to which real {{< acr DER >}}
+constraint, voltage or thermal, a customer's own future {{< acr PV >}} or
+{{< acr EV >}} adoption is likely to trigger.
+
+These archetypes are not the end of the story. They are a grouping key
+later parts of this book reuse, and Chapter 5 takes the same shape-based
+recipe one level up, to real feeders rather than real customers. Part 7
+builds anomaly-detection baselines
+per archetype rather than one baseline for all 342 customers pooled
+together. Part 8's own {{< acr DER >}}-growth scenarios, once built, can
+apply per archetype rather than uniformly across a feeder, using exactly
+the enrichment found above to decide where growth is likely to bind
+first.
+
+## References
+
+::: {#refs}
+:::

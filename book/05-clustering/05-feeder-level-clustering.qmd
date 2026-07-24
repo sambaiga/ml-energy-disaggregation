@@ -40,7 +40,7 @@ represents a much larger part of that feeder's customer base than the
 sample size alone suggests: samples drawn for other feeders often include
 patterns this feeder's own customers also happen to use.
 
-{{< embed 03-customer-feeder-clustering-code.ipynb#4f34063a >}}
+{{< embed 03-customer-clustering-code.ipynb#4f34063a >}}
 
 Coverage varies. Some feeders have thin coverage, only a handful of real
 customers whose sampled shape happened to match, worth keeping in mind:
@@ -51,9 +51,9 @@ sensitivity section raised for customer-level phase identification.
 
 ## Clustering the feeders themselves
 
-{{< embed 03-customer-feeder-clustering-code.ipynb#68718f7c >}}
+{{< embed 03-customer-clustering-code.ipynb#68718f7c >}}
 
-{{< embed 03-customer-feeder-clustering-code.ipynb#7def7104 >}}
+{{< embed 03-customer-clustering-code.ipynb#7def7104 >}}
 
 Clustering at the feeder level gives much clearer separation than at the
 customer level: a silhouette score of 0.67 at k=2, against 0.23 for
@@ -63,7 +63,7 @@ the customer level in the first place. Unlike the customer-level case,
 k=2 actually is the validity-index optimum here, not a compromise past
 it.
 
-{{< embed 03-customer-feeder-clustering-code.ipynb#895b3642 >}}
+{{< embed 03-customer-clustering-code.ipynb#895b3642 >}}
 
 Two distinct feeder archetypes emerge. The first shows a sharp evening
 peak and much lower daytime demand, consistent with a residential-heavy

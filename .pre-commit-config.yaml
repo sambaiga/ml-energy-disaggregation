@@ -35,8 +35,13 @@ repos:
         # and book/08-forecasting/01-forecastability-code.ipynb already exceed
         # it too; those two just never triggered this check because git sees
         # their growth as a modification to an already-tracked path, not a new
-        # "added" file, and this hook only inspects newly added paths.
-        exclude: ^book/05-clustering/(04-customer-feeder-clustering-goiener-code|london-cluster)\.ipynb$
+        # "added" file, and this hook only inspects newly added paths. A git
+        # rename (content unchanged) counts as "added" under the new path, so
+        # a renamed large notebook needs adding here explicitly too, e.g.
+        # 03-customer-clustering-code.ipynb (renamed from
+        # 03-customer-feeder-clustering-code.ipynb once its feeder-level
+        # section moved to its own chapter).
+        exclude: ^book/05-clustering/(04-customer-feeder-clustering-goiener-code|london-cluster|03-customer-clustering-code)\.ipynb$
       - id: check-docstring-first
       - id: check-shebang-scripts-are-executable
       - id: check-merge-conflict

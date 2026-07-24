@@ -143,7 +143,7 @@ description: "A structured, project-based path through smart meter data: ML foun
 <ul class="act-chapters">
 <li><a href="book/05-clustering/01-clustering-foundations.qmd"><span class="ch-num">01</span><span class="ch-name">Clustering Foundations</span><i class="bi bi-check-circle-fill ch-check"></i></a></li>
 <li><a href="book/05-clustering/02-clustering-methodology.qmd"><span class="ch-num">02</span><span class="ch-name">Clustering Methodology</span><i class="bi bi-check-circle-fill ch-check"></i></a></li>
-<li><a href="book/05-clustering/03-customer-feeder-clustering.qmd"><span class="ch-num">03</span><span class="ch-name">Customer Clustering Across Three Utilities</span><i class="bi bi-check-circle-fill ch-check"></i></a></li>
+<li><a href="book/05-clustering/03-customer-clustering.qmd"><span class="ch-num">03</span><span class="ch-name">Customer Clustering Across Three Utilities</span><i class="bi bi-check-circle-fill ch-check"></i></a></li>
 <li><span class="ch-row"><span class="ch-num">04</span><span class="ch-name">Alternative Representations, Tested Honestly</span><span class="ch-soon">Soon</span></span></li>
 <li><a href="book/05-clustering/05-feeder-level-clustering.qmd"><span class="ch-num">05</span><span class="ch-name">Feeder-Level Clustering at Scale</span><i class="bi bi-check-circle-fill ch-check"></i></a></li>
 </ul>
