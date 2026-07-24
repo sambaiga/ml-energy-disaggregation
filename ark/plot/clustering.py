@@ -47,6 +47,7 @@ from lets_plot import (
     guides,
     labs,
     layer_tooltips,
+    sampling_random_stratified,
     scale_color_manual,
     scale_shape_manual,
     scale_x_continuous,
@@ -314,6 +315,7 @@ def cluster_scatter(
     show_density: bool = False,  # New: Density contours
     density_color: str = "#6B7280",  # New: Density contour color
     tooltip_info: bool = True,
+    max_points: int | None = None,
 ) -> object:
     """Scatter a 2D embedding, colored by cluster label.
 
@@ -340,6 +342,14 @@ def cluster_scatter(
         show_density: Whether to draw density contours.
         density_color: Color used for the density contours.
         tooltip_info: Whether to include tooltips on the points.
+        max_points: If set and the embedding has more rows than this,
+            draw a random sample stratified by cluster label instead of
+            every point, so one dense majority cluster does not drown out
+            a real but small minority one, and dense scatters with
+            thousands of points stay readable rather than a solid blob.
+            Every cluster still keeps at least a handful of points via
+            lets-plot's own `min_subsample`. `None` (the default) draws
+            every point, unchanged from this function's prior behaviour.
 
     Returns:
         A lets-plot figure, ready to display in a notebook cell.
@@ -365,12 +375,18 @@ def cluster_scatter(
             .disable_splitting()
         )
 
+    sampling = None
+    if max_points is not None and len(df) > max_points:
+        min_subsample = max(5, max_points // (n_clusters * 4))
+        sampling = sampling_random_stratified(max_points, seed=0, min_subsample=min_subsample)
+
     plot = ggplot(df, aes(x="x", y="y", color="cluster", shape="cluster")) + geom_point(
         size=point_size,
         alpha=alpha,
         stroke=stroke,
         stroke_color="#1F2937",  # subtle dark edge for definition
         tooltips=tooltips,
+        sampling=sampling,
     )
     if show_density:
         plot += geom_density2d(color=density_color, size=0.45, alpha=0.65, tooltips="none")
