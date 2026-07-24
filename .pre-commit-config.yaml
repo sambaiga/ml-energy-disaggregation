@@ -41,7 +41,7 @@ repos:
         # 03-customer-clustering-code.ipynb (renamed from
         # 03-customer-feeder-clustering-code.ipynb once its feeder-level
         # section moved to its own chapter).
-        exclude: ^book/05-clustering/(04-customer-feeder-clustering-goiener-code|london-cluster|03-customer-clustering-code)\.ipynb$
+        exclude: ^book/05-clustering/(04-customer-feeder-clustering-goiener-code|02-clustering-methodology-code|03-customer-clustering-code)\.ipynb$
       - id: check-docstring-first
       - id: check-shebang-scripts-are-executable
       - id: check-merge-conflict
