@@ -1,5 +1,5 @@
 ---
-title: "Chapter 3: Customer and Feeder Clustering"
+title: "Chapter 3: Customer Clustering Across Three Utilities"
 bibliography: ../../references.bib
 ---
 
@@ -151,6 +151,30 @@ afternoon-into-evening riser, a late-evening peaker with a small morning
 bump, and two broadly similar late-night risers, exactly the pair the
 modest silhouette score was warning about. The chart makes concrete what
 the number only hinted at: some of these archetypes genuinely overlap.
+
+Choosing five archetypes over the strict silhouette optimum of two was a
+deliberate trade, made transparently earlier in this section rather than
+silently. Part 5 Chapter 2's own trust-gated composite score put a real
+number on exactly this kind of trade: separation bought at the cost of
+resampling trust does not average out, it gets vetoed. The same real,
+well-powered check that chapter built, prediction strength across ten
+held-out splits and cluster-wise stability across a hundred bootstrap
+resamples, run here against AusNet's own five-archetype split, prices
+that trade honestly instead of leaving it as a qualitative aside.
+
+{{< embed 03-customer-feeder-clustering-code.ipynb#3d92fcd5 >}}
+
+A prediction strength of 0.408 sits well under Tibshirani and Walther's
+own suggested 0.8 to 0.9 range, the real cost of choosing five archetypes
+for the story they tell rather than the two a stricter resampling
+standard would prefer. The minimum cluster-wise stability, 0.693, lands
+inside Hennig's own "patterned, not stable" band, not the "dissolved"
+one below it: these five archetypes are not statistical noise, but they
+are not the resampling-bulletproof structure Part 5 Chapter 2's own
+settled recipe found for London either. Both readings are the honest
+price of choosing operational richness over the maximally trustworthy
+split, not a flaw hiding behind the validity indices already reported
+above.
 
 ## How much does that overlap actually matter?
 
@@ -486,73 +510,66 @@ The cluster means themselves are the more concrete artifact a {{< acr DSO >}} wo
 
 These five discovered shapes read as genuinely distinct real behaviors, and the composition table above lines up with them directly. Cluster 1, 97% commercial, shows a sharp, tall midday peak, roughly 10:00 to 14:00, the shape of a business open standard daytime hours. Cluster 4, 92% commercial, peaks narrower still, later in the afternoon. Cluster 0, three-quarters commercial, stays relatively flat and elevated across the entire day, plausible for a round-the-clock operation rather than a nine-to-five one. Cluster 2, the most residential-leaning group at 73%, is the clear outlier of the five: a broader, gentler rise into the afternoon and evening, closer to a home's own daily rhythm than any of the sharp commercial peaks. Cluster 3, the most genuinely mixed group, 40% residential, reads as a broad, low-contrast plateau, no single real behavior dominating clearly, exactly what a 60/40 mix of two different populations sharing one cluster should look like. That is a genuinely useful, real finding on its own: shape-based clustering is not producing noise, it recovers real, interpretable behavioral groups, largely tracking the coarse residential/commercial split even where it does not track the full 19-way label. What it does not reliably do, and what the ARI/NMI numbers above already quantified, is line those groups up with NREL's own independently assigned building-type labels one-to-one. A cluster that looks "sharp midday peak" plausibly contains a real mix of offices, retail spaces, and schools that all happen to draw power on the same daytime schedule for different underlying reasons, a distinction daily shape alone cannot resolve, whatever a known building type, occupancy schedule, or floor area might resolve instead.
 
-## Feeder-level clustering
+## Does this generalize to other utilities?
 
-Everything above groups customers. Ledva and Mathieu and Li et al. ask
-the same question one level up: do whole feeders fall into a handful of
-aggregate archetypes too, residential-heavy, commercial-heavy, mixed,
-useful for a {{< acr DSO >}} planning investment across many feeders at
-once, not just one at a time [@ledva2020feederdemand; @li2015substation].
-AusNet's own single 31-customer feeder cannot answer this, there is only
-one of it. This section reuses SMART-DS, {{< acr NREL >}}'s real,
-validated synthetic distribution testbed for the Austin, TX region, 33
-real {{< acr LV >}} feeders across 8 substations, each with its own real
-per-building demand profiles.
+The NREL check above asks whether shape recovers a *known* label. It is a
+different question from whether the recipe itself, peak-normalised
+shape, no dimension reduction, $K$ chosen by the same validity indices
+this chapter already uses, finds similarly coherent structure on an
+independently metered population elsewhere. London and GoiEner, loaded
+through the same shared `ark.cluster.datasets` helpers Part 5 Chapter 2's
+own cross-utility check reuses, answer that here, letting each
+population's own $K$ emerge rather than forcing AusNet's five onto it.
 
-Each feeder's network model uses 200 to 350 real customer profiles from a
-shared, region-wide pool. Fetching every profile for all 33 feeders would
-mean thousands of small downloads, even though this section only needs
-each feeder's overall load shape, not every individual customer. Instead,
-the fetch script samples a real, kW-stratified subset per feeder from the
-same shared pool:
+{{< embed 03-customer-feeder-clustering-code.ipynb#ee7d137c >}}
 
-```bash
-uv run python scripts/fetch_part4_smartds_data.py
-```
+{{< embed 03-customer-feeder-clustering-code.ipynb#14e00cd5 >}}
 
-Two small helpers do the work: `feeder_load_profiles()` parses a feeder's
-own `Loads.dss` into `(customer name, kW, profile id)` triples, and
-`feeder_aggregate_shape()` sums whichever sampled profile CSVs actually
-landed on disk into one real, kW-weighted aggregate demand curve per
-feeder.
+London settles on $K=2$, the same answer Part 5 Chapter 2's own
+PaCMAP-reduced search found, even with no dimension-reduction step in the
+pipeline at all: a real, independent confirmation that London's own
+two-way split is a property of the population itself, not an artefact of
+any one embedding. The resampling numbers still move, though. Prediction
+strength drops from Chapter 2's own perfect 1.000 to 0.782 here, and
+minimum cluster stability from 1.000 to 0.915, both still comfortably
+inside Tibshirani and Walther's and Hennig's own trustworthy ranges, but
+a real, measurable cost: dimension reduction is not only cosmetic, it
+finds a more resampling-robust separation than clustering on the raw
+48-dimensional shape directly. GoiEner settles on a genuinely different
+$K=4$, its own smallest cluster's stability, 0.796, and prediction
+strength, 0.546, both weaker again, consistent with the same pattern
+this chapter's own sensitivity section already established: less data,
+here a smaller real population and a coarser hourly resolution, buys
+less resampling confidence.
 
-Since these are common, real patterns found throughout the region, and
-not unique to each customer, even a small sample from each feeder
-represents a much larger part of that feeder's customer base than the
-sample size alone suggests: samples drawn for other feeders often include
-patterns this feeder's own customers also happen to use.
+{{< embed 03-customer-feeder-clustering-code.ipynb#383ef6fe >}}
 
-{{< embed 03-customer-feeder-clustering-code.ipynb#4f34063a >}}
+Three real populations, three different answers when no dimension
+reduction is involved: AusNet's own five, chosen for operational
+richness at a real resampling cost already quantified above; London's
+two, the same trustworthy split Chapter 2's reduced-space search found
+independently; GoiEner's four, its own real answer, not borrowed from
+either of the other two. What generalises is the recipe, peak-normalised
+shape, real validity-index-driven $K$ selection, a real resampling audit
+before trusting the result, not one fixed number of archetypes every
+utility is assumed to share.
 
-Coverage varies. Some feeders have thin coverage, only a handful of real
-customers whose sampled shape happened to match, worth keeping in mind:
-their own cluster membership rests on less real evidence than a feeder
-with hundreds of matched customers (median 767, ranging 1 to 2,580), the
-same "how many meters do you need" caution Part 4 Chapter 3's own sensitivity
-section raised for customer-level phase identification.
+{{< embed 03-customer-feeder-clustering-code.ipynb#0a98a24d >}}
 
-{{< embed 03-customer-feeder-clustering-code.ipynb#68718f7c >}}
+{{< embed 03-customer-feeder-clustering-code.ipynb#ce6c7191 >}}
 
-{{< embed 03-customer-feeder-clustering-code.ipynb#7def7104 >}}
+London's own two archetypes read as cleanly as AusNet's five did, a
+sharper evening-peaking group against a flatter, lower one. GoiEner's
+four are less crisply separated visually, consistent with its own
+weaker resampling numbers above: real structure, read honestly, is not
+always as clean as the population that happens to anchor this chapter.
 
-Clustering at the feeder level gives much clearer separation than at the
-customer level: a silhouette score of 0.67 at k=2, against 0.23 for
-individual customers. This is expected, not a contradiction. Averaging at
-the feeder level smooths out the individual noise that caused overlap at
-the customer level in the first place. Unlike the customer-level case,
-k=2 actually is the validity-index optimum here, not a compromise past
-it.
-
-{{< embed 03-customer-feeder-clustering-code.ipynb#895b3642 >}}
-
-Two distinct feeder archetypes emerge. The first shows a sharp evening
-peak and much lower daytime demand, consistent with a residential-heavy
-mix. The second holds a sustained plateau through the middle of the day
-before a noisier, more irregular evening, consistent with a commercial-
-heavy mix whose demand does not track the residential dinner-and-bedtime
-rhythm the rest of this chapter has been clustering on. Exactly the
-"different customer mix" a {{< acr DSO >}} would want to plan for
-differently, now visible at the feeder level, not just guessed at.
+The real {{< acr PV >}}/{{< acr EV >}} {{< acr DER >}}-risk
+cross-tabulation earlier in this chapter stays AusNet-network-specific:
+it needs the real OpenDSS feeder model Part 4 Chapters 1 and 2 already
+solved, and neither London nor GoiEner has a paired real network model in
+this book. What generalises here is the clustering recipe itself, not
+the {{< acr DER >}}-risk simulation built on top of it.
 
 ## Why bother
 
@@ -611,11 +628,12 @@ not a day or a week, earns that trust. A controlled test showing
 clustering can rediscover a real behavior change with 90-97.5% recall.
 And a direct, checkable link from archetype to which real {{< acr DER >}}
 constraint, voltage or thermal, a customer's own future {{< acr PV >}} or
-{{< acr EV >}} adoption is likely to trigger. Two real feeder archetypes
-on top of that, the same method one level up.
+{{< acr EV >}} adoption is likely to trigger.
 
 These archetypes are not the end of the story. They are a grouping key
-later parts of this book reuse. Part 7 builds anomaly-detection baselines
+later parts of this book reuse, and Chapter 4 takes the same shape-based
+recipe one level up, to real feeders rather than real customers. Part 7
+builds anomaly-detection baselines
 per archetype rather than one baseline for all 342 customers pooled
 together. Part 8's own {{< acr DER >}}-growth scenarios, once built, can
 apply per archetype rather than uniformly across a feeder, using exactly
