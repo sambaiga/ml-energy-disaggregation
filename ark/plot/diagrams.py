@@ -3515,3 +3515,91 @@ def component_selection_diagram() -> plt.Figure:
     fig.tight_layout()
     plt.close(fig)
     return fig
+
+
+def cross_population_trust_gate_diagram() -> plt.Figure:
+    """Draw the real trust-gate verdict for each representation on each population.
+
+    A 4x2 grid, one row per representation checked against Chapter 1's own
+    promise (Tucker, Chronos-2, diffusion maps, CROCS), one column per real
+    population (GoiEner, London). Each cell's colour is the real trust-gate
+    verdict this part's own notebooks found: green for a clean pass on both
+    Tibshirani-Walther prediction strength and Hennig cluster-wise
+    stability, amber for a real, disclosed complication (passes on paper
+    but with a caveat, or a mixed result within the same representation),
+    red for a decisive failure. Only Chronos-2 passes cleanly on both real
+    populations; every other representation's own verdict depends on which
+    population it is checked against, the chapter's own central finding
+    made visible at a glance.
+
+    Returns:
+        The matplotlib Figure, ready to display in a notebook cell.
+    """
+    rows = ["CROCS\n(RLS + WSMD)", "Diffusion maps", "Chronos-2\n(zero-shot)", "Tucker\n(tensor factorisation)"]
+    cols = ["GoiEner", "London"]
+    # SUCCESS: clean pass on both real thresholds. WARNING: passes with a
+    # real, disclosed caveat, or a mixed within-population result. DANGER:
+    # decisive failure. Rows above are in bottom-to-top plot order.
+    verdicts = [
+        [WARNING, SUCCESS],  # CROCS: moderate resampling agreement (GoiEner) vs near-perfect (London)
+        [WARNING, DANGER],  # Diffusion: one rescued point (GoiEner) vs never stabilises (London)
+        [SUCCESS, SUCCESS],  # Chronos-2: decisive pass on both
+        [WARNING, DANGER],  # Tucker: peak-normalized passes with a balance caveat (GoiEner) vs fails outright (London)
+    ]
+    labels = [
+        ["Moderate\nagreement", "Near-perfect\nagreement"],
+        ["One point\nrescued", "Never\nstabilises"],
+        ["Decisive\npass", "Decisive\npass"],
+        ["Passes, but\nranked last", "Fails at\nevery k"],
+    ]
+
+    fig, ax = plt.subplots(figsize=(8.2, 5.8))
+    cell_w, cell_h = 1.0, 1.0
+    for r, row_label in enumerate(rows):
+        for c, _col_label in enumerate(cols):
+            x, y = c * cell_w, r * cell_h
+            color = verdicts[r][c]
+            ax.add_patch(
+                FancyBboxPatch(
+                    (x + 0.05, y + 0.05),
+                    cell_w - 0.1,
+                    cell_h - 0.1,
+                    boxstyle="round,pad=0.02,rounding_size=0.06",
+                    facecolor=color,
+                    alpha=0.85,
+                    edgecolor="white",
+                    linewidth=1.5,
+                )
+            )
+            ax.text(
+                x + cell_w / 2,
+                y + cell_h / 2,
+                labels[r][c],
+                ha="center",
+                va="center",
+                fontsize=9,
+                color="white",
+                fontweight="bold",
+            )
+        ax.text(-0.15, r * cell_h + cell_h / 2, row_label, ha="right", va="center", fontsize=9.5, color=TEXT_MUTED)
+
+    for c, col_label in enumerate(cols):
+        ax.text(
+            c * cell_w + cell_w / 2,
+            len(rows) * cell_h + 0.15,
+            col_label,
+            ha="center",
+            va="bottom",
+            fontsize=11,
+            color=PRIMARY,
+            fontweight="bold",
+        )
+
+    ax.set_xlim(-1.7, len(cols) * cell_w + 0.2)
+    ax.set_ylim(-0.2, len(rows) * cell_h + 0.6)
+    ax.set_aspect("equal")
+    ax.axis("off")
+
+    fig.tight_layout()
+    plt.close(fig)
+    return fig
