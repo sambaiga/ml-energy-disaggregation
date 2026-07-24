@@ -15,7 +15,7 @@ description: "A structured, project-based path through smart meter data: ML foun
 <div class="cover-stat-row">
 <div class="cover-stat"><span class="stat-value">342</span><span class="stat-label">Real households</span></div>
 <div class="cover-stat"><span class="stat-value">16</span><span class="stat-label">Appliance types</span></div>
-<div class="cover-stat"><span class="stat-value">18</span><span class="stat-label">Chapters live</span></div>
+<div class="cover-stat"><span class="stat-value">19</span><span class="stat-label">Chapters live</span></div>
 </div>
 
 <p class="cover-author">By <a href="https://sambaiga.github.io/" style="color:#38BDF8;font-weight:600">Anthony Faustine</a>&nbsp;&nbsp;<a href="https://github.com/sambaiga" title="GitHub" style="color:#94A3B8"><i class="bi bi-github"></i></a>&nbsp;<a href="https://www.linkedin.com/in/sambaiga" title="LinkedIn" style="color:#94A3B8"><i class="bi bi-linkedin"></i></a>&nbsp;<a href="mailto:sambaiga@gmail.com" title="Email" style="color:#94A3B8"><i class="bi bi-envelope-at"></i></a></p>
@@ -139,11 +139,12 @@ description: "A structured, project-based path through smart meter data: ML foun
 <div class="act-inner">
 <i class="bi bi-diagram-2-fill act-icon act-icon-5"></i>
 <span class="act-eyebrow">Part 5 · Clustering</span>
-<p class="act-desc">Theoretical foundations of clustering under DER, a settled methodology validated across three real utilities, then applying it to real AusNet customers and feeders.</p>
+<p class="act-desc">Theoretical foundations of clustering under DER, a settled methodology validated across three real utilities, then applying it to real customers across those utilities and to real feeders at scale.</p>
 <ul class="act-chapters">
 <li><a href="book/05-clustering/01-clustering-foundations.qmd"><span class="ch-num">01</span><span class="ch-name">Clustering Foundations</span><i class="bi bi-check-circle-fill ch-check"></i></a></li>
 <li><a href="book/05-clustering/02-clustering-methodology.qmd"><span class="ch-num">02</span><span class="ch-name">Clustering Methodology</span><i class="bi bi-check-circle-fill ch-check"></i></a></li>
-<li><a href="book/05-clustering/03-customer-feeder-clustering.qmd"><span class="ch-num">03</span><span class="ch-name">Customer and Feeder Clustering</span><i class="bi bi-check-circle-fill ch-check"></i></a></li>
+<li><a href="book/05-clustering/03-customer-feeder-clustering.qmd"><span class="ch-num">03</span><span class="ch-name">Customer Clustering Across Three Utilities</span><i class="bi bi-check-circle-fill ch-check"></i></a></li>
+<li><a href="book/05-clustering/04-feeder-level-clustering.qmd"><span class="ch-num">04</span><span class="ch-name">Feeder-Level Clustering at Scale</span><i class="bi bi-check-circle-fill ch-check"></i></a></li>
 </ul>
 </div>
 </div>

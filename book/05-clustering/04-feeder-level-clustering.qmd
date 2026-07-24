@@ -1,0 +1,93 @@
+---
+title: "Chapter 4: Feeder-Level Clustering at Scale"
+bibliography: ../../references.bib
+---
+
+Chapter 3 clustered customers. Ledva and Mathieu and Li et al. ask the
+same question one level up: do whole feeders fall into a handful of
+aggregate archetypes too, residential-heavy, commercial-heavy, mixed,
+useful for a {{< acr DSO >}} planning investment across many feeders at
+once, not just one at a time [@ledva2020feederdemand; @li2015substation].
+AusNet's own single 31-customer feeder cannot answer this, there is only
+one of it. This chapter uses SMART-DS, {{< acr NREL >}}'s real, validated
+synthetic distribution testbed for the Austin, TX region, 33 real
+{{< acr LV >}} feeders across 8 substations, each with its own real
+per-building demand profiles, to ask the question on a real population of
+feeders rather than one.
+
+## Getting the SMART-DS data
+
+Each feeder's network model uses 200 to 350 real customer profiles from a
+shared, region-wide pool. Fetching every profile for all 33 feeders would
+mean thousands of small downloads, even though this chapter only needs
+each feeder's overall load shape, not every individual customer. Instead,
+the fetch script samples a real, kW-stratified subset per feeder from the
+same shared pool:
+
+```bash
+uv run python scripts/fetch_part4_smartds_data.py
+```
+
+Two small helpers do the work: `feeder_load_profiles()` parses a feeder's
+own `Loads.dss` into `(customer name, kW, profile id)` triples, and
+`feeder_aggregate_shape()` sums whichever sampled profile CSVs actually
+landed on disk into one real, kW-weighted aggregate demand curve per
+feeder.
+
+Since these are common, real patterns found throughout the region, and
+not unique to each customer, even a small sample from each feeder
+represents a much larger part of that feeder's customer base than the
+sample size alone suggests: samples drawn for other feeders often include
+patterns this feeder's own customers also happen to use.
+
+{{< embed 03-customer-feeder-clustering-code.ipynb#4f34063a >}}
+
+Coverage varies. Some feeders have thin coverage, only a handful of real
+customers whose sampled shape happened to match, worth keeping in mind:
+their own cluster membership rests on less real evidence than a feeder
+with hundreds of matched customers (median 767, ranging 1 to 2,580), the
+same "how many meters do you need" caution Part 4 Chapter 3's own
+sensitivity section raised for customer-level phase identification.
+
+## Clustering the feeders themselves
+
+{{< embed 03-customer-feeder-clustering-code.ipynb#68718f7c >}}
+
+{{< embed 03-customer-feeder-clustering-code.ipynb#7def7104 >}}
+
+Clustering at the feeder level gives much clearer separation than at the
+customer level: a silhouette score of 0.67 at k=2, against 0.23 for
+individual customers. This is expected, not a contradiction. Averaging at
+the feeder level smooths out the individual noise that caused overlap at
+the customer level in the first place. Unlike the customer-level case,
+k=2 actually is the validity-index optimum here, not a compromise past
+it.
+
+{{< embed 03-customer-feeder-clustering-code.ipynb#895b3642 >}}
+
+Two distinct feeder archetypes emerge. The first shows a sharp evening
+peak and much lower daytime demand, consistent with a residential-heavy
+mix. The second holds a sustained plateau through the middle of the day
+before a noisier, more irregular evening, consistent with a commercial-
+heavy mix whose demand does not track the residential dinner-and-bedtime
+rhythm Chapter 3 was clustering on. Exactly the "different customer mix"
+a {{< acr DSO >}} would want to plan for differently, now visible at the
+feeder level, not just guessed at.
+
+## Where this leads
+
+Two real feeder archetypes, the same shape-based recipe Chapter 3 already
+settled on, applied one level up rather than re-derived for a different
+granularity. This is the first, smaller piece of a larger question this
+chapter does not yet fully answer: the same "cluster whole feeders"
+question asked again at the substation rather than the feeder, and on
+real networks larger than SMART-DS's own 33, AusNet's own SMR8, KLO14,
+HPK11, and CRE21 networks among them. `li2015substation`'s own
+substation-clustering method, cited here for the same feeder-clustering
+motivation `ledva2020feederdemand` already provides, is a real, waiting
+anchor for that larger question, not yet built.
+
+## References
+
+::: {#refs}
+:::
