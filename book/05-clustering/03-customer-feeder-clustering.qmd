@@ -631,7 +631,7 @@ constraint, voltage or thermal, a customer's own future {{< acr PV >}} or
 {{< acr EV >}} adoption is likely to trigger.
 
 These archetypes are not the end of the story. They are a grouping key
-later parts of this book reuse, and Chapter 4 takes the same shape-based
+later parts of this book reuse, and Chapter 5 takes the same shape-based
 recipe one level up, to real feeders rather than real customers. Part 7
 builds anomaly-detection baselines
 per archetype rather than one baseline for all 342 customers pooled
