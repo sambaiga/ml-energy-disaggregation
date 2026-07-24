@@ -103,9 +103,9 @@ div.csl-indent {
 <link href="../../site_libs/quarto-html/quarto-syntax-highlighting-de63f62b328812d8e578a4d74e282472.css" rel="stylesheet" class="quarto-color-scheme-extra" id="quarto-text-highlighting-styles">
 <script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="../../site_libs/bootstrap/bootstrap-84b0f63d2b22afb69d3c32ede53d2fe2.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
-<link href="../../site_libs/bootstrap/bootstrap-dark-86bd388472066654720eaf2de8d3b778.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="dark">
-<link href="../../site_libs/bootstrap/bootstrap-84b0f63d2b22afb69d3c32ede53d2fe2.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme-extra" id="quarto-bootstrap" data-mode="light">
+<link href="../../site_libs/bootstrap/bootstrap-42b40ac53c79a0c7380937c8b346a02c.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
+<link href="../../site_libs/bootstrap/bootstrap-dark-697b03a7f16093b717e6cc27e64c2b97.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="dark">
+<link href="../../site_libs/bootstrap/bootstrap-42b40ac53c79a0c7380937c8b346a02c.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme-extra" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -489,7 +489,12 @@ window.Quarto = {
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../../book/05-clustering/03-customer-feeder-clustering.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">Chapter 3: Customer and Feeder Clustering</span></a>
+  <a href="../../book/05-clustering/03-customer-clustering.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">Chapter 3: Customer Clustering Across Three Utilities</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../book/05-clustering/05-feeder-level-clustering.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">Chapter 5: Feeder-Level Clustering at Scale</span></a>
   </div>
 </li>
       </ul>
@@ -647,7 +652,7 @@ window.Quarto = {
 <img src="../../assets/forecastability-persistent-vs-volatile.svg" class="img-fluid figure-img">
 </div>
 <figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-forecastability-persistent-vs-volatile-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Figure&nbsp;16.1: Two signals sharing the same average level and daily cycle. Left: a persistent signal, low entropy, Hurst above 0.5, where yesterday’s reading genuinely predicts today’s. Right: a volatile signal, the same cycle buried under noise large enough to swamp it, high entropy, Hurst near the random-walk boundary. Every metric in this chapter measures this same real distinction from a different angle.
+Figure&nbsp;17.1: Two signals sharing the same average level and daily cycle. Left: a persistent signal, low entropy, Hurst above 0.5, where yesterday’s reading genuinely predicts today’s. Right: a volatile signal, the same cycle buried under noise large enough to swamp it, high entropy, Hurst near the random-walk boundary. Every metric in this chapter measures this same real distinction from a different angle.
 </figcaption>
 </figure>
 </div>
@@ -3050,7 +3055,7 @@ w_j = \frac{u_j}{\sum_{j'=1}^{J} u_{j'}}
 <img src="../../assets/diversity-weighted-ranking.svg" class="img-fluid figure-img">
 </div>
 <figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-diversity-weighted-ranking-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Figure&nbsp;16.2: Four pointwise-error metrics point in almost the same direction, so each is individually down-weighted; Corr points somewhere else entirely and is weighted more, exactly the diversity-weighted Borda count this chapter’s own ranking table applies to these four baselines.
+Figure&nbsp;17.2: Four pointwise-error metrics point in almost the same direction, so each is individually down-weighted; Corr points somewhere else entirely and is weighted more, exactly the diversity-weighted Borda count this chapter’s own ranking table applies to these four baselines.
 </figcaption>
 </figure>
 </div>
