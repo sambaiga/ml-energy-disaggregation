@@ -473,11 +473,9 @@ Chapter 1 already defined both indices this check needs to compare a discovered 
 $$\text{ARI} = \frac{\sum_{ij}\binom{n_{ij}}{2} - \left[\sum_i \binom{a_i}{2}\sum_j \binom{b_j}{2}\right]\big/\binom{n}{2}}{\frac{1}{2}\left[\sum_i \binom{a_i}{2} + \sum_j \binom{b_j}{2}\right] - \left[\sum_i \binom{a_i}{2}\sum_j \binom{b_j}{2}\right]\big/\binom{n}{2}}$$
 where $n_{ij}$ is the number of objects placed in true group $i$ and discovered group $j$ at once, and $a_i$, $b_j$ are each partition's own group sizes. Normalized Mutual Information asks a different question, how much does knowing one partition reduce real uncertainty about the other:
 $$\text{NMI}(U, V) = \frac{I(U, V)}{\tfrac{1}{2}\left[H(U) + H(V)\right]}$$
-where $I(U,V)$ is the mutual information between the two partitions and $H(\cdot)$ is Shannon entropy. Neither index rewards a discovered partition just for having a similar number of groups to the true one; both only reward it for actually grouping the same real objects together.
+where $I(U,V)$ is the mutual information between the two partitions and $H(\cdot)$ is Shannon entropy. Neither index rewards a discovered partition just for having a similar number of groups to the true one; both only reward it for actually grouping the same real objects together. Chapter 1's own diagram shows exactly what that means: agreement between two real partitions of the same objects, not just matching group counts.
 
 </div>
-
-![What ARI and NMI actually measure: agreement between two real partitions of the same objects, corrected for chance, not just matching group counts. A point whose true category and discovered cluster disagree is marked with an outline.](../../assets/ground-truth-vs-discovered-clusters.svg){#fig-ground-truth-vs-discovered-clusters}
 
 {{< embed 03-customer-clustering-code.ipynb#459405ad >}}
 

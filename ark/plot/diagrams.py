@@ -3159,6 +3159,59 @@ def same_blind_spot_diagram() -> plt.Figure:
     return fig
 
 
+def separation_index_blind_spot_diagram() -> plt.Figure:
+    """Draw why separation-based indices cannot tell a real split from an isolated outlier.
+
+    The general-purpose version of :func:`same_blind_spot_diagram`, generic
+    rather than tied to this book's own `MAC000037` finding, since it
+    introduces the concept before any later chapter demonstrates it on
+    real data. Left: a real, evenly sized two-way split. Right: one
+    dominant group plus two isolated points, an illustrative population
+    share, not a real book number. Both scatters are deliberately
+    unlabelled on their axes; neither is a real feature space.
+
+    Returns:
+        The matplotlib Figure, ready to display in a notebook cell.
+    """
+    rng = np.random.default_rng(7)
+
+    fig, axes = plt.subplots(1, 2, figsize=(9.4, 4.4))
+
+    ax = axes[0]
+    ax.set_title("A real split", fontsize=11.5, color=PRIMARY, fontweight="bold")
+    group_a = rng.normal(loc=(-1.4, 0.0), scale=0.35, size=(40, 2))
+    group_b = rng.normal(loc=(1.4, 0.0), scale=0.35, size=(40, 2))
+    ax.scatter(*group_a.T, s=26, color=SUCCESS, alpha=0.85, edgecolor="none")
+    ax.scatter(*group_b.T, s=26, color=INFO, alpha=0.85, edgecolor="none")
+    ax.text(0, -1.7, "well separated · 50% / 50%", fontsize=9.5, color=TEXT_MUTED, ha="center")
+
+    ax = axes[1]
+    ax.set_title("An isolated outlier", fontsize=11.5, color=PRIMARY, fontweight="bold")
+    main_group = rng.normal(loc=(0.0, 0.0), scale=0.5, size=(78, 2))
+    ax.scatter(*main_group.T, s=22, color=INFO, alpha=0.75, edgecolor="none")
+    outliers = np.array([[2.7, 1.8], [2.9, -2.0]])
+    ax.scatter(*outliers.T, s=90, color=DANGER, edgecolor="white", linewidth=1.2, zorder=3)
+    ax.text(0, -3.0, "also well separated · 98.7% / 1.3%", fontsize=9.5, color=TEXT_MUTED, ha="center")
+
+    for ax in axes:
+        ax.set_xlim(-3.0, 3.6)
+        ax.set_ylim(-3.6, 3.0)
+        ax.set_aspect("equal")
+        ax.axis("off")
+
+    fig.text(
+        0.5,
+        0.03,
+        "Same formulas, same blind spot: neither reads population share",
+        fontsize=10.5,
+        color=TEXT_MUTED,
+        ha="center",
+    )
+    fig.tight_layout(rect=(0, 0.11, 1, 1))
+    plt.close(fig)
+    return fig
+
+
 def _two_cluster_scatter(
     ax: plt.Axes,
     rng: np.random.Generator,
@@ -3378,5 +3431,87 @@ def resampling_validity_diagram() -> plt.Figure:
     _cluster_wise_stability_panel(fig.add_subplot(gs[0, 1]), rng)
     _stability_gauge_panel(fig.add_subplot(gs[1, :]))
 
+    plt.close(fig)
+    return fig
+
+
+def resampling_mechanisms_diagram() -> plt.Figure:
+    """Draw the two resampling mechanisms on their own, with no real-data verdict attached.
+
+    The general-purpose, illustrative version of the top row of
+    :func:`resampling_validity_diagram`, reusing the same two panel
+    functions unchanged. This one carries no book-specific numbers, since
+    it introduces the two mechanisms themselves, before any later chapter
+    applies them to this book's own real data.
+
+    Returns:
+        The matplotlib Figure, ready to display in a notebook cell.
+    """
+    rng = np.random.default_rng(11)
+
+    fig, axes = plt.subplots(1, 2, figsize=(11.4, 5.4))
+    _prediction_strength_panel(axes[0], rng)
+    _cluster_wise_stability_panel(axes[1], rng)
+
+    fig.tight_layout()
+    plt.close(fig)
+    return fig
+
+
+def component_selection_diagram() -> plt.Figure:
+    """Draw why a fixed variance threshold and profile likelihood can disagree on how many components to keep.
+
+    One illustrative eigenvalue spectrum, one dominant direction followed
+    by a long, smoothly decaying tail, the shape this book's own real
+    load-shape spectra share. The 90%-cumulative-variance rule and Zhu and
+    Ghodsi's profile-likelihood change point are marked at different
+    points along that same curve, since the tail decays too smoothly for
+    either method to agree on where it stops mattering by construction.
+
+    Returns:
+        The matplotlib Figure, ready to display in a notebook cell.
+    """
+    rng = np.random.default_rng(4)
+    p = 14
+    eigenvalues = 9.0 * np.exp(-0.55 * np.arange(p)) + 0.15
+    eigenvalues += rng.normal(0, 0.03, size=p)
+    eigenvalues = np.sort(eigenvalues)[::-1]
+    cumulative = np.cumsum(eigenvalues) / eigenvalues.sum()
+    variance_q = int(np.searchsorted(cumulative, 0.90) + 1)
+    profile_q = 2  # illustrative: profile likelihood finds the one genuine change point early
+
+    fig, ax = plt.subplots(figsize=(8.6, 4.8))
+    components = np.arange(1, p + 1)
+    ax.plot(components, eigenvalues, color=PRIMARY, linewidth=1.8, zorder=2)
+    ax.scatter(components, eigenvalues, color=PRIMARY, s=32, zorder=3)
+
+    ax.axvline(profile_q + 0.5, color=SUCCESS, linewidth=1.6, linestyle="--", zorder=1)
+    ax.text(
+        profile_q + 0.65,
+        eigenvalues[0] * 0.92,
+        f"profile likelihood\nstops at q={profile_q}",
+        fontsize=9,
+        color=SUCCESS,
+        fontweight="bold",
+        va="top",
+    )
+    ax.axvline(variance_q + 0.5, color=WARNING, linewidth=1.6, linestyle="--", zorder=1)
+    ax.text(
+        variance_q + 0.65,
+        eigenvalues[0] * 0.55,
+        f"90% variance rule\nstops at q={variance_q}",
+        fontsize=9,
+        color=WARNING,
+        fontweight="bold",
+        va="top",
+    )
+
+    ax.set_xlabel("Component index", fontsize=10, color=TEXT_MUTED)
+    ax.set_ylabel("Eigenvalue", fontsize=10, color=TEXT_MUTED)
+    ax.set_xticks(components)
+    ax.spines[["top", "right"]].set_visible(False)
+    ax.tick_params(colors=TEXT_MUTED, labelsize=8.5)
+
+    fig.tight_layout()
     plt.close(fig)
     return fig

@@ -82,6 +82,8 @@ $$\ell(q) = \sum_{i=1}^{q} \log \mathcal{N}(\lambda_i \mid \mu_1, \sigma^2) + \s
 where $\lambda_1 \geq \dots \geq \lambda_p$ are the ordered eigenvalues, $\mu_1, \mu_2$ are each group's own mean, and $\sigma^2$ is pooled across both so the profile likelihood cannot diverge by shrinking one group's variance to zero. A later chapter checks this method directly against the fixed 90%-variance rule on this book's own real data, and reports where the two agree and where they genuinely diverge.
 :::
 
+![An illustrative eigenvalue spectrum, one dominant direction followed by a long, smoothly decaying tail. The 90%-variance rule and profile likelihood's own change point land at genuinely different points along the same curve, since a smoothly decaying tail gives neither method an obvious place to stop by construction.](../../assets/component-selection.svg){#fig-component-selection}
+
 ::: {.ark-mistake}
 <span class="ark-mistake-title"><i class="bi bi-bug-fill"></i> Common Mistake</span>
 
@@ -136,6 +138,8 @@ $$H(\mathbf{p}) = -\sum_{k=1}^{K} p_k \log p_k, \qquad p_k = n_k / n$$
 normalised to $[0, 1]$ by dividing by $\log K$, its own maximum when every cluster is exactly the same size. Balance is cheap to compute and needs no resampling, but it is a symptom check, not proof that a cluster is real: a genuine rare archetype and a fabricated one can both score low. A later chapter finds a concrete, real example of separation-index agreement hiding exactly this failure, and builds a decision rule around balance and resampling evidence together rather than separation alone.
 :::
 
+![Two illustrative populations, both reading as well separated by every formula above. Left: a real, even two-way split. Right: one dominant group plus two isolated points, a genuine outlier rather than a real archetype. Neither silhouette, Davies-Bouldin, nor Calinski-Harabasz has a term for population share, so both score as a win.](../../assets/separation-index-blind-spot.svg){#fig-separation-index-blind-spot}
+
 ## Choosing K
 
 The silhouette coefficient serves a dual purpose. When averaged across all points, it helps determine the actual number of clusters in a population, eliminating the need for a distortion curve's elbow.
@@ -174,6 +178,8 @@ $$J(C, C') = \frac{|C \cap C'|}{|C \cup C'|}, \qquad \text{stability}(C) = \frac
 averaged over $B$ bootstrap resamples. Hennig's own interpretation bands read stability below 0.5 as dissolved, 0.6 to 0.75 as patterned but not stable, and above 0.75 as stable.
 :::
 
+![Two ways to ask whether a clustering survives data coming out slightly differently. Prediction strength splits the data once and checks whether one half's own centroids still predict the other half's own pairs correctly. Cluster-wise stability bootstraps the whole dataset and checks how well one specific cluster survives being found again.](../../assets/resampling-mechanisms.svg){#fig-resampling-mechanisms}
+
 Every method above, the ensemble check and both resampling checks, ultimately compares two partitions of the same objects and needs a way to score how much they agree. Two indices do that job, each correcting for the agreement chance alone would produce.
 
 ::: {.ark-concept}
@@ -185,6 +191,8 @@ Here $n_{ij}$ is the number of objects placed in group $i$ by one partition and 
 $$\text{NMI}(U, V) = \frac{I(U, V)}{\tfrac{1}{2}\left[H(U) + H(V)\right]}$$
 where $I(U, V)$ is the mutual information between the two partitions and $H(\cdot)$ is Shannon entropy. Neither index rewards a partition just for having a similar number of groups to the one it is compared against; both only reward it for actually grouping the same real objects together.
 :::
+
+![What ARI and NMI actually measure: agreement between two real partitions of the same objects, corrected for chance, not just matching group counts. A point whose true category and discovered cluster disagree is marked with an outline.](../../assets/ground-truth-vs-discovered-clusters.svg){#fig-ground-truth-vs-discovered-clusters}
 
 A later chapter puts all four of these methods to work on this book's own real data, and reports at least one case where a clustering that reads well on separation alone does not survive contact with a resample.
 
