@@ -7,7 +7,14 @@ import pandas as pd
 import pytest
 
 import ark.cluster.datasets as datasets_module
-from ark.cluster.datasets import load_ausnet_shape, load_goiener_shape, load_london_shape
+from ark.cluster.datasets import (
+    load_ausnet_pivot,
+    load_ausnet_shape,
+    load_goiener_pivot,
+    load_goiener_shape,
+    load_london_pivot,
+    load_london_shape,
+)
 
 
 def test_load_ausnet_shape_missing_file_raises_system_exit(tmp_path, monkeypatch):
@@ -34,6 +41,26 @@ def test_load_ausnet_shape_returns_peak_normalised_whole_year_mean(tmp_path, mon
     assert shape.shape == (3, 4)
     assert np.isclose(shape.to_numpy().max(axis=1), 1.0).all()  # every household peaks at exactly 1.0
     assert list(shape.index) == [0, 1, 2]
+
+
+def test_load_ausnet_pivot_returns_a_real_datetime_index_and_float_dtype(tmp_path, monkeypatch):
+    monkeypatch.setattr(datasets_module, "_RESOURCES", tmp_path)
+    data_dir = tmp_path / "cvar_flexibility" / "data" / "timeseries-lv"
+    data_dir.mkdir(parents=True)
+
+    rng = np.random.default_rng(0)
+    # Integer-valued readings (a real edge case: some real households' whole
+    # window happens to round to whole numbers, which numpy/pandas would
+    # otherwise infer as int64, failing extract_features's own float64
+    # contract downstream).
+    load_data = rng.integers(0, 5, size=(2, 360, 4)).astype(np.float64)
+    np.save(data_dir / "Residential load data 30-min resolution.npy", load_data)
+
+    pivot = load_ausnet_pivot()
+
+    assert pivot.shape == (360 * 4, 2)
+    assert pd.api.types.is_datetime64_any_dtype(pivot.index)
+    assert (pivot.dtypes == np.float64).all()
 
 
 def _write_london_archive(path, rng, n_households=3, n_days=360):
@@ -65,6 +92,23 @@ def test_load_london_shape_returns_peak_normalised_whole_year_mean(tmp_path, mon
 
     assert shape.shape == (3, 48)
     assert np.isclose(shape.to_numpy().max(axis=1), 1.0).all()
+
+
+def test_load_london_pivot_returns_float_dtype_even_from_integer_readings(tmp_path, monkeypatch):
+    monkeypatch.setattr(datasets_module, "_RESOURCES", tmp_path)
+    data_dir = tmp_path / "london-lcl" / "data"
+    data_dir.mkdir(parents=True)
+
+    class _IntegerRNG:
+        def uniform(self, low, high, size):
+            return np.zeros(size)  # every reading is exactly 0.0, a real int-like edge case
+
+    _write_london_archive(data_dir / "Partitioned LCL Data.zip", _IntegerRNG())
+
+    pivot = load_london_pivot(n_partitions=1, min_coverage=0.5)
+
+    assert (pivot.dtypes == np.float64).all()
+    assert pd.api.types.is_datetime64_any_dtype(pivot.index)
 
 
 def _write_goiener_archive(archive_path, metadata_path, rng, n_households=3, n_days=360):
@@ -111,3 +155,20 @@ def test_load_goiener_shape_returns_peak_normalised_whole_year_mean(tmp_path, mo
 
     assert shape.shape == (3, 24)
     assert np.isclose(shape.to_numpy().max(axis=1), 1.0).all()
+
+
+def test_load_goiener_pivot_returns_float_dtype_even_from_integer_readings(tmp_path, monkeypatch):
+    monkeypatch.setattr(datasets_module, "_RESOURCES", tmp_path)
+    data_dir = tmp_path / "goiener" / "data"
+    data_dir.mkdir(parents=True)
+
+    class _ZeroRNG:
+        def uniform(self, low, high, size):
+            return np.zeros(size)  # every reading exactly 0.0, the real int64-inference edge case
+
+    _write_goiener_archive(data_dir / "imp-post.tzst", data_dir / "metadata.csv", _ZeroRNG())
+
+    pivot = load_goiener_pivot(n_households=3, min_coverage=0.5)
+
+    assert (pivot.dtypes == np.float64).all()
+    assert pd.api.types.is_datetime64_any_dtype(pivot.index)
