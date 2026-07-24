@@ -119,6 +119,31 @@ bump, and two broadly similar late-night risers, exactly the pair the
 modest silhouette score was warning about. The chart makes concrete what
 the number only hinted at: some of these archetypes genuinely overlap.
 
+### Does the clustering algorithm matter here too?
+
+Part 5 Chapter 2 found that k-means, Gaussian mixture, and agglomerative
+clustering return the identical partition once feature, scaler, and
+reducer are already fixed. That finding was checked on London's own
+PaCMAP-reduced embedding at $K=2$, not on AusNet's own raw
+48-dimensional shape at $K=5$. A different population, a different
+dimensionality, and a different $K$ is exactly the kind of change that
+could break an inherited assumption rather than confirm it, so it gets
+checked directly here, not assumed to travel.
+
+{{< embed 03-customer-clustering-code.ipynb#11a0708c >}}
+
+Unlike London's own clean two-way split, the clusterer choice is not
+free here. k-means and Gaussian mixture come close, nearly identical
+silhouette (0.163 against 0.162) and balance (0.975 against 0.972), and
+a real but imperfect agreement (Adjusted Rand Index 0.876). Agglomerative
+clustering diverges more. Its silhouette drops to 0.129 and it agrees
+with k-means on barely half the population (Adjusted Rand Index 0.456).
+Five overlapping archetypes leave real room for algorithms to disagree,
+room a cleanly separated two-way split simply does not have. k-means
+remains this chapter's own reasonable, defensible choice. It is not
+interchangeable with every other family the way Chapter 2's own
+easier case suggested.
+
 Choosing five archetypes over the strict silhouette optimum of two was a
 deliberate trade, made transparently earlier in this section rather than
 silently. Part 5 Chapter 2's own trust-gated composite score put a real
