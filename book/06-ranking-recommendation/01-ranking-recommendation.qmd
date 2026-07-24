@@ -4,14 +4,14 @@ bibliography: ../../references.bib
 ---
 
 A rooftop-solar application lands in a {{< acr DSO >}}'s connection queue.
-The archetype lookup Part 5 Chapter 2 built says this customer belongs to
+The archetype lookup Part 5 Chapter 3 built says this customer belongs to
 Archetype 3, the same bucket 63 other applicants this quarter also landed
 in. Nine of those 64 turned out, on inspection, to be genuine voltage
 risks. Fifty-five did not. The archetype label is real, and it is also
 useless for the one decision actually sitting in front of someone right
 now: not "how does this bucket of 64 people behave on average," but
 "should this one customer's application go through today, and if not,
-what fixes it." Part 5 Chapter 2 sorted the crowd. This chapter has to answer
+what fixes it." Part 5 Chapter 3 sorted the crowd. This chapter has to answer
 for the individual standing at the counter.
 
 Three chained questions carry that individual decision the rest of the
@@ -116,7 +116,7 @@ graph structure, and a real {{< acr LV >}} feeder genuinely is a graph
 [@he2020lightgcn]. That is a real, checkable extension for later, not a
 stretch, but it would add real complexity this chapter's own small,
 structured data does not need to earn back right now, the same lesson
-Part 5 Chapter 2 already drew from {{< acr IDEC >}}.
+Part 5 Chapter 3 already drew from {{< acr IDEC >}}.
 
 ## Getting the data
 
@@ -135,7 +135,7 @@ network, fetched separately:
 uv run python scripts/fetch_part4_uk_mvlv_data.py
 ```
 
-The generalization check later in this chapter reuses Part 5 Chapter 2's
+The generalization check later in this chapter reuses Part 5 Chapter 3's
 own {{< acr NREL >}} sample, a stratified 760 real US buildings, fetched the
 same way:
 
@@ -143,14 +143,14 @@ same way:
 uv run python scripts/fetch_part5_nrel_buildstock_data.py
 ```
 
-Part 5 Chapter 2's own embedding, a peak-normalized, season-mean load
+Part 5 Chapter 3's own embedding, a peak-normalized, season-mean load
 shape per customer, and its k-means archetype labels, are recomputed here exactly
 as that chapter built them, not loaded from a saved file, so this chapter
 stays reproducible on its own.
 
 ## Building a real labeled risk set
 
-Part 5 Chapter 2's own `per_customer_pv_voltage_risk()` and
+Part 5 Chapter 3's own `per_customer_pv_voltage_risk()` and
 `per_customer_ev_thermal_contribution()` are real, working simulators, and
 each call only labels 31 customers, one per physical bus on AusNet's real
 feeder, sampled by a seed from the 342-customer pool. A single seed is not
@@ -210,7 +210,7 @@ whose real load shape looks most like this one, and use their
 already-simulated risk as a fast, defensible stand-in.
 
 The real test is not whether this technique runs. It is whether it beats
-what Part 5 Chapter 2 already offers for free: the coarser, five-bucket
+what Part 5 Chapter 3 already offers for free: the coarser, five-bucket
 archetype mean. If retrieval cannot beat that simpler baseline, it has
 not earned the extra machinery, the same discipline this book applied to
 {{< acr IDEC >}}.
@@ -273,7 +273,7 @@ actual mistake to avoid here.
 
 A predicted value alone says nothing about how confident it is. Part 4
 Chapter 3 built a split-conformal confidence set around cluster
-membership using distance to a centroid; Part 5 Chapter 2 reused the
+membership using distance to a centroid; Part 5 Chapter 3 reused the
 same idea for archetype confidence. The same machinery generalizes directly here: instead of
 distance to a cluster's own centroid, use distance to a query customer's
 single nearest labeled neighbor. A customer with a close real neighbor
@@ -313,7 +313,7 @@ dressed up to look like one.
 Eight customers, 2.7% of the labeled pool, get flagged: real households
 whose nearest labeled neighbor sits farther away than 90% of a held-back
 calibration set ever needed to travel to find its own match. That is a
-similar rate to Part 5 Chapter 2's own archetype-membership finding, where 6% of
+similar rate to Part 5 Chapter 3's own archetype-membership finding, where 6% of
 the full 342-customer pool got an empty prediction set. Two different
 conformal mechanisms, on two different questions, land on a similar
 honest answer: a real minority of customers do not resemble anyone else
@@ -336,7 +336,7 @@ real and both useful.
 {{< embed 01-ranking-recommendation-code.ipynb#8bf39dff >}}
 
 The combined score deliberately takes the worse of the two normalized
-risks, not their average. Part 5 Chapter 2 already found that different
+risks, not their average. Part 5 Chapter 3 already found that different
 archetypes lead different {{< acr DER >}} risks, the same customer rarely
 tops both lists at once, and averaging away that distinction would hide
 exactly the finding worth keeping visible. This is a simple, transparent
@@ -378,7 +378,7 @@ than a connection-queue processor [@hardowar2017restoration].
 
 The voltage-risk leader and the thermal-risk leader are different bus
 positions, the same "different risk, different location" finding
-Part 5 Chapter 2 made at the archetype level, now visible at the
+Part 5 Chapter 3 made at the archetype level, now visible at the
 physical-location level a network planner actually acts on. A
 reinforcement plan built around a single "worst bus" number would miss
 that half the risk on this feeder sits somewhere else entirely.
@@ -507,7 +507,7 @@ that far past their fair share; a bigger unit or a smarter schedule is a
 real, separate question this chapter leaves open rather than quietly
 resolves. Retrieval, restricted to cases of the same violation type,
 still routes each customer to the right lever family using nothing but
-Part 5 Chapter 2's own ordinary load-shape embedding, never told directly
+Part 5 Chapter 3's own ordinary load-shape embedding, never told directly
 whether a given case is voltage- or thermal-driven, the real payoff of
 content-based retrieval here.
 
@@ -578,7 +578,7 @@ this particular batch, an honest result rather than a manufactured one.
 
 ## Does retrieval generalize to a genuinely different real population?
 
-Part 5 Chapter 2 already asked a version of this question at the archetype
+Part 5 Chapter 3 already asked a version of this question at the archetype
 level: does shape-based clustering, run on 760 real {{< acr NREL >}}
 ResStock and ComStock buildings, recover a genuinely different
 population's own real ground-truth building types? It found a real,
@@ -608,7 +608,7 @@ $$
 \hat{y}(x) = \frac{1}{k}\sum_{i \in N_k(x)} y_i
 $$
 where $N_k(x)$ is the k closest labeled points to a query $x$ by Euclidean
-distance in the same peak-normalized shape embedding Part 5 Chapter 2
+distance in the same peak-normalized shape embedding Part 5 Chapter 3
 built. The
 technique's whole assumption is that nearby points in that embedding
 space share similar real outcomes. Nothing about that assumption
@@ -626,7 +626,7 @@ Retrieval, trained purely on 342 real AusNet customers, does not beat a
 plain population-mean baseline here, and its predictions carry a
 slightly negative rank correlation with these real US buildings' own
 actual evening peaks. That is not a bug in the k-nearest-neighbor code,
-it is the same honest limit Part 5 Chapter 2 already found at the clustering
+it is the same honest limit Part 5 Chapter 3 already found at the clustering
 level, now visible one level sharper: a real, different population's own
 relationship between daily shape and peak demand, driven by a different
 climate and a different heating and cooling technology mix, is not
@@ -848,9 +848,9 @@ silently extrapolating.
 Every technique above is checked against real, simulated outcomes on two real networks, AusNet's own 31-customer feeder and a second country's real 334-feeder topology. Naming what that real data still cannot settle is the same discipline this chapter has applied to every one of its own findings.
 
 **The embedding's own assumption is stated, not proven for every case.** Retrieval and ranking both work in the peak-normalized shape space
-Part 5 Chapter 2 built, on the assumption that customers close in that space share close real outcomes. The variance-decomposition check earlier in this chapter already found where that assumption holds, thermal risk, and where it does not, voltage risk depends on bus position too, a real, physical reason, not a defect in the embedding itself. What that check cannot say is whether a *different* similarity metric, one that also encoded electrical distance or phase, would close the voltage-risk gap. That is a real, concrete extension, not attempted here because this chapter's own smart-meter-only scope has no electrical-distance feature to add.
+Part 5 Chapter 3 built, on the assumption that customers close in that space share close real outcomes. The variance-decomposition check earlier in this chapter already found where that assumption holds, thermal risk, and where it does not, voltage risk depends on bus position too, a real, physical reason, not a defect in the embedding itself. What that check cannot say is whether a *different* similarity metric, one that also encoded electrical distance or phase, would close the voltage-risk gap. That is a real, concrete extension, not attempted here because this chapter's own smart-meter-only scope has no electrical-distance feature to add.
 
-**Hyperparameters here are chosen for consistency with earlier chapters, not independently tuned against a held-out objective.** $k=5$ for retrieval matches the same neighbor count Part 5 Chapter 2
+**Hyperparameters here are chosen for consistency with earlier chapters, not independently tuned against a held-out objective.** $k=5$ for retrieval matches the same neighbor count Part 5 Chapter 3
 used for its own archetype work, reused rather than re-tuned; $\alpha=0.1$ for every conformal threshold in this book fixes coverage at the same 90% used throughout, and Section 1 of Part 7 Chapter 1 later makes that exact tradeoff,
 coverage against flagging rate, fully explicit rather than assuming one
 value is universally right. The bootstrap rank interval's 200 resamples was not swept against a smaller count to check where the interval stabilizes, an honest gap, not a claim of having checked it. None of these were grid-searched against a held-out objective, because this chapter's own real labeled pool, a few hundred customers, is not large enough to tune hyperparameters and validate the tuning independently at the same time; a real utility deployment with a genuinely large labeled pool could do both.
@@ -858,14 +858,14 @@ value is universally right. The bootstrap rank interval's 200 resamples was not 
 **Scalability is answerable directly, the same way Part 4 Chapter 3
 answered it for phase identification.** Retrieval costs $O(n \log n)$ to build the nearest-neighbor index and $O(\log n)$ per query with a standard tree structure, cheap at any real utility scale. Ranking a candidate pool of size $n$ costs $O(n \log n)$ to sort, and the bootstrap confidence interval multiplies that by 200 resamples, still trivial into the tens of thousands of candidates. Recommendation's own case-based retrieval scales the same way as customer-level retrieval. Nothing in this chapter's own machinery is the bottleneck at scale; the real constraint is the same one Part 4 Chapter 3 named, how many real, OpenDSS-simulated labels exist to retrieve from or rank in the first place, which grows with simulation budget, not with this chapter's own algorithms.
 
-**Deployment is a real, statable sequence.** A {{< acr DSO >}} adopting this needs, in order: each customer's own smart-meter history (already collected for billing); Part 5 Chapter 2's own archetype embedding recomputed on the utility's real population; a labeled risk set built the same way this chapter built one, real OpenDSS runs across enough seeds to cover the customer base at least once; and the same conformal calibration this chapter uses throughout to decide, honestly, which retrieved predictions to trust. Validating this before a real rollout means exactly what this chapter itself did: check retrieval and ranking against genuinely held-out real cases, the five new adopters and the 334 UK feeders here, before trusting either on a customer or a network the method was never checked against.
+**Deployment is a real, statable sequence.** A {{< acr DSO >}} adopting this needs, in order: each customer's own smart-meter history (already collected for billing); Part 5 Chapter 3's own archetype embedding recomputed on the utility's real population; a labeled risk set built the same way this chapter built one, real OpenDSS runs across enough seeds to cover the customer base at least once; and the same conformal calibration this chapter uses throughout to decide, honestly, which retrieved predictions to trust. Validating this before a real rollout means exactly what this chapter itself did: check retrieval and ranking against genuinely held-out real cases, the five new adopters and the 334 UK feeders here, before trusting either on a customer or a network the method was never checked against.
 
-**What to do when retrieval or ranking fails is already answered here for the case this chapter found, not for every possible one.** The honest answer for voltage risk is not "use retrieval anyway," it is "route back to Part 5 Chapter 2's own coarser archetype mean,
+**What to do when retrieval or ranking fails is already answered here for the case this chapter found, not for every possible one.** The honest answer for voltage risk is not "use retrieval anyway," it is "route back to Part 5 Chapter 3's own coarser archetype mean,
 or fall back to a full network study," exactly what the calibrated confidence gate already does for a customer whose nearest neighbor sits too far away. A genuinely new failure mode, one this chapter's own real data has not produced, would need the same honest diagnosis this chapter modeled: check the variance decomposition first, do not assume a fix before finding the real cause.
 
 ## Where this leaves Part 6
 
-Part 5 Chapter 2 sorted 342 real customers into five archetypes. This chapter
+Part 5 Chapter 3 sorted 342 real customers into five archetypes. This chapter
 sharpened that signal to the level a real decision actually needs, and
 then checked how far that signal actually travels. Retrieval predicts a
 new customer's thermal risk well and is honest about not predicting their
